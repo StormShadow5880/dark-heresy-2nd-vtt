@@ -1,1 +1,74 @@
 
+name: Build and Publish Foundry System
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Update system version and URLs
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+
+          const tag = process.env.RELEASE_TAG;
+          const version = tag.replace(/^v/, '');
+          const repo = process.env.GITHUB_REPOSITORY;
+          const path = 'src/system.json';
+
+          if (!/^\d+\.\d+\.\d+$/.test(version)) {
+            throw new Error('Invalid release version: ' + tag);
+          }
+
+          const system = JSON.parse(fs.readFileSync(path, 'utf8'));
+
+          system.version = version;
+          system.url = `https://github.com/${repo}`;
+          system.manifest = `https://github.com/${repo}/releases/latest/download/system.json`;
+          system.download = `https://github.com/${repo}/releases/download/${tag}/dark-heresy-2nd-${version}.zip`;
+
+          fs.writeFileSync(path, JSON.stringify(system, null, 2) + '\n');
+          NODE
+
+      - name: Build Foundry system
+        run: npm run build
+
+      - name: Verify build
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          VERSION="${RELEASE_TAG#v}"
+          test -f "archive/dark-heresy-2nd-${VERSION}.zip"
+          test -f "build/dark-heresy-2nd/system.json"
+
+      - name: Upload release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          VERSION="${RELEASE_TAG#v}"
+          gh release upload "$RELEASE_TAG" \
+            "archive/dark-heresy-2nd-${VERSION}.zip" \
+            "build/dark-heresy-2nd/system.json" \
+            --clobber
