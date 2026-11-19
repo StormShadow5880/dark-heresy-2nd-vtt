@@ -36,6 +36,18 @@ export function DHSheetMixin(Base) {
         /** The tab that is shown when the sheet is opened */
         static DEFAULT_TAB = 'main';
 
+        /** Only show the document name, the default V2 title is prefixed by the (unlocalized) document type. */
+        get title() {
+            return this.document.name;
+        }
+
+        async _onFirstRender(context, options) {
+            await super._onFirstRender(context, options);
+            // Make sure the configured size is used, the content has a fixed layout
+            const position = this.constructor.DEFAULT_OPTIONS?.position;
+            if (position && !options?.position) this.setPosition(position);
+        }
+
         async _prepareContext(options) {
             const context = await super._prepareContext(options);
             context.dh = CONFIG.dh;
