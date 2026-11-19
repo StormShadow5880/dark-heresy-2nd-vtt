@@ -55,6 +55,12 @@
     }
 }
 
+// The ornamental sheet border is dark and needs the light parchment behind it (the V1 window had it, V2 windows are dark)
+.application.dh-sheet > .window-content {
+    padding: 8px;
+    background: url('../images/40k_back.png') #eff2f1 center/cover;
+}
+
 // Prompts are single forms rendered as the application element
 .application.dh-prompt > .window-content > .dh-wrapper {
     width: 100%;
