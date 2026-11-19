@@ -83,22 +83,18 @@
 
         <article class="panel panel--quick">
             <h2 class="panel__title">Key Skills <span class="panel__hint">Star skills on the Skills tab</span></h2>
-            <table class="dtable">
-                <thead><tr><th>Skill</th><th>Char.</th><th>Training</th><th class="num">Target</th><th></th></tr></thead>
-                <tbody>
-                    {{#each dossier.quickSkills as |s|}}
-                        <tr>
-                            <td>{{s.label}}</td>
-                            <td>{{s.characteristic}}</td>
-                            <td>{{#each s.pips as |p|}}<i class="pip {{#if p.filled}}on{{/if}}"></i>{{/each}} <small>{{s.training}}</small></td>
-                            <td class="num strong target">{{s.total}}</td>
-                            <td class="act"><button type="button" class="icon-btn roll-skill" data-skill="{{s.skillKey}}" data-specialty="{{s.specKey}}" data-tooltip="Roll {{s.label}}"><i class="fa-solid fa-dice-d20"></i></button></td>
-                        </tr>
-                    {{else}}
-                        <tr><td colspan="5" class="empty">No favourite skills. Use the star on the Skills tab.</td></tr>
-                    {{/each}}
-                </tbody>
-            </table>
+            <ul class="qs">
+                {{#each dossier.quickSkills as |s|}}
+                    <li class="qs__item" data-tooltip="{{s.label}} · {{s.training}} ({{s.characteristic}})">
+                        <span class="qs__name">{{s.label}} <small>{{s.characteristic}}</small></span>
+                        <span class="qs__pips">{{#each s.pips as |p|}}<i class="pip {{#if p.filled}}on{{/if}}"></i>{{/each}}</span>
+                        <span class="qs__target">{{s.total}}</span>
+                        <button type="button" class="icon-btn roll-skill" data-skill="{{s.skillKey}}" data-specialty="{{s.specKey}}" data-tooltip="Roll {{s.label}} (W100 ≤ {{s.total}})"><i class="fa-solid fa-dice-d20"></i></button>
+                    </li>
+                {{else}}
+                    <li class="empty">No favourite skills. Use the star on the Skills tab.</li>
+                {{/each}}
+            </ul>
         </article>
 
         <article class="panel panel--details">

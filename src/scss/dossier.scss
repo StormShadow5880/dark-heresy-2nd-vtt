@@ -746,7 +746,7 @@
     .ov-layout {
         display: grid;
         grid-template-columns: minmax(0, 7fr) minmax(280px, 4fr);
-        grid-template-areas: 'chars status' 'quick status' 'quick details';
+        grid-template-areas: 'chars status' 'quick status' 'details status';
         gap: 0 16px;
         align-items: start;
         .panel--status {
@@ -760,6 +760,10 @@
         }
         .panel--details {
             grid-area: details;
+            .details {
+                grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+                gap: 6px 18px;
+            }
         }
     }
     .combat-layout {
@@ -1354,6 +1358,60 @@
     @container dossier (max-width: 560px) {
         .chars {
             grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+        }
+    }
+
+
+    // ------------------------------------------------ Key skills (compact list, two columns when wide)
+    .qs {
+        list-style: none;
+        margin: 0;
+        padding: 4px 8px 6px;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+        gap: 0 14px;
+        &__item {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto 38px 26px;
+            align-items: center;
+            gap: 6px;
+            min-height: 28px;
+            padding: 0 2px;
+            border-bottom: 1px solid rgba(80, 70, 56, 0.5);
+            &:hover {
+                background: rgba(255, 255, 255, 0.03);
+            }
+            &.empty {
+                grid-column: 1 / -1;
+            }
+        }
+        &__name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 0.9rem;
+            small {
+                margin-left: 3px;
+                font-size: 0.7rem;
+            }
+        }
+        &__pips {
+            white-space: nowrap;
+            .pip {
+                width: 6px;
+                height: 6px;
+                margin: 0 2px;
+            }
+        }
+        &__target {
+            text-align: right;
+            font-family: var(--ds-font-title);
+            font-size: 1.1rem;
+            color: #fff;
+        }
+        .icon-btn {
+            width: 24px;
+            height: 24px;
         }
     }
 
