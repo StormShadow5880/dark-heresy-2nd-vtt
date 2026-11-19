@@ -745,8 +745,8 @@
     // ------------------------------------------------ Layouts
     .ov-layout {
         display: grid;
-        grid-template-columns: minmax(0, 7fr) minmax(280px, 4fr);
-        grid-template-areas: 'chars status' 'quick status' 'quick details';
+        grid-template-columns: minmax(280px, 4fr) minmax(0, 7fr);
+        grid-template-areas: 'chars chars' 'status quick' 'details quick';
         gap: 0 16px;
         align-items: start;
         .panel--status {
@@ -1128,20 +1128,20 @@
         padding: 0 4px;
     }
 
-    // ------------------------------------------------ Characteristics (matrix of tiles)
+    // ------------------------------------------------ Characteristics (one row, details in a hover pop-up)
     .chars {
         display: grid;
-        grid-template-columns: repeat(5, minmax(0, 1fr));
-        gap: 10px;
-        padding: 12px 14px 14px;
+        grid-template-columns: repeat(10, minmax(0, 1fr));
+        gap: 6px;
+        padding: 10px 10px 12px;
     }
     .char {
         position: relative;
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 3px;
-        padding: 8px 6px 8px;
+        gap: 1px;
+        padding: 5px 4px 6px;
         background: linear-gradient(180deg, #232320, #141413);
         border: 1px solid var(--ds-line);
         border-top: 2px solid var(--ds-gold);
@@ -1154,22 +1154,24 @@
         &__short {
             font-family: var(--ds-font-title);
             font-variant: small-caps;
-            font-size: 1.05rem;
-            letter-spacing: 0.12em;
+            font-size: 1rem;
+            letter-spacing: 0.1em;
             color: var(--ds-gold);
+            line-height: 1.2;
         }
         &__roll {
             width: 100%;
-            height: 54px;
-            font-size: 2.1rem;
+            height: 44px;
+            font-size: 1.85rem;
             font-family: var(--ds-font-title);
             color: #f6efdc;
             background: radial-gradient(ellipse at 50% 30%, #1d1d1b, #0a0a09);
             border: 1px solid var(--ds-line);
-            border-radius: 28px / 26px;
+            border-radius: 24px / 22px;
             box-shadow: inset 0 0 0 1px #000, inset 0 0 8px #000;
             cursor: pointer;
             line-height: 1;
+            padding: 0;
             &:hover,
             &:focus-visible {
                 border-color: var(--ds-gold);
@@ -1178,25 +1180,26 @@
             }
         }
         &__bonus {
-            font-size: 0.72rem;
+            font-size: 0.66rem;
             letter-spacing: 0.08em;
             text-transform: uppercase;
             color: var(--ds-muted);
+            margin-top: 1px;
         }
         &__edit-toggle {
             position: absolute;
-            top: 3px;
-            right: 3px;
-            width: 20px;
-            height: 20px;
+            top: 1px;
+            right: 1px;
+            width: 18px;
+            height: 18px;
             padding: 0;
             background: transparent;
             border: 0;
             color: var(--ds-muted);
-            opacity: 0.45;
+            opacity: 0;
             cursor: pointer;
             i {
-                font-size: 0.7rem;
+                font-size: 0.62rem;
             }
             &:hover,
             &:focus-visible {
@@ -1205,43 +1208,150 @@
                 outline: none;
             }
         }
-        // the technical fields are hidden in view mode but stay in the form
-        &__edit {
+        &:hover .char__edit-toggle,
+        &:focus-within .char__edit-toggle {
+            opacity: 0.8;
+        }
+
+        // the detail pop-up: contains the real form fields so values can be edited directly
+        &__pop {
             display: none;
-            grid-template-columns: 1fr 1fr;
-            gap: 4px;
-            width: 100%;
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 30;
+            width: 214px;
             margin-top: 4px;
-            padding-top: 6px;
-            border-top: 1px solid var(--ds-line);
-            label {
+            padding: 8px 10px 10px;
+            background: linear-gradient(180deg, #232320, #131312);
+            border: 1px solid var(--ds-gold);
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.75);
+            text-align: left;
+            // little pointer towards the tile
+            &::before {
+                content: '';
+                position: absolute;
+                top: -6px;
+                left: 50%;
+                width: 9px;
+                height: 9px;
+                background: #232320;
+                border-left: 1px solid var(--ds-gold);
+                border-top: 1px solid var(--ds-gold);
+                transform: translateX(-50%) rotate(45deg);
+            }
+            // invisible bridge so the pop-up does not close while the mouse travels to it
+            &::after {
+                content: '';
+                position: absolute;
+                left: 0;
+                right: 0;
+                top: -8px;
+                height: 8px;
+            }
+            header {
                 display: flex;
-                flex-direction: column;
-                font-size: 0.62rem;
+                justify-content: space-between;
+                align-items: baseline;
+                gap: 8px;
+                padding-bottom: 5px;
+                margin-bottom: 6px;
+                border-bottom: 1px solid var(--ds-line);
+                b {
+                    font-family: var(--ds-font-title);
+                    font-variant: small-caps;
+                    letter-spacing: 0.06em;
+                    font-weight: 400;
+                    color: var(--ds-gold);
+                    font-size: 1rem;
+                }
+                span {
+                    font-family: var(--ds-font-title);
+                    font-size: 1.15rem;
+                    color: #fff;
+                }
+            }
+            label {
+                display: grid;
+                grid-template-columns: 88px 1fr;
+                align-items: center;
+                gap: 6px;
+                margin-top: 4px;
+                font-size: 0.78rem;
                 color: var(--ds-muted);
                 text-transform: uppercase;
-                letter-spacing: 0.05em;
+                letter-spacing: 0.06em;
             }
             input,
             select {
-                height: 22px;
-                font-size: 0.78rem;
-                padding: 0 2px;
+                height: 24px;
+                font-size: 0.85rem;
             }
         }
+        &:hover,
+        &:focus-within,
         &.is-editing {
-            .char__edit {
-                display: grid;
+            z-index: 20;
+        }
+        &:hover .char__pop,
+        &:focus-within .char__pop,
+        &.is-editing .char__pop {
+            display: block;
+        }
+        // keep the pop-up inside the panel for the tiles at the edges
+        &:nth-child(-n + 2) .char__pop {
+            left: 0;
+            transform: none;
+            &::before {
+                left: 28px;
             }
-            .char__edit-toggle {
-                opacity: 1;
-                color: var(--ds-gold);
+        }
+        &:nth-last-child(-n + 2) .char__pop {
+            left: auto;
+            right: 0;
+            transform: none;
+            &::before {
+                left: auto;
+                right: 28px;
+                transform: rotate(45deg);
             }
         }
     }
-    @container dossier (max-width: 640px) {
+    .chars .pips {
+        margin-top: 1px;
+        .pip {
+            width: 6px;
+            height: 6px;
+            margin: 0 2px;
+        }
+    }
+    @container dossier (max-width: 960px) {
         .chars {
-            grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+        }
+        // with two rows the pop-ups of the first row open downwards over the second row, that is fine
+        .char:nth-child(5n + 1) .char__pop {
+            left: 0;
+            right: auto;
+            transform: none;
+        }
+        .char:nth-child(5n) .char__pop {
+            left: auto;
+            right: 0;
+            transform: none;
+        }
+        .char:nth-child(5n + 2) .char__pop,
+        .char:nth-child(5n + 3) .char__pop,
+        .char:nth-child(5n + 4) .char__pop {
+            left: 50%;
+            right: auto;
+            transform: translateX(-50%);
+        }
+    }
+    @container dossier (max-width: 560px) {
+        .chars {
+            grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
         }
     }
 
