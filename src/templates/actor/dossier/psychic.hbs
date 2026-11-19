@@ -1,7 +1,11 @@
-<section class="tab dossier-tab" data-tab="psychic" data-group="primary">
+<section class="tab dossier-tab dossier-tab--psychic" data-tab="psychic" data-group="primary">
     <div class="two-col two-col--narrow-left">
         <article class="panel">
             <h2 class="panel__title">Psychic Profile</h2>
+            <div class="psy-rating" data-tooltip="Current Psy Rating (rating minus sustained powers)">
+                <span class="psy-rating__ring"><b>{{dossier.psychic.current}}</b></span>
+                <span class="psy-rating__label">Psy Rating {{dossier.psychic.rating}}</span>
+            </div>
             <div class="panel__body details">
                 <label><span>Psy Rating</span><input type="number" data-dtype="Number" name="system.psy.rating" value="{{actor.system.psy.rating}}" /></label>
                 <label><span>Sustained</span><input type="number" data-dtype="Number" name="system.psy.sustained" value="{{actor.system.psy.sustained}}" data-tooltip="Number of powers currently sustained" /></label>

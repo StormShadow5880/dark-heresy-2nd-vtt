@@ -7,6 +7,7 @@ import {
     buildCombatProfile,
     buildDevelopment,
     buildGear,
+    buildProgression,
     buildPsychic,
     buildQuickSkills,
     buildRelations,
@@ -45,6 +46,9 @@ export class AcolyteDossierSheet extends AcolyteSheet {
             awardExperience: AcolyteDossierSheet.#onAwardExperience,
             removeLogEntry: AcolyteDossierSheet.#onRemoveLogEntry,
             rollTable: AcolyteDossierSheet.#onRollTable,
+            setTraining: AcolyteDossierSheet.#onSetTraining,
+            setPips: AcolyteDossierSheet.#onSetPips,
+            toggleCharEdit: AcolyteDossierSheet.#onToggleCharEdit,
         },
     };
 
@@ -65,25 +69,33 @@ export class AcolyteDossierSheet extends AcolyteSheet {
 
     _skillUi = { ...DEFAULT_SKILL_UI };
     _gearFilter = 'all';
+    /** Characteristic tiles that are currently open for editing (kept across re-renders) */
+    _openCharEdits = new Set();
 
     async _prepareContext(options) {
         const context = await super._prepareContext(options);
         const actor = this.actor;
         const skills = buildSkills(actor);
+        const resources = buildResources(actor);
+        const weapons = buildWeapons(actor);
         context.dossier = {
             characteristics: buildCharacteristics(actor),
-            resources: buildResources(actor),
+            resources: resources,
+            res: Object.fromEntries(resources.map((r) => [r.id, r])),
             skills,
             quickSkills: buildQuickSkills(actor, skills),
             specialistGroups: buildSpecialistGroups(actor),
             combat: buildCombatProfile(actor, skills),
             armour: buildArmour(actor),
-            weapons: buildWeapons(actor),
+            weapons,
+            hasEquippedWeapon: weapons.some((w) => w.equipped),
+            hasStowedWeapon: weapons.some((w) => !w.equipped),
             criticalInjuries: buildCriticalInjuries(actor),
             sizeOptions: CONFIG.dh.bio.size,
             gear: buildGear(actor),
             psychic: buildPsychic(actor),
             development: buildDevelopment(actor),
+            progression: buildProgression(actor, skills),
             relations: buildRelations(actor),
             favorites: getFavoriteSkills(actor),
             bioFields: ['homeWorld', 'background', 'role', 'elite', 'divination'].map((key) => ({
@@ -115,6 +127,7 @@ export class AcolyteDossierSheet extends AcolyteSheet {
         super._activateListeners(html);
         this._activateSkillFilters(this.element);
         this._activateGearFilters(this.element);
+        this.element.querySelectorAll('.char').forEach((tile) => tile.classList.toggle('is-editing', this._openCharEdits.has(tile.dataset.char)));
         // Buttons inside <summary> must not toggle the surrounding <details>
         this.element.querySelectorAll('summary button').forEach((b) => b.addEventListener('click', (ev) => ev.preventDefault()));
     }
@@ -173,6 +186,32 @@ export class AcolyteDossierSheet extends AcolyteSheet {
     /* -------------------------------------------- */
     /*  Actions                                      */
     /* -------------------------------------------- */
+
+    /** Clicking a training pip sets that level, clicking the highest filled pip lowers it by one */
+    static async #onSetTraining(event, target) {
+        if (!this.isEditable) return;
+        const { path } = target.dataset;
+        const level = Number(target.dataset.level);
+        const current = Number(foundry.utils.getProperty(this.actor, path) ?? 0);
+        await this.actor.update({ [path]: current === level ? level - 1 : level });
+    }
+
+    /** Generic pip counter (e.g. Fate points) */
+    static async #onSetPips(event, target) {
+        if (!this.isEditable) return;
+        const { path } = target.dataset;
+        const level = Number(target.dataset.level);
+        const current = Number(foundry.utils.getProperty(this.actor, path) ?? 0);
+        await this.actor.update({ [path]: current === level ? level - 1 : level });
+    }
+
+    static #onToggleCharEdit(event, target) {
+        const key = target.dataset.char;
+        const tile = target.closest('.char');
+        if (this._openCharEdits.has(key)) this._openCharEdits.delete(key);
+        else this._openCharEdits.add(key);
+        tile?.classList.toggle('is-editing', this._openCharEdits.has(key));
+    }
 
     static async #onToggleFavorite(event, target) {
         const id = target.dataset.skillId;

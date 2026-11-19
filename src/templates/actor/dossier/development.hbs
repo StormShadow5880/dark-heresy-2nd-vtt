@@ -22,6 +22,30 @@
             <p class="hint">Advancement costs from the rulebook are not stored in the system. Enter the cost you pay; limits (maximum advances) and available EP are validated.</p>
         </article>
 
+        <div class="stack">
+        <article class="panel">
+            <h2 class="panel__title">Advancement Overview <span class="panel__hint">Current level → next level</span></h2>
+            <div class="progress-grid">
+                <ul class="rows rows--compact">
+                    {{#each dossier.progression.characteristics as |c|}}
+                        <li><span class="grow">{{c.short}} <small>{{c.current}}</small></span>
+                            <span class="next">{{#if c.next}}→ {{c.next}}{{else}}<small>Maximum</small>{{/if}}</span>
+                            <span class="spent" data-tooltip="EP spent so far">{{c.spent}}</span></li>
+                    {{/each}}
+                </ul>
+                <ul class="rows rows--compact">
+                    {{#each dossier.progression.skills as |s|}}
+                        <li><span class="grow">{{s.label}} <small>{{s.current}}</small></span>
+                            <span class="next">{{#if s.next}}→ {{s.next}}{{else}}<small>Maximum</small>{{/if}}</span>
+                            <span class="spent" data-tooltip="EP spent so far">{{s.spent}}</span></li>
+                    {{else}}
+                        <li class="empty">No trained skills yet.</li>
+                    {{/each}}
+                </ul>
+            </div>
+            <p class="hint">Costs and aptitude discounts depend on the rulebook tables, which are not part of the system data. Enter the cost when you spend EP.</p>
+        </article>
+
         <article class="panel">
             <h2 class="panel__title">Advancement Log</h2>
             <div class="table-scroll">
@@ -43,5 +67,6 @@
                 </table>
             </div>
         </article>
+        </div>
     </div>
 </section>

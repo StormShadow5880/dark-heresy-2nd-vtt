@@ -26,6 +26,8 @@ export const TRAINING_LEVELS = {
     4: 'Veteran',
 };
 
+export const TRAINING_PIP_LABELS = { 1: 'Known', 2: '+10', 3: '+20', 4: '+30' };
+
 export const CHARACTERISTIC_ADVANCE_LEVELS = {
     0: 'None',
     1: 'Simple',
@@ -35,6 +37,8 @@ export const CHARACTERISTIC_ADVANCE_LEVELS = {
     5: 'Expert',
 };
 
+const MAX_CHARACTERISTIC_PIPS = 5;
+const MAX_CHARACTERISTIC_ADVANCE_LEVEL = 5;
 const DEFAULT_FAVORITE_SKILLS = ['awareness', 'dodge', 'inquiry', 'techUse'];
 
 const ARMOUR_ZONES = [
@@ -84,6 +88,7 @@ export function buildCharacteristics(actor) {
             base: c.base,
             advance: c.advance,
             advanceLabel: CHARACTERISTIC_ADVANCE_LEVELS[c.advance] ?? c.advance,
+            advancePips: Array.from({ length: MAX_CHARACTERISTIC_PIPS }, (_, i) => i < toNumber(c.advance)),
             modifier: c.modifier,
             unnatural: c.unnatural,
             total: c.total,
@@ -128,6 +133,7 @@ export function buildResources(actor) {
             pct: percent(s.fate.value, s.fate.max),
             tone: 'fate',
             note: '',
+            pips: s.fate.max > 0 && s.fate.max <= 12 ? Array.from({ length: s.fate.max }, (_, i) => ({ level: i + 1, filled: i < s.fate.value })) : null,
         },
         {
             id: 'corruption',
@@ -173,6 +179,7 @@ export function buildSkills(actor) {
             trainingBonus: actor._skillAdvanceToValue(advance),
             total: skill.current,
             trained: advance >= 1,
+            pips: [1, 2, 3, 4].map((level) => ({ level, filled: advance >= level, label: TRAINING_PIP_LABELS[level] })),
             favorite: favorites.includes(id),
             advancePath: `${basePath}.advance`,
             charPath: specKey ? null : `${basePath}.characteristic`,
@@ -434,4 +441,31 @@ export function buildCriticalInjuries(actor) {
     return actor.items
         .filter((i) => i.type === 'criticalInjury')
         .map((i) => ({ id: i.id, name: i.name, img: i.img, part: i.system.part, type: i.system.type }));
+}
+
+/**
+ * Overview of the current advance level of every characteristic and skill together with the next level.
+ * Costs and aptitude discounts are intentionally NOT calculated: the cost tables are not part of the system data.
+ */
+export function buildProgression(actor, skills) {
+    const characteristics = CHARACTERISTIC_ORDER.filter((k) => actor.characteristics[k]).map((key) => {
+        const c = actor.characteristics[key];
+        const advance = toNumber(c.advance);
+        return {
+            label: c.label,
+            short: c.short,
+            current: CHARACTERISTIC_ADVANCE_LEVELS[advance],
+            next: advance >= MAX_CHARACTERISTIC_ADVANCE_LEVEL ? null : CHARACTERISTIC_ADVANCE_LEVELS[advance + 1],
+            spent: toNumber(c.cost),
+        };
+    });
+    const trained = skills
+        .filter((s) => s.advance > 0)
+        .map((s) => ({
+            label: s.label,
+            current: s.training,
+            next: s.advance >= 4 ? null : TRAINING_LEVELS[s.advance + 1],
+            spent: toNumber(s.cost),
+        }));
+    return { characteristics, skills: trained };
 }

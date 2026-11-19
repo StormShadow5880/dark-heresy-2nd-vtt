@@ -16,10 +16,10 @@
         </div>
         <div class="skill-table dtable dtable--grid" data-sort="name">
             <div class="skill-head">
-                <span></span><span>Skill</span><span>Char.</span><span>Training</span><span class="num">Mod.</span><span class="num">Target</span><span></span>
+                <span></span><span>Skill</span><span>Char.</span><span>Training (Known · +10 · +20 · +30)</span><span class="num">Mod.</span><span class="num">Target</span><span></span>
             </div>
             {{#each dossier.skills as |s|}}
-                <div class="skill-row actor-drag" data-name="{{toLowerCase s.label}}" data-trained="{{s.trained}}" data-favorite="{{s.favorite}}"
+                <div class="skill-row {{#if s.trained}}is-trained{{/if}} actor-drag" data-name="{{toLowerCase s.label}}" data-trained="{{s.trained}}" data-favorite="{{s.favorite}}"
                      data-item-type="skill" data-item-id="{{s.skillKey}}" {{#if s.specKey}}data-speciality="{{s.specKey}}"{{/if}}
                      style="--name-order: {{s.nameOrder}}; --char-order: {{s.charOrder}};">
                     <button type="button" class="icon-btn star {{#if s.favorite}}on{{/if}}" data-action="toggleFavorite" data-skill-id="{{s.id}}" data-tooltip="Favourite" aria-pressed="{{s.favorite}}">
@@ -33,9 +33,10 @@
                     {{else}}
                         <span>{{s.characteristic}}</span>
                     {{/if}}
-                    <select name="{{s.advancePath}}" data-dtype="Number" aria-label="Training">
-                        {{selectOptions @root.dossier.trainingLevels selected=s.advance}}
-                    </select>
+                    <span class="train" data-tooltip="{{s.training}}">
+                        {{#each s.pips as |p|}}<button type="button" class="pip pip--btn {{#if p.filled}}on{{/if}}" data-action="setTraining" data-path="{{s.advancePath}}" data-level="{{p.level}}" aria-label="{{p.label}}" aria-pressed="{{p.filled}}" data-tooltip="{{p.label}}"></button>{{/each}}
+                        <small>{{s.training}}</small>
+                    </span>
                     <span class="num">{{#if (gt s.trainingBonus 0)}}+{{/if}}{{s.trainingBonus}}</span>
                     <span class="num strong">{{s.total}}</span>
                     <button type="button" class="icon-btn roll-skill" data-skill="{{s.skillKey}}" data-specialty="{{s.specKey}}" data-tooltip="Roll {{s.label}} (W100 ≤ {{s.total}})"><i class="fa-solid fa-dice-d20"></i></button>

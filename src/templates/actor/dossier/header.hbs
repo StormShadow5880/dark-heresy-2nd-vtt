@@ -1,6 +1,11 @@
 <header class="dossier-header">
-    <img class="dossier-portrait" src="{{actor.img}}" alt="{{actor.name}}" data-edit="img" data-action="editImage" data-tooltip="Change portrait" />
+    <figure class="portrait">
+        <img class="portrait__img" src="{{actor.img}}" alt="{{actor.name}}" data-edit="img" data-action="editImage" data-tooltip="Change portrait" />
+        <i class="orn orn--tl"></i><i class="orn orn--tr"></i><i class="orn orn--bl"></i><i class="orn orn--br"></i>
+    </figure>
+
     <div class="dossier-identity">
+        <p class="record-title"><span>Imperial Personnel Record</span><span class="record-title__sub">Adeptus Administratum · Personnel Archive</span></p>
         <input class="dossier-name" name="name" type="text" value="{{actor.name}}" aria-label="Name" />
         <div class="dossier-bio-fields">
             {{#each dossier.bioFields as |field|}}
@@ -14,4 +19,21 @@
             {{/each}}
         </div>
     </div>
+
+    <aside class="dossier-status" aria-label="Character status">
+        <div class="hs hs--wounds">
+            <span class="hs__label">Wounds</span>
+            <span class="hs__value"><b>{{dossier.res.wounds.value}}</b><small>/ {{dossier.res.wounds.max}}</small></span>
+            <div class="seg-bar seg-bar--wounds"><span style="width: {{dossier.res.wounds.pct}}%"></span></div>
+        </div>
+        <div class="hs hs--fate">
+            <span class="hs__label">Fate</span>
+            <span class="hs__value"><b>{{dossier.res.fate.value}}</b><small>/ {{dossier.res.fate.max}}</small></span>
+        </div>
+        <div class="hs hs--xp">
+            <span class="hs__label">Available XP</span>
+            <span class="hs__value"><b>{{dossier.development.available}}</b></span>
+        </div>
+        <i class="seal" aria-hidden="true"></i>
+    </aside>
 </header>
