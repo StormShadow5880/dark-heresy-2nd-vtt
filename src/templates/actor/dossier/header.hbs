@@ -24,27 +24,41 @@
     <div class="hmini" aria-label="Damage">
         <div class="hmini__top">
             <span class="hmini__label">Damage</span>
-            <span class="hmini__value">{{dossier.res.wounds.bar.damage}}<small> / {{dossier.res.wounds.max}}</small></span>
-            {{#if dossier.res.wounds.bar.dead}}
-                <span class="wstate is-dead">Dead</span>
-            {{else if dossier.res.wounds.bar.critical}}
-                <span class="wstate is-serious" data-tooltip="Critical damage (dead at 10)">Critical {{dossier.res.wounds.bar.critical}}/10</span>
-            {{else if dossier.res.wounds.bar.serious}}
-                <span class="wstate is-serious">Seriously injured</span>
-            {{else if dossier.res.wounds.bar.hasDamage}}
-                <span class="wstate">Minor</span>
-            {{/if}}
+            <span class="hmini__fields" data-tooltip="Damage taken / maximum wounds">
+                <input type="number" class="damage-input" min="0" value="{{dossier.res.wounds.bar.damage}}" aria-label="Damage taken" />
+                <span>/</span>
+                <input type="number" data-dtype="Number" name="system.wounds.max" value="{{dossier.res.wounds.max}}" aria-label="Maximum wounds" />
+            </span>
             <span class="hmini__steps">
                 <button type="button" class="step" data-action="adjustDamage" data-delta="-1" aria-label="Heal one point of damage" data-tooltip="Heal 1">−</button>
                 <button type="button" class="step" data-action="adjustDamage" data-delta="1" aria-label="Take one point of damage" data-tooltip="Damage +1 (beyond the maximum: critical)">+</button>
             </span>
         </div>
-        <div class="wbar wbar--mini {{#if dossier.res.wounds.bar.serious}}is-serious{{/if}} {{#if dossier.res.wounds.bar.dead}}is-dead{{/if}}">
+        <div class="wbar wbar--mini {{#if dossier.res.wounds.bar.serious}}is-serious{{/if}} {{#if dossier.res.wounds.bar.dead}}is-dead{{/if}}" role="progressbar" aria-valuemin="0" aria-valuemax="{{dossier.res.wounds.max}}" aria-valuenow="{{dossier.res.wounds.bar.damage}}">
             <i class="wbar__cap wbar__cap--l"></i>
             <div class="wbar__cells">
                 {{#each dossier.res.wounds.bar.cells as |c|}}<i class="wbar__cell {{#if c.filled}}on{{/if}} {{#if c.minor}}minor{{/if}} {{#if c.gap}}gap{{/if}}"></i>{{/each}}
             </div>
             <i class="wbar__cap wbar__cap--r"></i>
+        </div>
+        {{#if dossier.res.wounds.bar.cells.length}}
+            <div class="wzones" data-tooltip="Minor damage: the first 2 × toughness bonus points of damage. Beyond that the character is seriously injured.">
+                {{#if dossier.res.wounds.bar.minorCells}}<span class="wzones__minor" style="flex: {{dossier.res.wounds.bar.minorCells}}">Minor · {{dossier.res.wounds.bar.minorLimit}}</span>{{/if}}
+                {{#if dossier.res.wounds.bar.seriousCells}}<span class="wzones__serious" style="flex: {{dossier.res.wounds.bar.seriousCells}}">Serious</span>{{/if}}
+            </div>
+        {{/if}}
+        <div class="crit {{#if dossier.res.wounds.bar.dead}}is-dead{{/if}}">
+            <span class="crit__label" data-tooltip="Critical damage: damage beyond the maximum wounds. At 10 the character is dead. The injuries are listed on the Combat tab.">Critical</span>
+            <span class="crit__pips" role="group" aria-label="Critical damage">
+                {{#each dossier.res.wounds.bar.criticalPips as |p|}}<button type="button" class="crit__pip {{#if p.filled}}on{{/if}}" data-action="setCritical" data-level="{{p.level}}" aria-label="Set critical damage to {{p.level}}" aria-pressed="{{p.filled}}"></button>{{/each}}
+            </span>
+            {{#if dossier.res.wounds.bar.dead}}
+                <span class="wstate is-dead">Dead</span>
+            {{else if dossier.res.wounds.bar.serious}}
+                <span class="wstate is-serious">Seriously injured</span>
+            {{else if dossier.res.wounds.bar.hasDamage}}
+                <span class="wstate">Minor damage</span>
+            {{/if}}
         </div>
     </div>
 

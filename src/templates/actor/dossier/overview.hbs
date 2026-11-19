@@ -2,15 +2,14 @@
     <div class="ov-layout">
         <article class="panel panel--characteristics">
             <h2 class="panel__title">Characteristics</h2>
-            <ul class="attrs">
+            <div class="chars">
                 {{#each dossier.characteristics as |c|}}
-                    <li class="char {{#if c.hasBonus}}char--bonus{{/if}} {{#if c.hasNegative}}char--negative{{/if}} actor-drag" data-item-type="characteristic" data-item-id="{{c.key}}" data-char="{{c.key}}">
-                        <span class="char__short" data-tooltip="{{c.label}}">{{c.short}}</span>
-                        <span class="char__label">{{c.label}}</span>
-                        <span class="pips" data-tooltip="Advances: {{c.advanceLabel}}">{{#each c.advancePips as |on|}}<i class="pip {{#if on}}on{{/if}}"></i>{{/each}}</span>
-                        <span class="char__bonus" data-tooltip="Characteristic bonus">B{{c.bonus}}</span>
-                        <button type="button" class="char__roll roll-characteristic" data-characteristic="{{c.key}}" data-tooltip="Roll {{c.label}} test (W100 ≤ {{c.total}})">{{c.total}}</button>
+                    <div class="char {{#if c.hasBonus}}char--bonus{{/if}} {{#if c.hasNegative}}char--negative{{/if}} actor-drag" data-item-type="characteristic" data-item-id="{{c.key}}" data-char="{{c.key}}">
                         <button type="button" class="char__edit-toggle" data-action="toggleCharEdit" data-char="{{c.key}}" data-tooltip="Pin details" aria-label="Pin details of {{c.label}}"><i class="fa-solid fa-thumbtack"></i></button>
+                        <span class="char__short" data-tooltip="{{c.label}}">{{c.short}}</span>
+                        <button type="button" class="char__roll roll-characteristic" data-characteristic="{{c.key}}" data-tooltip="Roll {{c.label}} test (W100 ≤ {{c.total}})">{{c.total}}</button>
+                        <span class="char__bonus" data-tooltip="Characteristic bonus">Bonus {{c.bonus}}</span>
+                        <span class="pips" data-tooltip="Advances: {{c.advanceLabel}}">{{#each c.advancePips as |on|}}<i class="pip {{#if on}}on{{/if}}"></i>{{/each}}</span>
                         <div class="char__pop" role="group" aria-label="{{c.label}} details">
                             <header><b>{{c.label}}</b><span>{{c.total}} <small>Bonus {{c.bonus}}</small></span></header>
                             <label data-tooltip="Initial value"><span>Initial</span>
@@ -24,58 +23,12 @@
                             <label data-tooltip="Unnatural characteristic (extra bonus)"><span>Unnatural</span>
                                 <input type="number" data-dtype="Number" name="system.characteristics.{{c.key}}.unnatural" value="{{c.unnatural}}" /></label>
                         </div>
-                    </li>
+                    </div>
                 {{/each}}
-            </ul>
+            </div>
         </article>
 
         <div class="ov-main">
-            <article class="panel panel--wounds">
-                <h2 class="panel__title">Damage
-                    <span class="panel__hint">
-                        {{#if dossier.res.wounds.bar.dead}}Dead{{else if dossier.res.wounds.bar.critical}}Critical damage {{dossier.res.wounds.bar.critical}} / 10{{else if dossier.res.wounds.bar.serious}}Seriously injured{{else if dossier.res.wounds.bar.hasDamage}}Minor damage{{else}}Unharmed{{/if}}
-                    </span>
-                </h2>
-                <div class="wounds-panel">
-                    <div class="stat__big" data-tooltip="Damage taken / maximum wounds">
-                        <button type="button" class="step" data-action="adjustDamage" data-delta="-1" aria-label="Heal one point of damage">−</button>
-                        <input type="number" class="damage-input" min="0" value="{{dossier.res.wounds.bar.damage}}" aria-label="Damage taken" />
-                        <span class="sep">/</span>
-                        <input type="number" data-dtype="Number" name="system.wounds.max" value="{{dossier.res.wounds.max}}" aria-label="Maximum wounds" />
-                        <button type="button" class="step" data-action="adjustDamage" data-delta="1" aria-label="Take one point of damage">+</button>
-                    </div>
-                    <div class="wounds-bar">
-                        <div class="wbar {{#if dossier.res.wounds.bar.serious}}is-serious{{/if}} {{#if dossier.res.wounds.bar.dead}}is-dead{{/if}}" role="progressbar" aria-valuemin="0" aria-valuemax="{{dossier.res.wounds.max}}" aria-valuenow="{{dossier.res.wounds.bar.damage}}">
-                            <i class="wbar__cap wbar__cap--l"></i>
-                            <div class="wbar__cells">
-                                {{#each dossier.res.wounds.bar.cells as |c|}}<i class="wbar__cell {{#if c.filled}}on{{/if}} {{#if c.minor}}minor{{/if}} {{#if c.gap}}gap{{/if}}"></i>{{/each}}
-                            </div>
-                            <i class="wbar__cap wbar__cap--r"></i>
-                        </div>
-                        {{#if dossier.res.wounds.bar.cells.length}}
-                            <div class="wzones" data-tooltip="Minor damage: the first 2 × toughness bonus points of damage. Beyond that the character is seriously injured.">
-                                {{#if dossier.res.wounds.bar.minorCells}}<span class="wzones__minor" style="flex: {{dossier.res.wounds.bar.minorCells}}">Minor · {{dossier.res.wounds.bar.minorLimit}}</span>{{/if}}
-                                {{#if dossier.res.wounds.bar.seriousCells}}<span class="wzones__serious" style="flex: {{dossier.res.wounds.bar.seriousCells}}">Serious</span>{{/if}}
-                            </div>
-                        {{/if}}
-                    </div>
-                </div>
-                <div class="crit {{#if dossier.res.wounds.bar.dead}}is-dead{{/if}}">
-                    <span class="crit__label" data-tooltip="Damage beyond the maximum wounds. At 10 critical damage the character is dead.">Critical</span>
-                    <span class="crit__pips" role="group" aria-label="Critical damage">
-                        {{#each dossier.res.wounds.bar.criticalPips as |p|}}<button type="button" class="crit__pip {{#if p.filled}}on{{/if}}" data-action="setCritical" data-level="{{p.level}}" aria-label="Set critical damage to {{p.level}}" aria-pressed="{{p.filled}}"></button>{{/each}}
-                    </span>
-                    <span class="crit__count">{{dossier.res.wounds.bar.critical}} / 10</span>
-                    {{#if dossier.res.wounds.bar.dead}}<span class="crit__dead">Dead</span>{{/if}}
-                    <span class="crit__injuries">
-                        {{#each dossier.criticalInjuries as |injury|}}
-                            <span class="chip item-edit" data-item-id="{{injury.id}}" role="button" tabindex="0" data-tooltip="{{injury.part}} · {{injury.type}}">{{injury.name}}</span>
-                        {{/each}}
-                        <button type="button" class="icon-btn item-create" data-type="criticalInjury" data-tooltip="New critical injury"><i class="fa-solid fa-plus"></i></button>
-                    </span>
-                </div>
-            </article>
-
             <div class="stat-row">
                 <div class="tile tile--fatigue">
                     <span class="tile__label">Fatigue</span>
