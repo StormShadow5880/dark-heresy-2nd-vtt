@@ -45,8 +45,9 @@ export class DarkHeresyBaseActor extends Actor {
         return this.system.movement;
     }
 
-    prepareData() {
-        super.prepareData();
+    /** Calculated values run after the Active Effects were applied (see DarkHeresyAcolyte.prepareDerivedData) */
+    prepareDerivedData() {
+        super.prepareDerivedData();
         this._computeCharacteristics();
         this._computeMovement();
     }

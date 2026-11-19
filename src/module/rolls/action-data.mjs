@@ -5,6 +5,8 @@ import { refundAmmo, useAmmo } from '../rules/ammo.mjs';
 import { DHBasicActionManager } from '../actions/basic-action-manager.mjs';
 import { SYSTEM_ID } from '../hooks-manager.mjs';
 import { DarkHeresySettings } from '../dark-heresy-settings.mjs';
+import { activatePsychicEffect, deactivatePsychicEffect } from '../actions/psychic-effect-manager.mjs';
+import { hasEffect } from '../rules/psychic-effects.mjs';
 
 export class ActionData {
     id = uuid();
@@ -286,6 +288,9 @@ export class ActionData {
         }
     }
 
+    /** Hook for subclasses: called as soon as success or failure is known, before the chat message is created */
+    async applyResultEffects() {}
+
     async performActionAndSendToChat() {
         // Store Roll Information
         DHBasicActionManager.storeActionData(this);
@@ -295,6 +300,9 @@ export class ActionData {
 
         // Determine Success/Hits
         await this.calculateSuccessOrFailure();
+
+        // Effects that depend on the result (e.g. psychic powers that stay in effect)
+        await this.applyResultEffects();
 
         if (this.rollData.action !== 'Stun') {
             await this.checkForOpposed();
@@ -351,6 +359,24 @@ export class PsychicActionData extends ActionData {
             this.template = 'systems/dark-heresy-2nd/templates/chat/psychic-action-chat.hbs';
         }
         await super.performActionAndSendToChat();
+    }
+
+    /**
+     * A successful manifestation switches the effect of the power on (sustained, psy rating reduced, active effect).
+     * A failed re-roll of an action that had switched it on ends it again.
+     */
+    async applyResultEffects() {
+        const power = this.rollData.power;
+        const actor = this.rollData.sourceActor;
+        if (!power || !actor || !hasEffect(power)) return;
+        this.activeEffectText = '';
+        if (this.rollData.success) {
+            this._psyEffectPowerId = power.id;
+            this.activeEffectText = await activatePsychicEffect(actor, power, this.rollData.pr);
+        } else if (this._psyEffectPowerId) {
+            await deactivatePsychicEffect(actor, this._psyEffectPowerId);
+            this._psyEffectPowerId = null;
+        }
     }
 
     async descriptionText() {

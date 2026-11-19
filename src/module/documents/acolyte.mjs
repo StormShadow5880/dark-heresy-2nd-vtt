@@ -70,7 +70,12 @@ export class DarkHeresyAcolyte extends DarkHeresyBaseActor {
         return this.system.backgroundEffects;
     }
 
-    prepareData() {
+    /**
+     * Everything that is calculated from the data runs in prepareDerivedData, i.e. AFTER Foundry applied the
+     * Active Effects. Otherwise an effect (e.g. Unnatural Toughness of a psychic power) would change the
+     * characteristic but not the armour, skill targets or encumbrance that are derived from it.
+     */
+    prepareDerivedData() {
         this.system.backgroundEffects = {
             abilities: [],
         };
@@ -81,7 +86,6 @@ export class DarkHeresyAcolyte extends DarkHeresyBaseActor {
         this._computeArmour();
         this._computeMovement();
         this._computeEncumbrance();
-        super.prepareData();
     }
 
     async rollWeaponDamage(weapon) {

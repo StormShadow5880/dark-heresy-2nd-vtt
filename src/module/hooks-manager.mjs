@@ -40,6 +40,7 @@ import { DHTourMain } from './tours/main-tour.mjs';
 import * as documents from './documents/_module.mjs'
 
 import { SYSTEM_ID } from './system-id.mjs';
+import { onPsychicEffectRemoved, refreshPsychicEffects } from './actions/psychic-effect-manager.mjs';
 export { SYSTEM_ID };
 
 export class HooksManager {
@@ -49,6 +50,8 @@ export class HooksManager {
         Hooks.once('init', HooksManager.init);
         Hooks.on('ready', HooksManager.ready);
         Hooks.on('hotbarDrop', HooksManager.hotbarDrop);
+        Hooks.on('deleteActiveEffect', HooksManager.deleteActiveEffect);
+        Hooks.on('updateActor', HooksManager.updateActor);
 
         DHTargetedActionManager.initializeHooks();
         DHBasicActionManager.initializeHooks();
@@ -141,6 +144,19 @@ Enable Debug with: game.dh.debug = true
         if (!game.settings.get(SYSTEM_ID, DarkHeresySettings.SETTINGS.processActiveEffectsDuringCombat)) {
             DHCombatActionManager.disableHooks();
         }
+    }
+
+    /** Whoever deleted the effect of a sustained power also updates the sustained count */
+    static async deleteActiveEffect(effect, options, userId) {
+        if (userId !== game.user.id) return;
+        await onPsychicEffectRemoved(effect);
+    }
+
+    /** Active psychic effects follow a changed psy rating */
+    static async updateActor(actor, changes, options, userId) {
+        if (userId !== game.user.id) return;
+        if (foundry.utils.getProperty(changes, 'system.psy.rating') === undefined) return;
+        await refreshPsychicEffects(actor);
     }
 
     static hotbarDrop(bar, data, slot) {

@@ -24,6 +24,7 @@ import {
 import { removeLogEntry } from '../../rules/experience.mjs';
 import { MAX_CRITICAL, adjustDamage, applyTypedDamage } from '../../rules/wounds.mjs';
 import { stepCounter } from '../../rules/counters.mjs';
+import { activatePsychicEffect, deactivatePsychicEffect, findPsychicEffect } from '../../actions/psychic-effect-manager.mjs';
 import { prepareAwardExperience, prepareSpendExperience } from '../../prompts/experience-prompt.mjs';
 import { confirmDialog } from '../../prompts/dialog-helpers.mjs';
 
@@ -52,6 +53,7 @@ export class AcolyteDossierSheet extends AcolyteSheet {
             setTraining: AcolyteDossierSheet.#onSetTraining,
             toggleCharEdit: AcolyteDossierSheet.#onToggleCharEdit,
             adjustDamage: AcolyteDossierSheet.#onAdjustDamage,
+            togglePsychicEffect: AcolyteDossierSheet.#onTogglePsychicEffect,
             setCritical: AcolyteDossierSheet.#onSetCritical,
         },
     };
@@ -209,6 +211,18 @@ export class AcolyteDossierSheet extends AcolyteSheet {
         const level = Number(target.dataset.level);
         const current = Number(foundry.utils.getProperty(this.actor, path) ?? 0);
         await this.actor.update({ [path]: current === level ? level - 1 : level });
+    }
+
+    /** Ends an active power by hand, or switches a power with an effect on at the actor's psy rating */
+    static async #onTogglePsychicEffect(event, target) {
+        if (!this.isEditable) return;
+        const power = this.actor.items.get(target.dataset.itemId);
+        if (!power) return;
+        if (findPsychicEffect(this.actor, power.id)) {
+            await deactivatePsychicEffect(this.actor, power.id);
+        } else {
+            await activatePsychicEffect(this.actor, power, this.actor.system.psy.rating);
+        }
     }
 
     /** +1 damage (or -1 when healing). Damage beyond the maximum counts as critical damage. */

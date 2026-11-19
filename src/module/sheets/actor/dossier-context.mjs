@@ -5,6 +5,7 @@
  */
 import { SYSTEM_ID } from '../../system-id.mjs';
 import { woundBar } from '../../rules/wounds.mjs';
+import { hasEffect } from '../../rules/psychic-effects.mjs';
 
 export const CHARACTERISTIC_ORDER = [
     'weaponSkill',
@@ -370,6 +371,8 @@ export function buildPsychic(actor) {
             damage: item.system.damage,
             penetration: item.system.penetration,
             attackType: item.system.attackType,
+            hasEffect: hasEffect(item),
+            active: !!item.getFlag(SYSTEM_ID, 'sustainedActive'),
             isAttack: !!item.system.damage && item.system.damage !== 0 && item.system.damage !== '0',
         }))
         .sort((a, b) => (a.discipline ?? '').localeCompare(b.discipline ?? '') || a.name.localeCompare(b.name));

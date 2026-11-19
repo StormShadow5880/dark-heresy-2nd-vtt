@@ -22,6 +22,9 @@
                 <span class="dh-mod"><b>Opposed {{opposedChar}}</b> {{opposedRoll.total}} vs {{opposedTarget}}{{#if opposedSuccess}} ({{opposedDos}}){{/if}}</span>
             </div>
         {{/if}}
+        {{#if @root.activeEffectText}}
+            <p class="dh-note"><b>In effect</b> – {{@root.activeEffectText}}. The power is sustained until you end it.</p>
+        {{/if}}
         {{#each @root.effectOutput as |effect|}}
             <p class="dh-note"><b>{{effect.name}}</b> – {{effect.effect}}</p>
         {{/each}}
