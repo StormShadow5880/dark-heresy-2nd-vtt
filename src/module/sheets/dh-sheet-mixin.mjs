@@ -83,6 +83,8 @@ export function DHSheetMixin(Base) {
             const show = (name) => {
                 if (!tabs.some((t) => t.dataset.tab === name)) name = tabs[0].dataset.tab;
                 this._activeTab = name;
+                // lets stylesheets react to the active tab (e.g. compact header outside of the overview)
+                this.element.dataset.activeTab = name;
                 navLinks.forEach((a) => a.classList.toggle('active', a.dataset.tab === name));
                 tabs.forEach((t) => t.classList.toggle('active', t.dataset.tab === name));
             };

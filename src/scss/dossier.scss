@@ -61,8 +61,8 @@
         flex-direction: column;
         overflow: hidden;
         background: #0c0c0b;
-        border: 46px solid transparent;
-        border-image: var(--ds-img-frame) 120 fill / 46px / 0 stretch;
+        border: 34px solid transparent;
+        border-image: var(--ds-img-frame) 120 fill / 34px / 0 stretch;
         container-type: inline-size;
         container-name: dossier;
     }
@@ -417,6 +417,70 @@
         }
         .dossier-bio-fields {
             grid-template-columns: 1fr;
+        }
+    }
+
+
+    // ------------------------------------------------ Compact header
+    // The full dossier head (portrait, form fields, big wounds bar) is only shown on the overview.
+    // On every other tab the header shrinks to a single strip so the tab content gets the space.
+    &:not([data-active-tab='overview']) {
+        .dossier-header {
+            min-height: 0;
+            padding-bottom: 4px;
+            align-items: center;
+        }
+        .shield {
+            width: 84px;
+            height: 93px;
+            margin-top: 0;
+        }
+        .shield__ribbon {
+            font-size: 0.5rem;
+            top: 68%;
+        }
+        .record-title,
+        .dossier-bio-fields,
+        .hwounds__sub {
+            display: none;
+        }
+        .dossier-header input.dossier-name {
+            font-size: 1.8rem;
+        }
+        .hwounds {
+            padding-top: 0;
+        }
+        .banner {
+            width: 62px;
+            height: 107px;
+            margin-top: -4px;
+        }
+        .banner__label {
+            display: none;
+        }
+        .banner__value {
+            top: 58%;
+            font-size: 1.05rem;
+        }
+        .dossier-nav {
+            padding-top: 2px;
+        }
+    }
+    @container dossier (min-width: 1041px) {
+        &:not([data-active-tab='overview']) .dossier-header {
+            grid-template-columns: 84px minmax(0, 1fr) 340px 62px;
+        }
+    }
+    @container dossier (max-width: 1040px) {
+        &:not([data-active-tab='overview']) .dossier-header {
+            grid-template-columns: 84px minmax(0, 1fr) 62px;
+            grid-template-areas: 'shield ident banner' 'shield wounds banner';
+        }
+    }
+    @container dossier (max-width: 740px) {
+        &:not([data-active-tab='overview']) .dossier-header {
+            grid-template-columns: 84px minmax(0, 1fr);
+            grid-template-areas: 'shield ident' 'wounds wounds';
         }
     }
 
