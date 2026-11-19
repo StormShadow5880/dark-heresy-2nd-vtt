@@ -35,10 +35,23 @@
                 <button type="button" class="step" data-action="adjustValue" data-path="system.wounds.value" data-delta="1" data-max="{{dossier.res.wounds.max}}" aria-label="Increase wounds">+</button>
             </span>
         </div>
-        <div class="wbar" role="progressbar" aria-valuemin="0" aria-valuemax="{{dossier.res.wounds.max}}" aria-valuenow="{{dossier.res.wounds.value}}">
-            <div class="wbar__full" style="--inset: {{dossier.res.wounds.barInset}}%"></div>
+        <div class="wbar {{#if dossier.res.wounds.bar.serious}}is-serious{{/if}}" role="progressbar" aria-valuemin="0" aria-valuemax="{{dossier.res.wounds.max}}" aria-valuenow="{{dossier.res.wounds.value}}">
+            <i class="wbar__cap wbar__cap--l"></i>
+            <div class="wbar__cells">
+                {{#each dossier.res.wounds.bar.cells as |c|}}<i class="wbar__cell {{#if c.filled}}on{{/if}} {{#if c.minor}}minor{{/if}} {{#if c.gap}}gap{{/if}}"></i>{{/each}}
+            </div>
+            <i class="wbar__cap wbar__cap--r"></i>
         </div>
+        {{#if dossier.res.wounds.bar.cells.length}}
+            <div class="wzones" data-tooltip="Minor damage: the first 2 × toughness bonus points of damage. Beyond that the character is seriously injured.">
+                {{#if dossier.res.wounds.bar.seriousCells}}<span class="wzones__serious" style="flex: {{dossier.res.wounds.bar.seriousCells}}">Serious</span>{{/if}}
+                {{#if dossier.res.wounds.bar.minorCells}}<span class="wzones__minor" style="flex: {{dossier.res.wounds.bar.minorCells}}">Minor · {{dossier.res.wounds.bar.minorLimit}}</span>{{/if}}
+            </div>
+        {{/if}}
         <div class="hwounds__sub">
+            {{#if dossier.res.wounds.bar.hasDamage}}
+                <span class="wstate {{#if dossier.res.wounds.bar.serious}}is-serious{{/if}}">{{#if dossier.res.wounds.bar.serious}}Seriously injured{{else}}Minor damage{{/if}} · {{dossier.res.wounds.bar.damage}}</span>
+            {{/if}}
             {{#if actor.system.wounds.critical}}<span>Critical <b>{{actor.system.wounds.critical}}</b></span>{{/if}}
             <span>Fatigue <b>{{dossier.res.fatigue.value}} / {{dossier.res.fatigue.max}}</b></span>
             <span>Fate <b>{{dossier.res.fate.value}} / {{dossier.res.fate.max}}</b></span>

@@ -28,8 +28,11 @@
     --ds-img-shield: url('../images/dossier/shield.webp');
     --ds-img-ring: url('../images/dossier/ring.webp');
     --ds-img-banner: url('../images/dossier/banner.webp');
-    --ds-img-bar-empty: url('../images/dossier/bar-empty.webp');
-    --ds-img-bar-full: url('../images/dossier/bar-full.webp');
+    --ds-img-wcap-l: url('../images/dossier/wcap-l.webp');
+    --ds-img-wcap-r: url('../images/dossier/wcap-r.webp');
+    --ds-img-wcell-full: url('../images/dossier/wcell-full.webp');
+    --ds-img-wcell-empty: url('../images/dossier/wcell-empty.webp');
+    --ds-img-figure: url('../images/dossier/figure.webp');
     --ds-img-corner: url('../images/dossier/corner.svg');
 
     background: var(--ds-bg);
@@ -217,6 +220,9 @@
 
     // Wounds: always visible, with the supplied segmented bar (empty layer + clipped full layer)
     .dossier-header .hwounds {
+        --h: 44px;
+        --cap-l: calc(var(--h) * 59 / 92);
+        --cap-r: calc(var(--h) * 57 / 92);
         grid-area: wounds;
         padding-top: 6px;
         min-width: 0;
@@ -298,18 +304,93 @@
             }
         }
     }
+    // One cell per maximum wound (artwork: end caps + one repeatable cell, empty and filled variant)
     .wbar {
-        position: relative;
-        width: 100%;
-        // artwork is 900 x 92
-        aspect-ratio: 900 / 92;
+        display: flex;
+        align-items: stretch;
+        height: var(--h);
         margin-top: 3px;
-        background: var(--ds-img-bar-empty) no-repeat center / 100% 100%;
-        &__full {
-            position: absolute;
-            inset: 0;
-            background: var(--ds-img-bar-full) no-repeat center / 100% 100%;
-            clip-path: inset(0 var(--inset, 100%) 0 0);
+        &__cap {
+            flex: none;
+            background: no-repeat center / 100% 100%;
+            &--l {
+                width: var(--cap-l);
+                background-image: var(--ds-img-wcap-l);
+            }
+            &--r {
+                width: var(--cap-r);
+                background-image: var(--ds-img-wcap-r);
+            }
+        }
+        &__cells {
+            flex: 1;
+            display: flex;
+            min-width: 0;
+        }
+        &__cell {
+            flex: 1 1 0;
+            min-width: 0;
+            background: var(--ds-img-wcell-empty) no-repeat center / 100% 100%;
+            &.on {
+                background-image: var(--ds-img-wcell-full);
+            }
+            // gap between the serious and the minor damage zone, marked with a small gold diamond
+            &.gap {
+                position: relative;
+                margin-left: 7px;
+                &::before {
+                    content: '';
+                    position: absolute;
+                    left: -8px;
+                    top: -3px;
+                    width: 7px;
+                    height: 7px;
+                    background: var(--ds-gold);
+                    transform: rotate(45deg);
+                }
+                &::after {
+                    content: '';
+                    position: absolute;
+                    left: -5px;
+                    top: 3px;
+                    bottom: 3px;
+                    width: 1px;
+                    background: rgba(182, 154, 98, 0.65);
+                }
+            }
+        }
+        &.is-serious {
+            filter: drop-shadow(0 0 5px rgba(200, 40, 40, 0.6));
+        }
+    }
+    .wzones {
+        display: flex;
+        margin: 1px var(--cap-r, 26px) 0 var(--cap-l, 28px);
+        font-size: 0.6rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--ds-muted);
+        // the bracket lines show which cells belong to which zone
+        span {
+            min-width: 0;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            text-align: center;
+            border-top: 1px solid var(--ds-line);
+            padding-top: 1px;
+            margin: 0 2px;
+        }
+        &__minor {
+            color: var(--ds-gold);
+            border-top-color: var(--ds-gold) !important;
+        }
+    }
+    .wstate {
+        color: var(--ds-gold);
+        font-weight: 600;
+        &.is-serious {
+            color: #e06a62;
         }
     }
 
@@ -441,8 +522,12 @@
         }
         .record-title,
         .dossier-bio-fields,
-        .hwounds__sub {
+        .hwounds__sub,
+        .wzones {
             display: none;
+        }
+        .hwounds {
+            --h: 38px;
         }
         .dossier-header input.dossier-name {
             font-size: 1.8rem;
@@ -1629,56 +1714,65 @@
             color: #fff;
         }
     }
-    // Armour as a body map: head on top, arms + torso, legs below
-    .body-map {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        grid-template-areas: '. head .' 'rarm body larm' 'rleg . lleg';
-        gap: 6px;
-        padding: 10px 12px 12px;
-        max-width: 420px;
-        margin: 0 auto;
+    // Armour: hit zones laid over the supplied figure illustration
+    .armour-figure {
+        position: relative;
+        width: min(100%, 360px);
+        aspect-ratio: 448 / 520;
+        margin: 8px auto 12px;
+        background: var(--ds-img-figure) no-repeat center / contain;
     }
     .zone {
+        position: absolute;
+        transform: translate(-50%, 0);
+        width: 76px;
         display: flex;
         flex-direction: column;
         align-items: center;
-        padding: 4px 2px 5px;
-        background: linear-gradient(180deg, #232320, #141413);
+        padding: 2px 2px 3px;
+        background: rgba(10, 10, 9, 0.78);
         border: 1px solid var(--ds-line);
+        backdrop-filter: blur(1px);
         &--head {
-            grid-area: head;
+            left: 50%;
+            top: 6%;
         }
         &--body {
-            grid-area: body;
+            left: 50%;
+            top: 31%;
             border-top: 2px solid var(--ds-gold);
         }
         &--rightArm {
-            grid-area: rarm;
+            left: 17%;
+            top: 38%;
         }
         &--leftArm {
-            grid-area: larm;
+            left: 83%;
+            top: 38%;
         }
         &--rightLeg {
-            grid-area: rleg;
+            left: 33%;
+            top: 72%;
         }
         &--leftLeg {
-            grid-area: lleg;
+            left: 67%;
+            top: 72%;
         }
         &__label {
-            font-size: 0.62rem;
+            font-size: 0.56rem;
             text-transform: uppercase;
             letter-spacing: 0.1em;
             color: var(--ds-muted);
+            white-space: nowrap;
         }
         &__total {
             font-family: var(--ds-font-title);
-            font-size: 1.7rem;
-            line-height: 1.1;
+            font-size: 1.55rem;
+            line-height: 1.05;
             color: #fff;
         }
         &__parts {
-            font-size: 0.65rem;
+            font-size: 0.58rem;
             color: var(--ds-muted);
             white-space: nowrap;
         }

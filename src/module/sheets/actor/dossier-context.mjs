@@ -73,21 +73,48 @@ function toNumber(value, fallback = 0) {
     return Number.isFinite(n) ? n : fallback;
 }
 
+const MAX_WOUND_CELLS = 40;
+
 /**
- * The wounds bar artwork has 10 cells. This returns the amount (in percent) that has to be cut off at the right
- * of the "full" layer so that exactly the cells that are (partially) filled stay visible.
- * Geometry (fractions of the artwork width) was measured from the supplied bar image.
+ * Cell layout of the wounds bar: one cell per wound point (so the bar is exactly as long as the maximum wounds).
+ * With more than MAX_WOUND_CELLS wounds a cell stands for several wounds.
+ *
+ * Damage zones (as described by the group's reading of the rules): the first `2 x toughness bonus` points of damage
+ * are "minor damage", every further point means the character is seriously injured. Damage is taken from the right
+ * end of the bar, so the rightmost cells form the minor zone and a gap separates it from the serious zone.
+ * The limit lives here only; it is NOT applied to any dice roll or other game mechanic.
+ *
+ * @param value {number} current wounds
+ * @param max {number} maximum wounds
+ * @param toughnessBonus {number}
  */
-const BAR_FIRST_CELL = 0.0673;
-const BAR_CELL_PITCH = 0.08717;
-const BAR_CELL_WIDTH = 0.0855;
-export function barInset(value, max, cells = 10) {
-    const v = toNumber(value);
-    const m = toNumber(max);
-    if (m <= 0 || v <= 0) return 100;
-    const filled = Math.min(cells, Math.ceil((v / m) * cells));
-    const right = BAR_FIRST_CELL + (filled - 1) * BAR_CELL_PITCH + BAR_CELL_WIDTH;
-    return Math.round((1 - right) * 1000) / 10;
+export function woundBar(value, max, toughnessBonus) {
+    const m = Math.max(0, Math.floor(toNumber(max)));
+    const v = Math.min(m, Math.max(0, Math.floor(toNumber(value))));
+    const minorLimit = Math.min(m, Math.max(0, 2 * Math.floor(toNumber(toughnessBonus))));
+    const count = Math.min(m, MAX_WOUND_CELLS);
+    const per = count ? m / count : 1;
+    const cells = [];
+    for (let i = 0; i < count; i++) {
+        const start = i * per;
+        cells.push({
+            filled: start < v,
+            minor: start >= m - minorLimit,
+            gap: false,
+        });
+    }
+    const firstMinor = cells.findIndex((c) => c.minor);
+    if (firstMinor > 0) cells[firstMinor].gap = true;
+    const damage = m - v;
+    return {
+        cells,
+        damage,
+        minorLimit,
+        seriousCells: cells.filter((c) => !c.minor).length,
+        minorCells: cells.filter((c) => c.minor).length,
+        serious: m > 0 && damage > minorLimit,
+        hasDamage: damage > 0,
+    };
 }
 
 function percent(value, max) {
@@ -127,7 +154,7 @@ export function buildResources(actor) {
             maxPath: 'system.wounds.max',
             max: s.wounds.max,
             pct: percent(s.wounds.value, s.wounds.max),
-            barInset: barInset(s.wounds.value, s.wounds.max),
+            bar: woundBar(s.wounds.value, s.wounds.max, actor.characteristics.toughness?.bonus),
             tone: 'wounds',
             note: s.wounds.critical ? `Critical: ${s.wounds.critical}` : '',
         },

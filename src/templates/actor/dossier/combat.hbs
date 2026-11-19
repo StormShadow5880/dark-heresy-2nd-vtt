@@ -62,7 +62,7 @@
 
         <article class="panel panel--armour">
             <h2 class="panel__title">Armour <span class="panel__hint">Total = armour + toughness bonus + trait</span></h2>
-            <div class="body-map">
+            <div class="armour-figure">
                 {{#each dossier.armour as |z|}}
                     <div class="zone zone--{{z.key}}" data-tooltip="{{z.label}}: armour {{z.armour}} + toughness bonus {{z.toughnessBonus}}{{#if z.traitBonus}} + trait {{z.traitBonus}}{{/if}}">
                         <span class="zone__label">{{z.label}}</span>
