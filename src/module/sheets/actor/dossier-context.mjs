@@ -471,3 +471,26 @@ export function buildProgression(actor, skills) {
         }));
     return { characteristics, skills: trained };
 }
+
+/**
+ * The four counters next to the characteristics. The value is shown inside the symbol, the maximum (where there is
+ * one) stays in the data and is only shown as tooltip.
+ */
+export function buildStatusTiles(actor) {
+    const r = Object.fromEntries(buildResources(actor).map((res) => [res.id, res]));
+    const withMax = (res, label) => `${label} ${res.value}${res.max ? ' / ' + res.max : ''}`;
+    return [
+        { id: 'fatigue', label: 'Fatigue', path: 'system.fatigue.value', value: r.fatigue.value, max: r.fatigue.max, tooltip: withMax(r.fatigue, 'Fatigue') },
+        {
+            id: 'fate',
+            label: 'Fate',
+            path: 'system.fate.value',
+            value: r.fate.value,
+            max: r.fate.max,
+            maxPath: 'system.fate.max',
+            tooltip: withMax(r.fate, 'Fate'),
+        },
+        { id: 'corruption', label: 'Corruption', path: 'system.corruption', value: r.corruption.value, max: null, tooltip: `Corruption ${r.corruption.value} · ${r.corruption.note}` },
+        { id: 'insanity', label: 'Insanity', path: 'system.insanity', value: r.insanity.value, max: null, tooltip: `Insanity ${r.insanity.value} · ${r.insanity.note}` },
+    ];
+}

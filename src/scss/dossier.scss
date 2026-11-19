@@ -42,6 +42,9 @@
     --ds-img-wcell-empty: url('../images/dossier/wcell-empty.webp');
     --ds-img-figure: url('../images/dossier/figure.webp');
     --ds-img-parchment: url('../images/dossier/parchment.webp');
+    --ds-img-emblem-fatigue: url('../images/dossier/emblem-fatigue.webp');
+    --ds-img-emblem-insanity: url('../images/dossier/emblem-insanity.webp');
+    --ds-img-emblem-corruption: url('../images/dossier/emblem-corruption.webp');
     --ds-img-card: url('../images/dossier/char-card.webp');
     --ds-img-card-eagle: url('../images/dossier/char-eagle.webp');
     --ds-img-corner: url('../images/dossier/corner.svg');
@@ -748,47 +751,130 @@
         flex-direction: column;
         min-width: 0;
     }
+    // Fatigue / Fate / Corruption / Insanity: imperial emblem with the value inside, only +/- next to it
     .stat-row {
         display: grid;
-        grid-template-columns: 1fr 1.7fr 1fr 1fr;
-        gap: 10px;
-        margin-bottom: 14px;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 8px;
+        margin-bottom: 12px;
     }
-    .tile {
+    .estat {
+        position: relative;
         display: flex;
-        flex-direction: column;
-        gap: 3px;
+        align-items: center;
+        gap: 6px;
         min-width: 0;
-        padding: 6px 8px 7px;
+        padding: 4px 8px 4px 4px;
         background: rgba(10, 10, 9, 0.58);
         border: 1px solid var(--ds-line);
         border-top: 2px solid var(--ds-gold);
+        &__side {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+            min-width: 0;
+        }
         &__label {
             font-family: var(--ds-font-title);
             font-variant: small-caps;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             letter-spacing: 0.06em;
             color: var(--ds-gold);
+            line-height: 1;
         }
-        &__note {
-            font-size: 0.74rem;
-            color: var(--ds-muted);
-        }
-        &--fate {
-            flex-direction: row;
-            align-items: center;
-            gap: 8px;
-        }
-        &__body {
+        &__btns {
             display: flex;
-            flex-direction: column;
-            gap: 3px;
-            min-width: 0;
+            gap: 4px;
+        }
+        // hover pop-up for the one setting that is not a plain counter (maximum fate)
+        &__pop {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            z-index: 30;
+            width: 190px;
+            margin-top: 4px;
+            padding: 8px 10px;
+            background: linear-gradient(180deg, #232320, #131312);
+            border: 1px solid var(--ds-gold);
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.75);
+            label {
+                display: grid;
+                gap: 4px;
+                font-size: 0.74rem;
+                text-transform: uppercase;
+                letter-spacing: 0.06em;
+                color: var(--ds-muted);
+            }
+            input {
+                height: 24px;
+            }
+        }
+        &:hover,
+        &:focus-within {
+            z-index: 20;
+        }
+        &:hover .estat__pop,
+        &:focus-within .estat__pop {
+            display: block;
         }
     }
-    @container dossier (max-width: 1100px) {
+    .emblem {
+        position: relative;
+        flex: none;
+        width: 66px;
+        height: 66px;
+        background: no-repeat center / contain;
+        filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.7));
+        b {
+            position: absolute;
+            left: 50%;
+            bottom: -3px;
+            transform: translateX(-50%);
+            min-width: 26px;
+            height: 22px;
+            padding: 0 5px;
+            display: grid;
+            place-items: center;
+            background: #0b0b0a;
+            border: 1px solid var(--ds-gold);
+            border-radius: 12px;
+            font-family: var(--ds-font-title);
+            font-size: 1rem;
+            font-weight: 600;
+            line-height: 1;
+            color: #fff;
+        }
+        &--fatigue {
+            background-image: var(--ds-img-emblem-fatigue);
+        }
+        &--corruption {
+            background-image: var(--ds-img-emblem-corruption);
+        }
+        &--insanity {
+            background-image: var(--ds-img-emblem-insanity);
+        }
+        // Fate keeps the spiked ring, its number sits in the centre
+        &--fate {
+            background-image: var(--ds-img-ring);
+            b {
+                top: 50%;
+                bottom: auto;
+                transform: translate(-50%, -50%);
+                min-width: 0;
+                height: auto;
+                padding: 0;
+                background: none;
+                border: 0;
+                font-size: 1.5rem;
+            }
+        }
+    }
+    @container dossier (max-width: 1000px) {
         .stat-row {
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
         }
     }
     @container dossier (max-width: 900px) {
@@ -1034,8 +1120,8 @@
     .chars {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 8px;
-        padding: 10px 10px 12px;
+        gap: 6px;
+        padding: 8px 8px 8px;
     }
     // Card: the supplied brass frame as 9-slice (corner plates keep their size), eagle laid on top
     .char {
@@ -1045,17 +1131,17 @@
         flex-direction: column;
         align-items: center;
         gap: 1px;
-        padding: 7px 4px 0;
-        border: 13px solid transparent;
-        border-image: var(--ds-img-card) 150 / 13px / 0 stretch;
+        padding: 3px 3px 0;
+        border: 9px solid transparent;
+        border-image: var(--ds-img-card) 150 / 9px / 0 stretch;
         background: var(--bg) padding-box;
         &::before {
             content: '';
             position: absolute;
-            top: -13px;
+            top: -9px;
             left: 50%;
-            width: 32px;
-            height: 18px;
+            width: 22px;
+            height: 12px;
             transform: translateX(-50%);
             background: var(--ds-img-card-eagle) no-repeat center / 100% 100%;
             pointer-events: none;
@@ -1069,24 +1155,24 @@
         &__short {
             font-family: var(--ds-font-title);
             font-variant: small-caps;
-            font-size: 1.05rem;
-            letter-spacing: 0.12em;
+            font-size: 0.9rem;
+            letter-spacing: 0.1em;
             color: var(--ds-gold);
-            line-height: 1.05;
+            line-height: 1;
             // thin engraved rule under the title, as on the card artwork
             &::after {
                 content: '';
                 display: block;
                 height: 1px;
-                margin: 2px auto 0;
+                margin: 1px auto 0;
                 background: linear-gradient(90deg, transparent, rgba(182, 154, 98, 0.8) 30%, rgba(182, 154, 98, 0.8) 70%, transparent);
             }
         }
         &__roll {
             width: calc(100% - 4px);
-            height: 30px;
+            height: 24px;
             padding: 0;
-            font-size: 1.4rem;
+            font-size: 1.15rem;
             font-family: var(--ds-font-title);
             color: #f6efdc;
             background: radial-gradient(ellipse at 50% 30%, #121211, #060606);
@@ -1095,7 +1181,7 @@
             box-shadow: inset 0 0 0 1px #000, inset 0 0 8px #000;
             cursor: pointer;
             line-height: 1;
-            margin-top: 3px;
+            margin-top: 2px;
             &:hover,
             &:focus-visible {
                 border-color: var(--ds-gold);
@@ -1107,12 +1193,12 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
-            margin-top: 2px;
-            min-height: 14px;
+            gap: 5px;
+            margin-top: 1px;
+            min-height: 11px;
         }
         &__bonus {
-            font-size: 0.6rem;
+            font-size: 0.54rem;
             letter-spacing: 0.1em;
             text-transform: uppercase;
             color: var(--ds-parchment);
@@ -1120,9 +1206,9 @@
         }
         &__edit-toggle {
             position: absolute;
-            top: -10px;
-            right: -10px;
-            width: 18px;
+            top: -8px;
+            right: -8px;
+            width: 16px;
             height: 18px;
             padding: 0;
             background: transparent;
@@ -1149,9 +1235,9 @@
             padding: 0;
             gap: 0;
             .pip {
-                width: 6px;
-                height: 6px;
-                margin: 0 1.5px;
+                width: 5px;
+                height: 5px;
+                margin: 0 1px;
             }
         }
 

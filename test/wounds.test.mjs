@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { MAX_CRITICAL, adjustDamage, valueForDamage, woundBar } from '../src/module/rules/wounds.mjs';
+import { MAX_CRITICAL, adjustDamage, applyTypedDamage, woundBar } from '../src/module/rules/wounds.mjs';
 
 test('the track starts without damage: nothing is filled', () => {
     const bar = woundBar(12, 12, 0, 3);
@@ -66,23 +66,51 @@ test('values are clamped and big pools use at most 40 cells', () => {
     assert.equal(big.cells.filter((c) => c.filled).length, 30);
 });
 
-test('adjustDamage: +1 damage lowers the remaining wounds, healing raises them', () => {
+test('adjustDamage: damage lowers the remaining wounds first', () => {
     assert.deepEqual(adjustDamage({ value: 10, max: 12, critical: 0 }, 1), { value: 9 });
-    assert.deepEqual(adjustDamage({ value: 10, max: 12, critical: 0 }, -1), { value: 11 });
-    assert.equal(adjustDamage({ value: 12, max: 12, critical: 0 }, -1), null); // nothing to heal
+    assert.deepEqual(adjustDamage({ value: 1, max: 12, critical: 0 }, 1), { value: 0 });
 });
 
-test('adjustDamage: damage beyond the maximum becomes critical damage, capped at ten', () => {
+test('adjustDamage: once the maximum is reached every further point becomes critical damage, capped at ten', () => {
+    assert.deepEqual(adjustDamage({ value: 0, max: 12, critical: 0 }, 1), { critical: 1 });
     assert.deepEqual(adjustDamage({ value: 0, max: 12, critical: 3 }, 1), { critical: 4 });
     assert.equal(adjustDamage({ value: 0, max: 12, critical: 10 }, 1), null);
-    // healing never touches the critical damage
-    assert.deepEqual(adjustDamage({ value: 0, max: 12, critical: 3 }, -1), { value: 1 });
 });
 
-test('valueForDamage converts an entered damage into the stored remaining wounds', () => {
-    assert.equal(valueForDamage(0, 12), 12);
-    assert.equal(valueForDamage(5, 12), 7);
-    assert.equal(valueForDamage(99, 12), 0);
-    assert.equal(valueForDamage(-3, 12), 12);
-    assert.equal(valueForDamage('abc', 12), 12);
+test('adjustDamage: healing runs the other way round - critical first, then wounds', () => {
+    assert.deepEqual(adjustDamage({ value: 0, max: 12, critical: 3 }, -1), { critical: 2 });
+    assert.deepEqual(adjustDamage({ value: 0, max: 12, critical: 1 }, -1), { critical: 0 });
+    assert.deepEqual(adjustDamage({ value: 0, max: 12, critical: 0 }, -1), { value: 1 });
+    assert.deepEqual(adjustDamage({ value: 5, max: 12, critical: 0 }, -1), { value: 6 });
+    assert.equal(adjustDamage({ value: 12, max: 12, critical: 0 }, -1), null); // nothing left to heal
+});
+
+test('adjustDamage: damage and healing are exact inverses over the whole range', () => {
+    let state = { value: 3, max: 3, critical: 0 };
+    const apply = (delta) => {
+        const u = adjustDamage(state, delta);
+        if (u) state = { ...state, ...u };
+        return state;
+    };
+    const seen = [];
+    for (let i = 0; i < 3 + MAX_CRITICAL; i++) seen.push({ ...apply(1) });
+    assert.deepEqual(state, { value: 0, max: 3, critical: MAX_CRITICAL });
+    // walking back visits the same states in reverse order
+    for (let i = seen.length - 2; i >= 0; i--) assert.deepEqual(apply(-1), seen[i]);
+    apply(-1);
+    assert.deepEqual(state, { value: 3, max: 3, critical: 0 });
+    // never negative, never above the limits
+    for (let i = 0; i < 40; i++) apply(1);
+    assert.ok(state.value >= 0 && state.critical <= MAX_CRITICAL);
+    for (let i = 0; i < 40; i++) apply(-1);
+    assert.ok(state.value <= state.max && state.critical >= 0);
+});
+
+test('typed damage: up to the maximum it hits the wounds, above it the excess becomes critical damage', () => {
+    assert.deepEqual(applyTypedDamage(5, 12, 0), { value: 7, critical: 0 });
+    assert.deepEqual(applyTypedDamage(5, 12, 2), { value: 7, critical: 2 }); // within the maximum: critical untouched
+    assert.deepEqual(applyTypedDamage(15, 12, 0), { value: 0, critical: 3 });
+    assert.deepEqual(applyTypedDamage(99, 12, 0), { value: 0, critical: MAX_CRITICAL });
+    assert.deepEqual(applyTypedDamage(-4, 12, 0), { value: 12, critical: 0 });
+    assert.deepEqual(applyTypedDamage('abc', 12, 0), { value: 12, critical: 0 });
 });

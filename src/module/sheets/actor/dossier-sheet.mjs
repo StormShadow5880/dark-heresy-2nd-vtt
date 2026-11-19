@@ -12,6 +12,7 @@ import {
     buildQuickSkills,
     buildRelations,
     buildResources,
+    buildStatusTiles,
     buildSkills,
     buildWeapons,
     buildSpecialistGroups,
@@ -21,7 +22,8 @@ import {
     TRAINING_LEVELS,
 } from './dossier-context.mjs';
 import { removeLogEntry } from '../../rules/experience.mjs';
-import { MAX_CRITICAL, adjustDamage, valueForDamage } from '../../rules/wounds.mjs';
+import { MAX_CRITICAL, adjustDamage, applyTypedDamage } from '../../rules/wounds.mjs';
+import { stepCounter } from '../../rules/counters.mjs';
 import { prepareAwardExperience, prepareSpendExperience } from '../../prompts/experience-prompt.mjs';
 import { confirmDialog } from '../../prompts/dialog-helpers.mjs';
 
@@ -83,6 +85,7 @@ export class AcolyteDossierSheet extends AcolyteSheet {
         context.dossier = {
             characteristics: buildCharacteristics(actor),
             resources: resources,
+            statusTiles: buildStatusTiles(actor),
             res: Object.fromEntries(resources.map((r) => [r.id, r])),
             skills,
             quickSkills: buildQuickSkills(actor, skills),
@@ -133,8 +136,9 @@ export class AcolyteDossierSheet extends AcolyteSheet {
         this.element.querySelectorAll('input.damage-input').forEach((input) =>
             input.addEventListener('change', async (ev) => {
                 ev.stopPropagation();
-                const value = valueForDamage(input.value, this.actor.system.wounds.max);
-                await this.actor.update({ 'system.wounds.value': value });
+                const wounds = this.actor.system.wounds;
+                const update = applyTypedDamage(input.value, wounds.max, wounds.critical);
+                await this.actor.update({ 'system.wounds.value': update.value, 'system.wounds.critical': update.critical });
                 this.render();
             }),
         );
@@ -264,13 +268,12 @@ export class AcolyteDossierSheet extends AcolyteSheet {
         ui.notifications.info(`${item.name} reloaded (${max}/${max}).`);
     }
 
+    /** +/- on the simple counters (fatigue, fate, corruption, insanity) */
     static async #onAdjustValue(event, target) {
+        if (!this.isEditable) return;
         const { path, delta } = target.dataset;
-        const max = target.dataset.max !== undefined && target.dataset.max !== '' ? Number(target.dataset.max) : null;
         const current = Number(foundry.utils.getProperty(this.actor, path) ?? 0);
-        let next = current + Number(delta);
-        if (next < 0) next = 0;
-        if (max !== null && Number.isFinite(max) && max > 0 && next > max) next = max;
+        const next = stepCounter(current, Number(delta), target.dataset.max);
         if (next === current) return;
         await this.actor.update({ [path]: next });
     }

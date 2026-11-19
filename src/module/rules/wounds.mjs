@@ -65,8 +65,14 @@ export function woundBar(value, max, critical, toughnessBonus) {
 
 /**
  * Applies one step of damage (delta > 0) or healing (delta < 0).
- * Damage beyond the maximum wounds is counted as critical damage (capped at MAX_CRITICAL).
- * Healing only reduces damage, critical damage is changed explicitly.
+ *
+ * Damage is applied to the wounds first; once the maximum wounds are reached every further point of damage
+ * is counted as critical damage (capped at MAX_CRITICAL). Healing runs exactly the other way round:
+ * critical damage is reduced first, then the wounds. Nothing becomes negative.
+ *
+ * Critical damage here is only the excess damage that is tracked on the sheet. Critical injuries and their
+ * effects are still handled by the existing critical damage rules of the system.
+ *
  * @returns {{value?: number, critical?: number} | null} the update to apply, or null when nothing changes
  */
 export function adjustDamage({ value, max, critical }, delta) {
@@ -80,14 +86,24 @@ export function adjustDamage({ value, max, critical }, delta) {
         return null;
     }
     if (step < 0) {
+        if (c > 0) return { critical: c - 1 };
         if (v < m) return { value: v + 1 };
         return null;
     }
     return null;
 }
 
-/** Remaining wounds for an entered amount of damage (clamped to 0..max) */
-export function valueForDamage(damage, max) {
+/**
+ * A damage amount typed into the wounds field: the wounds take up to their maximum, everything above that is
+ * entered as critical damage. A value within the maximum leaves the critical damage untouched.
+ * @returns {{value: number, critical: number}} remaining wounds and critical damage to store
+ */
+export function applyTypedDamage(typed, max, critical) {
     const m = Math.max(0, Math.floor(toNumber(max)));
-    return m - Math.min(m, Math.max(0, Math.floor(toNumber(damage))));
+    const d = Math.max(0, Math.floor(toNumber(typed)));
+    const c = Math.min(MAX_CRITICAL, Math.max(0, Math.floor(toNumber(critical))));
+    return {
+        value: m - Math.min(m, d),
+        critical: d > m ? Math.min(MAX_CRITICAL, d - m) : c,
+    };
 }

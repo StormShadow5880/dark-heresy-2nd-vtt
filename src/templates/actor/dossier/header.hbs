@@ -30,8 +30,8 @@
                 <input type="number" data-dtype="Number" name="system.wounds.max" value="{{dossier.res.wounds.max}}" aria-label="Maximum wounds" />
             </span>
             <span class="hmini__steps">
-                <button type="button" class="step" data-action="adjustDamage" data-delta="-1" aria-label="Heal one wound" data-tooltip="Heal 1 wound">−</button>
-                <button type="button" class="step" data-action="adjustDamage" data-delta="1" aria-label="Take one wound" data-tooltip="+1 wound (beyond the maximum: critical damage)">+</button>
+                <button type="button" class="step" data-action="adjustDamage" data-delta="-1" aria-label="Heal one point" data-tooltip="Heal 1 (critical damage first, then wounds)">−</button>
+                <button type="button" class="step" data-action="adjustDamage" data-delta="1" aria-label="Take one point of damage" data-tooltip="+1 damage (on the wounds first, beyond the maximum it becomes critical damage)">+</button>
             </span>
         </div>
         <div class="wbar wbar--mini {{#if dossier.res.wounds.bar.serious}}is-serious{{/if}} {{#if dossier.res.wounds.bar.dead}}is-dead{{/if}}" role="progressbar" aria-valuemin="0" aria-valuemax="{{dossier.res.wounds.max}}" aria-valuenow="{{dossier.res.wounds.bar.damage}}">
@@ -48,7 +48,7 @@
             </div>
         {{/if}}
         <div class="crit {{#if dossier.res.wounds.bar.dead}}is-dead{{/if}}">
-            <span class="crit__label" data-tooltip="Critical damage: damage beyond the maximum wounds. At 10 the character is dead. The injuries are listed on the Combat tab.">Critical</span>
+            <span class="crit__label" data-tooltip="Critical damage: the damage beyond the maximum wounds. The critical injuries themselves are handled with the critical damage rules, they are listed on the Combat tab. At 10 the character is dead.">Critical</span>
             <span class="crit__pips" role="group" aria-label="Critical damage">
                 {{#each dossier.res.wounds.bar.criticalPips as |p|}}<button type="button" class="crit__pip {{#if p.filled}}on{{/if}}" data-action="setCritical" data-level="{{p.level}}" aria-label="Set critical damage to {{p.level}}" aria-pressed="{{p.filled}}"></button>{{/each}}
             </span>

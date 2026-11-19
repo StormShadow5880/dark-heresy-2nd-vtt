@@ -32,46 +32,24 @@
 
         <div class="ov-main">
             <div class="stat-row">
-                <div class="tile tile--fatigue">
-                    <span class="tile__label">Fatigue</span>
-                    <div class="stat__counter">
-                        <button type="button" class="step" data-action="adjustValue" data-path="system.fatigue.value" data-delta="-1" data-max="{{dossier.res.fatigue.max}}" aria-label="Decrease fatigue">−</button>
-                        <input type="number" data-dtype="Number" name="system.fatigue.value" value="{{dossier.res.fatigue.value}}" aria-label="Fatigue" />
-                        <span class="sep">/ {{dossier.res.fatigue.max}}</span>
-                        <button type="button" class="step" data-action="adjustValue" data-path="system.fatigue.value" data-delta="1" data-max="{{dossier.res.fatigue.max}}" aria-label="Increase fatigue">+</button>
-                    </div>
-                </div>
-                <div class="tile tile--fate">
-                    <div class="ring ring--fate ring--small" data-tooltip="Fate points"><b>{{dossier.res.fate.value}}</b><small>of {{dossier.res.fate.max}}</small></div>
-                    <div class="tile__body">
-                        <span class="tile__label">Fate</span>
-                        <div class="stat__counter">
-                            <button type="button" class="step" data-action="adjustValue" data-path="system.fate.value" data-delta="-1" data-max="{{dossier.res.fate.max}}" aria-label="Decrease fate">−</button>
-                            <input type="number" data-dtype="Number" name="system.fate.value" value="{{dossier.res.fate.value}}" aria-label="Fate" />
-                            <span class="sep">/</span>
-                            <input type="number" data-dtype="Number" name="system.fate.max" value="{{dossier.res.fate.max}}" aria-label="Maximum fate" />
-                            <button type="button" class="step" data-action="adjustValue" data-path="system.fate.value" data-delta="1" data-max="{{dossier.res.fate.max}}" aria-label="Increase fate">+</button>
+                {{#each dossier.statusTiles as |t|}}
+                    <div class="estat estat--{{t.id}}" data-tooltip="{{t.tooltip}}">
+                        <div class="emblem emblem--{{t.id}}"><b>{{t.value}}</b></div>
+                        <div class="estat__side">
+                            <span class="estat__label">{{t.label}}</span>
+                            <span class="estat__btns">
+                                <button type="button" class="step" data-action="adjustValue" data-path="{{t.path}}" data-delta="-1" data-max="{{t.max}}" aria-label="Decrease {{t.label}}">−</button>
+                                <button type="button" class="step" data-action="adjustValue" data-path="{{t.path}}" data-delta="1" data-max="{{t.max}}" aria-label="Increase {{t.label}}">+</button>
+                            </span>
                         </div>
+                        {{#if t.maxPath}}
+                            <div class="estat__pop" role="group" aria-label="{{t.label}} maximum">
+                                <label><span>Maximum {{t.label}}</span>
+                                    <input type="number" data-dtype="Number" name="{{t.maxPath}}" value="{{t.max}}" /></label>
+                            </div>
+                        {{/if}}
                     </div>
-                </div>
-                <div class="tile tile--corruption">
-                    <span class="tile__label">Corruption</span>
-                    <div class="stat__counter">
-                        <button type="button" class="step" data-action="adjustValue" data-path="system.corruption" data-delta="-1" aria-label="Decrease corruption">−</button>
-                        <input type="number" data-dtype="Number" name="system.corruption" value="{{dossier.res.corruption.value}}" aria-label="Corruption" />
-                        <button type="button" class="step" data-action="adjustValue" data-path="system.corruption" data-delta="1" aria-label="Increase corruption">+</button>
-                    </div>
-                    <span class="tile__note">{{dossier.res.corruption.note}}</span>
-                </div>
-                <div class="tile tile--insanity">
-                    <span class="tile__label">Insanity</span>
-                    <div class="stat__counter">
-                        <button type="button" class="step" data-action="adjustValue" data-path="system.insanity" data-delta="-1" aria-label="Decrease insanity">−</button>
-                        <input type="number" data-dtype="Number" name="system.insanity" value="{{dossier.res.insanity.value}}" aria-label="Insanity" />
-                        <button type="button" class="step" data-action="adjustValue" data-path="system.insanity" data-delta="1" aria-label="Increase insanity">+</button>
-                    </div>
-                    <span class="tile__note">{{dossier.res.insanity.note}}</span>
-                </div>
+                {{/each}}
             </div>
 
             <article class="panel panel--quick">
