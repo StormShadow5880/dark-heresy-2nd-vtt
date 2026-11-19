@@ -281,3 +281,50 @@
         color: #a99673;
     }
 }
+
+// additions for the other ornate cards (attacks, damage, status messages, descriptions)
+.dh-ui.dh-card--ornate {
+    // damage / single-number results use the same crest, the number is the main information
+    .dh-badge--damage .dh-badge__num {
+        font-size: 2.1rem;
+    }
+    .dh-verdict--info {
+        color: var(--ds-gold-soft);
+    }
+    .dh-note {
+        margin: 4px 0 0;
+        text-align: center;
+    }
+    .dh-note--alert {
+        border-left: 0;
+        padding-left: 0;
+        color: #e4a29a;
+    }
+    .dh-card__foot--center {
+        justify-content: center;
+        padding: 0;
+    }
+    .dh-prose--center {
+        text-align: left;
+        padding: 2px 4px 4px;
+    }
+    // hidden damage / effect block
+    .dh-detail {
+        margin-top: 6px;
+        padding: 0;
+        border-top: 1px solid var(--ds-line);
+    }
+    .dh-hit {
+        align-items: stretch;
+        gap: 3px;
+        padding: 8px 0 2px;
+        &__title {
+            justify-content: center;
+            gap: 10px;
+            font-size: 0.95rem;
+        }
+        .dh-badge {
+            height: 76px;
+        }
+    }
+}

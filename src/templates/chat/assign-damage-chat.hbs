@@ -1,29 +1,21 @@
-<div class="dh-ui dh-card {{#if this.hasCriticalDamage}}dh-card--fail{{else}}dh-card--info{{/if}}">
-    <header class="dh-card__head">
-        <span class="dh-card__title">{{this.actor.name}}</span>
-        <span class="dh-card__action">{{#if hasDamage}}{{this.hit.location}} Hit{{else}}Status{{/if}}</span>
-    </header>
-    <div class="dh-card__body">
-        {{#if this.hasDamage}}
-            <div class="dh-result dh-result--fail">
-                <span class="dh-result__roll" data-tooltip="Damage taken">{{this.damageTaken}}</span>
-                <span class="dh-result__main">
-                    <span class="dh-status dh-status--fail">{{this.hit.damageType}} damage</span>
-                    <span class="dh-result__detail">Wounds {{this.actor.system.wounds.value}} / {{this.actor.system.wounds.max}}</span>
-                </span>
-            </div>
-        {{/if}}
-        {{#if this.hasFatigueDamage}}
-            <div class="dh-mods"><span class="dh-mod dh-mod--alert"><b>Fatigue</b> +{{this.fatigueTaken}}</span></div>
-        {{/if}}
-        {{#if this.hasCriticalDamage}}
-            <div class="dh-mods"><span class="dh-mod dh-mod--alert"><b>Critical damage</b> +{{this.criticalDamageTaken}}</span></div>
-            <p class="dh-note dh-note--alert">{{this.criticalEffect}}</p>
-        {{/if}}
-        <div class="dh-mods">
-            <span class="dh-mod"><b>Wounds</b> {{this.actor.system.wounds.value}} / {{this.actor.system.wounds.max}}</span>
-            <span class="dh-mod"><b>Fatigue</b> {{this.actor.system.fatigue.value}} / {{this.actor.system.fatigue.max}}</span>
-            <span class="dh-mod"><b>Critical</b> {{this.actor.system.wounds.critical}}</span>
-        </div>
+<div class="dh-ui dh-card dh-card--ornate {{#if this.hasCriticalDamage}}dh-card--fail{{/if}}">
+    <div class="dh-card__eyebrow">{{#if hasDamage}}{{this.hit.location}} Hit{{else}}Status{{/if}}</div>
+    <h2 class="dh-card__name">{{this.actor.name}}</h2>
+    <div class="dh-rule"></div>
+    {{#if this.hasDamage}}
+        <div class="dh-badge dh-badge--damage" data-tooltip="Damage taken"><span class="dh-badge__num">{{this.damageTaken}}</span></div>
+        <div class="dh-verdict dh-verdict--fail">{{this.hit.damageType}} damage</div>
+    {{/if}}
+    {{#if this.hasFatigueDamage}}
+        <div class="dh-mods dh-mods--center"><span class="dh-mod dh-mod--alert"><b>Fatigue</b> +{{this.fatigueTaken}}</span></div>
+    {{/if}}
+    {{#if this.hasCriticalDamage}}
+        <div class="dh-mods dh-mods--center"><span class="dh-mod dh-mod--alert"><b>Critical damage</b> +{{this.criticalDamageTaken}}</span></div>
+        <p class="dh-note dh-note--alert">{{this.criticalEffect}}</p>
+    {{/if}}
+    <div class="dh-mods dh-mods--center">
+        <span class="dh-mod"><b>Wounds</b> {{this.actor.system.wounds.value}} / {{this.actor.system.wounds.max}}</span>
+        <span class="dh-mod"><b>Fatigue</b> {{this.actor.system.fatigue.value}} / {{this.actor.system.fatigue.max}}</span>
+        <span class="dh-mod"><b>Critical</b> {{this.actor.system.wounds.critical}}</span>
     </div>
 </div>

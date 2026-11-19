@@ -1,49 +1,49 @@
-<div class="dh-ui dh-card {{#unless rollData.ignoreSuccess}}{{#if rollData.success}}dh-card--success{{else}}dh-card--fail{{/if}}{{/unless}}">
+<div class="dh-ui dh-card dh-card--ornate {{#unless rollData.ignoreSuccess}}{{#if rollData.success}}dh-card--success{{else}}dh-card--fail{{/if}}{{/unless}}">
     {{#with rollData}}
-        <header class="dh-card__head">
-            <span class="dh-card__title">{{name}}</span>
-            {{#if action}}<span class="dh-card__action">{{action}}</span>{{/if}}
-        </header>
-        {{#if @root.label}}<p class="dh-card__sub">{{@root.label}}{{#if effectString}} · {{effectString}}{{/if}}</p>
-        {{else if effectString}}<p class="dh-card__sub">{{effectString}}</p>{{/if}}
-        <div class="dh-card__body">
-            {{#unless ignoreSuccess}}
-                <div class="dh-result {{#if success}}dh-result--success{{else}}dh-result--fail{{/if}}">
-                    <span class="dh-result__roll" data-tooltip="Dice result (W100)">{{roll.total}}</span>
-                    <span class="dh-result__main">
-                        <span class="dh-status {{#if success}}dh-status--success{{else}}dh-status--fail{{/if}}">{{#if success}}Success{{else}}Failure{{/if}}</span>
-                        <span class="dh-result__detail">
-                            {{#unless ignoreModifiers}}Target {{modifiedTarget}}{{/unless}}
-                            {{#unless ignoreDegrees}}{{#unless ignoreModifiers}} · {{/unless}}{{#if success}}{{dos}} DoS{{else}}{{dof}} DoF{{/if}}{{/unless}}
-                        </span>
-                    </span>
-                </div>
+        <div class="dh-card__eyebrow">{{#if action}}{{action}}{{else}}Attack{{/if}}</div>
+        <h2 class="dh-card__name">{{name}}</h2>
+        {{#if @root.label}}<div class="dh-card__sub">{{@root.label}}{{#if effectString}} · {{effectString}}{{/if}}</div>
+        {{else if effectString}}<div class="dh-card__sub">{{effectString}}</div>{{/if}}
+        <div class="dh-rule"></div>
+
+        {{#unless ignoreSuccess}}
+            <div class="dh-vs">
+                <div class="dh-vs__value" data-tooltip="Dice result (W100)"><span>Roll</span><strong>{{roll.total}}</strong></div>
+                {{#unless ignoreModifiers}}
+                    <div class="dh-vs__sep">vs</div>
+                    <div class="dh-vs__value" data-tooltip="Base {{baseTarget}} with all modifiers"><span>Target</span><strong>{{modifiedTarget}}</strong></div>
+                {{/unless}}
+            </div>
+            {{#unless ignoreDegrees}}
+                <div class="dh-badge" data-tooltip="{{#if success}}Degrees of success{{else}}Degrees of failure{{/if}}"><span class="dh-badge__num">{{#if success}}+{{dos}}{{else}}−{{dof}}{{/if}}</span></div>
             {{/unless}}
+            <div class="dh-verdict {{#if success}}dh-verdict--success{{else}}dh-verdict--fail{{/if}}">{{#if success}}Success{{else}}Failure{{/if}}</div>
+            {{#unless ignoreDegrees}}<p class="dh-detail-line">{{#if success}}{{dos}} degrees of success{{else}}{{dof}} degrees of failure{{/if}}</p>{{/unless}}
+        {{/unless}}
 
-            {{#unless ignoreModifiers}}
-                <div class="dh-mods">
-                    <span class="dh-mod"><b>Base</b> {{baseTarget}}</span>
-                    {{#each activeModifiers}}<span class="dh-mod"><b>{{@key}}</b> {{this}}</span>{{/each}}
-                    <span class="dh-mod dh-mod--total"><b>Target</b> {{modifiedTarget}}</span>
-                    {{#if usesAmmo}}<span class="dh-mod"><b>Ammo used</b> {{ammoUsed}}</span>{{/if}}
-                </div>
-            {{else}}
-                {{#if usesAmmo}}<div class="dh-mods"><span class="dh-mod"><b>Ammo used</b> {{ammoUsed}}</span></div>{{/if}}
-            {{/unless}}
+        {{#unless ignoreModifiers}}
+            <div class="dh-mods dh-mods--center">
+                <span class="dh-mod"><b>Base</b> {{baseTarget}}</span>
+                {{#each activeModifiers}}<span class="dh-mod"><b>{{@key}}</b> {{this}}</span>{{/each}}
+                {{#if usesAmmo}}<span class="dh-mod"><b>Ammo used</b> {{ammoUsed}}</span>{{/if}}
+            </div>
+        {{else}}
+            {{#if usesAmmo}}<div class="dh-mods dh-mods--center"><span class="dh-mod"><b>Ammo used</b> {{ammoUsed}}</span></div>{{/if}}
+        {{/unless}}
 
-            {{#if isOpposed}}
-                <div class="dh-mods">
-                    <span class="dh-mod"><b>Opposed {{opposedChar}}</b> {{opposedRoll.total}} vs {{opposedTarget}}{{#if opposedSuccess}} ({{opposedDos}}){{/if}}</span>
-                </div>
-            {{/if}}
+        {{#if isOpposed}}
+            <div class="dh-mods dh-mods--center">
+                <span class="dh-mod"><b>Opposed {{opposedChar}}</b> {{opposedRoll.total}} vs {{opposedTarget}}{{#if opposedSuccess}} ({{opposedDos}}){{/if}}</span>
+            </div>
+        {{/if}}
 
-            {{#each @root.effectOutput as |effect|}}
-                <p class="dh-note"><b>{{effect.name}}</b> – {{effect.effect}}</p>
-            {{/each}}
-        </div>
+        {{#each @root.effectOutput as |effect|}}
+            <p class="dh-note"><b>{{effect.name}}</b> – {{effect.effect}}</p>
+        {{/each}}
 
         {{#unless ignoreControls}}
-            <footer class="dh-card__foot">
+            <div class="dh-rule"></div>
+            <footer class="dh-card__foot dh-card__foot--center">
                 {{#if showDamage}}
                     <button type="button" class="dh-btn roll-control__hide-control" data-toggle="{{@root.id}}">
                         <i class="fa-solid fa-burst"></i><span>Damage</span>
@@ -72,14 +72,13 @@
                 {{#each hits as |hit|}}
                     <section class="dh-hit">
                         <h4 class="dh-hit__title">Hit {{inc @index}}<span>{{hit.location}}</span></h4>
-                        <div class="dh-result dh-result--info">
-                            <span class="dh-result__roll" data-tooltip="Total damage">{{hit.totalDamage}}</span>
-                            <span class="dh-result__main">
-                                <span class="dh-status dh-status--info">Damage</span>
-                                <span class="dh-result__detail">{{hit.damageType}} · {{hit.location}} · Pen {{hit.totalPenetration}}</span>
-                            </span>
+                        <div class="dh-vs">
+                            <div class="dh-vs__value" data-tooltip="Total damage"><span>Damage</span><strong>{{hit.totalDamage}}</strong></div>
+                            <div class="dh-vs__sep">·</div>
+                            <div class="dh-vs__value" data-tooltip="Total penetration"><span>Pen</span><strong>{{hit.totalPenetration}}</strong></div>
                         </div>
-                        <div class="dh-mods">
+                        <p class="dh-detail-line">{{hit.damageType}} · {{hit.location}}</p>
+                        <div class="dh-mods dh-mods--center">
                             <span class="dh-mod"><b>Formula</b> {{hit.damageRoll.formula}}</span>
                             <span class="dh-mod"><b>Roll</b> {{hit.damageRoll.result}}</span>
                             {{#each modifiers}}<span class="dh-mod"><b>{{@key}}</b> {{this}}</span>{{/each}}
@@ -93,7 +92,7 @@
                             <p class="dh-note dh-note--alert"><b>Righteous Fury</b> – level {{fury.roll.total}} critical effect. {{fury.effect}}</p>
                         {{/each}}
                         {{#if @root.rollData.targetActor}}
-                            <div class="dh-card__foot">
+                            <div class="dh-card__foot dh-card__foot--center">
                                 <button type="button" class="dh-btn dh-btn--primary roll-control__assign-damage"
                                         data-location="{{hit.location}}"
                                         data-total-damage="{{hit.totalDamage}}"

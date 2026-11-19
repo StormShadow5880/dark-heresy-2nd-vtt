@@ -1,16 +1,15 @@
-<div class="dh-ui dh-card dh-card--fail">
-    <header class="dh-card__head">
-        <span class="dh-card__title">{{actor.name}}</span>
-        <span class="dh-card__action">Bleeding!</span>
-    </header>
-    <div class="dh-card__body">
-        <div class="dh-mods">
-            <span class="dh-mod dh-mod--alert"><b>Fatigue</b> +1</span>
-            <span class="dh-mod"><b>Fatigue now</b> {{actor.system.fatigue.value}} / {{actor.system.fatigue.max}}</span>
-        </div>
-        <p class="dh-note">Once per round as a Free Action, he (or another character who can reach him) can attempt a Difficult (–10) Medicae test to remove this condition.</p>
+<div class="dh-ui dh-card dh-card--ornate dh-card--fail">
+    <div class="dh-card__eyebrow">Bleeding!</div>
+    <h2 class="dh-card__name">{{actor.name}}</h2>
+    <div class="dh-rule"></div>
+    <div class="dh-badge dh-badge--damage" data-tooltip="Fatigue"><span class="dh-badge__num">+1</span></div>
+    <div class="dh-verdict dh-verdict--fail">Fatigue</div>
+    <div class="dh-mods dh-mods--center">
+        <span class="dh-mod"><b>Fatigue now</b> {{actor.system.fatigue.value}} / {{actor.system.fatigue.max}}</span>
     </div>
-    <footer class="dh-card__foot">
+    <p class="dh-note">Once per round as a Free Action, he (or another character who can reach him) can attempt a Difficult (–10) Medicae test to remove this condition.</p>
+    <div class="dh-rule"></div>
+    <footer class="dh-card__foot dh-card__foot--center">
         <button type="button" class="dh-btn dh-btn--primary roll-control__apply-damage"
                 data-uuid="{{actor.uuid}}"
                 data-damage="0"

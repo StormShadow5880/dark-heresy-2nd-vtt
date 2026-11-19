@@ -1,24 +1,21 @@
-<div class="dh-ui dh-card {{#if success}}dh-card--success{{else}}dh-card--fail{{/if}}">
-    <header class="dh-card__head">
-        <span class="dh-card__title">{{actor.name}}</span>
-        <span class="dh-card__action">On Fire!</span>
-    </header>
-    <p class="dh-card__sub">On Fire damage ignores armour</p>
-    <div class="dh-card__body">
-        <div class="dh-result {{#if success}}dh-result--success{{else}}dh-result--fail{{/if}}">
-            <span class="dh-result__roll" data-tooltip="Willpower test (W100)">{{roll.total}}</span>
-            <span class="dh-result__main">
-                <span class="dh-status {{#if success}}dh-status--success{{else}}dh-status--fail{{/if}}">{{#if success}}Willpower success{{else}}Willpower failure{{/if}}</span>
-                <span class="dh-result__detail">Target {{target}}</span>
-            </span>
-        </div>
-        <div class="dh-mods">
-            <span class="dh-mod"><b>Energy damage</b> {{damage}}</span>
-            <span class="dh-mod"><b>Fatigue</b> 1</span>
-        </div>
-        <p class="dh-note">{{#if success}}You may take actions as normal.{{else}}You can only flail in agony and scream.{{/if}}</p>
+<div class="dh-ui dh-card dh-card--ornate {{#if success}}dh-card--success{{else}}dh-card--fail{{/if}}">
+    <div class="dh-card__eyebrow">On Fire!</div>
+    <h2 class="dh-card__name">{{actor.name}}</h2>
+    <div class="dh-card__sub">On Fire damage ignores armour</div>
+    <div class="dh-rule"></div>
+    <div class="dh-vs">
+        <div class="dh-vs__value" data-tooltip="Willpower test (W100)"><span>Roll</span><strong>{{roll.total}}</strong></div>
+        <div class="dh-vs__sep">vs</div>
+        <div class="dh-vs__value"><span>Willpower</span><strong>{{target}}</strong></div>
     </div>
-    <footer class="dh-card__foot">
+    <div class="dh-verdict {{#if success}}dh-verdict--success{{else}}dh-verdict--fail{{/if}}">{{#if success}}Success{{else}}Failure{{/if}}</div>
+    <div class="dh-mods dh-mods--center">
+        <span class="dh-mod"><b>Energy damage</b> {{damage}}</span>
+        <span class="dh-mod"><b>Fatigue</b> 1</span>
+    </div>
+    <p class="dh-note">{{#if success}}You may take actions as normal.{{else}}You can only flail in agony and scream.{{/if}}</p>
+    <div class="dh-rule"></div>
+    <footer class="dh-card__foot dh-card__foot--center">
         <button type="button" class="dh-btn dh-btn--primary roll-control__apply-damage"
                 data-type="Energy"
                 data-ignore-armour="true"

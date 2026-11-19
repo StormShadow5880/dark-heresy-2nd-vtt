@@ -1,25 +1,19 @@
 {{#with rollData}}
-    <div class="dh-ui dh-card dh-card--info">
-        <header class="dh-card__head">
-            <span class="dh-card__title">{{name}}</span>
-            <span class="dh-card__action">Damage Roll</span>
-        </header>
-        <div class="dh-card__body">
-            <div class="dh-result dh-result--info">
-                <span class="dh-result__roll" data-tooltip="Damage">{{roll.total}}</span>
-                <span class="dh-result__main">
-                    <span class="dh-status dh-status--info">Damage</span>
-                    <span class="dh-result__detail">{{damageType}} · Penetration {{penetration}}</span>
-                </span>
-            </div>
-            <div class="dh-mods">
-                <span class="dh-mod"><b>Formula</b> {{roll.formula}}</span>
-                <span class="dh-mod"><b>Type</b> {{damageType}}</span>
-                <span class="dh-mod"><b>Penetration</b> {{penetration}}</span>
-            </div>
+    <div class="dh-ui dh-card dh-card--ornate">
+        <div class="dh-card__eyebrow">Damage Roll</div>
+        <h2 class="dh-card__name">{{name}}</h2>
+        <div class="dh-card__sub">{{damageType}} · Penetration {{penetration}}</div>
+        <div class="dh-rule"></div>
+        <div class="dh-badge dh-badge--damage" data-tooltip="Damage"><span class="dh-badge__num">{{roll.total}}</span></div>
+        <div class="dh-verdict dh-verdict--info">Damage</div>
+        <div class="dh-mods dh-mods--center">
+            <span class="dh-mod"><b>Formula</b> {{roll.formula}}</span>
+            <span class="dh-mod"><b>Type</b> {{damageType}}</span>
+            <span class="dh-mod"><b>Pen</b> {{penetration}}</span>
         </div>
         {{#if targetActor}}
-            <footer class="dh-card__foot">
+            <div class="dh-rule"></div>
+            <footer class="dh-card__foot dh-card__foot--center">
                 <button type="button" class="dh-btn dh-btn--primary roll-control__assign-damage"
                         data-location="Body"
                         data-total-damage="{{roll.total}}"
