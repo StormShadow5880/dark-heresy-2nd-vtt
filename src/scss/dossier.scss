@@ -1328,26 +1328,30 @@
 
     // ------------------------------------------------ Personal file: handwritten note on parchment
     .note {
-        --ink: #2a1b0e;
+        --ink: #e6d7b4;
+        --ink-label: #c9ae78;
+        --ink-line: rgba(201, 174, 120, 0.5);
         position: relative;
         margin: 6px 2px 14px;
-        padding: 0 12px 4px;
+        min-height: 150px;
+        padding: 14px 6px 12px;
         color: var(--ink);
-        // the supplied parchment strip as 9-slice: ragged edges stretch, the brass corner nails keep their size
-        border: 30px solid transparent;
-        border-image: var(--ds-img-parchment) 80 fill / 30px / 0 stretch;
+        // the supplied dark parchment: wax seal cap on the left, rivet cap on the right, the middle stretches
+        border: 0 solid transparent;
+        border-width: 0 32px 0 66px;
+        border-image: var(--ds-img-parchment) 0 78 0 163 fill / 1 / 0 stretch;
         filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.7));
         &__pin {
             display: none;
         }
         &__title {
-            margin: -10px 0 4px 6px;
+            margin: 0 0 4px 6px;
             font-family: var(--ds-font-title);
             font-variant: small-caps;
             font-weight: 400;
             font-size: 1.05rem;
             letter-spacing: 0.12em;
-            color: #5a1c20;
+            color: #d9b87a;
             border: 0;
             background: none;
             padding: 0;
@@ -1367,14 +1371,14 @@
             align-items: baseline;
             gap: 8px;
             min-width: 0;
-            border-bottom: 1px dotted #6b5632;
+            border-bottom: 1px dotted var(--ink-line);
             span {
                 flex: none;
                 font-family: var(--ds-font-title);
                 font-variant: small-caps;
                 font-size: 0.82rem;
                 letter-spacing: 0.06em;
-                color: #6b4a2a;
+                color: var(--ink-label);
             }
         }
         input[type='text'],
@@ -1393,20 +1397,20 @@
             appearance: none;
             &:hover,
             &:focus {
-                background: rgba(90, 28, 32, 0.08);
+                background: rgba(230, 215, 180, 0.08);
                 box-shadow: none;
                 outline: none;
             }
         }
         select option {
-            background: #e0d4b4;
+            background: #1b1510;
             color: var(--ink);
             font-family: var(--ds-font);
             font-size: 0.9rem;
         }
         label:focus-within {
             border-bottom-style: solid;
-            border-bottom-color: #5a1c20;
+            border-bottom-color: #d9b87a;
         }
     }
 
