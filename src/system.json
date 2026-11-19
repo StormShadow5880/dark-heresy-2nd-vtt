@@ -20,6 +20,7 @@
   ],
   "styles": [
     "css/dark-heresy-2nd.css",
+    "css/ui.css",
     "css/dossier.css"
   ],
   "scripts": [],

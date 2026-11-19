@@ -1,0 +1,166 @@
+// Shared components of the imperial UI. All rules are scoped to .dh-ui (our chat cards, windows and dialogs),
+// they are built from the mixins in _mixins.scss, so they look exactly like the matching parts of the sheet.
+
+.dh-ui {
+    // ------------------------------------------------ Button
+    .dh-btn {
+        @include dh-button;
+        min-height: 24px;
+        padding: 2px 10px;
+        font-size: 0.82rem;
+        // the chat hide/show control toggles a class on its label: mark the open state in gold
+        span.active {
+            color: var(--ds-gold-soft);
+        }
+        i {
+            font-size: 0.8rem;
+            margin: 0;
+        }
+        &--primary {
+            @include dh-button-primary;
+        }
+    }
+
+    // ------------------------------------------------ Status indicator (small marker, never a big coloured area)
+    .dh-status {
+        &--success {
+            @include dh-status(var(--ds-ok));
+        }
+        &--fail {
+            @include dh-status(var(--ds-fail));
+        }
+        &--info {
+            @include dh-status(var(--ds-gold));
+        }
+    }
+
+    // ------------------------------------------------ Roll result: the dice result stands out, the verdict is a small marker
+    .dh-result {
+        --res: var(--ds-gold);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 3px 10px 3px 8px;
+        background: rgba(0, 0, 0, 0.38);
+        border: var(--ds-border);
+        border-left: 3px solid var(--res);
+        &--success {
+            --res: var(--ds-ok);
+        }
+        &--fail {
+            --res: var(--ds-fail);
+        }
+        &__roll {
+            flex: none;
+            min-width: 2.3ch;
+            text-align: center;
+            font-family: var(--ds-font-title);
+            font-size: 1.9rem;
+            font-weight: 600;
+            line-height: 1.05;
+            color: #fff;
+            text-shadow: 0 1px 0 #000, 0 0 10px color-mix(in srgb, var(--res) 55%, transparent);
+        }
+        &__main {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            min-width: 0;
+        }
+        &__detail {
+            font-size: 0.8rem;
+            color: var(--ds-ink);
+        }
+    }
+
+    // ------------------------------------------------ Modifiers line
+    .dh-mods {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1px 12px;
+        font-size: 0.78rem;
+        line-height: 1.35;
+        color: var(--ds-ink);
+    }
+    .dh-mod {
+        white-space: nowrap;
+        b {
+            margin-right: 3px;
+            font-weight: 600;
+            color: var(--ds-gold-soft);
+        }
+        &--total {
+            margin-left: auto;
+            color: #fff;
+        }
+        &--alert,
+        &--alert b {
+            color: #e0877f;
+        }
+    }
+
+    // ------------------------------------------------ Notes and prose
+    .dh-note {
+        margin: 0;
+        font-size: 0.8rem;
+        line-height: 1.35;
+        color: var(--ds-ink);
+        b {
+            color: var(--ds-gold-soft);
+            font-weight: 600;
+        }
+        &--alert {
+            padding-left: 6px;
+            border-left: 2px solid var(--ds-fail);
+        }
+    }
+    .dh-prose {
+        font-size: 0.85rem;
+        line-height: 1.4;
+        color: var(--ds-ink);
+        p {
+            margin: 0 0 0.4em;
+            &:last-child {
+                margin-bottom: 0;
+            }
+        }
+        a,
+        .content-link {
+            color: var(--ds-gold-soft);
+        }
+        ul,
+        ol {
+            margin: 0 0 0.4em;
+            padding-left: 1.2em;
+        }
+        // roll links inside descriptions
+        .inline-roll {
+            padding: 0 5px;
+            background: rgba(0, 0, 0, 0.4);
+            border: var(--ds-border);
+            border-radius: var(--ds-radius);
+            color: var(--ds-ink);
+            white-space: nowrap;
+        }
+    }
+
+    // ------------------------------------------------ Table
+    .dh-table {
+        @include dh-table;
+    }
+}
+
+// ------------------------------------------------ Tooltip: only tooltips of elements marked with data-tooltip-class="dh-tooltip"
+#tooltip.dh-tooltip {
+    @include dh-tokens;
+    max-width: 300px;
+    padding: 4px 9px;
+    background: #12100d;
+    border: 1px solid var(--ds-gold);
+    border-radius: 2px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.75);
+    color: var(--ds-ink);
+    font-family: var(--ds-font);
+    font-size: 0.8rem;
+    line-height: 1.35;
+}

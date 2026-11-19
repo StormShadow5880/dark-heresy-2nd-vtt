@@ -1,30 +1,22 @@
-<div class="dh-wrapper">
-    <div class="dh-chat">
-        <div class="dh-roll">
-            <h1>{{actor.name}}</h1>
-            <h2>{{forceField.name}}</h2>
-            <div class="dh-roll__divider"></div>
-            {{#if overload}}
-                <div class="dh-roll__label">The field overloads! It ceases to function until it is recharged or repaired, requiring a successful Very Hard (–30) Tech-Use test.</div>
-            {{/if}}
-            {{#if success}}
-                <div class="dh-roll__success">
-                    <span>Success</span>
-                    <span>{{roll.total}}</span>
-                </div>
-                <div class="dh-roll__label">The field activates successfully!</div>
-            {{else}}
-                <div class="dh-roll__fail">
-                    <span>Fail</span>
-                    <span>{{roll.total}}</span>
-                </div>
-                <div class="dh-roll__label">The field fails to protect and the attack proceeds as normal.</div>
-            {{/if}}
-
-            {{#if forceField.system.description}}
-                <div class="dh-roll__divider"></div>
-                <div class="dh-roll__label">{{forceField.system.description}}</div>
-            {{/if}}
+<div class="dh-ui dh-card {{#if success}}dh-card--success{{else}}dh-card--fail{{/if}}">
+    <header class="dh-card__head">
+        <span class="dh-card__title">{{forceField.name}}</span>
+        <span class="dh-card__action">Force Field</span>
+    </header>
+    <p class="dh-card__sub">{{actor.name}}</p>
+    <div class="dh-card__body">
+        <div class="dh-result {{#if success}}dh-result--success{{else}}dh-result--fail{{/if}}">
+            <span class="dh-result__roll" data-tooltip="Dice result (W100)">{{roll.total}}</span>
+            <span class="dh-result__main">
+                <span class="dh-status {{#if success}}dh-status--success{{else}}dh-status--fail{{/if}}">{{#if success}}Success{{else}}Failure{{/if}}</span>
+                <span class="dh-result__detail">{{#if success}}The field activates successfully!{{else}}The field fails to protect and the attack proceeds as normal.{{/if}}</span>
+            </span>
         </div>
+        {{#if overload}}
+            <p class="dh-note dh-note--alert">The field overloads! It ceases to function until it is recharged or repaired, requiring a successful Very Hard (–30) Tech-Use test.</p>
+        {{/if}}
+        {{#if forceField.system.description}}
+            <p class="dh-note">{{forceField.system.description}}</p>
+        {{/if}}
     </div>
 </div>

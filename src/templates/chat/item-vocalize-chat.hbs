@@ -1,12 +1,11 @@
 {{dhlog this}}
-<div class="dh-wrapper">
-    <div class="dh-chat">
-        <h3>{{actor}} Vocalizes</h3>
-        <div class="dh-roll">
-            <h1>{{name}}</h1>
-            <h2>{{type}}</h2>
-            <div class="dh-roll__divider"></div>
-            <div class="dh-roll__label">{{{description}}}</div>
-        </div>
+<div class="dh-ui dh-card dh-card--info">
+    <header class="dh-card__head">
+        <span class="dh-card__title">{{name}}</span>
+        <span class="dh-card__action">{{type}}</span>
+    </header>
+    <p class="dh-card__sub">{{actor}} vocalizes</p>
+    <div class="dh-card__body">
+        <div class="dh-prose">{{{description}}}</div>
     </div>
 </div>

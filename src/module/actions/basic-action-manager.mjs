@@ -7,6 +7,7 @@ import { Hit } from '../rolls/damage-data.mjs';
 import { DarkHeresySettings } from '../dark-heresy-settings.mjs';
 import { SYSTEM_ID } from '../hooks-manager.mjs';
 import { confirmDialog } from '../prompts/dialog-helpers.mjs';
+import { markTooltips } from '../ui/tooltips.mjs';
 
 export class BasicActionManager {
     // This is stored rolls for allowing re-rolls, ammo refund, etc.
@@ -16,6 +17,7 @@ export class BasicActionManager {
         // Add show/hide support for chat messages
         Hooks.on('renderChatMessageHTML', (message, html, data) => {
             game.dh.log('renderChatMessageHTML', { message, html, data });
+            if (html.querySelector('.dh-card')) markTooltips(html);
             const bind = (selector, handler) =>
                 html.querySelectorAll(selector).forEach((el) => el.addEventListener('click', async (ev) => await handler(ev)));
             bind('.roll-control__hide-control', (ev) => this._toggleExpandChatMessage(ev));

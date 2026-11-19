@@ -1,0 +1,111 @@
+// Chat messages that were created with the previous system version keep their old markup
+// (.dh-wrapper > .dh-chat > .dh-roll) because Foundry stores the rendered HTML in the message.
+// This compact fallback gives them the same dark look; new messages use the .dh-card structure.
+
+.dh-wrapper .dh-chat {
+    color: var(--ds-ink);
+    font-family: var(--ds-font);
+    font-size: var(--ds-fs);
+    line-height: 1.35;
+
+    h1,
+    h2,
+    h3 {
+        margin: 0;
+        padding: 0;
+        border: 0;
+        text-align: left;
+        line-height: 1.25;
+    }
+    h1 {
+        font-family: var(--ds-font-title);
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: #f0e6cf;
+        text-transform: none;
+    }
+    h2 {
+        font-size: 0.85rem;
+        font-weight: 400;
+        color: var(--ds-gold-soft);
+    }
+    h3 {
+        font-size: 0.72rem;
+        font-weight: 400;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--ds-muted);
+    }
+    .dh-roll {
+        display: grid;
+        gap: 2px;
+        padding: 5px 10px 6px;
+        background: linear-gradient(rgba(12, 9, 6, 0.5), rgba(12, 9, 6, 0.5)), var(--ds-img-paper) center / cover, var(--ds-paper);
+        border: var(--ds-border);
+        border-left: 3px solid var(--ds-gold);
+    }
+    .dh-roll__divider {
+        height: 1px;
+        margin: 2px 0;
+        background: var(--ds-line);
+    }
+    .dh-roll__row,
+    .dh-roll__target {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        font-size: 0.8rem;
+    }
+    .dh-roll__label {
+        color: var(--ds-gold-soft);
+        font-weight: 600;
+    }
+    .dh-roll__row--full {
+        display: block;
+        font-size: 0.8rem;
+    }
+    .dh-roll__target {
+        font-weight: 600;
+        color: #fff;
+    }
+    .dh-roll__success,
+    .dh-roll__fail,
+    .dh-roll__notice {
+        display: flex;
+        gap: 8px;
+        padding: 1px 0 1px 8px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        border-left: 3px solid var(--ds-gold);
+    }
+    .dh-roll__success {
+        color: var(--ds-ok);
+        border-left-color: var(--ds-ok);
+    }
+    .dh-roll__fail {
+        color: var(--ds-fail);
+        border-left-color: var(--ds-fail);
+    }
+    .dh-roll__notice {
+        color: var(--ds-gold-soft);
+    }
+    .dh-roll__controls,
+    .dh-roll__controls-1,
+    .dh-roll__controls-2 {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        margin-top: 2px;
+    }
+    .dh-control-button {
+        @include dh-button;
+        min-height: 24px;
+        padding: 2px 10px;
+        font-size: 0.8rem;
+    }
+    .dh-control-button__disabled {
+        opacity: 0.45;
+    }
+}

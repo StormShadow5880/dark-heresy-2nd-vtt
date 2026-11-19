@@ -1,0 +1,241 @@
+// Dialogs and roll prompts: a compact imperial control window.
+// Applies to our ApplicationV2 prompts and to our DialogV2 dialogs (both carry the classes dh-ui dh-dialog).
+// The prompt templates still use a few legacy class names (dh-panel, dh-field__*, dh-header__*): they are
+// re-skinned here, the old light stylesheet (scoped to .dh-wrapper) does not apply to them anymore.
+
+.application.dh-dialog {
+    background: var(--ds-bg);
+    border: var(--ds-border);
+    box-shadow: 0 0 0 1px #000, 0 6px 24px rgba(0, 0, 0, 0.65);
+    color: var(--ds-ink);
+    font-family: var(--ds-font);
+    // Foundry theme variables for the native controls inside this window
+    --color-text-primary: var(--ds-parchment);
+    --color-text-secondary: var(--ds-muted);
+    --color-form-label: var(--ds-muted);
+
+    > .window-header {
+        min-height: 30px;
+        background: linear-gradient(90deg, var(--ds-oxblood), var(--ds-burgundy) 60%, #3d1519);
+        border-bottom: 1px solid var(--ds-gold);
+        color: #f0e6cf;
+        .window-title {
+            font-family: var(--ds-font-title);
+            font-variant: small-caps;
+            font-size: 1.05rem;
+            letter-spacing: 0.08em;
+            text-shadow: 0 1px 0 #000;
+        }
+        button,
+        .header-control {
+            color: #f0e6cf;
+        }
+    }
+
+    > .window-content {
+        gap: 6px;
+        padding: 8px 10px 10px;
+        background: var(--ds-grain), radial-gradient(ellipse at top, #222220 0%, var(--ds-bg) 75%);
+        overflow-y: auto;
+    }
+    // DialogV2 puts the content into a form
+    form {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+    p {
+        margin: 0;
+        font-size: 0.9rem;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    .dh-dialog-body,
+    .dh-prompt-body,
+    .dh-attack {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    // ------------------------------------------------ Panels
+    .dh-panel {
+        @include dh-panel;
+        margin: 0;
+        padding: 0 0 2px;
+    }
+    .dh-panel__header {
+        @include dh-panel-header;
+        font-size: 1rem;
+        padding: 3px 10px 3px 24px;
+        &::before {
+            left: 9px;
+            width: 6px;
+            height: 6px;
+        }
+    }
+
+    // ------------------------------------------------ Header row of the prompts (portrait + title)
+    .dh-header {
+        padding: 0;
+    }
+    .dh-header__prompt,
+    .dh-header__info,
+    .dh-header__item-wrapper--span-4 {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 4px 10px;
+        border: 0;
+        background: none;
+    }
+    .dh-header__logo-image-small {
+        flex: none;
+        width: 30px;
+        height: 30px;
+        object-fit: cover;
+        object-position: top;
+        border: 1px solid var(--ds-gold);
+        background: #000;
+    }
+    .dh-header__title {
+        font-family: var(--ds-font-title);
+        font-variant: small-caps;
+        font-size: 1.1rem;
+        letter-spacing: 0.06em;
+        color: #f0e6cf;
+    }
+    // section label inside a prompt ("Attack", "Modifiers")
+    .dh-header__subtitle {
+        display: block;
+        width: 100%;
+        padding-bottom: 1px;
+        font-family: var(--ds-font-title);
+        font-variant: small-caps;
+        font-size: 0.95rem;
+        letter-spacing: 0.08em;
+        color: var(--ds-gold);
+        border-bottom: var(--ds-border);
+    }
+
+    // ------------------------------------------------ Field rows: label left, control right
+    .dh-field__wrapper {
+        display: grid;
+        grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+        align-items: center;
+        gap: 8px;
+        padding: 3px 10px;
+        border-bottom: 1px dotted rgba(80, 70, 56, 0.8);
+        &:last-child {
+            border-bottom: 0;
+        }
+    }
+    .dh-field__span {
+        font-size: 0.88rem;
+        color: var(--ds-ink);
+        &:first-child {
+            font-family: var(--ds-font-title);
+            font-variant: small-caps;
+            letter-spacing: 0.04em;
+            color: var(--ds-gold-soft);
+        }
+        // read-only value on the right
+        &:last-child:not(:first-child) {
+            text-align: right;
+            font-weight: 600;
+            color: #fff;
+        }
+    }
+    input.dh-field__input,
+    select.dh-field__input {
+        @include dh-input;
+        height: 26px;
+    }
+    input.dh-field__input[type='number'] {
+        text-align: center;
+        -moz-appearance: textfield;
+        &::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+        }
+    }
+    select option {
+        background: var(--ds-input);
+        color: var(--ds-text);
+    }
+    .dh-field__input.check {
+        display: flex;
+        justify-content: flex-end;
+    }
+    input[type='checkbox'] {
+        width: 16px;
+        height: 16px;
+        accent-color: var(--ds-oxblood);
+    }
+    .dh-field__image {
+        width: 30px;
+        height: 30px;
+        object-fit: cover;
+        border: var(--ds-border);
+    }
+
+    // ------------------------------------------------ Weapon / power selection list
+    .table-row--head {
+        display: none;
+    }
+    .table-row {
+        display: grid;
+        grid-template-columns: 24px minmax(0, 1fr) 34px;
+        align-items: center;
+        gap: 8px;
+        padding: 3px 10px;
+        border-bottom: 1px solid rgba(80, 70, 56, 0.5);
+        &:last-child {
+            border-bottom: 0;
+        }
+    }
+    .table-cell--description {
+        font-size: 0.74rem;
+        color: var(--ds-muted);
+    }
+    .table-cell--left,
+    .table-cell,
+    .table-cell--last {
+        min-width: 0;
+    }
+
+    // ------------------------------------------------ Buttons (own button row and DialogV2 footer)
+    .dialog-buttons,
+    .form-footer {
+        display: flex;
+        gap: 8px;
+        padding-top: 4px;
+    }
+    .dialog-button,
+    .form-footer button {
+        @include dh-button;
+        flex: 1;
+        min-height: 32px;
+    }
+    .dialog-button.roll,
+    .form-footer button[data-action='confirm'],
+    .form-footer button.default {
+        @include dh-button-primary;
+    }
+    .dialog-button i,
+    .form-footer button i {
+        margin: 0;
+    }
+
+    // release notes
+    ul {
+        margin: 0;
+        padding: 4px 10px 6px 26px;
+        font-size: 0.88rem;
+        li {
+            margin-bottom: 3px;
+        }
+    }
+}

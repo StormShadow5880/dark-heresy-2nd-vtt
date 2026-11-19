@@ -1,0 +1,139 @@
+// Chat cards: one structure for every message of the system
+//   .dh-card__head   name + action            .dh-card__sub    optional small line
+//   .dh-card__body   result, modifiers, notes .dh-card__foot   action buttons
+//   .dh-detail       hidden extra block (damage / effect), toggled by the existing chat controls
+
+.dh-ui.dh-card {
+    --card-accent: var(--ds-gold);
+    position: relative;
+    display: block;
+    margin: 0;
+    padding: 0;
+    color: var(--ds-ink);
+    font-family: var(--ds-font);
+    font-size: var(--ds-fs);
+    line-height: 1.35;
+    // dark aged parchment, darkened so text keeps a high contrast
+    background: linear-gradient(rgba(12, 9, 6, 0.5), rgba(12, 9, 6, 0.5)), var(--ds-img-paper) center / cover, var(--ds-paper);
+    border: var(--ds-border);
+    border-left: 3px solid var(--card-accent);
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.55);
+    text-align: left;
+
+    &--success {
+        --card-accent: var(--ds-ok);
+    }
+    &--fail {
+        --card-accent: var(--ds-fail);
+    }
+    &--psy {
+        --ds-gold: #a79bc9;
+        --ds-gold-soft: #b9aedb;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    .dh-card__head {
+        @include dh-panel-header;
+        justify-content: space-between;
+        padding: 3px 10px 3px 24px;
+        font-size: 1rem;
+        &::before {
+            left: 9px;
+            width: 6px;
+            height: 6px;
+        }
+    }
+    .dh-card__title {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-weight: 600;
+    }
+    .dh-card__action {
+        flex: none;
+        font-family: var(--ds-font);
+        font-variant: normal;
+        font-size: 0.7rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: #d8c7a2;
+        text-shadow: none;
+    }
+    .dh-card__sub {
+        margin: 0;
+        padding: 3px 10px 0;
+        font-size: 0.74rem;
+        letter-spacing: 0.03em;
+        color: var(--ds-muted);
+    }
+    .dh-card__body {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        padding: 5px 10px 6px;
+        &:empty {
+            display: none;
+        }
+    }
+    .dh-card__foot {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        padding: 0 10px 6px;
+    }
+
+    // hidden extra block with the damage / effect details
+    .dh-detail {
+        padding: 0 10px 6px;
+        border-top: 1px solid var(--ds-line);
+    }
+    .dh-hit {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        padding: 6px 0 2px;
+        & + .dh-hit {
+            margin-top: 4px;
+            border-top: 1px dotted var(--ds-line);
+        }
+        &__title {
+            display: flex;
+            justify-content: space-between;
+            margin: 0;
+            font-family: var(--ds-font-title);
+            font-variant: small-caps;
+            font-size: 0.92rem;
+            letter-spacing: 0.06em;
+            font-weight: 400;
+            color: var(--ds-gold);
+            border: 0;
+            span {
+                font-family: var(--ds-font);
+                font-variant: normal;
+                font-size: 0.72rem;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+                color: var(--ds-muted);
+            }
+        }
+        .dh-card__foot {
+            padding: 0;
+        }
+    }
+    .dh-detail > .dh-prose {
+        padding-top: 6px;
+    }
+
+    // inline rolls of enriched text inside the card
+    .inline-roll {
+        padding: 0 5px;
+        background: rgba(0, 0, 0, 0.4);
+        border: var(--ds-border);
+        border-radius: var(--ds-radius);
+        color: var(--ds-ink);
+    }
+}

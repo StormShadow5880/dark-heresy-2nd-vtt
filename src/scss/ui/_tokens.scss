@@ -1,0 +1,63 @@
+// Dark Heresy 2E - design tokens of the imperial UI.
+// One place for colours, fonts and artwork, used by the character sheet, the chat cards and all dialogs.
+// Emitted once (in ui.scss) for every scope that belongs to the system; nothing here touches Foundry core.
+
+@mixin dh-tokens {
+    // surfaces
+    --ds-bg: #171715;
+    --ds-bg-2: #232321;
+    --ds-panel: #1b1b19;
+    --ds-input: #101113;
+    // dark aged parchment (chat cards, handwritten notes)
+    --ds-paper: #2a2118;
+    --ds-paper-2: #1f1912;
+    // accents
+    --ds-burgundy: #541e24;
+    --ds-oxblood: #702a30;
+    --ds-gold: #b69a62;
+    --ds-gold-soft: #c9ae78;
+    // text
+    --ds-parchment: #d9d0bd;
+    --ds-ink: #e6d7b4;
+    --ds-muted: #92918c;
+    // lines and states
+    --ds-line: #504638;
+    --ds-ok: #6f9a5c;
+    --ds-fail: #b8514b;
+    --ds-warn: #c9923a;
+    --ds-psy: #7b6aa8;
+    // aliases kept for the existing sheet styles
+    --ds-red: var(--ds-burgundy);
+    --ds-red-active: var(--ds-oxblood);
+    --ds-text: var(--ds-parchment);
+    --ds-text-2: var(--ds-muted);
+    // typography: serif for headings, Foundry's bundled UI font for everything that has to be read quickly
+    --ds-font-title: 'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif;
+    --ds-font: 'Signika', 'Segoe UI', sans-serif;
+    // sizes
+    --ds-fs-s: 0.78rem;
+    --ds-fs: 0.9rem;
+    --ds-fs-title: 1.05rem;
+    --ds-radius: 3px;
+    --ds-border: 1px solid var(--ds-line);
+    // very subtle paper grain, generated inline (no image files, tiles seamlessly)
+    --ds-grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .75  0 0 0 0 .66  0 0 0 0 .5  0 0 0 .085 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    // artwork (paths are relative to the css folder)
+    --ds-img-frame: url('../images/dossier/frame.webp');
+    --ds-img-shield: url('../images/dossier/shield.webp');
+    --ds-img-ring: url('../images/dossier/ring.webp');
+    --ds-img-banner: url('../images/dossier/banner.webp');
+    --ds-img-wcap-l: url('../images/dossier/wcap-l.webp');
+    --ds-img-wcap-r: url('../images/dossier/wcap-r.webp');
+    --ds-img-wcell-full: url('../images/dossier/wcell-full.webp');
+    --ds-img-wcell-empty: url('../images/dossier/wcell-empty.webp');
+    --ds-img-figure: url('../images/dossier/figure.webp');
+    --ds-img-parchment: url('../images/dossier/parchment.webp');
+    --ds-img-paper: url('../images/dossier/paper.webp');
+    --ds-img-emblem-fatigue: url('../images/dossier/emblem-fatigue.webp');
+    --ds-img-emblem-insanity: url('../images/dossier/emblem-insanity.webp');
+    --ds-img-emblem-corruption: url('../images/dossier/emblem-corruption.webp');
+    --ds-img-card: url('../images/dossier/char-card.webp');
+    --ds-img-card-eagle: url('../images/dossier/char-eagle.webp');
+    --ds-img-corner: url('../images/dossier/corner.svg');
+}

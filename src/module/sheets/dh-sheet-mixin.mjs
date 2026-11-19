@@ -1,3 +1,5 @@
+import { markTooltips } from '../ui/tooltips.mjs';
+
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 
 /**
@@ -66,6 +68,7 @@ export function DHSheetMixin(Base) {
             if (!this.isEditable) {
                 this.element.querySelectorAll('input, select, textarea').forEach((el) => (el.disabled = true));
             }
+            markTooltips(this.element);
             this._activateListeners($(this.element));
         }
 

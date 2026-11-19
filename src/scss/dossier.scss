@@ -7,47 +7,11 @@
 }
 
 // Dark Heresy 2E - "Inquisition dossier" character sheet (ApplicationV2)
-// All colours are CSS custom properties so the whole sheet can be re-themed in one place.
+// Colours, fonts and artwork are the shared tokens of the imperial UI (see ui/_tokens.scss).
+@import 'ui/mixins';
 
 .application.dossier {
-    --ds-bg: #171715;
-    --ds-bg-2: #232321;
-    --ds-panel: #1b1b19;
-    --ds-burgundy: #541e24;
-    --ds-oxblood: #702a30;
-    --ds-gold: #b69a62;
-    --ds-parchment: #d9d0bd;
-    --ds-muted: #92918c;
-    --ds-line: #504638;
-    --ds-ok: #6f9a5c;
-    --ds-warn: #c9923a;
-    --ds-psy: #7b6aa8;
-    // legacy aliases used further down
-    --ds-red: var(--ds-burgundy);
-    --ds-red-active: var(--ds-oxblood);
-    --ds-text: var(--ds-parchment);
-    --ds-text-2: var(--ds-muted);
-    // serif for headings, Foundry's bundled UI font for everything that has to be read quickly
-    --ds-font-title: 'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif;
-    --ds-font: 'Signika', 'Segoe UI', sans-serif;
-    // very subtle paper grain, generated inline (no image files, tiles seamlessly)
-    --ds-grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .75  0 0 0 0 .66  0 0 0 0 .5  0 0 0 .085 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
-    --ds-img-frame: url('../images/dossier/frame.webp');
-    --ds-img-shield: url('../images/dossier/shield.webp');
-    --ds-img-ring: url('../images/dossier/ring.webp');
-    --ds-img-banner: url('../images/dossier/banner.webp');
-    --ds-img-wcap-l: url('../images/dossier/wcap-l.webp');
-    --ds-img-wcap-r: url('../images/dossier/wcap-r.webp');
-    --ds-img-wcell-full: url('../images/dossier/wcell-full.webp');
-    --ds-img-wcell-empty: url('../images/dossier/wcell-empty.webp');
-    --ds-img-figure: url('../images/dossier/figure.webp');
-    --ds-img-parchment: url('../images/dossier/parchment.webp');
-    --ds-img-emblem-fatigue: url('../images/dossier/emblem-fatigue.webp');
-    --ds-img-emblem-insanity: url('../images/dossier/emblem-insanity.webp');
-    --ds-img-emblem-corruption: url('../images/dossier/emblem-corruption.webp');
-    --ds-img-card: url('../images/dossier/char-card.webp');
-    --ds-img-card-eagle: url('../images/dossier/char-eagle.webp');
-    --ds-img-corner: url('../images/dossier/corner.svg');
+    // colours, fonts and artwork come from the shared tokens (ui/_tokens.scss, emitted in ui.css)
 
     background: var(--ds-bg);
     border: 1px solid var(--ds-line);
@@ -629,44 +593,10 @@
 
     // ------------------------------------------------ Panels
     .panel {
-        position: relative;
-        background: rgba(10, 10, 9, 0.58);
-        border: 1px solid var(--ds-line);
+        @include dh-panel;
         margin-bottom: 14px;
-        min-width: 0;
         &__title {
-            position: relative;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin: 0;
-            padding: 5px 14px 5px 26px;
-            background: linear-gradient(90deg, var(--ds-oxblood), var(--ds-burgundy) 60%, #3d1519);
-            border: 0;
-            color: #f0e6cf;
-            font-family: var(--ds-font-title);
-            font-variant: small-caps;
-            font-size: 1.1rem;
-            letter-spacing: 0.08em;
-            text-shadow: 0 1px 0 #000;
-            // engraved gold rule under the banner and a small diamond as bullet
-            &::after {
-                content: '';
-                position: absolute;
-                inset: auto 0 0;
-                height: 1px;
-                background: var(--ds-gold);
-            }
-            &::before {
-                content: '';
-                position: absolute;
-                left: 10px;
-                top: 50%;
-                width: 7px;
-                height: 7px;
-                background: var(--ds-gold);
-                transform: translateY(-50%) rotate(45deg);
-            }
+            @include dh-panel-header;
             .icon-btn,
             .panel__hint {
                 margin-left: auto;
@@ -917,27 +847,7 @@
     input[type='search'],
     select,
     textarea {
-        background: #101113;
-        border: 1px solid var(--ds-line);
-        color: var(--ds-text);
-        border-radius: 3px;
-        padding: 3px 6px;
-        font-family: var(--ds-font);
-        font-size: 0.9rem;
-        height: 28px;
-        min-width: 0;
-        width: 100%;
-        &:hover {
-            border-color: var(--ds-gold);
-        }
-        &:focus {
-            border-color: var(--ds-gold);
-            box-shadow: 0 0 0 1px var(--ds-gold);
-            outline: none;
-        }
-        &:disabled {
-            opacity: 0.65;
-        }
+        @include dh-input;
     }
     textarea {
         height: auto;
@@ -965,26 +875,9 @@
         font-family: var(--ds-font);
     }
     .btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
-        padding: 5px 12px;
-        height: auto;
-        line-height: 1.2;
-        background: #26292d;
-        border: 1px solid var(--ds-gold);
-        border-radius: 3px;
-        color: var(--ds-text);
-        cursor: pointer;
-        &:hover,
-        &:focus-visible {
-            background: var(--ds-red);
-            color: #fff;
-            outline: none;
-        }
+        @include dh-button;
         &--primary {
-            background: var(--ds-red-active);
+            @include dh-button-primary;
         }
         &--danger:hover {
             background: #8a1f1f;

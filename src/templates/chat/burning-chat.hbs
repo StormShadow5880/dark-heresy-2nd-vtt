@@ -1,46 +1,31 @@
-<div class="dh-wrapper">
-    <div class="dh-chat">
-        <div class="dh-roll">
-            <h1>{{actor.name}}</h1>
-            <h2>On Fire!</h2>
-            <div class="dh-roll__divider"></div>
-
-            <div class="dh-roll__row dh-roll__row--number">
-                <div class="dh-roll__label">Energy Damage</div>
-                <div class="dh-roll__value">{{damage}}</div>
-            </div>
-            <div class="dh-roll__row dh-roll__row--number">
-                <div class="dh-roll__label">Fatigue</div>
-                <div class="dh-roll__value">1</div>
-            </div>
-
-            <div class="dh-roll__label">On Fire damage ignores Armour.</div>
-
-            {{#if success}}
-                <div class="dh-roll__success">
-                    <span>WP Success</span>
-                    <span>{{roll.total}}</span>
-                </div>
-                <div class="dh-roll__label">You make take actions as normal.</div>
-            {{else}}
-                <div class="dh-roll__fail">
-                    <span>WP Fail</span>
-                    <span>{{roll.total}}</span>
-                </div>
-                <div class="dh-roll__label">You can only flail in agony and scream.</div>
-            {{/if}}
-
-            <div class='dh-roll__controls-1'>
-                <div class="dh-control-button roll-control__apply-damage"
-                     data-type="Energy"
-                     data-ignore-armour="true"
-                     data-uuid="{{actor.uuid}}"
-                     data-damage="{{damage}}"
-                     data-fatigue="1">
-                    <span class="dh-control-button__span material-icons">api</span>
-                    <span class="dh-control-button__label">Apply Damage</span>
-                </div>
-            </div>
+<div class="dh-ui dh-card {{#if success}}dh-card--success{{else}}dh-card--fail{{/if}}">
+    <header class="dh-card__head">
+        <span class="dh-card__title">{{actor.name}}</span>
+        <span class="dh-card__action">On Fire!</span>
+    </header>
+    <p class="dh-card__sub">On Fire damage ignores armour</p>
+    <div class="dh-card__body">
+        <div class="dh-result {{#if success}}dh-result--success{{else}}dh-result--fail{{/if}}">
+            <span class="dh-result__roll" data-tooltip="Willpower test (W100)">{{roll.total}}</span>
+            <span class="dh-result__main">
+                <span class="dh-status {{#if success}}dh-status--success{{else}}dh-status--fail{{/if}}">{{#if success}}Willpower success{{else}}Willpower failure{{/if}}</span>
+                <span class="dh-result__detail">Target {{target}}</span>
+            </span>
         </div>
+        <div class="dh-mods">
+            <span class="dh-mod"><b>Energy damage</b> {{damage}}</span>
+            <span class="dh-mod"><b>Fatigue</b> 1</span>
+        </div>
+        <p class="dh-note">{{#if success}}You may take actions as normal.{{else}}You can only flail in agony and scream.{{/if}}</p>
     </div>
+    <footer class="dh-card__foot">
+        <button type="button" class="dh-btn dh-btn--primary roll-control__apply-damage"
+                data-type="Energy"
+                data-ignore-armour="true"
+                data-uuid="{{actor.uuid}}"
+                data-damage="{{damage}}"
+                data-fatigue="1">
+            <i class="fa-solid fa-crosshairs"></i><span>Apply Damage</span>
+        </button>
+    </footer>
 </div>

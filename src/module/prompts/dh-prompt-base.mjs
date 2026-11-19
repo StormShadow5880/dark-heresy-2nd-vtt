@@ -1,5 +1,6 @@
 import { applyDataTypes } from '../sheets/dh-sheet-mixin.mjs';
 import { recursiveUpdate } from '../rolls/roll-helpers.mjs';
+import { markTooltips } from '../ui/tooltips.mjs';
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -18,7 +19,7 @@ async function onSubmit(event, form, formData) {
 export class DHPromptApplication extends HandlebarsApplicationMixin(ApplicationV2) {
     static DEFAULT_OPTIONS = {
         tag: 'form',
-        classes: ['dialog', 'dh-prompt'],
+        classes: ['dialog', 'dh-prompt', 'dh-ui', 'dh-dialog'],
         position: { width: 500 },
         form: { handler: onSubmit, submitOnChange: true, closeOnSubmit: false },
     };
@@ -33,6 +34,7 @@ export class DHPromptApplication extends HandlebarsApplicationMixin(ApplicationV
 
     async _onRender(context, options) {
         await super._onRender(context, options);
+        markTooltips(this.element);
         this._activateListeners($(this.element));
     }
 

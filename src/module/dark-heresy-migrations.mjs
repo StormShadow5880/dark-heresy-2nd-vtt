@@ -160,6 +160,7 @@ export async function checkAndMigrateWorld() {
     async function releaseNotes(data) {
         const content = await foundry.applications.handlebars.renderTemplate('systems/dark-heresy-2nd/templates/prompt/release-notes-prompt.hbs', data);
         const dialog = new foundry.applications.api.DialogV2({
+            classes: ['dh-ui', 'dh-dialog'],
             window: { title: 'Release Notes' },
             position: { width: 300 },
             content,

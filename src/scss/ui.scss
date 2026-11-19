@@ -1,0 +1,18 @@
+// Dark Heresy 2E - imperial UI for everything outside of the character sheet:
+// chat cards, roll dialogs and the shared components. Colours, fonts and artwork are the same tokens the
+// character sheet uses. Every rule is scoped to a system class (.dh-ui, .dh-card, #tooltip.dh-tooltip),
+// nothing global: Foundry core and other modules are not affected.
+@import 'ui/tokens';
+@import 'ui/mixins';
+
+// Token scopes: the sheet, our windows/dialogs and our chat cards
+.application.dossier,
+.dh-ui,
+.dh-wrapper .dh-chat {
+    @include dh-tokens;
+}
+
+@import 'ui/components';
+@import 'ui/chat';
+@import 'ui/dialog';
+@import 'ui/legacy-chat';

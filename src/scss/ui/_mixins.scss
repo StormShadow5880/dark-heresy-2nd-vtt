@@ -1,0 +1,147 @@
+// Dark Heresy 2E - building blocks of the imperial UI.
+// Mixins only: they emit nothing by themselves. The character sheet, the chat cards and the dialogs include
+// the same mixins, so all of them share the same colours, border widths and typography.
+
+// Text input, select and textarea
+@mixin dh-input {
+    background: var(--ds-input);
+    border: var(--ds-border);
+    color: var(--ds-text);
+    border-radius: var(--ds-radius);
+    padding: 3px 6px;
+    font-family: var(--ds-font);
+    font-size: var(--ds-fs);
+    height: 28px;
+    min-width: 0;
+    width: 100%;
+    &:hover {
+        border-color: var(--ds-gold);
+    }
+    &:focus {
+        border-color: var(--ds-gold);
+        box-shadow: 0 0 0 1px var(--ds-gold);
+        outline: none;
+    }
+    &:disabled {
+        opacity: 0.65;
+    }
+}
+
+// Standard button; add dh-button-primary for the main action
+@mixin dh-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 5px 12px;
+    height: auto;
+    line-height: 1.2;
+    background: #26292d;
+    border: 1px solid var(--ds-gold);
+    border-radius: var(--ds-radius);
+    color: var(--ds-text);
+    font-family: var(--ds-font);
+    font-size: var(--ds-fs);
+    cursor: pointer;
+    &:hover,
+    &:focus-visible {
+        background: var(--ds-red);
+        color: #fff;
+        outline: none;
+    }
+    &:disabled,
+    &[disabled] {
+        opacity: 0.45;
+        cursor: default;
+        background: #26292d;
+        color: var(--ds-text);
+    }
+}
+@mixin dh-button-primary {
+    background: linear-gradient(180deg, var(--ds-oxblood), var(--ds-burgundy));
+    color: #fff;
+}
+
+// Oxblood banner with a gold rule and a small diamond, used for panel and dialog headers
+@mixin dh-panel-header {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    padding: 5px 14px 5px 26px;
+    background: linear-gradient(90deg, var(--ds-oxblood), var(--ds-burgundy) 60%, #3d1519);
+    border: 0;
+    color: #f0e6cf;
+    font-family: var(--ds-font-title);
+    font-variant: small-caps;
+    font-size: 1.1rem;
+    letter-spacing: 0.08em;
+    text-shadow: 0 1px 0 #000;
+    &::after {
+        content: '';
+        position: absolute;
+        inset: auto 0 0;
+        height: 1px;
+        background: var(--ds-gold);
+    }
+    &::before {
+        content: '';
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        width: 7px;
+        height: 7px;
+        background: var(--ds-gold);
+        transform: translateY(-50%) rotate(45deg);
+    }
+}
+
+// Panel body surface
+@mixin dh-panel {
+    position: relative;
+    background: rgba(10, 10, 9, 0.58);
+    border: var(--ds-border);
+    min-width: 0;
+}
+
+// Compact data table on a dark surface
+@mixin dh-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--ds-fs);
+    th {
+        text-align: left;
+        padding: 5px 10px;
+        color: var(--ds-gold);
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        border-bottom: var(--ds-border);
+        white-space: nowrap;
+    }
+    td {
+        padding: 4px 10px;
+        border-bottom: 1px solid rgba(80, 70, 56, 0.5);
+        vertical-align: middle;
+    }
+}
+
+// Small coloured marker for success / failure / neutral states
+@mixin dh-status($color) {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: $color;
+    &::before {
+        content: '';
+        width: 7px;
+        height: 7px;
+        background: $color;
+        transform: rotate(45deg);
+    }
+}

@@ -1,4 +1,9 @@
+import { markTooltips } from '../ui/tooltips.mjs';
+
 const { DialogV2 } = foundry.applications.api;
+
+/** classes that put a dialog into the imperial UI */
+export const DIALOG_CLASSES = ['dh-ui', 'dh-dialog'];
 
 /**
  * Shows a yes/no confirmation dialog.
@@ -9,6 +14,7 @@ const { DialogV2 } = foundry.applications.api;
  */
 export async function confirmDialog({ title, content, yes }) {
     const result = await DialogV2.confirm({
+        classes: DIALOG_CLASSES,
         window: { title },
         content,
         rejectClose: false,
@@ -30,6 +36,7 @@ export async function confirmDialog({ title, content, yes }) {
  */
 export async function actionDialog({ title, content, action, width = 300 }) {
     const dialog = new DialogV2({
+        classes: DIALOG_CLASSES,
         window: { title },
         position: { width },
         content,
@@ -48,5 +55,7 @@ export async function actionDialog({ title, content, action, width = 300 }) {
             },
         ],
     });
-    return dialog.render({ force: true });
+    await dialog.render({ force: true });
+    markTooltips(dialog.element);
+    return dialog;
 }
