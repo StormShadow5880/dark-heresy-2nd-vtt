@@ -3,28 +3,32 @@
  * e.g. weapons with associated weapon mods
  */
 import { DarkHeresyItemSheet } from './item-sheet.mjs';
+import { confirmDialog } from '../../prompts/dialog-helpers.mjs';
 
 export class DarkHeresyItemContainerSheet extends DarkHeresyItemSheet {
-    getData() {
-        const context = super.getData();
+    async _prepareContext(options) {
+        const context = await super._prepareContext(options);
         if (!context.item.system.container) {
             game.dh.warn('Unexpected Sheet Type: Item has container sheet but is not container?', context);
-            this.options.editable = false;
-            return context;
         }
         return context;
     }
 
-    activateListeners(html) {
-        super.activateListeners(html);
+    get isEditable() {
+        // Items that are not containers must not be edited through the container sheet
+        return super.isEditable && !!this.item.system.container;
+    }
+
+    _activateListeners(html) {
+        super._activateListeners(html);
 
         // Everything below here is only needed if the sheet is editable
         if (!this.isEditable) return;
 
         if (this.item.system.container) {
-            this.form.ondragover = (ev) => this._onDragOver(ev);
-            this.form.ondrop = (ev) => this._onDrop(ev);
-            this.form.ondragend = (ev) => this._onDragEnd(ev);
+            this.element.ondragover = (ev) => this._onDragOver(ev);
+            this.element.ondrop = (ev) => this._onDrop(ev);
+            this.element.ondragend = (ev) => this._onDragEnd(ev);
             html.find('.item-roll').click((ev) => this._onItemRoll(ev));
             html.find('.item-create').click(async (ev) => await this._onItemCreate(ev));
             html.find('.item-edit').click((ev) => this._onItemEdit(ev));
@@ -131,21 +135,19 @@ export class DarkHeresyItemContainerSheet extends DarkHeresyItemSheet {
         event.preventDefault();
         const div = $(event.currentTarget);
         let item = this.item.items.get(div.data('itemId'));
-        item.sheet.render(true);
+        item.sheet.render({ force: true });
     }
 
-    _onItemDelete(event) {
+    async _onItemDelete(event) {
         event.preventDefault();
-        foundry.appv1.api.Dialog.confirm({
+        const itemId = $(event.currentTarget).data('itemId');
+        await confirmDialog({
             title: 'Confirm Delete',
             content: '<p>Are you sure you would like to delete this?</p>',
-            yes: () => {
-                const div = $(event.currentTarget);
-                this.item.deleteNestedDocuments([div.data('itemId')]);
-                div.slideUp(200, () => this.render(false));
+            yes: async () => {
+                await this.item.deleteNestedDocuments([itemId]);
+                this.render();
             },
-            no: () => {},
-            defaultYes: false,
         });
     }
 
@@ -162,9 +164,8 @@ export class DarkHeresyItemContainerSheet extends DarkHeresyItemSheet {
         const itemId = element.dataset.itemId;
         let item = this.item.items.get(itemId);
         if (!item) {
-            // Cannot find item on container? Just let foundry handle it...
-            game.dh.log('Default Foundry Handler');
-            return super._onDragStart(event);
+            game.dh.log('Item not found in container - cancelling drag');
+            return;
         }
 
         // Create drag data

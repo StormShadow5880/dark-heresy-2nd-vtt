@@ -158,25 +158,13 @@ export async function checkAndMigrateWorld() {
     }
 
     async function releaseNotes(data) {
-        const html = await foundry.applications.handlebars.renderTemplate('systems/dark-heresy-2nd/templates/prompt/release-notes-prompt.hbs', data);
-        let dialog = new foundry.appv1.api.Dialog(
-            {
-                title: 'Release Notes',
-                content: html,
-                buttons: {
-                    ok: {
-                        icon: "<i class='dh-material'>close</i>",
-                        label: 'Ok',
-                        callback: () => {},
-                    },
-                },
-                default: 'ok',
-                close: () => {},
-            },
-            {
-                width: 300,
-            },
-        );
-        dialog.render(true);
+        const content = await foundry.applications.handlebars.renderTemplate('systems/dark-heresy-2nd/templates/prompt/release-notes-prompt.hbs', data);
+        const dialog = new foundry.applications.api.DialogV2({
+            window: { title: 'Release Notes' },
+            position: { width: 300 },
+            content,
+            buttons: [{ action: 'ok', label: 'Ok', icon: 'fa-solid fa-xmark', default: true }],
+        });
+        await dialog.render({ force: true });
     }
 }

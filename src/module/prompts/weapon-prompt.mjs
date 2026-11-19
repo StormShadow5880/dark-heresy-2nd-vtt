@@ -1,32 +1,27 @@
-import { recursiveUpdate } from '../rolls/roll-helpers.mjs';
-import { WeaponActionData } from '../rolls/action-data.mjs';
+import { DHPromptApplication } from './dh-prompt-base.mjs';
 
-export class WeaponAttackDialog extends foundry.appv1.api.FormApplication {
+export class WeaponAttackDialog extends DHPromptApplication {
+    static DEFAULT_OPTIONS = {
+        id: 'dh-weapon-attack-dialog',
+        window: { title: 'Weapon Attack' },
+    };
+
+    static PARTS = {
+        prompt: { template: 'systems/dark-heresy-2nd/templates/prompt/weapon-roll-prompt.hbs' },
+    };
+
     /**
      * @param weaponActionData {WeaponActionData}
      * @param options
      */
     constructor(weaponActionData = {}, options = {}) {
-        super(weaponActionData, options);
+        super(options);
         this.weaponAttackData = weaponActionData;
         this.data = weaponActionData.rollData;
         this.initialized = false;
     }
 
-    static get defaultOptions() {
-        return foundry.utils.mergeObject(super.defaultOptions, {
-            title: 'Weapon Attack',
-            id: 'dh-weapon-attack-dialog',
-            template: 'systems/dark-heresy-2nd/templates/prompt/weapon-roll-prompt.hbs',
-            width: 500,
-            closeOnSubmit: false,
-            submitOnChange: true,
-            classes: ['dialog'],
-        });
-    }
-
-    activateListeners(html) {
-        super.activateListeners(html);
+    _activateListeners(html) {
         html.find('.weapon-select').change(async (ev) => await this._updateWeapon(ev));
         html.find('#attack-roll').click(async (ev) => await this._rollAttack(ev));
         html.find('#attack-cancel').click(async (ev) => await this._cancelAttack(ev));
@@ -35,25 +30,16 @@ export class WeaponAttackDialog extends foundry.appv1.api.FormApplication {
     async _updateWeapon(event) {
         this.data.selectWeapon(event.target.name);
         await this.data.update();
-        this.render(true);
+        await this.render();
     }
 
-    async getData() {
+    async _prepareContext(options) {
         // Initial Values
         if (!this.initialized) {
             this.data.initialize();
             this.initialized = true;
         }
-        await this.data.update();
-        return this.data;
-    }
-
-    async _updateObject(event, formData) {
-        game.dh.log('_updateObject', { event, formData });
-        recursiveUpdate(this.data, formData);
-        game.dh.log('_updateObject complete', { 'data': this.data, formData });
-        await this.data.update();
-        this.render(true);
+        return super._prepareContext(options);
     }
 
     async _cancelAttack(event) {
@@ -61,7 +47,7 @@ export class WeaponAttackDialog extends foundry.appv1.api.FormApplication {
     }
 
     async _rollAttack(event) {
-        if(this.data.fireRate === 0) {
+        if (this.data.fireRate === 0) {
             ui.notifications.warn(`Not enough ammo to perform action. Do you need to reload?`);
             return;
         }
@@ -78,5 +64,5 @@ export class WeaponAttackDialog extends foundry.appv1.api.FormApplication {
  */
 export async function prepareWeaponRoll(weaponAttackData) {
     const prompt = new WeaponAttackDialog(weaponAttackData);
-    prompt.render(true);
+    await prompt.render({ force: true });
 }

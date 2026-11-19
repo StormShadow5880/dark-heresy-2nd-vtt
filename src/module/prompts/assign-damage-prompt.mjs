@@ -1,43 +1,23 @@
-import { recursiveUpdate } from '../rolls/roll-helpers.mjs';
-import { WeaponActionData } from '../rolls/action-data.mjs';
+import { DHPromptApplication } from './dh-prompt-base.mjs';
 
-export class AssignDamageDialog extends foundry.appv1.api.FormApplication {
+export class AssignDamageDialog extends DHPromptApplication {
+    static DEFAULT_OPTIONS = {
+        id: 'dh-assign-damage-dialog',
+        window: { title: 'Assign Damage' },
+    };
+
+    static PARTS = {
+        prompt: { template: 'systems/dark-heresy-2nd/templates/prompt/assign-damage-prompt.hbs' },
+    };
 
     constructor(assignDamageData = {}, options = {}) {
-        super(assignDamageData, options);
+        super(options);
         this.data = assignDamageData;
-        this.initialized = false;
     }
 
-    static get defaultOptions() {
-        return foundry.utils.mergeObject(super.defaultOptions, {
-            title: 'Assign Damage',
-            id: 'dh-assign-damage-dialog',
-            template: 'systems/dark-heresy-2nd/templates/prompt/assign-damage-prompt.hbs',
-            width: 500,
-            closeOnSubmit: false,
-            submitOnChange: true,
-            classes: ['dialog'],
-        });
-    }
-
-    activateListeners(html) {
-        super.activateListeners(html);
+    _activateListeners(html) {
         html.find('#assign-damage').click(async (ev) => await this._assignDamage(ev));
         html.find('#cancel-prompt').click(async (ev) => await this._cancelPrompt(ev));
-    }
-
-    async getData() {
-        await this.data.update();
-        return this.data;
-    }
-
-    async _updateObject(event, formData) {
-        game.dh.log('_updateObject', { event, formData });
-        recursiveUpdate(this.data, formData);
-        game.dh.log('_updateObject complete', { 'data': this.data, formData });
-        await this.data.update();
-        this.render(true);
     }
 
     async _cancelPrompt(event) {
@@ -53,5 +33,5 @@ export class AssignDamageDialog extends foundry.appv1.api.FormApplication {
 
 export async function prepareAssignDamageRoll(assignDamageData) {
     const prompt = new AssignDamageDialog(assignDamageData);
-    prompt.render(true);
+    await prompt.render({ force: true });
 }

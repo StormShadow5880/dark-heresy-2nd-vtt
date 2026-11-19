@@ -169,8 +169,8 @@ export class DarkHeresyItemContainer extends Item {
                 currentItem.updateSource(idata);
                 currentItem.prepareData();
                 this.items.set(idata._id, currentItem);
-                if (this.sheet) {
-                    currentItem.render(false, { action: 'update', data: currentItem.system });
+                if (currentItem.sheet?.rendered) {
+                    currentItem.sheet.render();
                 }
             }
         });

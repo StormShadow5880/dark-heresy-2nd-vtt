@@ -1,43 +1,23 @@
-import { recursiveUpdate } from '../rolls/roll-helpers.mjs';
-import { WeaponActionData } from '../rolls/action-data.mjs';
+import { DHPromptApplication } from './dh-prompt-base.mjs';
 
-export class ForceFieldDialog extends foundry.appv1.api.FormApplication {
+export class ForceFieldDialog extends DHPromptApplication {
+    static DEFAULT_OPTIONS = {
+        id: 'dh-force-field-dialog',
+        window: { title: 'Force Field' },
+    };
+
+    static PARTS = {
+        prompt: { template: 'systems/dark-heresy-2nd/templates/prompt/force-field-prompt.hbs' },
+    };
 
     constructor(forceFieldData = {}, options = {}) {
-        super(forceFieldData, options);
+        super(options);
         this.data = forceFieldData;
-        this.initialized = false;
     }
 
-    static get defaultOptions() {
-        return foundry.utils.mergeObject(super.defaultOptions, {
-            title: 'Force Field',
-            id: 'dh-force-field-dialog',
-            template: 'systems/dark-heresy-2nd/templates/prompt/force-field-prompt.hbs',
-            width: 500,
-            closeOnSubmit: false,
-            submitOnChange: true,
-            classes: ['dialog'],
-        });
-    }
-
-    activateListeners(html) {
-        super.activateListeners(html);
+    _activateListeners(html) {
         html.find('#roll-force-field').click(async (ev) => await this._rollForceField(ev));
         html.find('#cancel-prompt').click(async (ev) => await this._cancelPrompt(ev));
-    }
-
-    async getData() {
-        await this.data.update();
-        return this.data;
-    }
-
-    async _updateObject(event, formData) {
-        game.dh.log('_updateObject', { event, formData });
-        recursiveUpdate(this.data, formData);
-        game.dh.log('_updateObject complete', { 'data': this.data, formData });
-        await this.data.update();
-        this.render(true);
     }
 
     async _cancelPrompt(event) {
@@ -45,12 +25,12 @@ export class ForceFieldDialog extends foundry.appv1.api.FormApplication {
     }
 
     async _rollForceField(event) {
-        if(!this.data.forceField.system.activated) {
+        if (!this.data.forceField.system.activated) {
             ui.notifications.warn(`Force Field not activated!`);
             return;
         }
 
-        if(this.data.forceField.system.overloaded) {
+        if (this.data.forceField.system.overloaded) {
             ui.notifications.warn(`Force Field currently overloaded!`);
             return;
         }
@@ -63,5 +43,5 @@ export class ForceFieldDialog extends foundry.appv1.api.FormApplication {
 
 export async function prepareForceFieldRoll(forceFieldData) {
     const prompt = new ForceFieldDialog(forceFieldData);
-    prompt.render(true);
+    await prompt.render({ force: true });
 }

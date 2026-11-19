@@ -1,4 +1,5 @@
 import { sendActionDataToChat } from '../rolls/roll-helpers.mjs';
+import { actionDialog } from './dialog-helpers.mjs';
 
 /**
  *
@@ -6,68 +7,37 @@ import { sendActionDataToChat } from '../rolls/roll-helpers.mjs';
  * @returns {Promise<void>}
  */
 export async function prepareSimpleRoll(simpleSkillData) {
-    const html = await foundry.applications.handlebars.renderTemplate('systems/dark-heresy-2nd/templates/prompt/simple-roll-prompt.hbs', simpleSkillData);
-    let dialog = new foundry.appv1.api.Dialog(
-        {
-            title: 'Roll Modifier',
-            content: html,
-            buttons: {
-                roll: {
-                    icon: "<i class='dh-material'>casino</i>",
-                    label: 'Roll',
-                    callback: async (html) => {
-                        const rollData = simpleSkillData.rollData;
-                        rollData.modifiers['difficulty'] = parseInt(html.find('[id=difficulty] :selected').val());
-                        rollData.modifiers['modifier'] = html.find('#modifier')[0].value;
-                        await rollData.calculateTotalModifiers();
-                        await simpleSkillData.calculateSuccessOrFailure();
-                        await sendActionDataToChat(simpleSkillData);
-                    },
-                },
-                cancel: {
-                    icon: "<i class='dh-material'>close</i>",
-                    label: 'Cancel',
-                    callback: () => {},
-                },
+    const content = await foundry.applications.handlebars.renderTemplate('systems/dark-heresy-2nd/templates/prompt/simple-roll-prompt.hbs', simpleSkillData);
+    await actionDialog({
+        title: 'Roll Modifier',
+        content,
+        action: {
+            label: 'Roll',
+            icon: 'fa-solid fa-dice-d20',
+            callback: async (element) => {
+                const rollData = simpleSkillData.rollData;
+                rollData.modifiers['difficulty'] = parseInt(element.querySelector('#difficulty').value);
+                rollData.modifiers['modifier'] = element.querySelector('#modifier').value;
+                await rollData.calculateTotalModifiers();
+                await simpleSkillData.calculateSuccessOrFailure();
+                await sendActionDataToChat(simpleSkillData);
             },
-            default: 'roll',
-            close: () => {},
         },
-        {
-            width: 300,
-        },
-    );
-    dialog.render(true);
+    });
 }
 
 export async function prepareCreateSpecialistSkillPrompt(simpleSkillData) {
-    const html = await foundry.applications.handlebars.renderTemplate('systems/dark-heresy-2nd/templates/prompt/add-speciality-prompt.hbs', simpleSkillData);
-    let dialog = new foundry.appv1.api.Dialog(
-        {
-            title: 'Create Specialist Skill',
-            content: html,
-            buttons: {
-                add: {
-                    icon: "<i class='dh-material'>add</i>",
-                    label: 'Add',
-                    callback: async (html) => {
-                        const speciality = html.find('#speciality-name')[0].value;
-                        await simpleSkillData.actor.addSpecialitySkill(simpleSkillData.skillName, speciality);
-                    },
-                },
-                cancel: {
-                    icon: "<i class='dh-material'>close</i>",
-                    label: 'Cancel',
-                    callback: () => {},
-                },
+    const content = await foundry.applications.handlebars.renderTemplate('systems/dark-heresy-2nd/templates/prompt/add-speciality-prompt.hbs', simpleSkillData);
+    await actionDialog({
+        title: 'Create Specialist Skill',
+        content,
+        action: {
+            label: 'Add',
+            icon: 'fa-solid fa-plus',
+            callback: async (element) => {
+                const speciality = element.querySelector('#speciality-name').value;
+                await simpleSkillData.actor.addSpecialitySkill(simpleSkillData.skillName, speciality);
             },
-            default: 'add',
-            close: () => {},
         },
-        {
-            width: 300,
-        },
-    );
-    dialog.render(true);
+    });
 }
-

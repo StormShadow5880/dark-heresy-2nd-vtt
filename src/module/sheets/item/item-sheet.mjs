@@ -1,28 +1,25 @@
 import { toggleUIExpanded } from '../../rules/config.mjs';
+import { DHSheetMixin } from '../dh-sheet-mixin.mjs';
 
-export class DarkHeresyItemSheet extends foundry.appv1.sheets.ItemSheet {
-    static get defaultOptions() {
-        return foundry.utils.mergeObject(super.defaultOptions, {
-            width: 650,
-            height: 500,
-            tabs: [{ navSelector: '.dh-navigation', contentSelector: '.dh-body', initial: 'description' }],
-        });
-    }
+export class DarkHeresyItemSheet extends DHSheetMixin(foundry.applications.sheets.ItemSheetV2) {
+    static DEFAULT_OPTIONS = {
+        position: { width: 650, height: 500 },
+    };
 
-    get template() {
-        return `systems/dark-heresy-2nd/templates/item/item-sheet.hbs`;
-    }
+    static DEFAULT_TAB = 'description';
 
-    getData() {
-        const context = super.getData();
-        context.flags = context.item.flags;
-        context.dh = CONFIG.dh;
-        context.effects = this.item.effects.contents;
+    static PARTS = {
+        sheet: { template: `systems/dark-heresy-2nd/templates/item/item-sheet.hbs`, scrollable: ['.dh-body'] },
+    };
+
+    async _prepareContext(options) {
+        const context = await super._prepareContext(options);
+        context.item = this.item;
         return context;
     }
 
-    activateListeners(html) {
-        super.activateListeners(html);
+    _activateListeners(html) {
+        super._activateListeners(html);
         if (!this.isEditable) return;
 
         html.find('.sheet-control__hide-control').click(async (ev) => await this._sheetControlHideToggle(ev));
@@ -67,7 +64,7 @@ export class DarkHeresyItemSheet extends foundry.appv1.sheets.ItemSheet {
         event.preventDefault();
         const div = $(event.currentTarget);
         const effect = this.item.effects.get(div.data('effectId'));
-        effect.sheet.render(true);
+        effect.sheet.render({ force: true });
     }
 
     async _effectCreate(event) {

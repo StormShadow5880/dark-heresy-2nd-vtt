@@ -95,13 +95,18 @@ Enable Debug with: game.dh.debug = true
 
         // Register sheet application classes
         const { Actors, Items } = foundry.documents.collections;
+        // Replace the core sheets with our ApplicationV2 sheets
         const { ActorSheet, ItemSheet } = foundry.appv1.sheets;
-        Actors.unregisterSheet('core', ActorSheet);
+        try {
+            Actors.unregisterSheet('core', ActorSheet);
+            Items.unregisterSheet('core', ItemSheet);
+        } catch (err) {
+            game.dh.warn('Unable to unregister core sheets', err);
+        }
         Actors.registerSheet(SYSTEM_ID, AcolyteSheet, {types: ["acolyte"], makeDefault: true });
         Actors.registerSheet(SYSTEM_ID, NpcSheet, {types: ['npc'], makeDefault: true });
         Actors.registerSheet(SYSTEM_ID, VehicleSheet, {types: ['vehicle'], makeDefault: true });
 
-        Items.unregisterSheet('core', ItemSheet);
         Items.registerSheet(SYSTEM_ID, DarkHeresyItemSheet, { makeDefault: true });
         Items.registerSheet(SYSTEM_ID, DarkHeresyAmmoSheet, { types: ['ammunition'], makeDefault: true });
         Items.registerSheet(SYSTEM_ID, DarkHeresyArmourSheet, { types: ['armour'], makeDefault: true });

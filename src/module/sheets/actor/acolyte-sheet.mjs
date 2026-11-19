@@ -5,30 +5,21 @@ import { DHTargetedActionManager } from '../../actions/targeted-action-manager.m
 import { Hit } from '../../rolls/damage-data.mjs';
 import { AssignDamageData } from '../../rolls/assign-damage-data.mjs';
 import { prepareAssignDamageRoll } from '../../prompts/assign-damage-prompt.mjs';
+import { confirmDialog } from '../../prompts/dialog-helpers.mjs';
 
 export class AcolyteSheet extends ActorContainerSheet {
-    static get defaultOptions() {
-        return foundry.utils.mergeObject(super.defaultOptions, {
-            width: 1000,
-            height: 750,
-            resizable: true,
-            tabs: [{ navSelector: '.dh-navigation', contentSelector: '.dh-body', initial: 'main' }],
-        });
-    }
+    static DEFAULT_OPTIONS = {
+        position: { width: 1000, height: 750 },
+    };
 
-    get template() {
-        return `systems/dark-heresy-2nd/templates/actor/actor-acolyte-sheet.hbs`;
-    }
+    static DEFAULT_TAB = 'main';
 
-    getData() {
-        const context = super.getData();
-        context.dh = CONFIG.dh;
-        context.effects = this.actor.effects.contents;
-        return context;
-    }
+    static PARTS = {
+        sheet: { template: `systems/dark-heresy-2nd/templates/actor/actor-acolyte-sheet.hbs`, scrollable: ['.dh-body'] },
+    };
 
-    activateListeners(html) {
-        super.activateListeners(html);
+    _activateListeners(html) {
+        super._activateListeners(html);
 
         html.find('.roll-characteristic').click(async (ev) => await this._prepareRollCharacteristic(ev));
         html.find('.roll-skill').click(async (ev) => await this._prepareRollSkill(ev));
@@ -42,7 +33,7 @@ export class AcolyteSheet extends ActorContainerSheet {
         event.preventDefault();
         const target = event.currentTarget;
 
-        switch(target.dataset.action) {
+        switch(target.dataset.combatAction) {
             case 'attack':
                 await DHTargetedActionManager.performWeaponAttack(this.actor);
                 break;
@@ -88,30 +79,27 @@ export class AcolyteSheet extends ActorContainerSheet {
         await this.actor.rollSkill(skillName, specialtyName);
     }
 
-    _onHomeworldChange(event) {
+    async _onHomeworldChange(event) {
         event.preventDefault();
-        foundry.appv1.api.Dialog.confirm({
+        const confirmed = await confirmDialog({
             title: 'Roll Characteristics?',
             content: '<p>Would you like to roll Wounds and Fate for this homeworld?</p>',
-            yes: async () => {
-                // Something is probably wrong -- we will skip this
-                if(!this.actor.backgroundEffects?.homeworld) return;
-
-                // Roll Wounds
-                let woundRoll = new Roll(this.actor.backgroundEffects.homeworld.wounds);
-                await woundRoll.evaluate();
-                this.actor.wounds.max = woundRoll.total;
-
-                // Roll Fate
-                let fateRoll = new Roll('1d10');
-                await fateRoll.evaluate();
-                this.actor.fate.max =
-                    parseInt(this.actor.backgroundEffects.homeworld.fate_threshold) +
-                    (fateRoll.total >= this.actor.backgroundEffects.homeworld.emperors_blessing ? 1 : 0);
-                this.render(true);
-            },
-            no: () => {},
-            defaultYes: false,
         });
+        if (!confirmed) return;
+
+        // Something is probably wrong -- we will skip this
+        const homeworld = this.actor.backgroundEffects?.homeworld;
+        if (!homeworld) return;
+
+        // Roll Wounds
+        const woundRoll = new Roll(homeworld.wounds);
+        await woundRoll.evaluate();
+        this.actor.wounds.max = woundRoll.total;
+
+        // Roll Fate
+        const fateRoll = new Roll('1d10');
+        await fateRoll.evaluate();
+        this.actor.fate.max = parseInt(homeworld.fate_threshold) + (fateRoll.total >= homeworld.emperors_blessing ? 1 : 0);
+        this.render();
     }
 }

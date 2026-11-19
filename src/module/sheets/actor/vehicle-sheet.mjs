@@ -1,24 +1,15 @@
 import { ActorContainerSheet } from './actor-container-sheet.mjs';
 
 export class VehicleSheet extends ActorContainerSheet {
-    static get defaultOptions() {
-        return foundry.utils.mergeObject(super.defaultOptions, {
-            width: 1000,
-            height: 750,
-            resizable: true,
-            tabs: [{ navSelector: '.dh-navigation', contentSelector: '.dh-body', initial: 'main' }],
-        });
-    }
+    static DEFAULT_OPTIONS = {
+        position: { width: 1000, height: 750 },
+    };
 
-    get template() {
-        return `systems/dark-heresy-2nd/templates/actor/actor-vehicle-sheet.hbs`;
-    }
+    static DEFAULT_TAB = 'main';
 
-    getData() {
-        const context = super.getData();
-        context.dh = CONFIG.dh;
-        return context;
-    }
+    static PARTS = {
+        sheet: { template: `systems/dark-heresy-2nd/templates/actor/actor-vehicle-sheet.hbs`, scrollable: ['.dh-body'] },
+    };
 
     async _onItemDamage(event) {
         event.preventDefault();

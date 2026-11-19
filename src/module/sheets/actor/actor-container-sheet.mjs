@@ -1,17 +1,26 @@
 import { toggleUIExpanded } from '../../rules/config.mjs';
 import { DHBasicActionManager } from '../../actions/basic-action-manager.mjs';
 import { prepareCreateSpecialistSkillPrompt } from '../../prompts/simple-prompt.mjs';
+import { DHSheetMixin } from '../dh-sheet-mixin.mjs';
+import { confirmDialog } from '../../prompts/dialog-helpers.mjs';
 
 /**
  * Shared Actor functions for Actor that contains embedded items
  */
-export class ActorContainerSheet extends foundry.appv1.sheets.ActorSheet {
-    activateListeners(html) {
-        super.activateListeners(html);
+export class ActorContainerSheet extends DHSheetMixin(foundry.applications.sheets.ActorSheetV2) {
+    async _prepareContext(options) {
+        const context = await super._prepareContext(options);
+        context.actor = this.actor;
+        return context;
+    }
+
+    _activateListeners(html) {
+        super._activateListeners(html);
 
         // Everything below here is only needed if the sheet is editable
         if (!this.isEditable) return;
-        this.form.ondrop = (ev) => this._onDrop(ev);
+        this.element.ondragover = (ev) => ev.preventDefault();
+        this.element.ondrop = (ev) => this._onDrop(ev);
         html.find('.sheet-control__hide-control').click(async (ev) => await this._sheetControlHideToggle(ev));
         html.find('.item-roll').click(async (ev) => await this._onItemRoll(ev));
         html.find('.item-damage').click(async (ev) => await this._onItemDamage(ev));
@@ -40,27 +49,46 @@ export class ActorContainerSheet extends foundry.appv1.sheets.ActorSheet {
         html.find('.add-skill').click(async (ev) => await this._addSpecialistSkill(ev));
     }
 
-    _onDrop(event) {
+    async _onDrop(event) {
         event.preventDefault();
         event.stopPropagation();
         game.dh.log('Actor _onDrop', event);
 
         try {
-            const data = JSON.parse(event.dataTransfer.getData('text/plain'));
+            const data = foundry.applications.ux.TextEditor.implementation.getDragEventData(event);
             if (data.type === 'Item' || data.type === 'item') {
                 game.dh.log('Checking if item already exists', data);
                 // Check if Item already Exists
                 if (this.actor.items.find((i) => i._id === data?.data?._id)) {
                     game.dh.log('Item already exists on Actor -- ignoring');
                     return false;
-                } else {
-                    return super._onDrop(event);
+                }
+                return await this._onDropItem(data);
+            } else if (data.type === 'ActiveEffect') {
+                const effect = await ActiveEffect.implementation.fromDropData(data);
+                if (effect && effect.parent?.uuid !== this.actor.uuid) {
+                    await this.actor.createEmbeddedDocuments('ActiveEffect', [effect.toObject()]);
                 }
             }
         } catch (err) {
             game.dh.log('Actor Container | drop error', err);
-            return false;
         }
+        return false;
+    }
+
+    async _onDropItem(data) {
+        let item;
+        try {
+            item = await Item.implementation.fromDropData(data);
+        } catch (err) {
+            game.dh.log('Unable to resolve dropped item by uuid, using embedded data', err);
+        }
+        // Items dragged from other sheets carry the item data itself
+        if (!(item instanceof Item) && data.data) item = new Item.implementation(data.data);
+        if (!item) return false;
+        if (item.parent?.uuid === this.actor.uuid) return false;
+        await this.actor.createEmbeddedDocuments('Item', [item.toObject()]);
+        return false;
     }
 
     async _addSpecialistSkill(event) {
@@ -105,21 +133,19 @@ export class ActorContainerSheet extends foundry.appv1.sheets.ActorSheet {
         event.preventDefault();
         const div = $(event.currentTarget);
         let item = this.actor.items.get(div.data('itemId'));
-        item.sheet.render(true);
+        item.sheet.render({ force: true });
     }
 
-    _onItemDelete(event) {
+    async _onItemDelete(event) {
         event.preventDefault();
-        foundry.appv1.api.Dialog.confirm({
+        const div = $(event.currentTarget);
+        const itemId = div.data('itemId');
+        await confirmDialog({
             title: 'Confirm Delete',
             content: '<p>Are you sure you would like to delete this?</p>',
-            yes: () => {
-                const div = $(event.currentTarget);
-                this.actor.deleteEmbeddedDocuments('Item', [div.data('itemId')]);
-                div.slideUp(200, () => this.render(false));
+            yes: async () => {
+                await this.actor.deleteEmbeddedDocuments('Item', [itemId]);
             },
-            no: () => {},
-            defaultYes: false,
         });
     }
 
@@ -160,9 +186,8 @@ export class ActorContainerSheet extends foundry.appv1.sheets.ActorSheet {
         const itemId = element.dataset.itemId;
         const item = this.actor.items.get(itemId);
         if (!item) {
-            // Cannot find item on actor? Just let foundry handle it...
-            game.dh.log('Default Foundry Handler');
-            return super._onDragStart(event);
+            game.dh.log('Item not found on actor - cancelling drag');
+            return;
         }
 
         // Create drag data
@@ -177,16 +202,6 @@ export class ActorContainerSheet extends foundry.appv1.sheets.ActorSheet {
         };
         event.dataTransfer.setData('text/plain', JSON.stringify(dragData));
     }
-
-    async _sheetControlHideToggle(event) {
-        event.preventDefault();
-        const displayToggle = $(event.currentTarget);
-        $('span', displayToggle).first().toggleClass('active');
-        const target = displayToggle.data('toggle');
-        $('.' + target).toggle();
-        toggleUIExpanded(target);
-    }
-
 
     async _onActorDragStart(event) {
         event.stopPropagation();
@@ -233,9 +248,8 @@ export class ActorContainerSheet extends foundry.appv1.sheets.ActorSheet {
                 event.dataTransfer.setData('text/plain', JSON.stringify(dragData));
                 return;
             default:
-                // Let default Foundry handler deal with default drag cases.
-                game.dh.warn('No handler for drag type: ' + dragType + ' Using default foundry handler.');
-                return super._onDragStart(event);
+                game.dh.warn('No handler for drag type: ' + dragType);
+                return;
         }
     }
 
@@ -264,7 +278,7 @@ export class ActorContainerSheet extends foundry.appv1.sheets.ActorSheet {
         event.preventDefault();
         const div = $(event.currentTarget);
         const effect = this.actor.effects.get(div.data('effectId'));
-        effect.sheet.render(true);
+        effect.sheet.render({ force: true });
     }
 
     async _effectCreate(event) {

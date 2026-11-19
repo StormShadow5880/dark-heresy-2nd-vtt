@@ -6,6 +6,7 @@ import { DHTargetedActionManager } from './targeted-action-manager.mjs';
 import { Hit } from '../rolls/damage-data.mjs';
 import { DarkHeresySettings } from '../dark-heresy-settings.mjs';
 import { SYSTEM_ID } from '../hooks-manager.mjs';
+import { confirmDialog } from '../prompts/dialog-helpers.mjs';
 
 export class BasicActionManager {
     // This is stored rolls for allowing re-rolls, ammo refund, etc.
@@ -60,15 +61,13 @@ export class BasicActionManager {
             return;
         }
 
-        foundry.appv1.api.Dialog.confirm({
+        await confirmDialog({
             title: 'Confirm Refund',
             content: '<p>Are you sure you would like to refund ammo, fate, etc for this action?</p>',
             yes: async () => {
                 await actionData.refundResources();
                 ui.notifications.info(`Resources refunded`);
             },
-            no: () => {},
-            defaultYes: false,
         });
     }
 
@@ -88,7 +87,7 @@ export class BasicActionManager {
             return;
         }
 
-        foundry.appv1.api.Dialog.confirm({
+        await confirmDialog({
             title: 'Confirm Re-Roll',
             content: '<p>Are you sure you would like to use a fate point to re-roll action?</p>',
             yes: async () => {
@@ -103,8 +102,6 @@ export class BasicActionManager {
                 // Run it back
                 await actionData.performActionAndSendToChat();
             },
-            no: () => {},
-            defaultYes: false,
         });
     }
 

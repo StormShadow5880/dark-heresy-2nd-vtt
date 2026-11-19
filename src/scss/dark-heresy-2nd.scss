@@ -45,3 +45,17 @@
     @import 'src/scss/sheets/item';
     @import 'src/scss/sheets/attack';
 }
+
+// ApplicationV2 window frames: the sheet/prompt content brings its own padding and borders
+.application.dh-sheet,
+.application.dh-prompt {
+    > .window-content {
+        padding: 0;
+        overflow-y: auto;
+    }
+}
+
+// Prompts are single forms rendered as the application element
+.application.dh-prompt > .window-content > .dh-wrapper {
+    width: 100%;
+}
