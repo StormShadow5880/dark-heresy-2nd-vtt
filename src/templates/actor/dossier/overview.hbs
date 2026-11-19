@@ -1,15 +1,16 @@
 <section class="tab dossier-tab" data-tab="overview" data-group="primary">
     <div class="ov-layout">
-        <article class="panel panel--ornate panel--characteristics">
+        <article class="panel panel--characteristics">
             <h2 class="panel__title">Characteristics</h2>
-            <div class="chars">
+            <ul class="attrs">
                 {{#each dossier.characteristics as |c|}}
-                    <div class="char {{#if c.hasBonus}}char--bonus{{/if}} {{#if c.hasNegative}}char--negative{{/if}} actor-drag" data-item-type="characteristic" data-item-id="{{c.key}}" data-char="{{c.key}}">
-                        <button type="button" class="char__edit-toggle" data-action="toggleCharEdit" data-char="{{c.key}}" data-tooltip="Pin details" aria-label="Pin details of {{c.label}}"><i class="fa-solid fa-thumbtack"></i></button>
-                        <span class="char__short">{{c.short}}</span>
-                        <button type="button" class="char__roll roll-characteristic" data-characteristic="{{c.key}}" data-tooltip="Roll {{c.label}} test (W100 ≤ {{c.total}})">{{c.total}}</button>
-                        <span class="char__bonus" data-tooltip="Characteristic bonus">Bonus {{c.bonus}}</span>
+                    <li class="char {{#if c.hasBonus}}char--bonus{{/if}} {{#if c.hasNegative}}char--negative{{/if}} actor-drag" data-item-type="characteristic" data-item-id="{{c.key}}" data-char="{{c.key}}">
+                        <span class="char__short" data-tooltip="{{c.label}}">{{c.short}}</span>
+                        <span class="char__label">{{c.label}}</span>
                         <span class="pips" data-tooltip="Advances: {{c.advanceLabel}}">{{#each c.advancePips as |on|}}<i class="pip {{#if on}}on{{/if}}"></i>{{/each}}</span>
+                        <span class="char__bonus" data-tooltip="Characteristic bonus">B{{c.bonus}}</span>
+                        <button type="button" class="char__roll roll-characteristic" data-characteristic="{{c.key}}" data-tooltip="Roll {{c.label}} test (W100 ≤ {{c.total}})">{{c.total}}</button>
+                        <button type="button" class="char__edit-toggle" data-action="toggleCharEdit" data-char="{{c.key}}" data-tooltip="Pin details" aria-label="Pin details of {{c.label}}"><i class="fa-solid fa-thumbtack"></i></button>
                         <div class="char__pop" role="group" aria-label="{{c.label}} details">
                             <header><b>{{c.label}}</b><span>{{c.total}} <small>Bonus {{c.bonus}}</small></span></header>
                             <label data-tooltip="Initial value"><span>Initial</span>
@@ -23,16 +24,61 @@
                             <label data-tooltip="Unnatural characteristic (extra bonus)"><span>Unnatural</span>
                                 <input type="number" data-dtype="Number" name="system.characteristics.{{c.key}}.unnatural" value="{{c.unnatural}}" /></label>
                         </div>
-                    </div>
+                    </li>
                 {{/each}}
-            </div>
+            </ul>
         </article>
 
-        <article class="panel panel--status">
-            <h2 class="panel__title">Status</h2>
-            <div class="status">
-                <div class="stat stat--fatigue">
-                    <span class="stat__label">Fatigue</span>
+        <div class="ov-main">
+            <article class="panel panel--wounds">
+                <h2 class="panel__title">Damage
+                    <span class="panel__hint">
+                        {{#if dossier.res.wounds.bar.dead}}Dead{{else if dossier.res.wounds.bar.critical}}Critical damage {{dossier.res.wounds.bar.critical}} / 10{{else if dossier.res.wounds.bar.serious}}Seriously injured{{else if dossier.res.wounds.bar.hasDamage}}Minor damage{{else}}Unharmed{{/if}}
+                    </span>
+                </h2>
+                <div class="wounds-panel">
+                    <div class="stat__big" data-tooltip="Damage taken / maximum wounds">
+                        <button type="button" class="step" data-action="adjustDamage" data-delta="-1" aria-label="Heal one point of damage">−</button>
+                        <input type="number" class="damage-input" min="0" value="{{dossier.res.wounds.bar.damage}}" aria-label="Damage taken" />
+                        <span class="sep">/</span>
+                        <input type="number" data-dtype="Number" name="system.wounds.max" value="{{dossier.res.wounds.max}}" aria-label="Maximum wounds" />
+                        <button type="button" class="step" data-action="adjustDamage" data-delta="1" aria-label="Take one point of damage">+</button>
+                    </div>
+                    <div class="wounds-bar">
+                        <div class="wbar {{#if dossier.res.wounds.bar.serious}}is-serious{{/if}} {{#if dossier.res.wounds.bar.dead}}is-dead{{/if}}" role="progressbar" aria-valuemin="0" aria-valuemax="{{dossier.res.wounds.max}}" aria-valuenow="{{dossier.res.wounds.bar.damage}}">
+                            <i class="wbar__cap wbar__cap--l"></i>
+                            <div class="wbar__cells">
+                                {{#each dossier.res.wounds.bar.cells as |c|}}<i class="wbar__cell {{#if c.filled}}on{{/if}} {{#if c.minor}}minor{{/if}} {{#if c.gap}}gap{{/if}}"></i>{{/each}}
+                            </div>
+                            <i class="wbar__cap wbar__cap--r"></i>
+                        </div>
+                        {{#if dossier.res.wounds.bar.cells.length}}
+                            <div class="wzones" data-tooltip="Minor damage: the first 2 × toughness bonus points of damage. Beyond that the character is seriously injured.">
+                                {{#if dossier.res.wounds.bar.minorCells}}<span class="wzones__minor" style="flex: {{dossier.res.wounds.bar.minorCells}}">Minor · {{dossier.res.wounds.bar.minorLimit}}</span>{{/if}}
+                                {{#if dossier.res.wounds.bar.seriousCells}}<span class="wzones__serious" style="flex: {{dossier.res.wounds.bar.seriousCells}}">Serious</span>{{/if}}
+                            </div>
+                        {{/if}}
+                    </div>
+                </div>
+                <div class="crit {{#if dossier.res.wounds.bar.dead}}is-dead{{/if}}">
+                    <span class="crit__label" data-tooltip="Damage beyond the maximum wounds. At 10 critical damage the character is dead.">Critical</span>
+                    <span class="crit__pips" role="group" aria-label="Critical damage">
+                        {{#each dossier.res.wounds.bar.criticalPips as |p|}}<button type="button" class="crit__pip {{#if p.filled}}on{{/if}}" data-action="setCritical" data-level="{{p.level}}" aria-label="Set critical damage to {{p.level}}" aria-pressed="{{p.filled}}"></button>{{/each}}
+                    </span>
+                    <span class="crit__count">{{dossier.res.wounds.bar.critical}} / 10</span>
+                    {{#if dossier.res.wounds.bar.dead}}<span class="crit__dead">Dead</span>{{/if}}
+                    <span class="crit__injuries">
+                        {{#each dossier.criticalInjuries as |injury|}}
+                            <span class="chip item-edit" data-item-id="{{injury.id}}" role="button" tabindex="0" data-tooltip="{{injury.part}} · {{injury.type}}">{{injury.name}}</span>
+                        {{/each}}
+                        <button type="button" class="icon-btn item-create" data-type="criticalInjury" data-tooltip="New critical injury"><i class="fa-solid fa-plus"></i></button>
+                    </span>
+                </div>
+            </article>
+
+            <div class="stat-row">
+                <div class="tile tile--fatigue">
+                    <span class="tile__label">Fatigue</span>
                     <div class="stat__counter">
                         <button type="button" class="step" data-action="adjustValue" data-path="system.fatigue.value" data-delta="-1" data-max="{{dossier.res.fatigue.max}}" aria-label="Decrease fatigue">−</button>
                         <input type="number" data-dtype="Number" name="system.fatigue.value" value="{{dossier.res.fatigue.value}}" aria-label="Fatigue" />
@@ -40,13 +86,10 @@
                         <button type="button" class="step" data-action="adjustValue" data-path="system.fatigue.value" data-delta="1" data-max="{{dossier.res.fatigue.max}}" aria-label="Increase fatigue">+</button>
                     </div>
                 </div>
-
-                <div class="stat stat--fate">
-                    <div class="ring ring--fate" data-tooltip="Fate points">
-                        <b>{{dossier.res.fate.value}}</b><small>of {{dossier.res.fate.max}}</small>
-                    </div>
-                    <div class="stat__fate-controls">
-                        <span class="stat__label">Fate</span>
+                <div class="tile tile--fate">
+                    <div class="ring ring--fate ring--small" data-tooltip="Fate points"><b>{{dossier.res.fate.value}}</b><small>of {{dossier.res.fate.max}}</small></div>
+                    <div class="tile__body">
+                        <span class="tile__label">Fate</span>
                         <div class="stat__counter">
                             <button type="button" class="step" data-action="adjustValue" data-path="system.fate.value" data-delta="-1" data-max="{{dossier.res.fate.max}}" aria-label="Decrease fate">−</button>
                             <input type="number" data-dtype="Number" name="system.fate.value" value="{{dossier.res.fate.value}}" aria-label="Fate" />
@@ -56,59 +99,55 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="stat-pair">
-                    <div class="stat stat--corruption">
-                        <span class="stat__label">Corruption</span>
-                        <div class="stat__counter">
-                            <button type="button" class="step" data-action="adjustValue" data-path="system.corruption" data-delta="-1" aria-label="Decrease corruption">−</button>
-                            <input type="number" data-dtype="Number" name="system.corruption" value="{{dossier.res.corruption.value}}" aria-label="Corruption" />
-                            <button type="button" class="step" data-action="adjustValue" data-path="system.corruption" data-delta="1" aria-label="Increase corruption">+</button>
-                        </div>
-                        <span class="stat__note">{{dossier.res.corruption.note}}</span>
+                <div class="tile tile--corruption">
+                    <span class="tile__label">Corruption</span>
+                    <div class="stat__counter">
+                        <button type="button" class="step" data-action="adjustValue" data-path="system.corruption" data-delta="-1" aria-label="Decrease corruption">−</button>
+                        <input type="number" data-dtype="Number" name="system.corruption" value="{{dossier.res.corruption.value}}" aria-label="Corruption" />
+                        <button type="button" class="step" data-action="adjustValue" data-path="system.corruption" data-delta="1" aria-label="Increase corruption">+</button>
                     </div>
-                    <div class="stat stat--insanity">
-                        <span class="stat__label">Insanity</span>
-                        <div class="stat__counter">
-                            <button type="button" class="step" data-action="adjustValue" data-path="system.insanity" data-delta="-1" aria-label="Decrease insanity">−</button>
-                            <input type="number" data-dtype="Number" name="system.insanity" value="{{dossier.res.insanity.value}}" aria-label="Insanity" />
-                            <button type="button" class="step" data-action="adjustValue" data-path="system.insanity" data-delta="1" aria-label="Increase insanity">+</button>
-                        </div>
-                        <span class="stat__note">{{dossier.res.insanity.note}}</span>
-                    </div>
+                    <span class="tile__note">{{dossier.res.corruption.note}}</span>
                 </div>
-
+                <div class="tile tile--insanity">
+                    <span class="tile__label">Insanity</span>
+                    <div class="stat__counter">
+                        <button type="button" class="step" data-action="adjustValue" data-path="system.insanity" data-delta="-1" aria-label="Decrease insanity">−</button>
+                        <input type="number" data-dtype="Number" name="system.insanity" value="{{dossier.res.insanity.value}}" aria-label="Insanity" />
+                        <button type="button" class="step" data-action="adjustValue" data-path="system.insanity" data-delta="1" aria-label="Increase insanity">+</button>
+                    </div>
+                    <span class="tile__note">{{dossier.res.insanity.note}}</span>
+                </div>
             </div>
-        </article>
 
-        <article class="panel panel--quick">
-            <h2 class="panel__title">Key Skills <span class="panel__hint">Star skills on the Skills tab</span></h2>
-            <ul class="qs">
-                {{#each dossier.quickSkills as |s|}}
-                    <li class="qs__item" data-tooltip="{{s.label}} · {{s.training}} ({{s.characteristic}})">
-                        <span class="qs__name">{{s.label}} <small>{{s.characteristic}}</small></span>
-                        <span class="qs__pips">{{#each s.pips as |p|}}<i class="pip {{#if p.filled}}on{{/if}}"></i>{{/each}}</span>
-                        <span class="qs__target">{{s.total}}</span>
-                        <button type="button" class="icon-btn roll-skill" data-skill="{{s.skillKey}}" data-specialty="{{s.specKey}}" data-tooltip="Roll {{s.label}} (W100 ≤ {{s.total}})"><i class="fa-solid fa-dice-d20"></i></button>
-                    </li>
-                {{else}}
-                    <li class="empty">No favourite skills. Use the star on the Skills tab.</li>
-                {{/each}}
-            </ul>
-        </article>
+            <article class="panel panel--quick">
+                <h2 class="panel__title">Key Skills <span class="panel__hint">Star skills on the Skills tab</span></h2>
+                <ul class="qs">
+                    {{#each dossier.quickSkills as |s|}}
+                        <li class="qs__item" data-tooltip="{{s.label}} · {{s.training}} ({{s.characteristic}})">
+                            <span class="qs__name">{{s.label}} <small>{{s.characteristic}}</small></span>
+                            <span class="qs__pips">{{#each s.pips as |p|}}<i class="pip {{#if p.filled}}on{{/if}}"></i>{{/each}}</span>
+                            <span class="qs__target">{{s.total}}</span>
+                            <button type="button" class="icon-btn roll-skill" data-skill="{{s.skillKey}}" data-specialty="{{s.specKey}}" data-tooltip="Roll {{s.label}} (W100 ≤ {{s.total}})"><i class="fa-solid fa-dice-d20"></i></button>
+                        </li>
+                    {{else}}
+                        <li class="empty">No favourite skills. Use the star on the Skills tab.</li>
+                    {{/each}}
+                </ul>
+            </article>
 
-        <article class="note panel--details">
-            <i class="note__pin" aria-hidden="true"></i>
-            <h2 class="note__title">Personal File</h2>
-            <div class="note__grid">
-                <label><span>Gender</span><input type="text" name="system.bio.gender" value="{{actor.system.bio.gender}}" /></label>
-                <label><span>Age</span><input type="text" name="system.bio.age" value="{{actor.system.bio.age}}" /></label>
-                <label><span>Build</span><input type="text" name="system.bio.build" value="{{actor.system.bio.build}}" /></label>
-                <label><span>Complexion</span><input type="text" name="system.bio.complexion" value="{{actor.system.bio.complexion}}" /></label>
-                <label><span>Hair</span><input type="text" name="system.bio.hair" value="{{actor.system.bio.hair}}" /></label>
-                <label><span>Size</span>
-                    <select name="system.size" data-dtype="Number">{{selectOptions dossier.sizeOptions selected=actor.system.size}}</select></label>
-            </div>
-        </article>
+            <article class="note">
+                <i class="note__pin" aria-hidden="true"></i>
+                <h2 class="note__title">Personal File</h2>
+                <div class="note__grid">
+                    <label><span>Gender</span><input type="text" name="system.bio.gender" value="{{actor.system.bio.gender}}" /></label>
+                    <label><span>Age</span><input type="text" name="system.bio.age" value="{{actor.system.bio.age}}" /></label>
+                    <label><span>Build</span><input type="text" name="system.bio.build" value="{{actor.system.bio.build}}" /></label>
+                    <label><span>Complexion</span><input type="text" name="system.bio.complexion" value="{{actor.system.bio.complexion}}" /></label>
+                    <label><span>Hair</span><input type="text" name="system.bio.hair" value="{{actor.system.bio.hair}}" /></label>
+                    <label><span>Size</span>
+                        <select name="system.size" data-dtype="Number">{{selectOptions dossier.sizeOptions selected=actor.system.size}}</select></label>
+                </div>
+            </article>
+        </div>
     </div>
 </section>

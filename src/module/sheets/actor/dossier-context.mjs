@@ -4,6 +4,7 @@
  * rules are not re-implemented in the templates.
  */
 import { SYSTEM_ID } from '../../system-id.mjs';
+import { woundBar } from '../../rules/wounds.mjs';
 
 export const CHARACTERISTIC_ORDER = [
     'weaponSkill',
@@ -73,50 +74,6 @@ function toNumber(value, fallback = 0) {
     return Number.isFinite(n) ? n : fallback;
 }
 
-const MAX_WOUND_CELLS = 40;
-
-/**
- * Cell layout of the wounds bar: one cell per wound point (so the bar is exactly as long as the maximum wounds).
- * With more than MAX_WOUND_CELLS wounds a cell stands for several wounds.
- *
- * Damage zones (as described by the group's reading of the rules): the first `2 x toughness bonus` points of damage
- * are "minor damage", every further point means the character is seriously injured. Damage is taken from the right
- * end of the bar, so the rightmost cells form the minor zone and a gap separates it from the serious zone.
- * The limit lives here only; it is NOT applied to any dice roll or other game mechanic.
- *
- * @param value {number} current wounds
- * @param max {number} maximum wounds
- * @param toughnessBonus {number}
- */
-export function woundBar(value, max, toughnessBonus) {
-    const m = Math.max(0, Math.floor(toNumber(max)));
-    const v = Math.min(m, Math.max(0, Math.floor(toNumber(value))));
-    const minorLimit = Math.min(m, Math.max(0, 2 * Math.floor(toNumber(toughnessBonus))));
-    const count = Math.min(m, MAX_WOUND_CELLS);
-    const per = count ? m / count : 1;
-    const cells = [];
-    for (let i = 0; i < count; i++) {
-        const start = i * per;
-        cells.push({
-            filled: start < v,
-            minor: start >= m - minorLimit,
-            gap: false,
-        });
-    }
-    const firstMinor = cells.findIndex((c) => c.minor);
-    if (firstMinor > 0) cells[firstMinor].gap = true;
-    const damage = m - v;
-    return {
-        cells,
-        damage,
-        minorLimit,
-        seriousCells: cells.filter((c) => !c.minor).length,
-        minorCells: cells.filter((c) => c.minor).length,
-        serious: m > 0 && damage > minorLimit,
-        hasDamage: damage > 0,
-    };
-}
-
 function percent(value, max) {
     if (!max || max <= 0) return 0;
     return Math.max(0, Math.min(100, Math.round((toNumber(value) / max) * 100)));
@@ -154,7 +111,7 @@ export function buildResources(actor) {
             maxPath: 'system.wounds.max',
             max: s.wounds.max,
             pct: percent(s.wounds.value, s.wounds.max),
-            bar: woundBar(s.wounds.value, s.wounds.max, actor.characteristics.toughness?.bonus),
+            bar: woundBar(s.wounds.value, s.wounds.max, s.wounds.critical, actor.characteristics.toughness?.bonus),
             tone: 'wounds',
             note: s.wounds.critical ? `Critical: ${s.wounds.critical}` : '',
         },

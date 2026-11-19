@@ -7,7 +7,6 @@
     </div>
 
     <div class="dossier-identity">
-        <p class="record-title"><span>Imperial Personnel Record</span><span class="record-title__sub">Adeptus Administratum · Personnel Archive</span></p>
         <input class="dossier-name" name="name" type="text" value="{{actor.name}}" aria-label="Name" />
         <div class="dossier-bio-fields">
             {{#each dossier.bioFields as |field|}}
@@ -22,44 +21,34 @@
         </div>
     </div>
 
-    <div class="hwounds" aria-label="Wounds">
-        <div class="hwounds__top">
-            <span class="hwounds__label">Wounds</span>
-            <span class="hwounds__value">
-                <input type="number" data-dtype="Number" name="system.wounds.value" value="{{dossier.res.wounds.value}}" aria-label="Wounds" />
-                <span>/</span>
-                <input type="number" data-dtype="Number" name="system.wounds.max" value="{{dossier.res.wounds.max}}" aria-label="Maximum wounds" />
-            </span>
-            <span class="hwounds__steps">
-                <button type="button" class="step" data-action="adjustValue" data-path="system.wounds.value" data-delta="-1" data-max="{{dossier.res.wounds.max}}" aria-label="Decrease wounds">−</button>
-                <button type="button" class="step" data-action="adjustValue" data-path="system.wounds.value" data-delta="1" data-max="{{dossier.res.wounds.max}}" aria-label="Increase wounds">+</button>
+    <div class="hmini" aria-label="Damage">
+        <div class="hmini__top">
+            <span class="hmini__label">Damage</span>
+            <span class="hmini__value">{{dossier.res.wounds.bar.damage}}<small> / {{dossier.res.wounds.max}}</small></span>
+            {{#if dossier.res.wounds.bar.dead}}
+                <span class="wstate is-dead">Dead</span>
+            {{else if dossier.res.wounds.bar.critical}}
+                <span class="wstate is-serious" data-tooltip="Critical damage (dead at 10)">Critical {{dossier.res.wounds.bar.critical}}/10</span>
+            {{else if dossier.res.wounds.bar.serious}}
+                <span class="wstate is-serious">Seriously injured</span>
+            {{else if dossier.res.wounds.bar.hasDamage}}
+                <span class="wstate">Minor</span>
+            {{/if}}
+            <span class="hmini__steps">
+                <button type="button" class="step" data-action="adjustDamage" data-delta="-1" aria-label="Heal one point of damage" data-tooltip="Heal 1">−</button>
+                <button type="button" class="step" data-action="adjustDamage" data-delta="1" aria-label="Take one point of damage" data-tooltip="Damage +1 (beyond the maximum: critical)">+</button>
             </span>
         </div>
-        <div class="wbar {{#if dossier.res.wounds.bar.serious}}is-serious{{/if}}" role="progressbar" aria-valuemin="0" aria-valuemax="{{dossier.res.wounds.max}}" aria-valuenow="{{dossier.res.wounds.value}}">
+        <div class="wbar wbar--mini {{#if dossier.res.wounds.bar.serious}}is-serious{{/if}} {{#if dossier.res.wounds.bar.dead}}is-dead{{/if}}">
             <i class="wbar__cap wbar__cap--l"></i>
             <div class="wbar__cells">
                 {{#each dossier.res.wounds.bar.cells as |c|}}<i class="wbar__cell {{#if c.filled}}on{{/if}} {{#if c.minor}}minor{{/if}} {{#if c.gap}}gap{{/if}}"></i>{{/each}}
             </div>
             <i class="wbar__cap wbar__cap--r"></i>
         </div>
-        {{#if dossier.res.wounds.bar.cells.length}}
-            <div class="wzones" data-tooltip="Minor damage: the first 2 × toughness bonus points of damage. Beyond that the character is seriously injured.">
-                {{#if dossier.res.wounds.bar.seriousCells}}<span class="wzones__serious" style="flex: {{dossier.res.wounds.bar.seriousCells}}">Serious</span>{{/if}}
-                {{#if dossier.res.wounds.bar.minorCells}}<span class="wzones__minor" style="flex: {{dossier.res.wounds.bar.minorCells}}">Minor · {{dossier.res.wounds.bar.minorLimit}}</span>{{/if}}
-            </div>
-        {{/if}}
-        <div class="hwounds__sub">
-            {{#if dossier.res.wounds.bar.hasDamage}}
-                <span class="wstate {{#if dossier.res.wounds.bar.serious}}is-serious{{/if}}">{{#if dossier.res.wounds.bar.serious}}Seriously injured{{else}}Minor damage{{/if}} · {{dossier.res.wounds.bar.damage}}</span>
-            {{/if}}
-            {{#if actor.system.wounds.critical}}<span>Critical <b>{{actor.system.wounds.critical}}</b></span>{{/if}}
-            <span>Fatigue <b>{{dossier.res.fatigue.value}} / {{dossier.res.fatigue.max}}</b></span>
-            <span>Fate <b>{{dossier.res.fate.value}} / {{dossier.res.fate.max}}</b></span>
-        </div>
     </div>
 
     <div class="banner" data-tooltip="Available experience points">
-        <span class="banner__label">Available XP</span>
         <b class="banner__value">{{dossier.development.available}}</b>
     </div>
 </header>

@@ -21,6 +21,7 @@ import {
     TRAINING_LEVELS,
 } from './dossier-context.mjs';
 import { removeLogEntry } from '../../rules/experience.mjs';
+import { MAX_CRITICAL, adjustDamage, valueForDamage } from '../../rules/wounds.mjs';
 import { prepareAwardExperience, prepareSpendExperience } from '../../prompts/experience-prompt.mjs';
 import { confirmDialog } from '../../prompts/dialog-helpers.mjs';
 
@@ -47,8 +48,9 @@ export class AcolyteDossierSheet extends AcolyteSheet {
             removeLogEntry: AcolyteDossierSheet.#onRemoveLogEntry,
             rollTable: AcolyteDossierSheet.#onRollTable,
             setTraining: AcolyteDossierSheet.#onSetTraining,
-            setPips: AcolyteDossierSheet.#onSetPips,
             toggleCharEdit: AcolyteDossierSheet.#onToggleCharEdit,
+            adjustDamage: AcolyteDossierSheet.#onAdjustDamage,
+            setCritical: AcolyteDossierSheet.#onSetCritical,
         },
     };
 
@@ -127,6 +129,15 @@ export class AcolyteDossierSheet extends AcolyteSheet {
         super._activateListeners(html);
         this._activateSkillFilters(this.element);
         this._activateGearFilters(this.element);
+        // the damage field is derived (max - remaining wounds) and therefore not part of the form
+        this.element.querySelectorAll('input.damage-input').forEach((input) =>
+            input.addEventListener('change', async (ev) => {
+                ev.stopPropagation();
+                const value = valueForDamage(input.value, this.actor.system.wounds.max);
+                await this.actor.update({ 'system.wounds.value': value });
+                this.render();
+            }),
+        );
         this.element.querySelectorAll('.char').forEach((tile) => tile.classList.toggle('is-editing', this._openCharEdits.has(tile.dataset.char)));
         // Buttons inside <summary> must not toggle the surrounding <details>
         this.element.querySelectorAll('summary button').forEach((b) => b.addEventListener('click', (ev) => ev.preventDefault()));
@@ -196,13 +207,25 @@ export class AcolyteDossierSheet extends AcolyteSheet {
         await this.actor.update({ [path]: current === level ? level - 1 : level });
     }
 
-    /** Generic pip counter (e.g. Fate points) */
-    static async #onSetPips(event, target) {
+    /** +1 damage (or -1 when healing). Damage beyond the maximum counts as critical damage. */
+    static async #onAdjustDamage(event, target) {
         if (!this.isEditable) return;
-        const { path } = target.dataset;
+        const wounds = this.actor.system.wounds;
+        const update = adjustDamage(wounds, Number(target.dataset.delta));
+        if (!update) return;
+        const data = {};
+        if (update.value !== undefined) data['system.wounds.value'] = update.value;
+        if (update.critical !== undefined) data['system.wounds.critical'] = update.critical;
+        await this.actor.update(data);
+    }
+
+    /** Clicking a critical pip sets that level, clicking the highest filled one lowers it by one */
+    static async #onSetCritical(event, target) {
+        if (!this.isEditable) return;
         const level = Number(target.dataset.level);
-        const current = Number(foundry.utils.getProperty(this.actor, path) ?? 0);
-        await this.actor.update({ [path]: current === level ? level - 1 : level });
+        const current = Number(this.actor.system.wounds.critical ?? 0);
+        const next = Math.min(MAX_CRITICAL, Math.max(0, current === level ? level - 1 : level));
+        await this.actor.update({ 'system.wounds.critical': next });
     }
 
     static #onToggleCharEdit(event, target) {

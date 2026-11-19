@@ -52,7 +52,7 @@
             </div>
             <dl class="stats stats--compact">
                 <div><dt>Initiative</dt><dd>{{dossier.combat.initiativeBase}} + {{dossier.combat.initiativeBonus}} <small>({{dossier.combat.initiativeCharacteristic}})</small></dd></div>
-                <div><dt>Wounds</dt><dd>{{dossier.combat.wounds.value}} / {{dossier.combat.wounds.max}}</dd></div>
+                <div><dt>Damage</dt><dd>{{dossier.res.wounds.bar.damage}} / {{dossier.res.wounds.max}}{{#if dossier.res.wounds.bar.critical}} <small>+{{dossier.res.wounds.bar.critical}} crit</small>{{/if}}</dd></div>
                 <div><dt>Half / Full</dt><dd>{{dossier.combat.movement.half}} / {{dossier.combat.movement.full}} m</dd></div>
                 <div><dt>Charge / Run</dt><dd>{{dossier.combat.movement.charge}} / {{dossier.combat.movement.run}} m</dd></div>
                 <div><dt>SB / TB</dt><dd>{{dossier.combat.strengthBonus}} / {{dossier.combat.toughnessBonus}}</dd></div>
