@@ -59,3 +59,23 @@
 .application.dh-prompt > .window-content > .dh-wrapper {
     width: 100%;
 }
+
+// Foundry V13+ themes (dark by default) set a light text color on every application.
+// The sheets are designed for dark text on light parchment panels, so restore that for our content.
+.dh-wrapper {
+    color: #191813;
+    --color-text-primary: #191813;
+    --color-text-secondary: #3b3a35;
+    --color-text-subtle: #4b4a44;
+    --color-text-emphatic: #000;
+    --color-form-label: #4b4a44;
+    --color-form-hint: #4b4a44;
+
+    input,
+    select,
+    textarea,
+    button,
+    option {
+        color: inherit;
+    }
+}
