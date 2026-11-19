@@ -1,0 +1,47 @@
+<section class="tab dossier-tab" data-tab="development" data-group="primary">
+    <div class="two-col two-col--narrow-left">
+        <article class="panel">
+            <h2 class="panel__title">Experience</h2>
+            <div class="panel__body details">
+                <label><span>Total earned</span><input type="number" data-dtype="Number" name="system.experience.total" value="{{actor.system.experience.total}}" /></label>
+                <label><span>Spent</span><input type="number" data-dtype="Number" name="system.experience.used" value="{{actor.system.experience.used}}" /></label>
+                <label><span>Available</span><span class="static strong">{{dossier.development.available}}</span></label>
+            </div>
+            <div class="resource__bar"><span style="width: {{dossier.development.pct}}%"></span></div>
+            <dl class="stats stats--compact">
+                <div><dt>Characteristics</dt><dd>{{dossier.development.spentCharacteristics}}</dd></div>
+                <div><dt>Skills</dt><dd>{{dossier.development.spentSkills}}</dd></div>
+                <div><dt>Talents</dt><dd>{{dossier.development.spentTalents}}</dd></div>
+                <div><dt>Psychic</dt><dd>{{dossier.development.spentPsychicPowers}}</dd></div>
+                <div><dt>Sum of entries</dt><dd class="{{#if dossier.development.mismatch}}warn{{/if}}" {{#if dossier.development.mismatch}}data-tooltip="Differs from 'Spent' - entries may have been edited manually"{{/if}}>{{dossier.development.calculatedTotal}}</dd></div>
+            </dl>
+            <div class="btn-row">
+                <button type="button" class="btn btn--primary" data-action="spendExperience"><i class="fa-solid fa-coins"></i> Spend EP</button>
+                <button type="button" class="btn" data-action="awardExperience"><i class="fa-solid fa-plus"></i> Award EP</button>
+            </div>
+            <p class="hint">Advancement costs from the rulebook are not stored in the system. Enter the cost you pay; limits (maximum advances) and available EP are validated.</p>
+        </article>
+
+        <article class="panel">
+            <h2 class="panel__title">Advancement Log</h2>
+            <div class="table-scroll">
+                <table class="dtable">
+                    <thead><tr><th>Date</th><th>Entry</th><th class="num">EP</th><th>By</th><th></th></tr></thead>
+                    <tbody>
+                        {{#each dossier.development.log as |entry|}}
+                            <tr>
+                                <td>{{entry.date}}</td>
+                                <td>{{entry.label}}{{#if entry.override}} <span class="pill warn">GM override</span>{{/if}}{{#if entry.note}}<br /><small>{{entry.note}}</small>{{/if}}</td>
+                                <td class="num strong">{{#if entry.isSpend}}−{{else}}+{{/if}}{{entry.cost}}</td>
+                                <td>{{entry.user}}</td>
+                                <td class="act">{{#if @root.dossier.isGM}}<button type="button" class="icon-btn" data-action="removeLogEntry" data-log-id="{{entry.id}}" data-tooltip="Remove entry"><i class="fa-solid fa-trash"></i></button>{{/if}}</td>
+                            </tr>
+                        {{else}}
+                            <tr><td colspan="5" class="empty">No entries yet.</td></tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+            </div>
+        </article>
+    </div>
+</section>

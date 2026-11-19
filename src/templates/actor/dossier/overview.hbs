@@ -1,0 +1,102 @@
+<section class="tab dossier-tab" data-tab="overview" data-group="primary">
+    <div class="ov-layout">
+        <article class="panel panel--status">
+            <h2 class="panel__title">Status</h2>
+            <div class="panel__body">
+                {{#each dossier.resources as |res|}}
+                    <div class="resource resource--{{res.tone}}">
+                        <span class="resource__label">{{res.label}}</span>
+                        {{#if res.max}}
+                            <div class="resource__bar" role="progressbar" aria-valuemin="0" aria-valuemax="{{res.max}}" aria-valuenow="{{res.value}}"><span style="width: {{res.pct}}%"></span></div>
+                        {{else}}
+                            <div class="resource__bar resource__bar--empty"></div>
+                        {{/if}}
+                        <div class="resource__controls">
+                            <button type="button" class="step" data-action="adjustValue" data-path="{{res.valuePath}}" data-delta="-1" data-max="{{res.max}}" aria-label="Decrease {{res.label}}">−</button>
+                            <input type="number" data-dtype="Number" name="{{res.valuePath}}" value="{{res.value}}" aria-label="{{res.label}}" />
+                            {{#if res.maxPath}}
+                                <span class="sep">/</span>
+                                <input type="number" data-dtype="Number" name="{{res.maxPath}}" value="{{res.max}}" aria-label="{{res.label}} maximum" />
+                            {{else if res.max}}
+                                <span class="sep">/</span><span class="static">{{res.max}}</span>
+                            {{/if}}
+                            <button type="button" class="step" data-action="adjustValue" data-path="{{res.valuePath}}" data-delta="1" data-max="{{res.max}}" aria-label="Increase {{res.label}}">+</button>
+                        </div>
+                        {{#if res.note}}<span class="resource__note">{{res.note}}</span>{{/if}}
+                    </div>
+                {{/each}}
+                <div class="resource resource--xp">
+                    <span class="resource__label">Experience</span>
+                    <div class="resource__bar"><span style="width: {{dossier.development.pct}}%"></span></div>
+                    <div class="resource__controls">
+                        <span class="static">{{dossier.development.used}} / {{dossier.development.total}}</span>
+                        <span class="resource__note">Available: {{dossier.development.available}}</span>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <article class="panel panel--characteristics">
+            <h2 class="panel__title">Characteristics</h2>
+            <div class="chars">
+                {{#each dossier.characteristics as |c|}}
+                    <div class="char {{#if c.hasBonus}}char--bonus{{/if}} {{#if c.hasNegative}}char--negative{{/if}} actor-drag" data-item-type="characteristic" data-item-id="{{c.key}}">
+                        <span class="char__short" data-tooltip="{{c.label}}">{{c.short}}</span>
+                        <button type="button" class="char__roll roll-characteristic" data-characteristic="{{c.key}}" data-tooltip="Roll {{c.label}} test (W100 ≤ {{c.total}})">
+                            {{c.total}}
+                        </button>
+                        <span class="char__bonus" data-tooltip="Characteristic bonus">+{{c.bonus}}</span>
+                        <div class="char__edit">
+                            <label data-tooltip="Initial value"><span>Init</span>
+                                <input type="number" data-dtype="Number" name="system.characteristics.{{c.key}}.base" value="{{c.base}}" /></label>
+                            <label data-tooltip="Permanent advances (each +5)"><span>Adv</span>
+                                <select name="system.characteristics.{{c.key}}.advance">
+                                    {{selectOptions @root.dossier.characteristicAdvanceLevels selected=c.advance}}
+                                </select></label>
+                            <label data-tooltip="Temporary modifier"><span>Mod</span>
+                                <input type="number" data-dtype="Number" name="system.characteristics.{{c.key}}.modifier" value="{{c.modifier}}" /></label>
+                            <label data-tooltip="Unnatural characteristic (extra bonus)"><span>Unn</span>
+                                <input type="number" data-dtype="Number" name="system.characteristics.{{c.key}}.unnatural" value="{{c.unnatural}}" /></label>
+                        </div>
+                    </div>
+                {{/each}}
+            </div>
+        </article>
+
+        <article class="panel panel--quick">
+            <h2 class="panel__title">Key Skills
+                <span class="panel__hint">Star skills on the Skills tab</span>
+            </h2>
+            <table class="dtable">
+                <thead><tr><th>Skill</th><th>Char.</th><th>Training</th><th class="num">Bonus</th><th class="num">Total</th><th></th></tr></thead>
+                <tbody>
+                    {{#each dossier.quickSkills as |s|}}
+                        <tr>
+                            <td>{{s.label}}</td>
+                            <td>{{s.characteristic}}</td>
+                            <td><span class="pill {{#if s.trained}}pill--on{{/if}}">{{s.training}}</span></td>
+                            <td class="num">{{#if (gt s.trainingBonus 0)}}+{{/if}}{{s.trainingBonus}}</td>
+                            <td class="num strong">{{s.total}}</td>
+                            <td class="act"><button type="button" class="icon-btn roll-skill" data-skill="{{s.skillKey}}" data-specialty="{{s.specKey}}" data-tooltip="Roll {{s.label}}"><i class="fa-solid fa-dice-d20"></i></button></td>
+                        </tr>
+                    {{else}}
+                        <tr><td colspan="6" class="empty">No favourite skills. Use the star on the Skills tab.</td></tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </article>
+
+        <article class="panel panel--details">
+            <h2 class="panel__title">Details</h2>
+            <div class="panel__body details">
+                <label><span>Gender</span><input type="text" name="system.bio.gender" value="{{actor.system.bio.gender}}" /></label>
+                <label><span>Age</span><input type="text" name="system.bio.age" value="{{actor.system.bio.age}}" /></label>
+                <label><span>Build</span><input type="text" name="system.bio.build" value="{{actor.system.bio.build}}" /></label>
+                <label><span>Complexion</span><input type="text" name="system.bio.complexion" value="{{actor.system.bio.complexion}}" /></label>
+                <label><span>Hair</span><input type="text" name="system.bio.hair" value="{{actor.system.bio.hair}}" /></label>
+                <label><span>Size</span>
+                    <select name="system.size" data-dtype="Number">{{selectOptions dossier.sizeOptions selected=actor.system.size}}</select></label>
+            </div>
+        </article>
+    </div>
+</section>

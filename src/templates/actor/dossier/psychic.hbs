@@ -1,0 +1,53 @@
+<section class="tab dossier-tab" data-tab="psychic" data-group="primary">
+    <div class="two-col two-col--narrow-left">
+        <article class="panel">
+            <h2 class="panel__title">Psychic Profile</h2>
+            <div class="panel__body details">
+                <label><span>Psy Rating</span><input type="number" data-dtype="Number" name="system.psy.rating" value="{{actor.system.psy.rating}}" /></label>
+                <label><span>Sustained</span><input type="number" data-dtype="Number" name="system.psy.sustained" value="{{actor.system.psy.sustained}}" data-tooltip="Number of powers currently sustained" /></label>
+                <label><span>Current PR</span><span class="static strong" data-tooltip="Psy Rating minus sustained powers">{{dossier.psychic.current}}</span></label>
+                <label><span>Class</span>
+                    <input type="text" name="system.psy.class" value="{{actor.system.psy.class}}" /></label>
+                <label><span>Has focus</span><input type="checkbox" name="system.psy.hasFocus" data-dtype="Boolean" {{checked actor.system.psy.hasFocus}} /></label>
+                <label><span>Disciplines</span><span class="static">{{#each dossier.psychic.disciplines as |d|}}{{d}}{{#unless @last}}, {{/unless}}{{else}}—{{/each}}</span></label>
+            </div>
+            <div class="btn-row">
+                <button type="button" class="btn" data-action="rollTable" data-table="Psychic Phenomena"><i class="fa-solid fa-burst"></i> Psychic Phenomena</button>
+                <button type="button" class="btn btn--danger" data-action="rollTable" data-table="Perils of the Warp"><i class="fa-solid fa-skull"></i> Perils of the Warp</button>
+            </div>
+            <p class="hint">Tables are drawn from the system compendium. Rules for when to roll them are in the rulebook.</p>
+        </article>
+
+        <article class="panel">
+            <h2 class="panel__title">Psychic Powers
+                <button type="button" class="icon-btn item-create" data-type="psychicPower" data-tooltip="New psychic power"><i class="fa-solid fa-plus"></i></button>
+            </h2>
+            <div class="table-scroll">
+                <table class="dtable">
+                    <thead><tr><th>Power</th><th>Discipline</th><th class="num">XP</th><th>Action</th><th>Sustained</th><th>Damage</th><th></th></tr></thead>
+                    <tbody>
+                        {{#each dossier.psychic.powers as |p|}}
+                            <tr class="item-drag" data-item-id="{{p.id}}">
+                                <td class="strong">{{p.name}}{{#if p.subtype}} <small>{{p.subtype}}</small>{{/if}}</td>
+                                <td>{{p.discipline}}</td>
+                                <td class="num">{{p.cost}}</td>
+                                <td>{{p.action}}</td>
+                                <td>{{p.sustained}}</td>
+                                <td>{{#if p.isAttack}}{{p.damage}} <small>pen {{p.penetration}}</small>{{else}}—{{/if}}</td>
+                                <td class="act actions">
+                                    <button type="button" class="icon-btn item-roll" data-item-id="{{p.id}}" data-tooltip="Manifest (focus power test)"><i class="fa-solid fa-eye"></i></button>
+                                    {{#if p.isAttack}}<button type="button" class="icon-btn item-damage" data-item-id="{{p.id}}" data-tooltip="Roll damage"><i class="fa-solid fa-burst"></i></button>{{/if}}
+                                    <button type="button" class="icon-btn item-vocalize" data-item-id="{{p.id}}" data-tooltip="Show in chat"><i class="fa-solid fa-comment"></i></button>
+                                    <button type="button" class="icon-btn item-edit" data-item-id="{{p.id}}" data-tooltip="Edit"><i class="fa-solid fa-pen"></i></button>
+                                    <button type="button" class="icon-btn item-delete" data-item-id="{{p.id}}" data-tooltip="Delete"><i class="fa-solid fa-trash"></i></button>
+                                </td>
+                            </tr>
+                        {{else}}
+                            <tr><td colspan="7" class="empty">No psychic powers. Drag powers from the compendium onto the sheet.</td></tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+            </div>
+        </article>
+    </div>
+</section>

@@ -1,0 +1,54 @@
+<section class="tab dossier-tab" data-tab="bio" data-group="primary">
+    <div class="two-col">
+        <article class="panel">
+            <h2 class="panel__title">Personality</h2>
+            <div class="panel__body stack-fields">
+                <label><span>Quirks</span><textarea name="system.bio.quirks" rows="3">{{actor.system.bio.quirks}}</textarea></label>
+                <label><span>Superstition</span><textarea name="system.bio.superstition" rows="3">{{actor.system.bio.superstition}}</textarea></label>
+                <label><span>Mementos</span><textarea name="system.bio.mementos" rows="3">{{actor.system.bio.mementos}}</textarea></label>
+            </div>
+        </article>
+        <article class="panel">
+            <h2 class="panel__title">Notes</h2>
+            <div class="panel__body stack-fields">
+                <textarea class="notes" name="system.bio.notes" rows="14" aria-label="Notes">{{actor.system.bio.notes}}</textarea>
+            </div>
+        </article>
+        <article class="panel">
+            <h2 class="panel__title">Contacts
+                <button type="button" class="icon-btn item-create" data-type="peer" data-tooltip="New contact"><i class="fa-solid fa-plus"></i></button>
+            </h2>
+            <ul class="rows">
+                {{#each dossier.relations.peers as |p|}}
+                    <li class="item-drag" data-item-id="{{p.id}}"><img src="{{p.img}}" alt="" /><span class="grow">{{p.name}}</span>
+                        <button type="button" class="icon-btn item-edit" data-item-id="{{p.id}}"><i class="fa-solid fa-pen"></i></button>
+                        <button type="button" class="icon-btn item-delete" data-item-id="{{p.id}}"><i class="fa-solid fa-trash"></i></button></li>
+                {{else}}<li class="empty">No contacts.</li>{{/each}}
+            </ul>
+        </article>
+        <article class="panel">
+            <h2 class="panel__title">Enemies
+                <button type="button" class="icon-btn item-create" data-type="enemy" data-tooltip="New enemy"><i class="fa-solid fa-plus"></i></button>
+            </h2>
+            <ul class="rows">
+                {{#each dossier.relations.enemies as |p|}}
+                    <li class="item-drag" data-item-id="{{p.id}}"><img src="{{p.img}}" alt="" /><span class="grow">{{p.name}}</span>
+                        <button type="button" class="icon-btn item-edit" data-item-id="{{p.id}}"><i class="fa-solid fa-pen"></i></button>
+                        <button type="button" class="icon-btn item-delete" data-item-id="{{p.id}}"><i class="fa-solid fa-trash"></i></button></li>
+                {{else}}<li class="empty">No enemies.</li>{{/each}}
+            </ul>
+        </article>
+        <article class="panel panel--wide">
+            <h2 class="panel__title">Journal
+                <button type="button" class="icon-btn item-create" data-type="journalEntry" data-tooltip="New journal entry"><i class="fa-solid fa-plus"></i></button>
+            </h2>
+            <ul class="rows">
+                {{#each dossier.relations.journal as |p|}}
+                    <li class="item-drag" data-item-id="{{p.id}}"><img src="{{p.img}}" alt="" /><span class="grow">{{p.name}}</span>
+                        <button type="button" class="icon-btn item-edit" data-item-id="{{p.id}}"><i class="fa-solid fa-pen"></i></button>
+                        <button type="button" class="icon-btn item-delete" data-item-id="{{p.id}}"><i class="fa-solid fa-trash"></i></button></li>
+                {{else}}<li class="empty">No journal entries.</li>{{/each}}
+            </ul>
+        </article>
+    </div>
+</section>

@@ -1,0 +1,17 @@
+<header class="dossier-header">
+    <img class="dossier-portrait" src="{{actor.img}}" alt="{{actor.name}}" data-edit="img" data-action="editImage" data-tooltip="Change portrait" />
+    <div class="dossier-identity">
+        <input class="dossier-name" name="name" type="text" value="{{actor.name}}" aria-label="Name" />
+        <div class="dossier-bio-fields">
+            {{#each dossier.bioFields as |field|}}
+                <label class="dossier-field">
+                    <span class="dossier-field__label">{{field.label}}</span>
+                    <select class="acolyte-{{field.key}}" name="system.bio.{{field.key}}">
+                        <option value=""></option>
+                        {{selectOptions (arrayToObject field.options) selected=field.value}}
+                    </select>
+                </label>
+            {{/each}}
+        </div>
+    </div>
+</header>

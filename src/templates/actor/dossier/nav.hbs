@@ -1,0 +1,7 @@
+<nav class="dossier-nav dh-navigation" aria-label="Character sheet sections">
+    {{#each dossier.tabs as |tab|}}
+        <a class="item {{#if tab.dim}}is-dim{{/if}}" data-tab="{{tab.id}}" data-group="primary" role="tab" tabindex="0">
+            <i class="{{tab.icon}}"></i><span>{{tab.label}}</span>
+        </a>
+    {{/each}}
+</nav>

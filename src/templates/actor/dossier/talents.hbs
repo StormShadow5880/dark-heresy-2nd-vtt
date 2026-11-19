@@ -1,0 +1,86 @@
+<section class="tab dossier-tab" data-tab="talents" data-group="primary">
+    <div class="two-col">
+        <article class="panel">
+            <h2 class="panel__title">Talents
+                <button type="button" class="icon-btn item-create" data-type="talent" data-tooltip="New talent"><i class="fa-solid fa-plus"></i></button>
+            </h2>
+            <ul class="rows rows--detail">
+                {{#each dossier.talents as |t|}}
+                    <li class="item-drag" data-item-id="{{t.id}}">
+                        <details>
+                            <summary>
+                                <span class="grow">{{t.name}}</span>
+                                <span class="pill" data-tooltip="Talent tier">Tier {{t.tier}}</span>
+                                <button type="button" class="icon-btn item-vocalize" data-item-id="{{t.id}}" data-tooltip="Show in chat"><i class="fa-solid fa-comment"></i></button>
+                                <button type="button" class="icon-btn item-edit" data-item-id="{{t.id}}" data-tooltip="Edit"><i class="fa-solid fa-pen"></i></button>
+                                <button type="button" class="icon-btn item-delete" data-item-id="{{t.id}}" data-tooltip="Delete"><i class="fa-solid fa-trash"></i></button>
+                            </summary>
+                            <div class="detail">
+                                {{#if t.prerequisites}}<p><strong>Prerequisites:</strong> {{t.prerequisites}}</p>{{/if}}
+                                {{#if t.aptitudes}}<p><strong>Aptitudes:</strong> {{t.aptitudes}}</p>{{/if}}
+                                <div class="prose">{{{t.benefit}}}</div>
+                            </div>
+                        </details>
+                    </li>
+                {{else}}
+                    <li class="empty">No talents.</li>
+                {{/each}}
+            </ul>
+        </article>
+
+        <div class="stack">
+            <article class="panel">
+                <h2 class="panel__title">Traits
+                    <button type="button" class="icon-btn item-create" data-type="trait" data-tooltip="New trait"><i class="fa-solid fa-plus"></i></button>
+                </h2>
+                <ul class="rows rows--detail">
+                    {{#each dossier.traits as |t|}}
+                        <li class="item-drag" data-item-id="{{t.id}}">
+                            <details>
+                                <summary>
+                                    <span class="grow">{{t.name}}</span>
+                                    {{#if t.level}}<span class="pill">{{t.level}}</span>{{/if}}
+                                    <button type="button" class="icon-btn item-edit" data-item-id="{{t.id}}" data-tooltip="Edit"><i class="fa-solid fa-pen"></i></button>
+                                    <button type="button" class="icon-btn item-delete" data-item-id="{{t.id}}" data-tooltip="Delete"><i class="fa-solid fa-trash"></i></button>
+                                </summary>
+                                <div class="detail prose">{{{t.description}}}</div>
+                            </details>
+                        </li>
+                    {{else}}
+                        <li class="empty">No traits.</li>
+                    {{/each}}
+                </ul>
+            </article>
+
+            <article class="panel">
+                <h2 class="panel__title">Aptitudes
+                    <button type="button" class="icon-btn item-create" data-type="aptitude" data-tooltip="New aptitude"><i class="fa-solid fa-plus"></i></button>
+                </h2>
+                <div class="chips chips--static">
+                    {{#each dossier.aptitudes as |a|}}
+                        <span class="chip item-drag" data-item-id="{{a.id}}">
+                            <span class="item-edit" data-item-id="{{a.id}}" role="button" tabindex="0">{{a.name}}</span>
+                            <button type="button" class="chip__x item-delete" data-item-id="{{a.id}}" aria-label="Remove {{a.name}}">×</button>
+                        </span>
+                    {{else}}
+                        <span class="empty">No aptitudes.</span>
+                    {{/each}}
+                </div>
+            </article>
+
+            <article class="panel">
+                <h2 class="panel__title">Origin Bonuses</h2>
+                <ul class="rows">
+                    {{#each dossier.abilities as |ab|}}
+                        <li>
+                            <span class="grow">{{ab.name}} <small>{{ab.source}}</small></span>
+                            <button type="button" class="icon-btn bonus-vocalize" data-bonus-name="{{ab.name}}" data-tooltip="Show in chat"><i class="fa-solid fa-comment"></i></button>
+                        </li>
+                    {{else}}
+                        <li class="empty">Select home world, background, role and divination in the header.</li>
+                    {{/each}}
+                </ul>
+            </article>
+        </div>
+    </div>
+</section>

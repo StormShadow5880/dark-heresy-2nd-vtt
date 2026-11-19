@@ -1,0 +1,43 @@
+<section class="tab dossier-tab" data-tab="gear" data-group="primary">
+    <article class="panel">
+        <h2 class="panel__title">Gear</h2>
+        <div class="toolbar">
+            <div class="chips" role="group" aria-label="Filter gear">
+                <button type="button" class="chip gear-filter" data-filter="all">All</button>
+                {{#each dossier.gear.allGroups as |g|}}
+                    <button type="button" class="chip gear-filter" data-filter="{{g.id}}">{{g.label}}</button>
+                {{/each}}
+            </div>
+            <div class="encumbrance {{#if dossier.gear.encumbrance.encumbered}}is-over{{/if}}" data-tooltip="Carried weight / capacity (kg)">
+                <span>Encumbrance</span>
+                <div class="resource__bar"><span style="width: {{dossier.gear.encumbrance.pct}}%"></span></div>
+                <strong>{{dossier.gear.encumbrance.value}} / {{dossier.gear.encumbrance.max}} kg</strong>
+            </div>
+        </div>
+        {{#each dossier.gear.groups as |group|}}
+            <section class="gear-group" data-group="{{group.id}}">
+                <h3 class="subtitle">{{group.label}}
+                    <button type="button" class="icon-btn item-create" data-type="{{group.types.[0]}}" data-tooltip="New {{group.label}}"><i class="fa-solid fa-plus"></i></button>
+                </h3>
+                <ul class="rows">
+                    {{#each group.items as |item|}}
+                        <li class="item-drag {{#if item.canEquip}}{{#unless item.equipped}}is-unequipped{{/unless}}{{/if}}" data-item-id="{{item.id}}">
+                            <img src="{{item.img}}" alt="" />
+                            <span class="grow">{{item.name}} <small>{{item.type}}{{#if item.inBackpack}} · in backpack{{/if}}</small></span>
+                            <span class="weight" data-tooltip="Weight">{{item.weight}} kg</span>
+                            {{#if item.canEquip}}
+                                <button type="button" class="icon-btn {{#if item.equipped}}on{{/if}}" data-action="toggleEquipped" data-item-id="{{item.id}}" data-tooltip="{{#if item.equipped}}Unequip{{else}}Equip{{/if}}" aria-pressed="{{item.equipped}}"><i class="fa-solid fa-check"></i></button>
+                            {{/if}}
+                            <button type="button" class="icon-btn item-vocalize" data-item-id="{{item.id}}" data-tooltip="Show in chat"><i class="fa-solid fa-comment"></i></button>
+                            <button type="button" class="icon-btn item-edit" data-item-id="{{item.id}}" data-tooltip="Edit"><i class="fa-solid fa-pen"></i></button>
+                            <button type="button" class="icon-btn item-delete" data-item-id="{{item.id}}" data-tooltip="Delete"><i class="fa-solid fa-trash"></i></button>
+                        </li>
+                    {{/each}}
+                </ul>
+            </section>
+        {{else}}
+            <p class="empty">No gear yet. Drag items from a compendium onto this sheet.</p>
+        {{/each}}
+        <p class="hint">Item quantities are not part of the system's item data, every item is an individual document.</p>
+    </article>
+</section>

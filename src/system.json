@@ -19,7 +19,8 @@
     "module/dark-heresy-2nd.mjs"
   ],
   "styles": [
-    "css/dark-heresy-2nd.css"
+    "css/dark-heresy-2nd.css",
+    "css/dossier.css"
   ],
   "scripts": [],
   "packs": [

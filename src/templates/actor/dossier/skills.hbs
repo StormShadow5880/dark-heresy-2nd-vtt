@@ -1,0 +1,63 @@
+<section class="tab dossier-tab" data-tab="skills" data-group="primary">
+    <article class="panel">
+        <h2 class="panel__title">Skills</h2>
+        <div class="toolbar">
+            <input type="search" class="skill-search" placeholder="Search skills…" aria-label="Search skills" />
+            <select class="skill-mode" aria-label="Filter skills">
+                <option value="all">All</option>
+                <option value="trained">Trained / Known</option>
+                <option value="untrained">Untrained</option>
+                <option value="favorites">Favourites</option>
+            </select>
+            <select class="skill-sort" aria-label="Sort skills">
+                <option value="name">Sort: Name</option>
+                <option value="char">Sort: Characteristic</option>
+            </select>
+        </div>
+        <div class="skill-table dtable dtable--grid" data-sort="name">
+            <div class="skill-head">
+                <span></span><span>Skill</span><span>Char.</span><span>Training</span><span class="num">Mod.</span><span class="num">Target</span><span></span>
+            </div>
+            {{#each dossier.skills as |s|}}
+                <div class="skill-row actor-drag" data-name="{{toLowerCase s.label}}" data-trained="{{s.trained}}" data-favorite="{{s.favorite}}"
+                     data-item-type="skill" data-item-id="{{s.skillKey}}" {{#if s.specKey}}data-speciality="{{s.specKey}}"{{/if}}
+                     style="--name-order: {{s.nameOrder}}; --char-order: {{s.charOrder}};">
+                    <button type="button" class="icon-btn star {{#if s.favorite}}on{{/if}}" data-action="toggleFavorite" data-skill-id="{{s.id}}" data-tooltip="Favourite" aria-pressed="{{s.favorite}}">
+                        <i class="fa-{{#if s.favorite}}solid{{else}}regular{{/if}} fa-star"></i>
+                    </button>
+                    <span class="skill-name">{{s.label}}</span>
+                    {{#if s.charPath}}
+                        <select name="{{s.charPath}}" aria-label="Characteristic">
+                            {{selectOptions (arrayToObject s.characteristicOptions) selected=s.characteristic}}
+                        </select>
+                    {{else}}
+                        <span>{{s.characteristic}}</span>
+                    {{/if}}
+                    <select name="{{s.advancePath}}" data-dtype="Number" aria-label="Training">
+                        {{selectOptions @root.dossier.trainingLevels selected=s.advance}}
+                    </select>
+                    <span class="num">{{#if (gt s.trainingBonus 0)}}+{{/if}}{{s.trainingBonus}}</span>
+                    <span class="num strong">{{s.total}}</span>
+                    <button type="button" class="icon-btn roll-skill" data-skill="{{s.skillKey}}" data-specialty="{{s.specKey}}" data-tooltip="Roll {{s.label}} (W100 ≤ {{s.total}})"><i class="fa-solid fa-dice-d20"></i></button>
+                </div>
+            {{/each}}
+        </div>
+    </article>
+
+    <article class="panel">
+        <h2 class="panel__title">Specialist Skills <span class="panel__hint">Choose which specialisations the character has taken</span></h2>
+        <div class="spec-groups">
+            {{#each dossier.specialistGroups as |group|}}
+                <details class="spec-group">
+                    <summary>{{group.label}}</summary>
+                    <div class="spec-list">
+                        {{#each group.specialities as |spec|}}
+                            <label><input type="checkbox" name="{{spec.path}}" data-dtype="Boolean" {{checked spec.taken}} /> {{spec.label}}</label>
+                        {{/each}}
+                    </div>
+                    <button type="button" class="btn add-skill" data-skill="{{group.skillKey}}"><i class="fa-solid fa-plus"></i> Custom speciality</button>
+                </details>
+            {{/each}}
+        </div>
+    </article>
+</section>

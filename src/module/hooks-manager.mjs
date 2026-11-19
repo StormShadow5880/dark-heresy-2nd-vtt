@@ -1,6 +1,7 @@
 import { DarkHeresyItem } from './documents/item.mjs';
 import { DarkHeresy } from './rules/config.mjs';
 import { AcolyteSheet } from './sheets/actor/acolyte-sheet.mjs';
+import { AcolyteDossierSheet } from './sheets/actor/dossier-sheet.mjs';
 import { DarkHeresyItemSheet } from './sheets/item/item-sheet.mjs';
 import { DarkHeresyWeaponSheet } from './sheets/item/weapon-sheet.mjs';
 import { DarkHeresyArmourSheet } from './sheets/item/armour-sheet.mjs';
@@ -38,7 +39,8 @@ import { DHTourMain } from './tours/main-tour.mjs';
 
 import * as documents from './documents/_module.mjs'
 
-export const SYSTEM_ID = 'dark-heresy-2nd';
+import { SYSTEM_ID } from './system-id.mjs';
+export { SYSTEM_ID };
 
 export class HooksManager {
     static registerHooks() {
@@ -103,7 +105,8 @@ Enable Debug with: game.dh.debug = true
         } catch (err) {
             game.dh.warn('Unable to unregister core sheets', err);
         }
-        Actors.registerSheet(SYSTEM_ID, AcolyteSheet, {types: ["acolyte"], makeDefault: true });
+        Actors.registerSheet(SYSTEM_ID, AcolyteDossierSheet, {types: ['acolyte'], makeDefault: true, label: 'Dark Heresy Dossier'});
+        Actors.registerSheet(SYSTEM_ID, AcolyteSheet, {types: ['acolyte'], makeDefault: false, label: 'Dark Heresy Classic'});
         Actors.registerSheet(SYSTEM_ID, NpcSheet, {types: ['npc'], makeDefault: true });
         Actors.registerSheet(SYSTEM_ID, VehicleSheet, {types: ['vehicle'], makeDefault: true });
 

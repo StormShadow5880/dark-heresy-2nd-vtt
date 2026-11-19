@@ -1,0 +1,112 @@
+<section class="tab dossier-tab" data-tab="combat" data-group="primary">
+    <div class="combat-layout">
+        <article class="panel panel--profile">
+            <h2 class="panel__title">Combat Profile</h2>
+            <dl class="stats">
+                <div><dt>Initiative</dt><dd>{{dossier.combat.initiativeBase}} + {{dossier.combat.initiativeBonus}} <small>({{dossier.combat.initiativeCharacteristic}})</small></dd></div>
+                <div><dt>WS / BS</dt><dd>{{dossier.combat.weaponSkill}} / {{dossier.combat.ballisticSkill}}</dd></div>
+                <div><dt>Strength Bonus</dt><dd>{{dossier.combat.strengthBonus}}</dd></div>
+                <div><dt>Toughness Bonus</dt><dd>{{dossier.combat.toughnessBonus}}</dd></div>
+                <div><dt>Wounds</dt><dd>{{dossier.combat.wounds.value}} / {{dossier.combat.wounds.max}}</dd></div>
+                <div><dt>Half / Full</dt><dd>{{dossier.combat.movement.half}} / {{dossier.combat.movement.full}} m</dd></div>
+                <div><dt>Charge / Run</dt><dd>{{dossier.combat.movement.charge}} / {{dossier.combat.movement.run}} m</dd></div>
+                <div><dt>Dodge</dt><dd>{{#if dossier.combat.dodge}}{{dossier.combat.dodge}}{{else}}—{{/if}}</dd></div>
+                <div><dt>Parry</dt><dd>{{#if dossier.combat.parry}}{{dossier.combat.parry}}{{else}}—{{/if}}</dd></div>
+            </dl>
+            <div class="btn-row">
+                <button type="button" class="btn combat-control" data-combat-action="dodge"><i class="fa-solid fa-person-running"></i> Dodge</button>
+                <button type="button" class="btn combat-control" data-combat-action="parry"><i class="fa-solid fa-shield-halved"></i> Parry</button>
+                <button type="button" class="btn combat-control" data-combat-action="assign-damage"><i class="fa-solid fa-burst"></i> Assign Damage</button>
+            </div>
+        </article>
+
+        <article class="panel panel--armour">
+            <h2 class="panel__title">Armour</h2>
+            <table class="dtable">
+                <thead><tr><th>Location</th><th class="num" data-tooltip="Armour points of worn armour">AP</th><th class="num" data-tooltip="Toughness bonus (always applies)">TB</th><th class="num" data-tooltip="Machine / Natural Armour trait">Trait</th><th class="num" data-tooltip="Total damage reduction">Total</th></tr></thead>
+                <tbody>
+                    {{#each dossier.armour as |z|}}
+                        <tr><td>{{z.label}}</td><td class="num">{{z.armour}}</td><td class="num">{{z.toughnessBonus}}</td><td class="num">{{z.traitBonus}}</td><td class="num strong">{{z.total}}</td></tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </article>
+
+        <article class="panel panel--weapons">
+            <h2 class="panel__title">Weapons
+                <button type="button" class="icon-btn item-create" data-type="weapon" data-tooltip="New weapon"><i class="fa-solid fa-plus"></i></button>
+            </h2>
+            <div class="table-scroll">
+                <table class="dtable dtable--weapons">
+                    <thead><tr>
+                        <th></th><th>Weapon</th><th>Class</th><th>Range</th><th>RoF</th><th>Damage</th><th class="num">Pen</th><th>Clip</th><th>Special</th><th></th>
+                    </tr></thead>
+                    <tbody>
+                        {{#each dossier.weapons as |w|}}
+                            <tr class="item-drag {{#unless w.equipped}}is-unequipped{{/unless}}" data-item-id="{{w.id}}" data-item-type="weapon">
+                                <td class="act"><button type="button" class="icon-btn {{#if w.equipped}}on{{/if}}" data-action="toggleEquipped" data-item-id="{{w.id}}" data-tooltip="{{#if w.equipped}}Unequip{{else}}Equip{{/if}}" aria-pressed="{{w.equipped}}"><i class="fa-solid fa-hand-fist"></i></button></td>
+                                <td class="strong">{{w.name}}</td>
+                                <td>{{w.class}}{{#if w.type}} <small>({{w.type}})</small>{{/if}}</td>
+                                <td>{{w.range}}</td>
+                                <td>{{w.rateOfFire}}</td>
+                                <td>{{w.damage}} <small>{{w.damageType}}</small></td>
+                                <td class="num">{{w.penetration}}</td>
+                                <td>{{#if w.usesAmmo}}{{w.clipValue}}/{{w.clipMax}} <small>{{w.reload}}</small>{{else}}—{{/if}}</td>
+                                <td class="specials">{{#each w.specials as |sp|}}<span class="pill">{{sp}}</span>{{else}}—{{/each}}</td>
+                                <td class="act actions">
+                                    <button type="button" class="icon-btn item-roll" data-item-id="{{w.id}}" data-tooltip="Attack"><i class="fa-solid fa-crosshairs"></i></button>
+                                    <button type="button" class="icon-btn item-damage" data-item-id="{{w.id}}" data-tooltip="Roll damage"><i class="fa-solid fa-burst"></i></button>
+                                    {{#if w.usesAmmo}}<button type="button" class="icon-btn" data-action="reloadWeapon" data-item-id="{{w.id}}" data-tooltip="Reload"><i class="fa-solid fa-rotate"></i></button>{{/if}}
+                                    <button type="button" class="icon-btn item-edit" data-item-id="{{w.id}}" data-tooltip="Edit"><i class="fa-solid fa-pen"></i></button>
+                                </td>
+                            </tr>
+                        {{else}}
+                            <tr><td colspan="10" class="empty">No weapons. Drag weapons from a compendium onto the sheet.</td></tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+            </div>
+        </article>
+
+        <article class="panel panel--conditions">
+            <h2 class="panel__title">Conditions &amp; Effects
+                <button type="button" class="icon-btn effect-create" data-tooltip="New effect"><i class="fa-solid fa-plus"></i></button>
+            </h2>
+            <ul class="rows">
+                {{#each effects as |effect|}}
+                    <li class="{{#if effect.disabled}}is-off{{/if}}">
+                        <img src="{{effect.img}}" alt="" />
+                        <span class="grow">{{effect.name}}</span>
+                        {{#if effect.disabled}}
+                            <button type="button" class="icon-btn effect-enable" data-effect-id="{{effect.id}}" data-tooltip="Enable"><i class="fa-solid fa-toggle-off"></i></button>
+                        {{else}}
+                            <button type="button" class="icon-btn effect-disable on" data-effect-id="{{effect.id}}" data-tooltip="Disable"><i class="fa-solid fa-toggle-on"></i></button>
+                        {{/if}}
+                        <button type="button" class="icon-btn effect-edit" data-effect-id="{{effect.id}}" data-tooltip="Edit"><i class="fa-solid fa-pen"></i></button>
+                        <button type="button" class="icon-btn effect-delete" data-effect-id="{{effect.id}}" data-tooltip="Delete"><i class="fa-solid fa-trash"></i></button>
+                    </li>
+                {{else}}
+                    <li class="empty">No active effects.</li>
+                {{/each}}
+            </ul>
+        </article>
+
+        <article class="panel panel--critical">
+            <h2 class="panel__title">Critical Injuries
+                <button type="button" class="icon-btn item-create" data-type="criticalInjury" data-tooltip="New critical injury"><i class="fa-solid fa-plus"></i></button>
+            </h2>
+            <ul class="rows">
+                {{#each dossier.criticalInjuries as |injury|}}
+                    <li class="item-drag" data-item-id="{{injury.id}}">
+                        <img src="{{injury.img}}" alt="" />
+                        <span class="grow">{{injury.name}} <small>{{injury.part}} · {{injury.type}}</small></span>
+                        <button type="button" class="icon-btn item-edit" data-item-id="{{injury.id}}" data-tooltip="Edit"><i class="fa-solid fa-pen"></i></button>
+                        <button type="button" class="icon-btn item-delete" data-item-id="{{injury.id}}" data-tooltip="Delete"><i class="fa-solid fa-trash"></i></button>
+                    </li>
+                {{else}}
+                    <li class="empty">No critical injuries.</li>
+                {{/each}}
+            </ul>
+        </article>
+    </div>
+</section>
