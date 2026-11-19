@@ -41,6 +41,7 @@
     --ds-img-wcell-full: url('../images/dossier/wcell-full.webp');
     --ds-img-wcell-empty: url('../images/dossier/wcell-empty.webp');
     --ds-img-figure: url('../images/dossier/figure.webp');
+    --ds-img-parchment: url('../images/dossier/parchment.webp');
     --ds-img-corner: url('../images/dossier/corner.svg');
 
     background: var(--ds-bg);
@@ -1425,26 +1426,17 @@
         --ink: #2a1b0e;
         position: relative;
         margin: 6px 2px 14px;
-        padding: 12px 22px 14px;
+        padding: 0 12px 4px;
         color: var(--ink);
-        background:
-            url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='p'><feTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .35  0 0 0 0 .24  0 0 0 0 .1  0 0 0 .28 0'/></filter><rect width='100%' height='100%' filter='url(%23p)'/></svg>"),
-            radial-gradient(ellipse at 18% 12%, #eadfc3 0%, #d9ccaa 48%, #c4b48b 100%);
-        // slightly ragged paper edge
-        clip-path: polygon(0 4%, 1.5% 0, 14% 2%, 33% 0, 57% 2.5%, 78% 0, 99% 1.5%, 100% 6%, 99% 38%, 100% 66%, 98.5% 100%, 76% 97.5%, 52% 100%, 27% 98%, 8% 100%, 0 97%, 1% 62%, 0 30%);
+        // the supplied parchment strip as 9-slice: ragged edges stretch, the brass corner nails keep their size
+        border: 30px solid transparent;
+        border-image: var(--ds-img-parchment) 80 fill / 30px / 0 stretch;
         filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.7));
         &__pin {
-            position: absolute;
-            left: 14px;
-            top: 8px;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: radial-gradient(circle at 35% 30%, #d8bd7e, #7a5f2c 70%);
-            box-shadow: 0 2px 2px rgba(0, 0, 0, 0.55);
+            display: none;
         }
         &__title {
-            margin: 0 0 6px 24px;
+            margin: -10px 0 4px 6px;
             font-family: var(--ds-font-title);
             font-variant: small-caps;
             font-weight: 400;
