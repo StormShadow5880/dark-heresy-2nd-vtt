@@ -328,3 +328,36 @@
         }
     }
 }
+
+// ------------------------------------------------ Foundry's message frame around our cards
+// Only messages that contain one of our cards are touched (:has), every other message keeps the Foundry look.
+.chat-message:has(.dh-card) {
+    --color-text-primary: #d9d0bd;
+    --color-text-secondary: #92918c;
+    --color-text-subtle: #92918c;
+    --color-border-light-primary: #3a3126;
+    --color-border-light-secondary: #3a3126;
+    background: #12100d;
+    background-image: none;
+    border: 1px solid #3a3126;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.55);
+    color: #d9d0bd;
+
+    // sender, time and delete icon on the dark surface
+    .message-header,
+    .message-sender,
+    .message-metadata,
+    .message-timestamp,
+    .message-delete {
+        color: #b8a98a;
+        text-shadow: none;
+    }
+    .message-header {
+        border-bottom: 0;
+    }
+    .message-content {
+        padding: 0;
+        background: transparent;
+        color: inherit;
+    }
+}
