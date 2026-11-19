@@ -2,7 +2,7 @@ import { recursiveUpdate } from '../rolls/roll-helpers.mjs';
 import { PsychicRollData } from '../rolls/roll-data.mjs';
 import { PsychicActionData } from '../rolls/action-data.mjs';
 
-export class PsychicPowerDialog extends FormApplication {
+export class PsychicPowerDialog extends foundry.appv1.api.FormApplication {
     /**
      * @param psychicAttackData {PsychicActionData}
      */

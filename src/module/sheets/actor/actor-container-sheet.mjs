@@ -5,7 +5,7 @@ import { prepareCreateSpecialistSkillPrompt } from '../../prompts/simple-prompt.
 /**
  * Shared Actor functions for Actor that contains embedded items
  */
-export class ActorContainerSheet extends ActorSheet {
+export class ActorContainerSheet extends foundry.appv1.sheets.ActorSheet {
     activateListeners(html) {
         super.activateListeners(html);
 
@@ -110,7 +110,7 @@ export class ActorContainerSheet extends ActorSheet {
 
     _onItemDelete(event) {
         event.preventDefault();
-        Dialog.confirm({
+        foundry.appv1.api.Dialog.confirm({
             title: 'Confirm Delete',
             content: '<p>Are you sure you would like to delete this?</p>',
             yes: () => {
@@ -131,7 +131,7 @@ export class ActorContainerSheet extends ActorSheet {
             actor: this.actor.name,
             name: item.name,
             type: item.type?.toUpperCase(),
-            description: await TextEditor.enrichHTML(item.system.benefit ?? item.system.description, {rollData: {actor: this.actor, item: this, pr: this.actor.psy.rating}}),
+            description: await foundry.applications.ux.TextEditor.implementation.enrichHTML(item.system.benefit ?? item.system.description, {rollData: {actor: this.actor, item: this, pr: this.actor.psy.rating}}),
         });
     }
 
@@ -270,8 +270,8 @@ export class ActorContainerSheet extends ActorSheet {
     async _effectCreate(event) {
         event.preventDefault();
         return this.actor.createEmbeddedDocuments('ActiveEffect', [{
-            label: 'New Effect',
-            icon: 'icons/svg/aura.svg',
+            name: 'New Effect',
+            img: 'icons/svg/aura.svg',
             origin: this.actor.uuid,
             disabled: true
         }], { renderSheet: true })

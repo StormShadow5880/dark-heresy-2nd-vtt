@@ -23,7 +23,7 @@ export class AcolyteSheet extends ActorContainerSheet {
     getData() {
         const context = super.getData();
         context.dh = CONFIG.dh;
-        context.effects = this.actor.getEmbeddedCollection('ActiveEffect').contents;
+        context.effects = this.actor.effects.contents;
         return context;
     }
 
@@ -90,7 +90,7 @@ export class AcolyteSheet extends ActorContainerSheet {
 
     _onHomeworldChange(event) {
         event.preventDefault();
-        Dialog.confirm({
+        foundry.appv1.api.Dialog.confirm({
             title: 'Roll Characteristics?',
             content: '<p>Would you like to roll Wounds and Fate for this homeworld?</p>',
             yes: async () => {

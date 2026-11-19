@@ -1,6 +1,6 @@
 import { toggleUIExpanded } from '../../rules/config.mjs';
 
-export class DarkHeresyItemSheet extends ItemSheet {
+export class DarkHeresyItemSheet extends foundry.appv1.sheets.ItemSheet {
     static get defaultOptions() {
         return foundry.utils.mergeObject(super.defaultOptions, {
             width: 650,
@@ -17,7 +17,7 @@ export class DarkHeresyItemSheet extends ItemSheet {
         const context = super.getData();
         context.flags = context.item.flags;
         context.dh = CONFIG.dh;
-        context.effects = this.item.getEmbeddedCollection('ActiveEffect').contents;
+        context.effects = this.item.effects.contents;
         return context;
     }
 
@@ -73,8 +73,8 @@ export class DarkHeresyItemSheet extends ItemSheet {
     async _effectCreate(event) {
         event.preventDefault();
         return this.item.createEmbeddedDocuments('ActiveEffect', [{
-            label: 'New Effect',
-            icon: 'icons/svg/aura.svg',
+            name: 'New Effect',
+            img: 'icons/svg/aura.svg',
             origin: this.item.uuid,
             disabled: true
         }], { renderSheet: true })

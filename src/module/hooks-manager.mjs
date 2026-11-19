@@ -94,6 +94,8 @@ Enable Debug with: game.dh.debug = true
         CONFIG.Item.documentClass = DarkHeresyItem;
 
         // Register sheet application classes
+        const { Actors, Items } = foundry.documents.collections;
+        const { ActorSheet, ItemSheet } = foundry.appv1.sheets;
         Actors.unregisterSheet('core', ActorSheet);
         Actors.registerSheet(SYSTEM_ID, AcolyteSheet, {types: ["acolyte"], makeDefault: true });
         Actors.registerSheet(SYSTEM_ID, NpcSheet, {types: ['npc'], makeDefault: true });

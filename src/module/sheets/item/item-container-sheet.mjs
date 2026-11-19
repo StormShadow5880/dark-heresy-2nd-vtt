@@ -136,7 +136,7 @@ export class DarkHeresyItemContainerSheet extends DarkHeresyItemSheet {
 
     _onItemDelete(event) {
         event.preventDefault();
-        Dialog.confirm({
+        foundry.appv1.api.Dialog.confirm({
             title: 'Confirm Delete',
             content: '<p>Are you sure you would like to delete this?</p>',
             yes: () => {

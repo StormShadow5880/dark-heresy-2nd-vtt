@@ -1,7 +1,7 @@
 import { recursiveUpdate } from '../rolls/roll-helpers.mjs';
 import { WeaponActionData } from '../rolls/action-data.mjs';
 
-export class WeaponAttackDialog extends FormApplication {
+export class WeaponAttackDialog extends foundry.appv1.api.FormApplication {
     /**
      * @param weaponActionData {WeaponActionData}
      * @param options

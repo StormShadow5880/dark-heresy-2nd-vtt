@@ -6,8 +6,8 @@ import { sendActionDataToChat } from '../rolls/roll-helpers.mjs';
  * @returns {Promise<void>}
  */
 export async function prepareSimpleRoll(simpleSkillData) {
-    const html = await renderTemplate('systems/dark-heresy-2nd/templates/prompt/simple-roll-prompt.hbs', simpleSkillData);
-    let dialog = new Dialog(
+    const html = await foundry.applications.handlebars.renderTemplate('systems/dark-heresy-2nd/templates/prompt/simple-roll-prompt.hbs', simpleSkillData);
+    let dialog = new foundry.appv1.api.Dialog(
         {
             title: 'Roll Modifier',
             content: html,
@@ -41,8 +41,8 @@ export async function prepareSimpleRoll(simpleSkillData) {
 }
 
 export async function prepareCreateSpecialistSkillPrompt(simpleSkillData) {
-    const html = await renderTemplate('systems/dark-heresy-2nd/templates/prompt/add-speciality-prompt.hbs', simpleSkillData);
-    let dialog = new Dialog(
+    const html = await foundry.applications.handlebars.renderTemplate('systems/dark-heresy-2nd/templates/prompt/add-speciality-prompt.hbs', simpleSkillData);
+    let dialog = new foundry.appv1.api.Dialog(
         {
             title: 'Create Specialist Skill',
             content: html,

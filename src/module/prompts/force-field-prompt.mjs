@@ -1,7 +1,7 @@
 import { recursiveUpdate } from '../rolls/roll-helpers.mjs';
 import { WeaponActionData } from '../rolls/action-data.mjs';
 
-export class ForceFieldDialog extends FormApplication {
+export class ForceFieldDialog extends foundry.appv1.api.FormApplication {
 
     constructor(forceFieldData = {}, options = {}) {
         super(forceFieldData, options);

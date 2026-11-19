@@ -152,7 +152,7 @@ export class DarkHeresyItem extends DarkHeresyItemContainer {
         return super._onCreate(data, options, user);
     }
 
-    async prepareData() {
+    prepareData() {
         super.prepareData();
         game.dh.log('Item prepare data', this);
 
@@ -192,7 +192,7 @@ export class DarkHeresyItem extends DarkHeresyItemContainer {
             game.dh.log('Special migrated for item: ' + this.name, this.system.special);
             this.system.special = undefined;
 
-            await this.convertNestedToItems();
+            this.convertNestedToItems();
         }
     }
 

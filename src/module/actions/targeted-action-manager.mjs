@@ -9,17 +9,19 @@ export class TargetedActionManager {
     initializeHooks() {
         // Initialize Scene Control Buttons
         Hooks.on('getSceneControlButtons', (controls) => {
-            const bar = controls.find((c) => c.name === 'token');
+            const tools = controls.tokens?.tools;
+            if (!tools) return;
             try {
                 if (!game.settings.get(SYSTEM_ID, DarkHeresySettings.SETTINGS.simpleAttackRolls)) {
-                    bar.tools.push({
-                        name: 'Attack',
+                    tools.attack = {
+                        name: 'attack',
                         title: 'Attack',
                         icon: 'fas fa-swords',
+                        order: Object.keys(tools).length,
                         visible: true,
-                        onClick: async () => DHTargetedActionManager.performWeaponAttack(),
                         button: true,
-                    });
+                        onChange: async () => DHTargetedActionManager.performWeaponAttack(),
+                    };
                 }
             } catch (error) {
                 game.dh.log('Unable to add game bar icon.', error)

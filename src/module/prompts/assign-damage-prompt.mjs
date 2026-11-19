@@ -1,7 +1,7 @@
 import { recursiveUpdate } from '../rolls/roll-helpers.mjs';
 import { WeaponActionData } from '../rolls/action-data.mjs';
 
-export class AssignDamageDialog extends FormApplication {
+export class AssignDamageDialog extends foundry.appv1.api.FormApplication {
 
     constructor(assignDamageData = {}, options = {}) {
         super(assignDamageData, options);

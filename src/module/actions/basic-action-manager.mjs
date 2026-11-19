@@ -13,26 +13,30 @@ export class BasicActionManager {
 
     initializeHooks() {
         // Add show/hide support for chat messages
-        Hooks.on('renderChatMessage', async (message, html, data) => {
-            game.dh.log('renderChatMessage', { message, html, data });
-            html.find('.roll-control__hide-control').click(async (ev) => await this._toggleExpandChatMessage(ev));
-            html.find('.roll-control__refund').click(async (ev) => await this._refundResources(ev));
-            html.find('.roll-control__fate-reroll').click(async (ev) => await this._fateReroll(ev));
-            html.find('.roll-control__assign-damage').click(async (ev) => await this._assignDamage(ev));
-            html.find('.roll-control__apply-damage').click(async (ev) => await this._applyDamage(ev));
+        Hooks.on('renderChatMessageHTML', (message, html, data) => {
+            game.dh.log('renderChatMessageHTML', { message, html, data });
+            const bind = (selector, handler) =>
+                html.querySelectorAll(selector).forEach((el) => el.addEventListener('click', async (ev) => await handler(ev)));
+            bind('.roll-control__hide-control', (ev) => this._toggleExpandChatMessage(ev));
+            bind('.roll-control__refund', (ev) => this._refundResources(ev));
+            bind('.roll-control__fate-reroll', (ev) => this._fateReroll(ev));
+            bind('.roll-control__assign-damage', (ev) => this._assignDamage(ev));
+            bind('.roll-control__apply-damage', (ev) => this._applyDamage(ev));
         });
 
         // Initialize Scene Control Buttons
         Hooks.on('getSceneControlButtons', (controls) => {
-            const bar = controls.find((c) => c.name === 'token');
-            bar.tools.push({
-                name: 'Assign Damage',
+            const tools = controls.tokens?.tools;
+            if (!tools) return;
+            tools.assignDamage = {
+                name: 'assignDamage',
                 title: 'Assign Damage',
                 icon: 'fas fa-shield',
+                order: Object.keys(tools).length,
                 visible: true,
-                onClick: async () => DHBasicActionManager.assignDamageTool(),
                 button: true,
-            });
+                onChange: async () => DHBasicActionManager.assignDamageTool(),
+            };
         });
     }
 
@@ -56,7 +60,7 @@ export class BasicActionManager {
             return;
         }
 
-        Dialog.confirm({
+        foundry.appv1.api.Dialog.confirm({
             title: 'Confirm Refund',
             content: '<p>Are you sure you would like to refund ammo, fate, etc for this action?</p>',
             yes: async () => {
@@ -84,7 +88,7 @@ export class BasicActionManager {
             return;
         }
 
-        Dialog.confirm({
+        foundry.appv1.api.Dialog.confirm({
             title: 'Confirm Re-Roll',
             content: '<p>Are you sure you would like to use a fate point to re-roll action?</p>',
             yes: async () => {
@@ -225,12 +229,12 @@ export class BasicActionManager {
      * @returns {Promise<void>}
      */
     async sendItemVocalizeChat(data) {
-        const html = await renderTemplate('systems/dark-heresy-2nd/templates/chat/item-vocalize-chat.hbs', data);
+        const html = await foundry.applications.handlebars.renderTemplate('systems/dark-heresy-2nd/templates/chat/item-vocalize-chat.hbs', data);
         let chatData = {
-            user: game.user.id,
+            author: game.user.id,
             content: html,
             rollMode: game.settings.get('core', 'rollMode'),
-            type: CONST.CHAT_MESSAGE_TYPES.IC,
+            style: CONST.CHAT_MESSAGE_STYLES.IC,
         };
         if (['gmroll', 'blindroll'].includes(chatData.rollMode)) {
             chatData.whisper = ChatMessage.getWhisperRecipients('GM');

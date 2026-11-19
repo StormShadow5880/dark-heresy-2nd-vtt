@@ -46,13 +46,13 @@ export class DarkHeresyItemContainer extends Item {
         return this.getNested().length > 0;
     }
 
-    async convertNestedToItems() {
+    convertNestedToItems() {
         // Convert Nested to Items
         game.dh.log('Convert ' + this.name + ' Nested', this.hasNested());
         this.items = new foundry.utils.Collection();
         for (const nestedData of this.getNested()) {
             const item = new CONFIG.Item.documentClass(nestedData, { parent: this });
-            await this.items.set(nestedData._id, item);
+            this.items.set(nestedData._id, item);
         }
         game.dh.log('Item ' + this.name + ' items:', this.items);
     }
@@ -66,7 +66,7 @@ export class DarkHeresyItemContainer extends Item {
         const toCreate = [];
         for (const item of items) {
             for (const e of item.effects) {
-                if (!e.data.transfer) continue;
+                if (!e.transfer) continue;
                 const effectData = e.toJSON();
                 effectData.origin = item.uuid;
                 toCreate.push(effectData);

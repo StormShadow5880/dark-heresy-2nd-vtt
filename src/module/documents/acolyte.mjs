@@ -70,7 +70,7 @@ export class DarkHeresyAcolyte extends DarkHeresyBaseActor {
         return this.system.backgroundEffects;
     }
 
-    async prepareData() {
+    prepareData() {
         this.system.backgroundEffects = {
             abilities: [],
         };
@@ -81,7 +81,7 @@ export class DarkHeresyAcolyte extends DarkHeresyBaseActor {
         this._computeArmour();
         this._computeMovement();
         this._computeEncumbrance();
-        await super.prepareData();
+        super.prepareData();
     }
 
     async rollWeaponDamage(weapon) {
@@ -170,7 +170,7 @@ export class DarkHeresyAcolyte extends DarkHeresyBaseActor {
                     actor: this.name,
                     name: item.name,
                     type: item.type?.toUpperCase(),
-                    description: await TextEditor.enrichHTML(item.system.benefit ?? item.system.description, {
+                    description: await foundry.applications.ux.TextEditor.implementation.enrichHTML(item.system.benefit ?? item.system.description, {
                         rollData: {
                             actor: this,
                             item: item,
