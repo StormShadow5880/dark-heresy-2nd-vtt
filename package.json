@@ -42,5 +42,8 @@
     "semver": "7.5.4",
     "underscore": "1.13.6",
     "word-wrap": "1.2.5"
+  },
+  "devDependencies": {
+    "handlebars": "^4.7.10"
   }
 }

@@ -2108,3 +2108,41 @@
         opacity: 0.8;
     }
 }
+
+// ------------------------------------------------ Roll prompts (weapon, psychic power, force field, assign damage)
+// These are ApplicationV2 windows; the legacy dialog markup (content + button row) is styled here.
+.application.dh-prompt {
+    .dh-prompt-body {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .dialog-buttons {
+        display: flex;
+        gap: 8px;
+        padding: 6px 0 2px;
+    }
+    .dialog-button {
+        flex: 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        min-height: 34px;
+        padding: 4px 12px;
+        background: #26292d;
+        border: 1px solid #b69a62;
+        border-radius: 3px;
+        color: #e6e0d3;
+        cursor: pointer;
+        &.roll {
+            background: linear-gradient(180deg, #702a30, #541e24);
+            color: #fff;
+        }
+        &:hover,
+        &:focus-visible {
+            border-color: #fff;
+            outline: none;
+        }
+    }
+}
