@@ -6,6 +6,7 @@ import { Hit } from '../../rolls/damage-data.mjs';
 import { AssignDamageData } from '../../rolls/assign-damage-data.mjs';
 import { prepareAssignDamageRoll } from '../../prompts/assign-damage-prompt.mjs';
 import { confirmDialog } from '../../prompts/dialog-helpers.mjs';
+import { toFormula } from '../../rules/formula.mjs';
 
 export class AcolyteSheet extends ActorContainerSheet {
     static DEFAULT_OPTIONS = {
@@ -92,7 +93,7 @@ export class AcolyteSheet extends ActorContainerSheet {
         if (!homeworld) return;
 
         // Roll Wounds
-        const woundRoll = new Roll(homeworld.wounds);
+        const woundRoll = new Roll(toFormula(homeworld.wounds));
         await woundRoll.evaluate();
         this.actor.wounds.max = woundRoll.total;
 

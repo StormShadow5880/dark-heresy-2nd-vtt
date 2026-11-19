@@ -1,4 +1,5 @@
 import { PsychicRollData, RollData, WeaponRollData } from '../rolls/roll-data.mjs';
+import { toFormula } from './formula.mjs';
 
 /**
  * @param rollData {WeaponRollData}
@@ -22,7 +23,7 @@ async function calculateWeaponMaxRange(rollData) {
         range = 0;
     } else {
         try {
-            const rangeCalculation = new Roll(weapon.system.range, rollData);
+            const rangeCalculation = new Roll(toFormula(weapon.system.range), rollData);
             rangeCalculation.evaluateSync();
             range = rangeCalculation.total ?? 0;
         } catch (error) {
@@ -65,7 +66,7 @@ async function calculatePsychicAbilityMaxRange(rollData) {
         range = 0;
     } else {
         try {
-            const rangeCalculation = new Roll(rollData.power.system.range, rollData);
+            const rangeCalculation = new Roll(toFormula(rollData.power.system.range), rollData);
             await rangeCalculation.evaluate();
             range = rangeCalculation.total ?? 0;
         } catch (error) {

@@ -1,6 +1,7 @@
 import { additionalHitLocations, getHitLocationForRoll } from '../rules/hit-locations.mjs';
 import { calculateAmmoDamageBonuses, calculateAmmoPenetrationBonuses, calculateAmmoSpecials } from '../rules/ammo.mjs';
 import { getCriticalDamage } from '../rules/critical-damage.mjs';
+import { toFormula } from '../rules/formula.mjs';
 import {
     calculateWeaponModifiersDamageBonuses,
     calculateWeaponModifiersPenetrationBonuses,
@@ -95,10 +96,7 @@ export class Hit {
             game.dh.log('_calculateDamage has vengeful: ', righteousFuryThreshold);
         }
 
-        let rollFormula = actionItem.system.damage;
-        if(!rollFormula || rollFormula === '') {
-            rollFormula = 0;
-        }
+        const rollFormula = toFormula(actionItem.system.damage);
         this.damageRoll = new Roll(rollFormula, attackData.rollData);
 
         if (attackData.rollData.hasAttackSpecial('Tearing')) {
@@ -246,7 +244,7 @@ export class Hit {
         }  else {
             this.hasPenetrationRoll = true;
             try {
-                this.penetrationRoll = new Roll(rollFormula, attackData.rollData);
+                this.penetrationRoll = new Roll(toFormula(rollFormula), attackData.rollData);
                 await this.penetrationRoll.evaluate();
                 this.penetration = this.penetrationRoll.total;
             } catch (error) {

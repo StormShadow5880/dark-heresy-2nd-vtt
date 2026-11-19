@@ -1,6 +1,7 @@
 import { sendActionDataToChat } from '../rolls/roll-helpers.mjs';
 import { ActionData } from '../rolls/action-data.mjs';
 import { actionDialog } from './dialog-helpers.mjs';
+import { toFormula } from '../rules/formula.mjs';
 
 export async function prepareDamageRoll(rollData) {
     rollData.dh = CONFIG.dh;
@@ -20,7 +21,7 @@ export async function prepareDamageRoll(rollData) {
                 rollData.damageType = element.querySelector('[name=damageType]').value;
                 rollData.pr = element.querySelector('#pr')?.value;
                 rollData.template = 'systems/dark-heresy-2nd/templates/chat/damage-roll-chat.hbs';
-                rollData.roll = new Roll(rollData.damage, rollData);
+                rollData.roll = new Roll(toFormula(rollData.damage), rollData);
                 await rollData.roll.evaluate();
 
                 actionData.rollData = rollData;

@@ -7,6 +7,7 @@ import { calculateAmmoAttackBonuses, calculateAmmoInformation } from '../rules/a
 import { calculateWeaponModifiersAttackBonuses, updateWeaponModifiers } from '../rules/weapon-modifiers.mjs';
 import { hitDropdown } from '../rules/hit-locations.mjs';
 import { DarkHeresy } from '../rules/config.mjs';
+import { toFormula } from '../rules/formula.mjs';
 
 export class RollData {
     difficulties = rollDifficulties();
@@ -159,7 +160,7 @@ export class RollData {
     async calculateTotalModifiers() {
         const rollDetails = this.modifiersToRollData();
         try {
-            const roll = new Roll(rollDetails.formula, rollDetails.params);
+            const roll = new Roll(toFormula(rollDetails.formula), rollDetails.params);
             await roll.evaluate();
             if (roll.total > 60) {
                 this.modifierTotal = 60;
