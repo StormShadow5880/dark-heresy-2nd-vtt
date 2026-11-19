@@ -22,6 +22,7 @@ const STATIC_FILES = [
   "!src/module/foundry-core/**",
   "src/templates/**/*",
   "src/images/**/*",
+  "src/fonts/**/*",
   "src/*.json"
 ];
 const PACK_SRC = "src/packs";
