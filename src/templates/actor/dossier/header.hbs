@@ -21,17 +21,17 @@
         </div>
     </div>
 
-    <div class="hmini" aria-label="Damage">
+    <div class="hmini" aria-label="Wounds">
         <div class="hmini__top">
-            <span class="hmini__label">Damage</span>
-            <span class="hmini__fields" data-tooltip="Damage taken / maximum wounds">
-                <input type="number" class="damage-input" min="0" value="{{dossier.res.wounds.bar.damage}}" aria-label="Damage taken" />
+            <span class="hmini__label">Wounds</span>
+            <span class="hmini__fields" data-tooltip="Wounds taken / maximum wounds">
+                <input type="number" class="damage-input" min="0" value="{{dossier.res.wounds.bar.damage}}" aria-label="Wounds taken" />
                 <span>/</span>
                 <input type="number" data-dtype="Number" name="system.wounds.max" value="{{dossier.res.wounds.max}}" aria-label="Maximum wounds" />
             </span>
             <span class="hmini__steps">
-                <button type="button" class="step" data-action="adjustDamage" data-delta="-1" aria-label="Heal one point of damage" data-tooltip="Heal 1">−</button>
-                <button type="button" class="step" data-action="adjustDamage" data-delta="1" aria-label="Take one point of damage" data-tooltip="Damage +1 (beyond the maximum: critical)">+</button>
+                <button type="button" class="step" data-action="adjustDamage" data-delta="-1" aria-label="Heal one wound" data-tooltip="Heal 1 wound">−</button>
+                <button type="button" class="step" data-action="adjustDamage" data-delta="1" aria-label="Take one wound" data-tooltip="+1 wound (beyond the maximum: critical damage)">+</button>
             </span>
         </div>
         <div class="wbar wbar--mini {{#if dossier.res.wounds.bar.serious}}is-serious{{/if}} {{#if dossier.res.wounds.bar.dead}}is-dead{{/if}}" role="progressbar" aria-valuemin="0" aria-valuemax="{{dossier.res.wounds.max}}" aria-valuenow="{{dossier.res.wounds.bar.damage}}">
