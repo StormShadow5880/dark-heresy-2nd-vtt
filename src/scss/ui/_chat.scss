@@ -137,3 +137,147 @@
         color: var(--ds-ink);
     }
 }
+
+// ------------------------------------------------ Ornate roll card (skill / characteristic tests)
+// Dark parchment, aquila watermark, brass frame (9-slice), crest badge with the degrees of success/failure.
+.dh-ui.dh-card--ornate {
+    --ink-gold: #f3dfb0;
+    isolation: isolate;
+    overflow: hidden;
+    padding: 20px 20px 14px;
+    text-align: center;
+    background: linear-gradient(rgba(17, 13, 10, 0.78), rgba(27, 16, 12, 0.8)), var(--ds-img-paper) center / cover, var(--ds-paper);
+    border: 0;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.6);
+
+    // aquila watermark
+    &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        background: var(--ds-img-card-aquila) center 55% / 88% auto no-repeat;
+        opacity: 0.12;
+        pointer-events: none;
+    }
+    // brass frame
+    &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: 3;
+        pointer-events: none;
+        border: solid transparent;
+        border-width: 22px 21px;
+        border-image: var(--ds-img-card-frame) 70 95 / 22px 21px / 0 stretch;
+    }
+    > * {
+        position: relative;
+        z-index: 1;
+    }
+
+    .dh-card__eyebrow {
+        font-size: 0.62rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: #bda77c;
+    }
+    .dh-card__name {
+        margin: 3px 0 0;
+        padding: 0;
+        border: 0;
+        font-family: var(--ds-font-title);
+        font-size: 1.2rem;
+        line-height: 1.15;
+        letter-spacing: 0.03em;
+        color: var(--ink-gold);
+        text-align: center;
+        text-shadow: 0 1px 0 #000;
+    }
+    .dh-card__sub {
+        padding: 1px 0 0;
+        font-size: 0.7rem;
+        color: #c0ae8b;
+    }
+    .dh-rule {
+        height: 1px;
+        margin: 8px 0;
+        background: linear-gradient(90deg, transparent, #a58349, transparent);
+    }
+    .dh-vs {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        &__value {
+            min-width: 56px;
+            span {
+                display: block;
+                font-size: 0.6rem;
+                letter-spacing: 0.12em;
+                text-transform: uppercase;
+                color: #c7b48d;
+            }
+            strong {
+                display: block;
+                margin-top: 1px;
+                font-family: var(--ds-font-title);
+                font-size: 1.7rem;
+                line-height: 1.1;
+                color: #fff;
+                text-shadow: 0 1px 0 #000;
+            }
+        }
+        &__sep {
+            font-size: 0.75rem;
+            color: #a99978;
+        }
+    }
+    // the crest: degrees of success / failure sit in the middle of the plate
+    .dh-badge {
+        position: relative;
+        height: 92px;
+        margin: 2px auto 0;
+        max-width: 190px;
+        background: var(--ds-img-card-badge) center / contain no-repeat;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        &__num {
+            font-family: var(--ds-font-title);
+            font-size: 1.9rem;
+            font-weight: 700;
+            color: #f7dfaa;
+            text-shadow: 0 2px 4px #000;
+            transform: translateY(2px);
+        }
+    }
+    .dh-verdict {
+        margin-top: -2px;
+        font-size: 0.9rem;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        &--success {
+            color: #c3d0a1;
+        }
+        &--fail {
+            color: #e4a29a;
+        }
+    }
+    .dh-detail-line {
+        margin: 2px 0 0;
+        font-size: 0.7rem;
+        color: #d1c1a1;
+    }
+    .dh-mods--center {
+        justify-content: center;
+        margin-top: 5px;
+    }
+    .dh-card__foot-line {
+        font-size: 0.58rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: #a99673;
+    }
+}

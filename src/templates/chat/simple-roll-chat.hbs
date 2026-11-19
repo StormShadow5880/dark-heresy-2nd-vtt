@@ -1,25 +1,26 @@
 {{#with rollData}}
-    <div class="dh-ui dh-card {{#if success}}dh-card--success{{else}}dh-card--fail{{/if}}">
-        <header class="dh-card__head">
-            <span class="dh-card__title">{{name}}</span>
-            <span class="dh-card__action">{{type}}</span>
-        </header>
-        {{#if sheetName}}<p class="dh-card__sub">{{sheetName}}{{#if difficulty}} · {{lookup difficulties difficulty}}{{/if}}</p>
-        {{else if difficulty}}<p class="dh-card__sub">{{lookup difficulties difficulty}}</p>{{/if}}
-        <div class="dh-card__body">
-            <div class="dh-result {{#if success}}dh-result--success{{else}}dh-result--fail{{/if}}">
-                <span class="dh-result__roll" data-tooltip="Dice result (W100)">{{roll.total}}</span>
-                <span class="dh-result__main">
-                    <span class="dh-status {{#if success}}dh-status--success{{else}}dh-status--fail{{/if}}">{{#if success}}Success{{else}}Failure{{/if}}</span>
-                    <span class="dh-result__detail">Target {{modifiedTarget}} · {{#if success}}{{dos}} DoS{{else}}{{dof}} DoF{{/if}}</span>
-                </span>
-            </div>
-            <div class="dh-mods">
+    <div class="dh-ui dh-card dh-card--ornate {{#if success}}dh-card--success{{else}}dh-card--fail{{/if}}">
+        <div class="dh-card__eyebrow">{{type}}</div>
+        <h2 class="dh-card__name">{{name}}</h2>
+        {{#if sheetName}}<div class="dh-card__sub">{{sheetName}}{{#if difficulty}} · {{lookup difficulties difficulty}}{{/if}}</div>
+        {{else if difficulty}}<div class="dh-card__sub">{{lookup difficulties difficulty}}</div>{{/if}}
+        <div class="dh-rule"></div>
+        <div class="dh-vs">
+            <div class="dh-vs__value" data-tooltip="Dice result (W100)"><span>Roll</span><strong>{{roll.total}}</strong></div>
+            <div class="dh-vs__sep">vs</div>
+            <div class="dh-vs__value" data-tooltip="Base {{baseTarget}} with all modifiers"><span>Target</span><strong>{{modifiedTarget}}</strong></div>
+        </div>
+        <div class="dh-badge" data-tooltip="{{#if success}}Degrees of success{{else}}Degrees of failure{{/if}}"><span class="dh-badge__num">{{#if success}}+{{dos}}{{else}}−{{dof}}{{/if}}</span></div>
+        <div class="dh-verdict {{#if success}}dh-verdict--success{{else}}dh-verdict--fail{{/if}}">{{#if success}}Success{{else}}Failure{{/if}}</div>
+        <p class="dh-detail-line">{{#if success}}{{dos}} degrees of success{{else}}{{dof}} degrees of failure{{/if}}</p>
+        {{#if activeModifiers}}
+            <div class="dh-mods dh-mods--center">
                 <span class="dh-mod"><b>Base</b> {{baseTarget}}</span>
                 {{#each activeModifiers}}<span class="dh-mod"><b>{{@key}}</b> {{this}}</span>{{/each}}
-                <span class="dh-mod dh-mod--total"><b>Target</b> {{modifiedTarget}}</span>
             </div>
-        </div>
+        {{/if}}
+        <div class="dh-rule"></div>
+        <div class="dh-card__foot-line">{{#if success}}The Emperor protects{{else}}Only in death does duty end{{/if}}</div>
         <div class="dice-rolls" style="display:none">
             <div class="dice-roll-render">
                 {{{render}}}
