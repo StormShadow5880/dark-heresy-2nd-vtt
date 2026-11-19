@@ -1,8 +1,10 @@
 <header class="dossier-header">
-    <figure class="portrait">
-        <img class="portrait__img" src="{{actor.img}}" alt="{{actor.name}}" data-edit="img" data-action="editImage" data-tooltip="Change portrait" />
-        <i class="orn orn--tl"></i><i class="orn orn--tr"></i><i class="orn orn--bl"></i><i class="orn orn--br"></i>
-    </figure>
+    <div class="shield">
+        <div class="shield__portrait">
+            <img src="{{actor.img}}" alt="{{actor.name}}" data-edit="img" data-action="editImage" data-tooltip="Change portrait" />
+        </div>
+        <span class="shield__ribbon">{{#if actor.system.bio.role}}{{actor.system.bio.role}}{{else}}Acolyte{{/if}}</span>
+    </div>
 
     <div class="dossier-identity">
         <p class="record-title"><span>Imperial Personnel Record</span><span class="record-title__sub">Adeptus Administratum · Personnel Archive</span></p>
@@ -20,20 +22,31 @@
         </div>
     </div>
 
-    <aside class="dossier-status" aria-label="Character status">
-        <div class="hs hs--wounds">
-            <span class="hs__label">Wounds</span>
-            <span class="hs__value"><b>{{dossier.res.wounds.value}}</b><small>/ {{dossier.res.wounds.max}}</small></span>
-            <div class="seg-bar seg-bar--wounds"><span style="width: {{dossier.res.wounds.pct}}%"></span></div>
+    <div class="hwounds" aria-label="Wounds">
+        <div class="hwounds__top">
+            <span class="hwounds__label">Wounds</span>
+            <span class="hwounds__value">
+                <input type="number" data-dtype="Number" name="system.wounds.value" value="{{dossier.res.wounds.value}}" aria-label="Wounds" />
+                <span>/</span>
+                <input type="number" data-dtype="Number" name="system.wounds.max" value="{{dossier.res.wounds.max}}" aria-label="Maximum wounds" />
+            </span>
+            <span class="hwounds__steps">
+                <button type="button" class="step" data-action="adjustValue" data-path="system.wounds.value" data-delta="-1" data-max="{{dossier.res.wounds.max}}" aria-label="Decrease wounds">−</button>
+                <button type="button" class="step" data-action="adjustValue" data-path="system.wounds.value" data-delta="1" data-max="{{dossier.res.wounds.max}}" aria-label="Increase wounds">+</button>
+            </span>
         </div>
-        <div class="hs hs--fate">
-            <span class="hs__label">Fate</span>
-            <span class="hs__value"><b>{{dossier.res.fate.value}}</b><small>/ {{dossier.res.fate.max}}</small></span>
+        <div class="wbar" role="progressbar" aria-valuemin="0" aria-valuemax="{{dossier.res.wounds.max}}" aria-valuenow="{{dossier.res.wounds.value}}">
+            <div class="wbar__full" style="--inset: {{dossier.res.wounds.barInset}}%"></div>
         </div>
-        <div class="hs hs--xp">
-            <span class="hs__label">Available XP</span>
-            <span class="hs__value"><b>{{dossier.development.available}}</b></span>
+        <div class="hwounds__sub">
+            {{#if actor.system.wounds.critical}}<span>Critical <b>{{actor.system.wounds.critical}}</b></span>{{/if}}
+            <span>Fatigue <b>{{dossier.res.fatigue.value}} / {{dossier.res.fatigue.max}}</b></span>
+            <span>Fate <b>{{dossier.res.fate.value}} / {{dossier.res.fate.max}}</b></span>
         </div>
-        <i class="seal" aria-hidden="true"></i>
-    </aside>
+    </div>
+
+    <div class="banner" data-tooltip="Available experience points">
+        <span class="banner__label">Available XP</span>
+        <b class="banner__value">{{dossier.development.available}}</b>
+    </div>
 </header>

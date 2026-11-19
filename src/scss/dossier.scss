@@ -24,9 +24,13 @@
     --ds-font: 'Signika', 'Segoe UI', sans-serif;
     // very subtle paper grain, generated inline (no image files, tiles seamlessly)
     --ds-grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .75  0 0 0 0 .66  0 0 0 0 .5  0 0 0 .085 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    --ds-img-frame: url('../images/dossier/frame.webp');
+    --ds-img-shield: url('../images/dossier/shield.webp');
+    --ds-img-ring: url('../images/dossier/ring.webp');
+    --ds-img-banner: url('../images/dossier/banner.webp');
+    --ds-img-bar-empty: url('../images/dossier/bar-empty.webp');
+    --ds-img-bar-full: url('../images/dossier/bar-full.webp');
     --ds-img-corner: url('../images/dossier/corner.svg');
-    --ds-img-divider: url('../images/dossier/divider.svg');
-    --ds-img-seal: url('../images/dossier/seal.svg');
 
     background: var(--ds-bg);
     border: 1px solid var(--ds-line);
@@ -49,13 +53,16 @@
         }
     }
 
+    // The supplied metal frame is the window border; its fill is the dark paper texture
     > .window-content {
-        padding: 0;
+        padding: 0 6px;
         gap: 0;
         display: flex;
         flex-direction: column;
         overflow: hidden;
-        background: var(--ds-grain), radial-gradient(ellipse at top, #222220 0%, var(--ds-bg) 72%);
+        background: #0c0c0b;
+        border: 46px solid transparent;
+        border-image: var(--ds-img-frame) 120 fill / 46px / 0 stretch;
         container-type: inline-size;
         container-name: dossier;
     }
@@ -67,101 +74,91 @@
     // ------------------------------------------------ Header (document head)
     .dossier-header {
         flex: none;
+        position: relative;
         display: grid;
-        grid-template-columns: auto minmax(0, 1fr) auto;
-        gap: 18px;
-        align-items: stretch;
-        padding: 14px 18px 12px;
-        background: var(--ds-grain), linear-gradient(180deg, #262624, var(--ds-bg-2));
-        border-bottom: 1px solid var(--ds-gold);
+        grid-template-columns: 178px minmax(0, 1fr) 390px 108px;
+        grid-template-areas: 'shield ident wounds banner';
+        column-gap: 18px;
+        align-items: start;
+        padding: 2px 4px 8px;
+        min-height: 196px;
+    }
+    .shield {
+        grid-area: shield;
         position: relative;
-        &::after {
-            // fine inner rule like the printed record
-            content: '';
+        width: 178px;
+        height: 197px;
+        margin-top: -6px;
+        background: var(--ds-img-shield) no-repeat center / 100% 100%;
+        &__portrait {
             position: absolute;
-            inset: auto 18px 3px;
-            height: 1px;
-            background: var(--ds-line);
+            left: 25%;
+            top: 11%;
+            width: 50%;
+            height: 54%;
+            overflow: hidden;
+            background: #0b0a08;
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                object-position: top;
+                display: block;
+                border: 0;
+                cursor: pointer;
+            }
         }
-    }
-    .portrait {
-        position: relative;
-        margin: 0;
-        width: 128px;
-        height: 156px;
-        padding: 6px;
-        background: linear-gradient(145deg, #3a3326, #1c1a15);
-        border: 1px solid var(--ds-gold);
-        box-shadow: inset 0 0 0 1px #000, inset 0 0 10px #000;
-        &__img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: top;
-            border: 1px solid #000;
-            background: #000;
-            cursor: pointer;
-            display: block;
-        }
-    }
-    .orn {
-        position: absolute;
-        width: 20px;
-        height: 20px;
-        background: var(--ds-img-corner) no-repeat center / contain;
-        pointer-events: none;
-        &--tl {
-            top: -4px;
-            left: -4px;
-        }
-        &--tr {
-            top: -4px;
-            right: -4px;
-            transform: scaleX(-1);
-        }
-        &--bl {
-            bottom: -4px;
-            left: -4px;
-            transform: scaleY(-1);
-        }
-        &--br {
-            bottom: -4px;
-            right: -4px;
-            transform: scale(-1);
+        &__ribbon {
+            position: absolute;
+            left: 22%;
+            right: 22%;
+            top: 69%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            text-align: center;
+            font-family: var(--ds-font-title);
+            font-variant: small-caps;
+            font-weight: 700;
+            font-size: 0.88rem;
+            letter-spacing: 0.1em;
+            color: #1d1405;
+            text-shadow: 0 1px 0 rgba(255, 235, 180, 0.45);
         }
     }
     .dossier-identity {
+        grid-area: ident;
         min-width: 0;
         display: flex;
         flex-direction: column;
-        gap: 4px;
+        gap: 3px;
     }
     .record-title {
         margin: 0;
         display: flex;
         flex-wrap: wrap;
-        gap: 2px 14px;
-        font-size: 0.7rem;
-        letter-spacing: 0.22em;
+        gap: 2px 12px;
+        font-size: 0.62rem;
+        letter-spacing: 0.2em;
         text-transform: uppercase;
         color: var(--ds-gold);
         &__sub {
             color: var(--ds-muted);
-            letter-spacing: 0.14em;
+            letter-spacing: 0.12em;
         }
     }
     .dossier-header input.dossier-name {
         font-family: var(--ds-font-title);
-        font-size: 2.4rem;
-        line-height: 1.15;
+        font-size: 2.6rem;
+        line-height: 1.1;
         height: auto;
         padding: 0 2px;
         background: transparent;
         border: 0;
         border-bottom: 1px solid transparent;
         border-radius: 0;
-        color: #efe7d3;
-        text-shadow: 0 1px 0 #000;
+        color: #f1e8d2;
+        text-shadow: 0 2px 0 #000;
         &:hover,
         &:focus {
             border-bottom-color: var(--ds-gold);
@@ -171,9 +168,9 @@
     }
     .dossier-bio-fields {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-        gap: 4px 20px;
-        margin-top: 2px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 4px 22px;
+        margin-top: 4px;
     }
     .dossier-field {
         display: flex;
@@ -181,13 +178,17 @@
         gap: 8px;
         min-width: 0;
         border-bottom: 1px solid var(--ds-line);
+        &:last-child:nth-child(odd) {
+            grid-column: 1 / -1;
+        }
         &__label {
             flex: none;
             font-family: var(--ds-font-title);
             font-variant: small-caps;
-            font-size: 0.85rem;
-            letter-spacing: 0.06em;
+            font-size: 0.88rem;
+            letter-spacing: 0.05em;
             color: var(--ds-gold);
+            white-space: nowrap;
         }
         // field looks like an entry on a form, not like a form control
         select {
@@ -213,75 +214,209 @@
             border-bottom-color: var(--ds-gold);
         }
     }
-    .dossier-status {
-        position: relative;
-        display: grid;
-        grid-template-columns: repeat(3, auto);
-        align-content: start;
-        gap: 6px;
-        padding-right: 54px;
-        .hs {
+
+    // Wounds: always visible, with the supplied segmented bar (empty layer + clipped full layer)
+    .dossier-header .hwounds {
+        grid-area: wounds;
+        padding-top: 6px;
+        min-width: 0;
+        &__top {
             display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            min-width: 70px;
-            padding: 4px 10px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid var(--ds-line);
-            border-top: 2px solid var(--ds-gold);
-            &__label {
-                font-size: 0.62rem;
-                letter-spacing: 0.14em;
-                text-transform: uppercase;
-                color: var(--ds-muted);
-            }
-            &__value {
+            align-items: center;
+            gap: 10px;
+        }
+        &__label {
+            font-family: var(--ds-font-title);
+            font-variant: small-caps;
+            letter-spacing: 0.1em;
+            color: var(--ds-gold);
+            font-size: 1.05rem;
+        }
+        &__value {
+            display: inline-flex;
+            align-items: baseline;
+            gap: 2px;
+            font-family: var(--ds-font-title);
+            color: var(--ds-muted);
+            // (double class to win against the generic form control rules)
+            input.hv,
+            input {
+                width: 48px;
+                height: 34px;
+                padding: 0;
+                background: transparent;
+                border: 0;
+                border-bottom: 1px solid transparent;
+                border-radius: 0;
                 font-family: var(--ds-font-title);
-                b {
-                    font-size: 1.7rem;
-                    color: #efe7d3;
-                    font-weight: 600;
-                }
-                small {
-                    margin-left: 3px;
+                font-size: 1.9rem;
+                color: #fff;
+                &:hover,
+                &:focus {
+                    border-bottom-color: var(--ds-gold);
+                    box-shadow: none;
                 }
             }
-            &--xp b {
-                color: var(--ds-gold);
-            }
-            .seg-bar {
-                width: 100%;
+            input:last-of-type {
+                font-size: 1.1rem;
+                color: var(--ds-muted);
+                width: 40px;
+                text-align: left;
             }
         }
-        .seal {
+        &__steps {
+            margin-left: auto;
+            display: flex;
+            gap: 4px;
+        }
+        .step {
+            width: 26px;
+            height: 26px;
+            padding: 0;
+            background: #222220;
+            border: 1px solid var(--ds-line);
+            color: var(--ds-parchment);
+            border-radius: 2px;
+            cursor: pointer;
+            line-height: 1;
+            &:hover,
+            &:focus-visible {
+                border-color: var(--ds-gold);
+                outline: none;
+            }
+        }
+        &__sub {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px 16px;
+            margin-top: 2px;
+            font-size: 0.78rem;
+            color: var(--ds-muted);
+            b {
+                color: var(--ds-parchment);
+                font-weight: 600;
+            }
+        }
+    }
+    .wbar {
+        position: relative;
+        width: 100%;
+        // artwork is 900 x 92
+        aspect-ratio: 900 / 92;
+        margin-top: 3px;
+        background: var(--ds-img-bar-empty) no-repeat center / 100% 100%;
+        &__full {
             position: absolute;
-            top: -4px;
-            right: -4px;
-            width: 62px;
-            height: 62px;
-            background: var(--ds-img-seal) no-repeat center / contain;
-            filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.6));
+            inset: 0;
+            background: var(--ds-img-bar-full) no-repeat center / 100% 100%;
+            clip-path: inset(0 var(--inset, 100%) 0 0);
         }
     }
 
-    @container dossier (max-width: 900px) {
-        .dossier-header {
-            grid-template-columns: auto minmax(0, 1fr);
+    // Experience banner hangs from the top frame edge
+    .banner {
+        grid-area: banner;
+        position: relative;
+        width: 108px;
+        height: 187px;
+        margin-top: -12px;
+        background: var(--ds-img-banner) no-repeat center / 100% 100%;
+        filter: drop-shadow(0 6px 5px rgba(0, 0, 0, 0.6));
+        z-index: 2;
+        &__label {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 62%;
+            text-align: center;
+            font-size: 0.5rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: #e7c98a;
         }
-        .dossier-status {
-            grid-column: 1 / -1;
-            grid-template-columns: repeat(3, 1fr);
-            padding-right: 0;
-            .seal {
-                display: none;
+        &__value {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 66%;
+            text-align: center;
+            font-family: var(--ds-font-title);
+            font-size: 1.8rem;
+            line-height: 1.1;
+            font-weight: 600;
+            color: #f6e7bf;
+            text-shadow: 0 2px 2px #000;
+        }
+    }
+
+    // The supplied spiked ring: used for Fate (overview) and Psy Rating (psychic tab)
+    .ring {
+        position: relative;
+        flex: none;
+        width: 118px;
+        height: 118px;
+        display: grid;
+        place-content: center;
+        text-align: center;
+        background: var(--ds-img-ring) no-repeat center / 100% 100%;
+        font-family: var(--ds-font-title);
+        b {
+            font-size: 2.1rem;
+            line-height: 1;
+            color: #fff;
+            font-weight: 600;
+        }
+        small {
+            font-size: 0.55rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--ds-gold);
+        }
+        &--psy {
+            width: 130px;
+            height: 130px;
+            b {
+                font-size: 2.8rem;
             }
         }
-        .portrait {
-            width: 96px;
-            height: 118px;
+    }
+
+    // Narrower windows: wounds move below the identity, the banner shrinks / disappears
+    @container dossier (max-width: 1040px) {
+        .dossier-header {
+            grid-template-columns: 150px minmax(0, 1fr) 96px;
+            grid-template-areas: 'shield ident banner' 'shield wounds banner';
+            min-height: 0;
         }
-        .dossier-name {
-            font-size: 1.8rem;
+        .shield {
+            width: 150px;
+            height: 166px;
+        }
+        .banner {
+            width: 96px;
+            height: 166px;
+        }
+        .dossier-header input.dossier-name {
+            font-size: 2.1rem;
+        }
+    }
+    @container dossier (max-width: 740px) {
+        .dossier-header {
+            grid-template-columns: 112px minmax(0, 1fr);
+            grid-template-areas: 'shield ident' 'wounds wounds';
+        }
+        .shield {
+            width: 112px;
+            height: 124px;
+        }
+        .shield__ribbon {
+            font-size: 0.62rem;
+        }
+        .banner {
+            display: none;
+        }
+        .dossier-bio-fields {
+            grid-template-columns: 1fr;
         }
     }
 
@@ -290,8 +425,8 @@
         flex: none;
         display: flex;
         gap: 2px;
-        padding: 8px 14px 0;
-        background: #111110;
+        padding: 6px 4px 0;
+        background: transparent;
         border-bottom: 1px solid var(--ds-gold);
         overflow-x: auto;
         scrollbar-width: thin;
@@ -342,14 +477,14 @@
             flex: 1 1 auto;
             min-height: 0;
             overflow-y: auto;
-            padding: 14px 16px 18px;
+            padding: 12px 8px 14px;
         }
     }
 
     // ------------------------------------------------ Panels
     .panel {
         position: relative;
-        background: var(--ds-grain), var(--ds-panel);
+        background: rgba(10, 10, 9, 0.58);
         border: 1px solid var(--ds-line);
         margin-bottom: 14px;
         min-width: 0;
@@ -461,8 +596,8 @@
     // ------------------------------------------------ Layouts
     .ov-layout {
         display: grid;
-        grid-template-columns: minmax(280px, 5fr) minmax(0, 6fr);
-        grid-template-areas: 'chars chars' 'status quick' 'status details';
+        grid-template-columns: minmax(0, 7fr) minmax(280px, 4fr);
+        grid-template-areas: 'chars status' 'quick status' 'quick details';
         gap: 0 16px;
         align-items: start;
         .panel--status {
@@ -778,6 +913,12 @@
         }
         &--wounds {
             --bar: #8a2a2f;
+        }
+        &--fate {
+            flex-direction: row;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px 14px;
         }
         &--fatigue {
             .stat__counter {
@@ -1521,21 +1662,6 @@
         align-items: center;
         gap: 14px;
         padding: 12px 14px 4px;
-        &__ring {
-            display: grid;
-            place-items: center;
-            width: 74px;
-            height: 74px;
-            border-radius: 50%;
-            border: 2px solid var(--ds-psy);
-            box-shadow: 0 0 0 4px #14121c, 0 0 0 5px #3d3752, inset 0 0 12px rgba(123, 106, 168, 0.4);
-            b {
-                font-family: var(--ds-font-title);
-                font-size: 2.2rem;
-                color: #efe9ff;
-                font-weight: 600;
-            }
-        }
         &__label {
             font-family: var(--ds-font-title);
             font-variant: small-caps;

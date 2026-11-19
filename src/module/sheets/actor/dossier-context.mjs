@@ -73,6 +73,23 @@ function toNumber(value, fallback = 0) {
     return Number.isFinite(n) ? n : fallback;
 }
 
+/**
+ * The wounds bar artwork has 10 cells. This returns the amount (in percent) that has to be cut off at the right
+ * of the "full" layer so that exactly the cells that are (partially) filled stay visible.
+ * Geometry (fractions of the artwork width) was measured from the supplied bar image.
+ */
+const BAR_FIRST_CELL = 0.0673;
+const BAR_CELL_PITCH = 0.08717;
+const BAR_CELL_WIDTH = 0.0855;
+export function barInset(value, max, cells = 10) {
+    const v = toNumber(value);
+    const m = toNumber(max);
+    if (m <= 0 || v <= 0) return 100;
+    const filled = Math.min(cells, Math.ceil((v / m) * cells));
+    const right = BAR_FIRST_CELL + (filled - 1) * BAR_CELL_PITCH + BAR_CELL_WIDTH;
+    return Math.round((1 - right) * 1000) / 10;
+}
+
 function percent(value, max) {
     if (!max || max <= 0) return 0;
     return Math.max(0, Math.min(100, Math.round((toNumber(value) / max) * 100)));
@@ -110,6 +127,7 @@ export function buildResources(actor) {
             maxPath: 'system.wounds.max',
             max: s.wounds.max,
             pct: percent(s.wounds.value, s.wounds.max),
+            barInset: barInset(s.wounds.value, s.wounds.max),
             tone: 'wounds',
             note: s.wounds.critical ? `Critical: ${s.wounds.critical}` : '',
         },

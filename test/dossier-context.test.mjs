@@ -56,3 +56,32 @@ test('development summary computes the progress and sorts the log newest first',
     assert.deepEqual(dev.log.map((e) => e.id), ['b', 'a']);
     assert.equal(dev.log[0].isSpend, true);
 });
+
+test('wounds bar: cells that are (partially) filled stay visible, empty bar is fully cut off', () => {
+    assert.equal(ctx.barInset(0, 16), 100);
+    assert.equal(ctx.barInset(-3, 16), 100);
+    assert.equal(ctx.barInset(5, 0), 100);
+    // 1 wound out of 16 already lights up the first cell
+    assert.ok(ctx.barInset(1, 16) > ctx.barInset(2, 16) - 0.001);
+    // full bar keeps only the right end cap area
+    const full = ctx.barInset(16, 16);
+    assert.ok(full > 0 && full < 10);
+    // more wounds than maximum does not overflow
+    assert.equal(ctx.barInset(99, 16), full);
+    // monotonic: more wounds never shows less of the bar
+    let last = 101;
+    for (let v = 0; v <= 16; v++) {
+        const inset = ctx.barInset(v, 16);
+        assert.ok(inset <= last);
+        last = inset;
+    }
+});
+
+test('resources expose the wounds bar inset', () => {
+    const actor = makeActor();
+    actor.system.wounds = { value: 8, max: 16, critical: 0 };
+    actor.system.fatigue = { value: 0, max: 5 };
+    actor.system.fate = { value: 2, max: 3 };
+    const wounds = ctx.buildResources(actor).find((r) => r.id === 'wounds');
+    assert.equal(wounds.barInset, ctx.barInset(8, 16));
+});

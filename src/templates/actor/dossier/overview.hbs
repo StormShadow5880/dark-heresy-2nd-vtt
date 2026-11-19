@@ -30,19 +30,6 @@
         <article class="panel panel--status">
             <h2 class="panel__title">Status</h2>
             <div class="status">
-                <div class="stat stat--wounds">
-                    <span class="stat__label">Wounds</span>
-                    <div class="stat__big">
-                        <button type="button" class="step" data-action="adjustValue" data-path="system.wounds.value" data-delta="-1" data-max="{{dossier.res.wounds.max}}" aria-label="Decrease wounds">−</button>
-                        <input type="number" data-dtype="Number" name="system.wounds.value" value="{{dossier.res.wounds.value}}" aria-label="Wounds" />
-                        <span class="sep">/</span>
-                        <input type="number" data-dtype="Number" name="system.wounds.max" value="{{dossier.res.wounds.max}}" aria-label="Maximum wounds" />
-                        <button type="button" class="step" data-action="adjustValue" data-path="system.wounds.value" data-delta="1" data-max="{{dossier.res.wounds.max}}" aria-label="Increase wounds">+</button>
-                    </div>
-                    <div class="seg-bar seg-bar--wounds"><span style="width: {{dossier.res.wounds.pct}}%"></span></div>
-                    {{#if dossier.res.wounds.note}}<span class="stat__note">{{dossier.res.wounds.note}}</span>{{/if}}
-                </div>
-
                 <div class="stat stat--fatigue">
                     <span class="stat__label">Fatigue</span>
                     <div class="stat__counter">
@@ -54,20 +41,18 @@
                 </div>
 
                 <div class="stat stat--fate">
-                    <span class="stat__label">Fate</span>
-                    {{#if dossier.res.fate.pips}}
-                        <div class="fate-pips" role="group" aria-label="Fate points">
-                            {{#each dossier.res.fate.pips as |p|}}
-                                <button type="button" class="fate-pip {{#if p.filled}}on{{/if}}" data-action="setPips" data-path="system.fate.value" data-level="{{p.level}}" aria-label="Set fate to {{p.level}}" aria-pressed="{{p.filled}}"></button>
-                            {{/each}}
+                    <div class="ring ring--fate" data-tooltip="Fate points">
+                        <b>{{dossier.res.fate.value}}</b><small>of {{dossier.res.fate.max}}</small>
+                    </div>
+                    <div class="stat__fate-controls">
+                        <span class="stat__label">Fate</span>
+                        <div class="stat__counter">
+                            <button type="button" class="step" data-action="adjustValue" data-path="system.fate.value" data-delta="-1" data-max="{{dossier.res.fate.max}}" aria-label="Decrease fate">−</button>
+                            <input type="number" data-dtype="Number" name="system.fate.value" value="{{dossier.res.fate.value}}" aria-label="Fate" />
+                            <span class="sep">/</span>
+                            <input type="number" data-dtype="Number" name="system.fate.max" value="{{dossier.res.fate.max}}" aria-label="Maximum fate" />
+                            <button type="button" class="step" data-action="adjustValue" data-path="system.fate.value" data-delta="1" data-max="{{dossier.res.fate.max}}" aria-label="Increase fate">+</button>
                         </div>
-                    {{/if}}
-                    <div class="stat__counter">
-                        <button type="button" class="step" data-action="adjustValue" data-path="system.fate.value" data-delta="-1" data-max="{{dossier.res.fate.max}}" aria-label="Decrease fate">−</button>
-                        <input type="number" data-dtype="Number" name="system.fate.value" value="{{dossier.res.fate.value}}" aria-label="Fate" />
-                        <span class="sep">/</span>
-                        <input type="number" data-dtype="Number" name="system.fate.max" value="{{dossier.res.fate.max}}" aria-label="Maximum fate" />
-                        <button type="button" class="step" data-action="adjustValue" data-path="system.fate.value" data-delta="1" data-max="{{dossier.res.fate.max}}" aria-label="Increase fate">+</button>
                     </div>
                 </div>
 
@@ -92,12 +77,6 @@
                     </div>
                 </div>
 
-                <div class="stat stat--xp">
-                    <span class="stat__label">Available XP</span>
-                    <span class="xp-big">{{dossier.development.available}}</span>
-                    <span class="stat__note">{{dossier.development.used}} spent · {{dossier.development.total}} total</span>
-                    <div class="seg-bar seg-bar--xp"><span style="width: {{dossier.development.pct}}%"></span></div>
-                </div>
             </div>
         </article>
 
