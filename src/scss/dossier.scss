@@ -745,8 +745,8 @@
     // ------------------------------------------------ Layouts
     .ov-layout {
         display: grid;
-        grid-template-columns: minmax(280px, 4fr) minmax(0, 7fr);
-        grid-template-areas: 'chars chars' 'status quick' 'details quick';
+        grid-template-columns: minmax(0, 7fr) minmax(280px, 4fr);
+        grid-template-areas: 'chars status' 'quick status' 'quick details';
         gap: 0 16px;
         align-items: start;
         .panel--status {
@@ -1132,16 +1132,16 @@
     .chars {
         display: grid;
         grid-template-columns: repeat(10, minmax(0, 1fr));
-        gap: 6px;
-        padding: 10px 10px 12px;
+        gap: 4px;
+        padding: 8px 8px 10px;
     }
     .char {
         position: relative;
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 1px;
-        padding: 5px 4px 6px;
+        gap: 0;
+        padding: 3px 2px 4px;
         background: linear-gradient(180deg, #232320, #141413);
         border: 1px solid var(--ds-line);
         border-top: 2px solid var(--ds-gold);
@@ -1154,21 +1154,21 @@
         &__short {
             font-family: var(--ds-font-title);
             font-variant: small-caps;
-            font-size: 1rem;
-            letter-spacing: 0.1em;
+            font-size: 0.85rem;
+            letter-spacing: 0.08em;
             color: var(--ds-gold);
             line-height: 1.2;
         }
         &__roll {
-            width: 100%;
-            height: 44px;
-            font-size: 1.85rem;
+            width: calc(100% - 4px);
+            height: 32px;
+            font-size: 1.35rem;
             font-family: var(--ds-font-title);
             color: #f6efdc;
             background: radial-gradient(ellipse at 50% 30%, #1d1d1b, #0a0a09);
             border: 1px solid var(--ds-line);
-            border-radius: 24px / 22px;
-            box-shadow: inset 0 0 0 1px #000, inset 0 0 8px #000;
+            border-radius: 18px / 16px;
+            box-shadow: inset 0 0 0 1px #000, inset 0 0 6px #000;
             cursor: pointer;
             line-height: 1;
             padding: 0;
@@ -1180,8 +1180,8 @@
             }
         }
         &__bonus {
-            font-size: 0.66rem;
-            letter-spacing: 0.08em;
+            font-size: 0.56rem;
+            letter-spacing: 0.06em;
             text-transform: uppercase;
             color: var(--ds-muted);
             margin-top: 1px;
@@ -1319,11 +1319,13 @@
         }
     }
     .chars .pips {
-        margin-top: 1px;
+        margin-top: 0;
+        padding: 0;
+        gap: 0;
         .pip {
-            width: 6px;
-            height: 6px;
-            margin: 0 2px;
+            width: 5px;
+            height: 5px;
+            margin: 2px 1.5px;
         }
     }
     @container dossier (max-width: 960px) {
