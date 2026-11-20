@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildChanges, canSustain, effectRows, normalizeDefinition, computeValue, describeEffects, getEffectDefinitions, hasEffect, MODE_ADD } from '../src/module/rules/psychic-effects.mjs';
+import { buildChanges, canSustain, effectLine, effectSummary, formulaText, effectRows, normalizeDefinition, computeValue, describeEffects, getEffectDefinitions, hasEffect, MODE_ADD } from '../src/module/rules/psychic-effects.mjs';
 import { installFoundryStubs } from './helpers.mjs';
 
 installFoundryStubs();
@@ -163,4 +163,21 @@ test('item data wins over the registry, so the compendium entry can define the e
     const own = { name: 'Iron Arm', system: { autoEffects: [{ characteristic: 'strength', field: 'unnatural', value: 1 }] } };
     assert.deepEqual(getEffectDefinitions(own).map((d) => d.path), ['system.characteristics.strength.unnatural']);
     assert.equal(normalizeDefinition({ path: 'system.foo', value: 3 }).label, 'system.foo');
+});
+
+test('readable formulas for the item sheet (no psy rating needed)', () => {
+    assert.equal(formulaText({ characteristic: 'toughness', field: 'unnatural', pr: { divide: 2, round: 'up' } }), '+⌈PR ÷ 2⌉');
+    assert.equal(formulaText({ characteristic: 'toughness', field: 'unnatural', pr: { divide: 2, round: 'down' } }), '+⌊PR ÷ 2⌋');
+    assert.equal(formulaText({ characteristic: 'toughness', field: 'unnatural' }), '+PR');
+    assert.equal(formulaText({ characteristic: 'agility', field: 'modifier', value: -10 }), '-10');
+    assert.equal(formulaText({ characteristic: 'agility', field: 'modifier', value: 5 }), '+5');
+});
+
+test('effect summary and line for Iron Arm and for a power without effects', () => {
+    assert.equal(effectLine(ironArm), 'Unnatural Toughness +⌈PR ÷ 2⌉, Unnatural Strength +⌈PR ÷ 2⌉, Agility -10');
+    const rows = effectSummary(ironArm);
+    assert.equal(rows.length, 3);
+    assert.deepEqual(rows[2], { label: 'Agility', value: '-10', fixed: true, characteristic: 'Agility', field: 'modifier' });
+    assert.equal(effectLine({ name: 'Smite', system: {} }), '');
+    assert.deepEqual(effectSummary({ name: 'Smite', system: {} }), []);
 });

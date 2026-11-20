@@ -22,3 +22,38 @@
         height: 24px;
     }
 }
+
+// Read-only effect cards (item sheet, also in the locked compendium)
+.dh-effect-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 8px;
+}
+.dh-effect-card {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 6px 12px;
+    background: #231b13;
+    border: 1px solid #b69a62;
+    border-left: 4px solid #b69a62;
+    color: #f3dfb0;
+    &--fixed {
+        border-left-color: #b8514b;
+    }
+    &__label {
+        font-size: 0.95rem;
+        color: #d8c7a2;
+    }
+    &__value {
+        font-family: Georgia, 'Palatino Linotype', serif;
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: #fff;
+    }
+}
+.dh-effect-state {
+    margin: 0 8px 8px;
+    font-size: 0.85rem;
+}

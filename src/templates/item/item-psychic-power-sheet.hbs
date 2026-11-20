@@ -202,6 +202,20 @@
                     <div class="tab" data-group="primary" data-tab="effects">
                         <div class="dh-panel dh-grid-col-6">
                             <h1 class="dh-panel__header">While the power is in effect</h1>
+                            <div class="dh-effect-cards">
+                                {{#each effectSummary as |e|}}
+                                    <div class="dh-effect-card {{#if e.fixed}}dh-effect-card--fixed{{/if}}" data-tooltip="{{e.characteristic}} · {{e.field}}">
+                                        <span class="dh-effect-card__label">{{e.label}}</span>
+                                        <span class="dh-effect-card__value">{{e.value}}</span>
+                                    </div>
+                                {{else}}
+                                    <p class="dh-effect-help">This power does not change any values.</p>
+                                {{/each}}
+                            </div>
+                            <p class="dh-effect-state">
+                                {{#if canSustain}}Applied after a successful manifestation. The power is sustained ({{item.system.sustained}}) until it is ended and reduces the current psy rating.{{else}}Sustained is "No": the effects are not applied automatically.{{/if}}
+                            </p>
+                            {{#if editable}}
                             <p class="dh-effect-help">After a successful manifestation these changes are applied to the psyker as an Active Effect
                                 (only for powers that can be sustained, the Sustained field is not "No"). Leave <em>Fixed</em> empty to calculate the
                                 value from the psy rating: psy rating ÷ <em>Divide</em>, rounded as selected.</p>
@@ -225,6 +239,7 @@
                                 </tbody>
                             </table>
                             <button type="button" data-action="addPsychicEffect">+ Add effect</button>
+                            {{/if}}
                         </div>
                     </div>
                     <div class="tab" data-group="primary" data-tab="description">

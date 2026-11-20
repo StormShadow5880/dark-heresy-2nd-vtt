@@ -5,7 +5,7 @@
  */
 import { SYSTEM_ID } from '../../system-id.mjs';
 import { woundBar } from '../../rules/wounds.mjs';
-import { canSustain, describeEffects, hasEffect } from '../../rules/psychic-effects.mjs';
+import { canSustain, describeEffects, effectLine, hasEffect } from '../../rules/psychic-effects.mjs';
 
 export const CHARACTERISTIC_ORDER = [
     'weaponSkill',
@@ -372,6 +372,7 @@ export function buildPsychic(actor) {
             penetration: item.system.penetration,
             attackType: item.system.attackType,
             hasEffect: hasEffect(item),
+            effectLine: effectLine(item),
             canSustain: canSustain(item),
             activatable: canSustain(item) || hasEffect(item),
             active: !!item.getFlag(SYSTEM_ID, 'sustainedActive') || actor.effects.some((e) => e.getFlag(SYSTEM_ID, 'psyEffect')?.powerId === item.id),

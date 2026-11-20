@@ -120,3 +120,43 @@ export function describeEffects(power, pr) {
         })
         .join(', ');
 }
+
+/**
+ * Readable form of one definition WITHOUT a psy rating, e.g. "+⌈PR ÷ 2⌉" or "-10".
+ * Used to show what a power does on the item sheet (also read-only in the compendium).
+ */
+export function formulaText(def) {
+    const d = normalizeDefinition(def);
+    if (d.value !== undefined) return d.value >= 0 ? `+${d.value}` : `${d.value}`;
+    const multiply = Number(d.pr?.multiply) || 1;
+    const divide = Number(d.pr?.divide) || 1;
+    let core = 'PR';
+    if (multiply !== 1) core += ` × ${multiply}`;
+    if (divide !== 1) core += ` ÷ ${divide}`;
+    switch (d.pr?.round) {
+        case 'up':
+            return divide !== 1 || multiply !== 1 ? `+⌈${core}⌉` : `+${core}`;
+        case 'down':
+            return divide !== 1 || multiply !== 1 ? `+⌊${core}⌋` : `+${core}`;
+        default:
+            return `+${core}`;
+    }
+}
+
+/** Display rows for the item sheet and the actor's psychic tab */
+export function effectSummary(power) {
+    return getEffectDefinitions(power).map((def) => ({
+        label: def.label,
+        value: formulaText(def),
+        fixed: def.value !== undefined,
+        characteristic: CHARACTERISTIC_LABELS[def.characteristic ?? /^system\.characteristics\.(\w+)\./.exec(def.path)?.[1]] ?? '',
+        field: def.field ?? def.path.split('.').pop(),
+    }));
+}
+
+/** One line for lists: "Unnatural Toughness +⌈PR ÷ 2⌉, Agility modifier -10" */
+export function effectLine(power) {
+    return effectSummary(power)
+        .map((e) => `${e.label} ${e.value}`)
+        .join(', ');
+}

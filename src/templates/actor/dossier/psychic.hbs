@@ -54,7 +54,7 @@
                     <tbody>
                         {{#each dossier.psychic.powers as |p|}}
                             <tr class="item-drag" data-item-id="{{p.id}}">
-                                <td class="strong">{{p.name}}{{#if p.subtype}} <small>{{p.subtype}}</small>{{/if}}{{#if p.active}} <span class="pill pill--on" data-tooltip="In effect, sustained">Active</span>{{/if}}</td>
+                                <td class="strong">{{p.name}}{{#if p.subtype}} <small>{{p.subtype}}</small>{{/if}}{{#if p.active}} <span class="pill pill--on" data-tooltip="In effect, sustained">Active</span>{{/if}}{{#if p.effectLine}}<br /><small class="effect-text" data-tooltip="Applied after a successful manifestation">{{p.effectLine}}</small>{{/if}}</td>
                                 <td>{{p.discipline}}</td>
                                 <td class="num">{{p.cost}}</td>
                                 <td>{{p.action}}</td>

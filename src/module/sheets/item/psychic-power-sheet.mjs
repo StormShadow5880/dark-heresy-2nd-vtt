@@ -1,5 +1,5 @@
 import { DarkHeresyItemContainerSheet } from './item-container-sheet.mjs';
-import { CHARACTERISTIC_LABELS, EFFECT_FIELDS, effectRows } from '../../rules/psychic-effects.mjs';
+import { CHARACTERISTIC_LABELS, EFFECT_FIELDS, effectRows, effectSummary, canSustain } from '../../rules/psychic-effects.mjs';
 
 export class DarkHeresyPsychicPowerSheet extends DarkHeresyItemContainerSheet {
     static DEFAULT_OPTIONS = {
@@ -19,6 +19,8 @@ export class DarkHeresyPsychicPowerSheet extends DarkHeresyItemContainerSheet {
     async _prepareContext(options) {
         const context = await super._prepareContext(options);
         context.effectRows = effectRows(this.item);
+        context.effectSummary = effectSummary(this.item);
+        context.canSustain = canSustain(this.item);
         context.effectCharacteristics = CHARACTERISTIC_LABELS;
         context.effectFields = EFFECT_FIELDS;
         context.effectRounding = { up: 'Round up', down: 'Round down', none: 'No rounding' };
