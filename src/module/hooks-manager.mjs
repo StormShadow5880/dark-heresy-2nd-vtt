@@ -41,6 +41,7 @@ import * as documents from './documents/_module.mjs'
 
 import { SYSTEM_ID } from './system-id.mjs';
 import { onPsychicEffectRemoved, refreshPsychicEffects } from './actions/psychic-effect-manager.mjs';
+import { registerWoundsSyncHooks, syncAllWounds } from './actions/wounds-sync.mjs';
 export { SYSTEM_ID };
 
 export class HooksManager {
@@ -52,6 +53,7 @@ export class HooksManager {
         Hooks.on('hotbarDrop', HooksManager.hotbarDrop);
         Hooks.on('deleteActiveEffect', HooksManager.deleteActiveEffect);
         Hooks.on('updateActor', HooksManager.updateActor);
+        registerWoundsSyncHooks();
 
         DHTargetedActionManager.initializeHooks();
         DHBasicActionManager.initializeHooks();
@@ -137,6 +139,7 @@ Enable Debug with: game.dh.debug = true
     static async ready() {
         console.log(`DH2e Loaded!`);
         DarkHeresySettings.applyDarkChat();
+        await syncAllWounds();
         await checkAndMigrateWorld();
 
         game.tours.register(SYSTEM_ID, "main-tour", new DHTourMain());

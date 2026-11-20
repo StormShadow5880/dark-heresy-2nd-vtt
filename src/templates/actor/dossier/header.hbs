@@ -1,3 +1,4 @@
+{{!-- IM-001 (Imperium Maledictum): the maximum wounds are calculated, see docs/imperium-maledictum-imports.md --}}
 <header class="dossier-header">
     <div class="shield">
         <div class="shield__portrait">
@@ -27,7 +28,12 @@
             <span class="hmini__fields" data-tooltip="Wounds taken / maximum wounds">
                 <input type="number" class="damage-input" min="0" value="{{dossier.res.wounds.bar.damage}}" aria-label="Wounds taken" />
                 <span>/</span>
-                <input type="number" data-dtype="Number" name="system.wounds.max" value="{{dossier.res.wounds.max}}" aria-label="Maximum wounds" />
+                {{#if dossier.res.wounds.derived}}
+                    <span class="hmini__max" data-tooltip="{{dossier.res.wounds.breakdown}} · rule from Imperium Maledictum">{{dossier.res.wounds.max}}</span>
+                    <label class="hmini__mod" data-tooltip="Wounds modifier (talents, traits, special cases)">+<input type="number" data-dtype="Number" name="system.wounds.modifier" value="{{dossier.res.wounds.modifier}}" aria-label="Wounds modifier" /></label>
+                {{else}}
+                    <input type="number" data-dtype="Number" name="system.wounds.max" value="{{dossier.res.wounds.max}}" aria-label="Maximum wounds" />
+                {{/if}}
             </span>
             <span class="hmini__steps">
                 <button type="button" class="step" data-action="adjustDamage" data-delta="-1" aria-label="Heal one point" data-tooltip="Heal 1 (critical damage first, then wounds)">−</button>

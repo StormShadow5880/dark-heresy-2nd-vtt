@@ -8,6 +8,7 @@ export class DarkHeresySettings {
         simplePsychicRolls: 'simple-psychic-rolls',
         processActiveEffectsDuringCombat: 'active-effects-during-combat',
         darkChat: 'dark-chat',
+        woundsFormula: 'wounds-formula',
 
     }
 
@@ -19,6 +20,20 @@ export class DarkHeresySettings {
     }
 
     static registerSettings() {
+        // IM-001: rule taken over from Imperium Maledictum, see docs/imperium-maledictum-imports.md
+        game.settings.register(SYSTEM_ID, DarkHeresySettings.SETTINGS.woundsFormula, {
+            name: 'Maximum Wounds Rule',
+            hint: 'Imperium Maledictum: Max Wounds = Strength Bonus + 2 x Toughness Bonus + Willpower Bonus, calculated automatically for player characters and updated when traits, powers or effects change a characteristic. Manual: the maximum entered on the sheet is used.',
+            scope: 'world',
+            config: true,
+            default: 'im',
+            type: String,
+            choices: {
+                im: 'Imperium Maledictum (calculated)',
+                manual: 'Manual (as entered)',
+            },
+            onChange: () => game.actors?.forEach((a) => a.prepareData?.()),
+        });
         game.settings.register(SYSTEM_ID, DarkHeresySettings.SETTINGS.darkChat, {
             name: 'Dark Chat',
             hint: 'Shows the whole chat (message list, messages and input) in the dark imperial style, whatever the Foundry theme is. Only affects you.',

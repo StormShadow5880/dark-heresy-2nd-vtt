@@ -228,6 +228,26 @@
                 width: 36px;
             }
         }
+        // calculated maximum (Imperium Maledictum rule) and its manual modifier
+        &__max {
+            font-size: 1rem;
+            color: var(--ds-parchment);
+            padding: 0 4px 0 2px;
+            cursor: help;
+        }
+        &__mod {
+            display: inline-flex;
+            align-items: baseline;
+            font-size: 0.8rem;
+            color: var(--ds-muted);
+            input[type='number'] {
+                width: 28px !important;
+                height: 20px !important;
+                font-size: 0.8rem !important;
+                color: var(--ds-muted) !important;
+                text-align: left !important;
+            }
+        }
         &__steps {
             margin-left: auto;
             display: flex;

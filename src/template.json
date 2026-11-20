@@ -5,6 +5,7 @@
             "base": {
                 "wounds": {
                     "max": 0,
+                    "modifier": 0,
                     "value": 0,
                     "critical": 0,
                     "rolled": false

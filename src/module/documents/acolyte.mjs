@@ -15,6 +15,8 @@ import { DHBasicActionManager } from '../actions/basic-action-manager.mjs';
 import { getDegree, roll1d100 } from '../rolls/roll-helpers.mjs';
 import { SYSTEM_ID } from '../hooks-manager.mjs';
 import { DarkHeresySettings } from '../dark-heresy-settings.mjs';
+import { maxWounds, maxWoundsBreakdown } from '../rules/imperium-maledictum.mjs';
+import { woundsFormulaIsIM } from '../rules/wounds-setting.mjs';
 
 export class DarkHeresyAcolyte extends DarkHeresyBaseActor {
 
@@ -81,6 +83,7 @@ export class DarkHeresyAcolyte extends DarkHeresyBaseActor {
         };
         this._computeBackgroundFields();
         this._computeCharacteristics();
+        this._computeWounds();
         this._computeSkills();
         this._computeExperience();
         this._computeArmour();
@@ -246,6 +249,8 @@ export class DarkHeresyAcolyte extends DarkHeresyBaseActor {
         for (const [name, characteristic] of Object.entries(this.characteristics)) {
             characteristic.total = characteristic.base + characteristic.advance * 5 + characteristic.modifier;
             characteristic.bonus = Math.floor(characteristic.total / 10) + characteristic.unnatural;
+            // bonus before the fatigue penalty: the maximum wounds must not change with fatigue
+            characteristic.bonusNoFatigue = characteristic.bonus;
 
             // Homeworld Bonus or Negative
             if (this.backgroundEffects.homeworld) {
@@ -267,6 +272,21 @@ export class DarkHeresyAcolyte extends DarkHeresyBaseActor {
         this.psy.currentRating = this.psy.rating - this.psy.sustained;
         this.initiative.bonus = this.characteristics[this.initiative.characteristic].bonus;
         this.fatigue.max = this.characteristics.toughness.bonus + this.characteristics.willpower.bonus;
+    }
+
+    /**
+     * IM-001 (Imperium Maledictum): Max Wounds = Strength Bonus + 2 x Toughness Bonus + Willpower Bonus (+ modifier).
+     * Only for player characters, NPC wounds stay as they are entered. World setting "wounds-formula" can switch
+     * back to the manually entered maximum. See docs/imperium-maledictum-imports.md.
+     */
+    _computeWounds() {
+        if (this.type !== 'acolyte' || !woundsFormulaIsIM()) return;
+        const c = this.characteristics;
+        const bonuses = { strength: c.strength.bonusNoFatigue, toughness: c.toughness.bonusNoFatigue, willpower: c.willpower.bonusNoFatigue };
+        const modifier = Number(this.system.wounds.modifier) || 0;
+        this.system.wounds.max = maxWounds(bonuses, modifier);
+        this.system.wounds.derived = true;
+        this.system.wounds.breakdown = maxWoundsBreakdown(bonuses, modifier);
     }
 
     _computeSkills() {

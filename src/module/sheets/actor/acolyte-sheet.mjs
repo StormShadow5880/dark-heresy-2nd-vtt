@@ -7,6 +7,7 @@ import { AssignDamageData } from '../../rolls/assign-damage-data.mjs';
 import { prepareAssignDamageRoll } from '../../prompts/assign-damage-prompt.mjs';
 import { confirmDialog } from '../../prompts/dialog-helpers.mjs';
 import { toFormula } from '../../rules/formula.mjs';
+import { woundsFormulaIsIM } from '../../rules/wounds-setting.mjs';
 
 export class AcolyteSheet extends ActorContainerSheet {
     static DEFAULT_OPTIONS = {
@@ -92,10 +93,13 @@ export class AcolyteSheet extends ActorContainerSheet {
         const homeworld = this.actor.backgroundEffects?.homeworld;
         if (!homeworld) return;
 
-        // Roll Wounds
-        const woundRoll = new Roll(toFormula(homeworld.wounds));
-        await woundRoll.evaluate();
-        this.actor.wounds.max = woundRoll.total;
+        // Roll Wounds - only when the maximum is entered by hand. With the Imperium Maledictum rule (IM-001)
+        // the maximum wounds are calculated from the characteristics.
+        if (!woundsFormulaIsIM()) {
+            const woundRoll = new Roll(toFormula(homeworld.wounds));
+            await woundRoll.evaluate();
+            this.actor.wounds.max = woundRoll.total;
+        }
 
         // Roll Fate
         const fateRoll = new Roll('1d10');

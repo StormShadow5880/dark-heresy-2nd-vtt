@@ -4,6 +4,10 @@ This is an _unofficial_ system for playing Dark Heresy 2nd Edition on [Foundry V
 
 It offers extensive support for character sheets, compendium packs, and automated management to save you time and allow you to focus on role playing. The existing system listed on Foundry was character sheet only and thus this system was created to facilitate the automation features I desired.
 
+## Changes
+
+See the [changelog](CHANGELOG.md). Rules taken over from Imperium Maledictum are listed in [docs/imperium-maledictum-imports.md](docs/imperium-maledictum-imports.md).
+
 ## Features
 
 🗡️ The system includes a variety of compendium packs, such as weapons, weapon mods, talents, armor, psychic abilities, ammunition, tools, traits, attack specials (toxic, corrosive, etc.), and consumables and drugs.
