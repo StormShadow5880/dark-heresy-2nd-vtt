@@ -4,6 +4,7 @@ import { divinations } from '../rules/divinations.mjs';
 import { roles } from '../rules/roles.mjs';
 import { eliteAdvances } from '../rules/elite-advances.mjs';
 import { fieldMatch } from '../rules/config.mjs';
+import { num, sumSpentXp } from '../rules/advancement.mjs';
 import { isPsychicPowerActive } from '../actions/psychic-effect-manager.mjs';
 import { prepareSimpleRoll } from '../prompts/simple-prompt.mjs';
 import { DHTargetedActionManager } from '../actions/targeted-action-manager.mjs';
@@ -335,31 +336,10 @@ export class DarkHeresyAcolyte extends DarkHeresyBaseActor {
 
     _computeExperience() {
         if(!this.experience) return;
-        this.experience.spentCharacteristics = 0;
-        this.experience.spentSkills = 0;
-        this.experience.spentTalents = 0;
-        this.experience.spentPsychicPowers = this.psy.cost;
-        for (let characteristic of Object.values(this.characteristics)) {
-            this.experience.spentCharacteristics += parseInt(characteristic.cost, 10);
-        }
-        for (let skill of Object.values(this.skills)) {
-            if (skill.isSpecialist) {
-                for (let speciality of Object.values(skill.specialities)) {
-                    this.experience.spentSkills += parseInt(speciality.cost, 10);
-                }
-            } else {
-                this.experience.spentSkills += parseInt(skill.cost, 10);
-            }
-        }
-        for (let item of this.items) {
-            if (item.isTalent) {
-                this.experience.spentTalents += parseInt(item.cost, 10);
-            } else if (item.isPsychicPower) {
-                this.experience.spentPsychicPowers += parseInt(item.cost, 10);
-            }
-        }
-        this.experience.calculatedTotal =
-            this.experience.spentCharacteristics + this.experience.spentSkills + this.experience.spentTalents + this.experience.spentPsychicPowers;
+        // every value goes through num() (see sumSpentXp): missing or text values must never produce NaN
+        Object.assign(this.experience, sumSpentXp(this.system, this.items));
+        this.experience.total = num(this.experience.total);
+        this.experience.used = num(this.experience.used);
         this.experience.available = this.experience.total - this.experience.used;
     }
 

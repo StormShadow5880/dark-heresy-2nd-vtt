@@ -55,6 +55,27 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
   contained Active Effects (e.g. Unnatural from a sustained power), and saving the sheet made them permanent. The
   bonus tooltip shows how it is made up (tens digit + unnatural).
 
+### Advancement (automatic XP prices)
+
+- **Characteristic, skill and talent advances are priced automatically** from the aptitudes of the character
+  (aptitude items on the actor, duplicates count once, *General* is implicit) with the rulebook tables:
+  characteristics (Simple … Expert, +5 each), skills (Known … Veteran, specialities advance on their own), talents
+  (tier 1-3). The rules are structured data in `src/module/rules/advancement-data.mjs`, the calculation is central in
+  `src/module/rules/advancement.mjs` and recalculated from the actor every time (aptitude changes apply at once).
+- **Advancement Overview** shows for every characteristic and skill: current → next level, required aptitudes (hover),
+  matching aptitudes (n/2) and the price in EP; maxed entries say "Maximum" and cannot be bought. New *Aptitudes*
+  panel on the Advancement tab.
+- **Spend EP dialog** shows the advance, level change, required and owned aptitudes, matches, price, available and
+  remaining EP. Talents are chosen from the talent compendium (tier and aptitudes from the talent); talents that can
+  be learned more than once (Weapon Training, Peer, …) ask for a choice; prerequisites are displayed and must be
+  confirmed. *Manual entry* stays for psychic powers and other entries (no automatic price yet).
+- A purchase validates against fresh data and applies advance, spent XP and log entry in **one** update; a talent
+  is created first and removed again if the update fails. A second purchase at the same moment is refused.
+- **NaN fixed**: the "Psychic" and "Sum of entries" values were NaN because talent and psychic power costs were read
+  from `item.cost` (does not exist) instead of `item.system.cost`; all sums now ignore missing/text values.
+- Not included yet: automatic prices for psychic powers; machine-checking of talent prerequisites (they are free
+  text in the data and are shown for confirmation).
+
 ### Psychic powers
 - Power list: the hourglass is only an indicator for a running power (not clickable). A running power cannot be
   manifested again (Manifest greyed out); ending it is done under Sustained Powers.

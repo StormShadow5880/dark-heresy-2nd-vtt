@@ -4,6 +4,7 @@
  * rules are not re-implemented in the templates.
  */
 import { SYSTEM_ID } from '../../system-id.mjs';
+import { buildQuotes, describeQuote } from '../../rules/advancement.mjs';
 import { woundBar } from '../../rules/wounds.mjs';
 import { canSustain, describeEffects, effectLine, hasEffect } from '../../rules/psychic-effects.mjs';
 
@@ -501,30 +502,30 @@ export function buildCriticalInjuries(actor) {
 }
 
 /**
- * Overview of the current advance level of every characteristic and skill together with the next level.
- * Costs and aptitude discounts are intentionally NOT calculated: the cost tables are not part of the system data.
+ * Overview of the next advance of every characteristic and skill with aptitudes, matches and price.
+ * The calculation lives in rules/advancement.mjs; this only shapes it for the template.
  */
-export function buildProgression(actor, skills) {
-    const characteristics = CHARACTERISTIC_ORDER.filter((k) => actor.characteristics[k]).map((key) => {
-        const c = actor.characteristics[key];
-        const advance = toNumber(c.advance);
-        return {
-            label: c.label,
-            short: c.short,
-            current: CHARACTERISTIC_ADVANCE_LEVELS[advance],
-            next: advance >= MAX_CHARACTERISTIC_ADVANCE_LEVEL ? null : CHARACTERISTIC_ADVANCE_LEVELS[advance + 1],
-            spent: toNumber(c.cost),
-        };
+export function buildProgression(actor) {
+    const quotes = buildQuotes(actor);
+    const shape = (q) => ({
+        kind: q.kind,
+        key: q.key,
+        label: q.label,
+        short: q.short ?? q.label,
+        from: q.fromName,
+        to: q.toName,
+        maxed: q.maxed,
+        advanceable: q.advanceable && !q.maxed,
+        cost: q.cost,
+        matches: q.matches,
+        required: q.required.join(' + '),
+        detail: describeQuote(q),
     });
-    const trained = skills
-        .filter((s) => s.advance > 0)
-        .map((s) => ({
-            label: s.label,
-            current: s.training,
-            next: s.advance >= 4 ? null : TRAINING_LEVELS[s.advance + 1],
-            spent: toNumber(s.cost),
-        }));
-    return { characteristics, skills: trained };
+    return {
+        characteristics: quotes.characteristics.map(shape),
+        skills: quotes.skills.map(shape),
+        aptitudes: quotes.aptitudes,
+    };
 }
 
 /**

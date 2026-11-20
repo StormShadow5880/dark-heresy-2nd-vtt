@@ -49,6 +49,7 @@ export class AcolyteDossierSheet extends AcolyteSheet {
             adjustValue: AcolyteDossierSheet.#onAdjustValue,
             spendExperience: AcolyteDossierSheet.#onSpendExperience,
             awardExperience: AcolyteDossierSheet.#onAwardExperience,
+            buyAdvance: AcolyteDossierSheet.#onBuyAdvance,
             removeLogEntry: AcolyteDossierSheet.#onRemoveLogEntry,
             rollTable: AcolyteDossierSheet.#onRollTable,
             setTraining: AcolyteDossierSheet.#onSetTraining,
@@ -106,7 +107,7 @@ export class AcolyteDossierSheet extends AcolyteSheet {
             gear: buildGear(actor),
             psychic: buildPsychic(actor),
             development: buildDevelopment(actor),
-            progression: buildProgression(actor, skills),
+            progression: buildProgression(actor),
             relations: buildRelations(actor),
             favorites: getFavoriteSkills(actor),
             bioFields: ['homeWorld', 'background', 'role', 'elite', 'divination'].map((key) => ({
@@ -316,6 +317,12 @@ export class AcolyteDossierSheet extends AcolyteSheet {
 
     static async #onSpendExperience() {
         await prepareSpendExperience(this.actor);
+    }
+
+    /** Buy button of a row in the advancement overview: opens the dialog with that advance selected */
+    static async #onBuyAdvance(event, target) {
+        if (!this.isEditable) return;
+        await prepareSpendExperience(this.actor, { kind: target.dataset.kind, key: target.dataset.key });
     }
 
     static async #onAwardExperience() {

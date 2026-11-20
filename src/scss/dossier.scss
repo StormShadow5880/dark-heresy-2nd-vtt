@@ -1993,10 +1993,85 @@
             font-variant-numeric: tabular-nums;
         }
     }
+    // Advancement overview: name + required aptitudes, next level, matching aptitudes, price, buy button
+    .adv-list {
+        .adv-head,
+        .adv {
+            display: grid;
+            grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.3fr) 34px 46px 28px;
+            align-items: center;
+            gap: 6px;
+        }
+        .adv-head {
+            min-height: 22px;
+            padding: 0 14px;
+            font-size: 0.64rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--ds-muted);
+            border-bottom: 1px solid var(--ds-line);
+            span:nth-child(3),
+            span:nth-child(4) {
+                text-align: right;
+            }
+        }
+        .adv {
+            min-height: 34px;
+            &__name {
+                display: flex;
+                flex-direction: column;
+                min-width: 0;
+                line-height: 1.15;
+                b {
+                    font-weight: 600;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+                small {
+                    font-size: 0.62rem;
+                    color: var(--ds-muted);
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+            }
+            &__step {
+                font-size: 0.8rem;
+                color: var(--ds-parchment);
+                em {
+                    font-style: normal;
+                    color: var(--ds-muted);
+                }
+            }
+            &__match {
+                text-align: right;
+                font-size: 0.8rem;
+                color: var(--psy-accent, #a79bc9);
+            }
+            &__cost {
+                text-align: right;
+                color: var(--ds-gold);
+                font-variant-numeric: tabular-nums;
+                font-weight: 700;
+            }
+            &.is-max {
+                opacity: 0.6;
+            }
+            .icon-btn {
+                width: 24px;
+                height: 24px;
+                &[disabled] {
+                    opacity: 0.3;
+                    cursor: not-allowed;
+                }
+            }
+        }
+    }
     .progress-grid {
         display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 0 12px;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 8px;
     }
 
     // ------------------------------------------------ Psychic: the sheet palette (anthracite, gold, burgundy), violet only as accent
@@ -2237,6 +2312,48 @@
     .dossier-dialog {
         display: grid;
         gap: 8px;
+    }
+}
+
+// Spend EP dialog: summary of the calculated advance
+.adv-dialog {
+    .adv-summary {
+        border: 1px solid var(--ds-line, #3a3935);
+        background: rgba(0, 0, 0, 0.25);
+        padding: 6px 10px;
+        &__rows {
+            margin: 0;
+            display: grid;
+            gap: 2px;
+            > div {
+                display: flex;
+                justify-content: space-between;
+                gap: 10px;
+                border-bottom: 1px solid rgba(80, 70, 56, 0.35);
+                padding: 1px 0;
+            }
+            dt {
+                font-size: 0.75rem;
+                text-transform: uppercase;
+                letter-spacing: 0.06em;
+                opacity: 0.7;
+            }
+            dd {
+                margin: 0;
+                text-align: right;
+            }
+        }
+        &__error {
+            margin: 6px 0 0;
+            color: #e07a6c;
+            font-size: 0.85rem;
+        }
+        .warn {
+            color: #e0b050;
+        }
+    }
+    [hidden] {
+        display: none !important;
     }
 }
 

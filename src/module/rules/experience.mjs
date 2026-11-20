@@ -1,13 +1,13 @@
 /**
  * Experience point (EP) handling for the character sheet.
  *
- * NOTE: The system does not ship the Dark Heresy 2E advancement cost tables, therefore costs are NOT
- * derived automatically - the player/GM enters the cost they paid according to the rulebook.
- * What IS enforced here are the structural limits that exist in the actor data model
- * (characteristics: advance 0-5, skills: advance 0-4) and the available EP.
+ * Characteristic, skill and talent advances are priced automatically (advancement.mjs) and bought with
+ * purchaseAdvancement(). spendExperience() is the manual path for everything that has no automatic price yet
+ * (psychic powers, other entries): the cost is entered by hand there.
  */
 import { SYSTEM_ID } from '../system-id.mjs';
 import { CHARACTERISTIC_ORDER } from '../sheets/actor/dossier-context.mjs';
+import { availableXp, characteristicQuote, checkPurchase, num, skillQuote, talentQuote } from './advancement.mjs';
 
 export const MAX_CHARACTERISTIC_ADVANCE = 5;
 export const MAX_SKILL_ADVANCE = 4;
@@ -158,3 +158,94 @@ export function purchaseTargets(actor) {
     }
     return { chars, skills, specs };
 }
+
+const purchasesRunning = new Set();
+
+/**
+ * Buys the next advance of a characteristic, skill (speciality) or a talent at the automatically calculated price.
+ * Validates against fresh actor data, then applies advance, spent XP and the log entry in ONE actor update, so a
+ * failed purchase leaves nothing half changed. A talent is created first and removed again if that update fails.
+ *
+ * @param actor
+ * @param purchase {{kind: 'char'|'skill'|'spec'|'talent', key: string, talent?: object, choice?: string,
+ *                    prerequisitesConfirmed?: boolean, note?: string}}
+ * @returns {Promise<{ok: boolean, errors: string[], quote?: object}>}
+ */
+export async function purchaseAdvancement(actor, { kind, key, talent = null, choice = '', prerequisitesConfirmed = false, note = '' }) {
+    const lock = `${actor.id ?? actor.name}`;
+    if (purchasesRunning.has(lock)) return { ok: false, errors: ['Another purchase is still being processed.'] };
+    purchasesRunning.add(lock);
+    try {
+        let quote;
+        if (kind === 'char') quote = characteristicQuote(actor, key);
+        else if (kind === 'skill') quote = skillQuote(actor, key);
+        else if (kind === 'spec') {
+            const [skillKey, specKey] = key.split('.');
+            quote = skillQuote(actor, skillKey, specKey);
+        } else if (kind === 'talent' && talent) quote = talentQuote(actor, talent, choice);
+        else return fail(['Unknown advancement.']);
+
+        const check = checkPurchase(actor, quote, { prerequisitesConfirmed });
+        if (!check.ok) return fail(check.errors, quote);
+
+        const cost = quote.cost;
+        const used = num(actor.system.experience.used) + cost;
+        const entry = {
+            id: foundry.utils.randomID(),
+            timestamp: Date.now(),
+            user: game.user.name,
+            type: 'spend',
+            category: kind === 'char' ? 'Characteristic' : kind === 'talent' ? 'Talent' : 'Skill',
+            label: kind === 'talent' ? `${quote.label} (tier ${quote.tier})` : `${quote.label} advance (${quote.fromName} → ${quote.toName})`,
+            cost,
+            note,
+            matches: quote.matches,
+            auto: true,
+        };
+        const log = [...(actor.getFlag(SYSTEM_ID, 'xpLog') ?? []), entry];
+        const update = { 'system.experience.used': used, [`flags.${SYSTEM_ID}.xpLog`]: log };
+
+        if (kind === 'char') {
+            const c = actor.system.characteristics[key];
+            update[`system.characteristics.${key}.advance`] = num(c.advance) + 1;
+            update[`system.characteristics.${key}.cost`] = num(c.cost) + cost;
+        } else if (kind === 'skill') {
+            const s = actor.system.skills[key];
+            update[`system.skills.${key}.advance`] = num(s.advance) + 1;
+            update[`system.skills.${key}.cost`] = num(s.cost) + cost;
+        } else if (kind === 'spec') {
+            const [skillKey, specKey] = key.split('.');
+            const s = actor.system.skills[skillKey].specialities[specKey];
+            update[`system.skills.${skillKey}.specialities.${specKey}.advance`] = num(s.advance) + 1;
+            update[`system.skills.${skillKey}.specialities.${specKey}.cost`] = num(s.cost) + cost;
+        }
+
+        let created = null;
+        try {
+            if (kind === 'talent') {
+                const data = {
+                    name: quote.label,
+                    type: 'talent',
+                    img: talent.img,
+                    system: { ...(talent.system ?? {}), aptitudes: talent.aptitudes, tier: String(quote.tier), prerequisites: quote.prerequisites, cost },
+                };
+                [created] = await actor.createEmbeddedDocuments('Item', [data]);
+            }
+            await actor.update(update);
+        } catch (error) {
+            if (created) await actor.deleteEmbeddedDocuments('Item', [created.id]).catch(() => {});
+            console.error('Dark Heresy 2e | advancement failed', error);
+            return fail(['The purchase failed, nothing was changed.'], quote);
+        }
+        return { ok: true, errors: [], quote };
+    } finally {
+        purchasesRunning.delete(lock);
+    }
+
+    function fail(errors, quote) {
+        for (const message of errors) ui.notifications.warn(message);
+        return { ok: false, errors, quote };
+    }
+}
+
+export { availableXp };

@@ -1,5 +1,6 @@
 <section class="tab dossier-tab" data-tab="development" data-group="primary">
     <div class="two-col two-col--narrow-left">
+        <div class="stack">
         <article class="panel">
             <h2 class="panel__title">Experience</h2>
             <div class="panel__body details">
@@ -19,31 +20,45 @@
                 <button type="button" class="btn btn--primary" data-action="spendExperience"><i class="fa-solid fa-coins"></i> Spend EP</button>
                 <button type="button" class="btn" data-action="awardExperience"><i class="fa-solid fa-plus"></i> Award EP</button>
             </div>
-            <p class="hint">Advancement costs from the rulebook are not stored in the system. Enter the cost you pay; limits (maximum advances) and available EP are validated.</p>
+            <p class="hint">Prices of characteristic, skill and talent advances are calculated from your aptitudes. Psychic powers and other entries are still entered by hand.</p>
         </article>
+
+        <article class="panel">
+            <h2 class="panel__title">Aptitudes <span class="panel__hint">{{dossier.progression.aptitudes.length}}</span></h2>
+            <div class="psyp__tags">{{#each dossier.progression.aptitudes as |a|}}<span class="chip">{{a}}</span>{{/each}}</div>
+        </article>
+        </div>
 
         <div class="stack">
         <article class="panel">
             <h2 class="panel__title">Advancement Overview <span class="panel__hint">Current level → next level</span></h2>
             <div class="progress-grid">
-                <ul class="rows rows--compact">
+                <ul class="rows rows--compact adv-list">
+                    <li class="adv-head"><span>Characteristic</span><span>Next level</span><span>Apt.</span><span>EP</span><span></span></li>
                     {{#each dossier.progression.characteristics as |c|}}
-                        <li><span class="grow">{{c.short}} <small>{{c.current}}</small></span>
-                            <span class="next">{{#if c.next}}→ {{c.next}}{{else}}<small>Maximum</small>{{/if}}</span>
-                            <span class="spent" data-tooltip="EP spent so far">{{c.spent}}</span></li>
+                        <li class="adv {{#if maxed}}is-max{{/if}}" data-tooltip="{{detail}}">
+                            <span class="adv__name"><b>{{label}}</b><small>{{required}}</small></span>
+                            <span class="adv__step">{{from}} → {{#if maxed}}<em>Maximum</em>{{else}}{{to}}{{/if}}</span>
+                            <span class="adv__match" data-tooltip="Matching aptitudes">{{#unless maxed}}{{matches}}/2{{/unless}}</span>
+                            <span class="adv__cost">{{#if maxed}}—{{else}}{{cost}}{{/if}}</span>
+                            <button type="button" class="icon-btn" data-action="buyAdvance" data-kind="{{kind}}" data-key="{{key}}" {{#unless advanceable}}disabled{{/unless}} data-tooltip="{{#if maxed}}Maximum reached{{else}}Spend EP on this advance{{/if}}"><i class="fa-solid fa-coins"></i></button>
+                        </li>
                     {{/each}}
                 </ul>
-                <ul class="rows rows--compact">
+                <ul class="rows rows--compact adv-list">
+                    <li class="adv-head"><span>Skill</span><span>Next level</span><span>Apt.</span><span>EP</span><span></span></li>
                     {{#each dossier.progression.skills as |s|}}
-                        <li><span class="grow">{{s.label}} <small>{{s.current}}</small></span>
-                            <span class="next">{{#if s.next}}→ {{s.next}}{{else}}<small>Maximum</small>{{/if}}</span>
-                            <span class="spent" data-tooltip="EP spent so far">{{s.spent}}</span></li>
-                    {{else}}
-                        <li class="empty">No trained skills yet.</li>
+                        <li class="adv {{#if maxed}}is-max{{/if}}" data-tooltip="{{detail}}">
+                            <span class="adv__name"><b>{{label}}</b><small>{{required}}</small></span>
+                            <span class="adv__step">{{from}} → {{#if maxed}}<em>Maximum</em>{{else}}{{to}}{{/if}}</span>
+                            <span class="adv__match" data-tooltip="Matching aptitudes">{{#unless maxed}}{{matches}}/2{{/unless}}</span>
+                            <span class="adv__cost">{{#if maxed}}—{{else}}{{cost}}{{/if}}</span>
+                            <button type="button" class="icon-btn" data-action="buyAdvance" data-kind="{{kind}}" data-key="{{key}}" {{#unless advanceable}}disabled{{/unless}} data-tooltip="{{#if maxed}}Maximum reached{{else}}Spend EP on this advance{{/if}}"><i class="fa-solid fa-coins"></i></button>
+                        </li>
                     {{/each}}
                 </ul>
             </div>
-            <p class="hint">Costs and aptitude discounts depend on the rulebook tables, which are not part of the system data. Enter the cost when you spend EP.</p>
+            <p class="hint">Hover a row for the required aptitudes. Talents are bought with "Spend EP" (tier and aptitudes come from the talent).</p>
         </article>
 
         <article class="panel">
