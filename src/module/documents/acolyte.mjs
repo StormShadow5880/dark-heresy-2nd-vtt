@@ -12,11 +12,12 @@ import { DarkHeresyBaseActor } from './base-actor.mjs';
 import { ForceFieldData } from '../rolls/force-field-data.mjs';
 import { prepareForceFieldRoll } from '../prompts/force-field-prompt.mjs';
 import { DHBasicActionManager } from '../actions/basic-action-manager.mjs';
-import { getDegree, roll1d100 } from '../rolls/roll-helpers.mjs';
+import { roll1d100 } from '../rolls/roll-helpers.mjs';
 import { SYSTEM_ID } from '../hooks-manager.mjs';
 import { DarkHeresySettings } from '../dark-heresy-settings.mjs';
 import { maxWounds, maxWoundsBreakdown } from '../rules/imperium-maledictum.mjs';
 import { woundsFormulaIsIM } from '../rules/wounds-setting.mjs';
+import { degreesOfFailure, degreesOfSuccess, toRuleDegrees } from '../rules/degrees.mjs';
 
 export class DarkHeresyAcolyte extends DarkHeresyBaseActor {
 
@@ -599,11 +600,15 @@ export class DarkHeresyAcolyte extends DarkHeresyBaseActor {
         const success = roll.total === 1 || (roll.total <= targetNumber && roll.total !== 100);
         let dos = 0;
         let dof = 0;
+        let ruleDos = 0;
+        let ruleDof = 0;
 
         if(success) {
-            dos = 1 + getDegree(targetNumber, roll.total);
+            dos = degreesOfSuccess(roll.total, targetNumber);
+            ruleDos = toRuleDegrees(dos);
         } else {
-            dof = 1 + getDegree(roll.total, targetNumber);
+            dof = degreesOfFailure(roll.total, targetNumber);
+            ruleDof = toRuleDegrees(dof);
         }
 
         return {
@@ -611,7 +616,9 @@ export class DarkHeresyAcolyte extends DarkHeresyBaseActor {
             target: targetNumber,
             success: success,
             dos: dos,
-            dof: dof
+            dof: dof,
+            ruleDos: ruleDos,
+            ruleDof: ruleDof
         }
     }
 
@@ -625,7 +632,7 @@ export class DarkHeresyAcolyte extends DarkHeresyBaseActor {
                 if(!rollCheckTarget.success) {
                     success = true;
                 } else {
-                    success = rollCheckSource.dos >= rollCheckTarget.dos;
+                    success = rollCheckSource.ruleDos >= rollCheckTarget.ruleDos;
                 }
             }
             return {

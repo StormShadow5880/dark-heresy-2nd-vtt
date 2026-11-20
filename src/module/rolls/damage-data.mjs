@@ -180,12 +180,12 @@ export class Hit {
             // Add Accurate
             if (attackData.rollData.action === 'Standard Attack' || attackData.rollData.action === 'Called Shot') {
                 if (attackData.rollData.hasAttackSpecial('Accurate')) {
-                    if (attackData.rollData.dos >= 3) {
+                    if (attackData.rollData.ruleDos >= 3) {
                         const accurateRoll = new Roll('1d10', {});
                         await accurateRoll.evaluate();
                         this.modifiers['accurate'] = accurateRoll.total;
                     }
-                    if (attackData.rollData.dos >= 5) {
+                    if (attackData.rollData.ruleDos >= 5) {
                         const accurateRoll = new Roll('1d10', {});
                         await accurateRoll.evaluate();
                         this.modifiers['accurate x 2'] = accurateRoll.total;
@@ -195,7 +195,7 @@ export class Hit {
 
             // Eye of Vengeance
             if (attackData.rollData.eyeOfVengeance) {
-                this.modifiers['eye of vengeance'] = attackData.rollData.dos;
+                this.modifiers['eye of vengeance'] = attackData.rollData.ruleDos;
             }
 
             // Las Modes
@@ -255,10 +255,10 @@ export class Hit {
 
         if (actionItem.isMelee) {
             if (this.penetration && attackData.rollData.hasAttackSpecial('Lance')) {
-                this.penetrationModifiers['lance'] = this.penetration * attackData.rollData.dos;
+                this.penetrationModifiers['lance'] = this.penetration * attackData.rollData.ruleDos;
             }
 
-            if (attackData.rollData.dos > 2 && attackData.rollData.hasAttackSpecial('Razer Sharp')) {
+            if (attackData.rollData.ruleDos > 2 && attackData.rollData.hasAttackSpecial('Razer Sharp')) {
                 this.penetrationModifiers['razer sharp'] = this.penetration;
             }
 
@@ -281,7 +281,7 @@ export class Hit {
         }
 
         if (attackData.rollData.eyeOfVengeance) {
-            this.penetrationModifiers['eye of vengeance'] = attackData.rollData.dos;
+            this.penetrationModifiers['eye of vengeance'] = attackData.rollData.ruleDos;
         }
 
         if (attackData.rollData.rangeName === 'Short Range' || attackData.rollData.rangeName === 'Point Blank') {

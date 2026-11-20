@@ -17,6 +17,15 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
   Files: `src/module/rules/imperium-maledictum.mjs`, `src/module/documents/acolyte.mjs`,
   `src/module/actions/wounds-sync.mjs`.
 
+### Changed rules
+
+- **Degrees of success and failure** are shown as the difference of the tens digits of target and roll: roll 69 against
+  70 is **+1** (before: +2, one degree was added for the success itself); equal tens digits are **+0**; failures the same
+  way round. Files: `src/module/rules/degrees.mjs`, `src/module/rolls/action-data.mjs`, `src/module/documents/acolyte.mjs`.
+  The rules that count degrees (semi-/full-auto bursts, Twin-Linked, Accurate, Razor Sharp, Lance, Eye of Vengeance and the
+  opposed knock-down thresholds) keep working with the Dark Heresy 2E count (`ruleDos` = shown degrees + 1), so their
+  behaviour is unchanged. If those rules should use the shown degrees as well, `ruleDos` has to be replaced there.
+
 ### Foundry VTT 13 / 14
 
 - System ported to Foundry VTT 13 and 14 (compatibility 13–14, verified 14.369): namespaced APIs, scene controls,

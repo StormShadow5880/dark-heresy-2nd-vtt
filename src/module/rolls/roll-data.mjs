@@ -62,8 +62,11 @@ export class RollData {
     previousRolls = [];
     automatic = false;
     success = false;
+    // degrees as shown on the card (tens digit difference); the rules use ruleDos / ruleDof, see rules/degrees.mjs
     dos = 0;
     dof = 0;
+    ruleDos = 0;
+    ruleDof = 0;
 
     get showDamage() {
         return this.success || this.isThrown;

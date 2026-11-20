@@ -1,11 +1,12 @@
 import { PsychicRollData, RollData, WeaponRollData } from './roll-data.mjs';
 import { Hit, PsychicDamageData, scatterDirection, WeaponDamageData } from './damage-data.mjs';
-import { getDegree, getOpposedDegrees, roll1d100, sendActionDataToChat, uuid } from './roll-helpers.mjs';
+import { getOpposedDegrees, roll1d100, sendActionDataToChat, uuid } from './roll-helpers.mjs';
 import { refundAmmo, useAmmo } from '../rules/ammo.mjs';
 import { DHBasicActionManager } from '../actions/basic-action-manager.mjs';
 import { SYSTEM_ID } from '../hooks-manager.mjs';
 import { DarkHeresySettings } from '../dark-heresy-settings.mjs';
 import { activatePsychicPower, deactivatePsychicEffect, isActivatable } from '../actions/psychic-effect-manager.mjs';
+import { degreesOfFailure, degreesOfSuccess, toRuleDegrees } from '../rules/degrees.mjs';
 
 export class ActionData {
     id = uuid();
@@ -42,6 +43,8 @@ export class ActionData {
             this.rollData.opposedRoll = rollCheck.roll;
             this.rollData.opposedDos = rollCheck.dos;
             this.rollData.opposedDof = rollCheck.dof;
+            this.rollData.opposedRuleDos = rollCheck.ruleDos;
+            this.rollData.opposedRuleDof = rollCheck.ruleDof;
             if(rollCheck.success) {
                 if(this.rollData.opposedDos >= this.rollData.dos) {
                     this.rollData.success = false;
@@ -63,7 +66,7 @@ export class ActionData {
 
         if (this.rollData.isKnockDown) {
             if(this.rollData.targetActor) {
-                const opposedDegrees = getOpposedDegrees(this.rollData.dos, this.rollData.dof, this.rollData.opposedDos, this.rollData.opposedDof);
+                const opposedDegrees = getOpposedDegrees(this.rollData.ruleDos, this.rollData.ruleDof, this.rollData.opposedRuleDos, this.rollData.opposedRuleDof);
                 if(opposedDegrees >= 2) {
                     const strengthBonus = this.rollData.sourceActor?.characteristics?.strength?.bonus ?? 0;
                     this.addEffect('Knock Down', `The target is knocked Prone and must use a Stand action in his turn to regain his feet! The impact deals [[1d5-3+${strengthBonus}]] (min 0) damage and one level of fatigue to the target!`);
@@ -127,8 +130,10 @@ export class ActionData {
 
             if(this.rollData.hasAttackSpecial('Spray')) {
                 this.rollData.success = true;
-                this.rollData.dos = 1;
+                this.rollData.dos = 0;
+                this.rollData.ruleDos = 1;
                 this.rollData.dof = 0;
+                this.rollData.ruleDof = 0;
                 this.addEffect('Spray', 'Everyone in 30 degree arc must pass an agility test or be hit.')
             }
 
@@ -163,7 +168,9 @@ export class ActionData {
 
         if (this.rollData.success) {
             this.rollData.dof = 0;
-            this.rollData.dos = 1 + getDegree(this.rollData.modifiedTarget, this.rollData.roll.total);
+            this.rollData.dos = degreesOfSuccess(this.rollData.roll.total, this.rollData.modifiedTarget);
+            this.rollData.ruleDos = toRuleDegrees(this.rollData.dos);
+            this.rollData.ruleDof = 0;
 
             if (actionItem) {
                 if (this.rollData.action === 'Semi-Auto Burst' ||
@@ -173,10 +180,11 @@ export class ActionData {
                     this.rollData.action === 'Suppressing Fire - Full') {
                     if (actionItem.isRanged && this.rollData.hasWeaponModification('Fluid Action')) {
                         this.rollData.dos += 1;
+                        this.rollData.ruleDos += 1;
                     }
 
                     // Possible Semi Rate
-                    this.damageData.additionalHits += Math.floor((this.rollData.dos - 1) / 2);
+                    this.damageData.additionalHits += Math.floor((this.rollData.ruleDos - 1) / 2);
 
                     // Storm
                     if (this.rollData.hasAttackSpecial('Storm')) {
@@ -189,7 +197,7 @@ export class ActionData {
                     }
                 } else if (this.rollData.action === 'Full Auto Burst' || this.rollData.action === 'Lightning Attack' || actionItem.isPsychicStorm) {
                     // Possible Full Rate
-                    this.damageData.additionalHits += Math.floor(this.rollData.dos - 1);
+                    this.damageData.additionalHits += Math.floor(this.rollData.ruleDos - 1);
 
                     // Storm
                     if (this.rollData.hasAttackSpecial('Storm')) {
@@ -203,13 +211,15 @@ export class ActionData {
                 }
             }
 
-            if (this.rollData.dos > 1 && this.rollData.hasAttackSpecial('Twin-Linked')) {
+            if (this.rollData.ruleDos > 1 && this.rollData.hasAttackSpecial('Twin-Linked')) {
                 this.damageData.additionalHits++;
             }
 
         } else {
             this.rollData.dos = 0;
-            this.rollData.dof = 1 + getDegree(this.rollData.roll.total, this.rollData.modifiedTarget);
+            this.rollData.ruleDos = 0;
+            this.rollData.dof = degreesOfFailure(this.rollData.roll.total, this.rollData.modifiedTarget);
+            this.rollData.ruleDof = toRuleDegrees(this.rollData.dof);
 
             if(this.rollData.isThrown) {
                 this.addEffect('Deviation', `The attack deviates [[ 1d5 ]]m off course to the ${scatterDirection()}!`);
