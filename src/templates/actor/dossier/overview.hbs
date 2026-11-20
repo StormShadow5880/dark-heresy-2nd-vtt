@@ -1,7 +1,7 @@
 <section class="tab dossier-tab" data-tab="overview" data-group="primary">
     <div class="ov-layout">
         <article class="panel panel--characteristics">
-            <h2 class="panel__title">Characteristics</h2>
+            <h2 class="panel__title">Characteristics <span class="panel__hint">and condition</span></h2>
             <div class="chars">
                 {{#each dossier.characteristics as |c|}}
                     <div class="char {{#if c.hasBonus}}char--bonus{{/if}} {{#if c.hasNegative}}char--negative{{/if}} actor-drag" data-item-type="characteristic" data-item-id="{{c.key}}" data-char="{{c.key}}">
@@ -28,11 +28,6 @@
                         </div>
                     </div>
                 {{/each}}
-            </div>
-        </article>
-
-        <div class="ov-main">
-            <div class="stat-row">
                 {{#each dossier.statusTiles as |t|}}
                     <div class="estat estat--{{t.id}}" data-tooltip="{{t.tooltip}}">
                         <div class="emblem emblem--{{t.id}}"><b>{{t.value}}</b></div>
@@ -52,7 +47,9 @@
                     </div>
                 {{/each}}
             </div>
+        </article>
 
+        <div class="ov-main">
             <article class="panel panel--quick">
                 <h2 class="panel__title">Key Skills <span class="panel__hint">Star skills on the Skills tab</span></h2>
                 <ul class="qs">

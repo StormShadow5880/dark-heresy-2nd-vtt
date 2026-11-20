@@ -39,7 +39,7 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
   (one root element per window part), dice formulas given as numbers.
 
 ### Character sheet
-- Overview: the ten characteristics are one horizontal row of square tiles above the status emblems (two rows of five on
+- Overview: the ten characteristics and the four status tiles (Fatigue, Fate, Corruption, Insanity) form one horizontal row (two rows of seven on
   narrow windows); the detail pop-up opens towards the inside of the sheet.
 
 - New **dossier character sheet** for player characters (default; the classic sheet stays selectable):
