@@ -330,34 +330,55 @@
 }
 
 // ------------------------------------------------ Foundry's message frame around our cards
-// Only messages that contain one of our cards are touched (:has), every other message keeps the Foundry look.
-.chat-message:has(.dh-card) {
+// Messages that contain one of our cards (new cards and messages created with the old markup) always get the same
+// dark surface, whatever Foundry adds to a message: whisper / blind / roll / own message, hover, light theme, popout.
+// Messages without one of our cards keep the Foundry look.
+:is(.chat-message, li.chat-message, .message):has(.dh-card, .dh-chat) {
     --color-text-primary: #d9d0bd;
     --color-text-secondary: #92918c;
     --color-text-subtle: #92918c;
+    --color-text-dark-primary: #d9d0bd;
     --color-border-light-primary: #3a3126;
     --color-border-light-secondary: #3a3126;
-    background: #12100d;
-    background-image: none;
-    border: 1px solid #3a3126;
+    --chat-message-bg: #12100d;
+    // !important: Foundry sets the message colours per state (whisper, blind, hover, theme) with similar specificity
+    background: #12100d !important;
+    background-image: none !important;
+    border: 1px solid #3a3126 !important;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.55);
     color: #d9d0bd;
+    color-scheme: dark;
+
+    &:hover,
+    &.whisper,
+    &.blind,
+    &.roll,
+    &.gm-roll,
+    &.self-roll,
+    &.emote,
+    &.ooc,
+    &.ic {
+        background: #12100d !important;
+        background-image: none !important;
+    }
 
     // sender, time and delete icon on the dark surface
     .message-header,
     .message-sender,
     .message-metadata,
     .message-timestamp,
-    .message-delete {
+    .message-delete,
+    .message-header * {
         color: #b8a98a;
         text-shadow: none;
     }
     .message-header {
+        background: transparent !important;
         border-bottom: 0;
     }
     .message-content {
         padding: 0;
-        background: transparent;
+        background: transparent !important;
         color: inherit;
     }
 }
