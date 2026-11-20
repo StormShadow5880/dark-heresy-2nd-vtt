@@ -92,3 +92,38 @@ export async function revalidateAdvances(draft, env) {
     }
     return failed;
 }
+
+/** Turns { a: { b: 1 } } into { 'a.b': 1 } (FormDataExtended#object is flat, expanded data is accepted too) */
+function flatten(obj, prefix = '', out = {}) {
+    for (const [k, v] of Object.entries(obj ?? {})) {
+        const key = prefix ? `${prefix}.${k}` : k;
+        if (v && typeof v === 'object' && !Array.isArray(v)) flatten(v, key, out);
+        else out[key] = v;
+    }
+    return out;
+}
+
+/**
+ * Writes the fields of the wizard form into the draft.
+ * Field names: mode, method, veteranMode, c.<choiceId>, bio.<field>, ov.characteristics.<key> (GM override).
+ * @param form {object} form data (flat names, or expanded)
+ * @param opts {{isGM: boolean, veteranAllowed: boolean, expert: boolean}}
+ */
+export function applyFormData(draft, form, { isGM = false, veteranAllowed = false, expert = false } = {}) {
+    const flat = flatten(form);
+    for (const [name, value] of Object.entries(flat)) {
+        if (name === 'mode') draft.mode = value === 'expert' && isGM ? 'expert' : 'guided';
+        else if (name === 'method') draft.characteristics.method = value;
+        else if (name === 'veteranMode') draft.characteristics.veteran = value === 'yes' && veteranAllowed;
+        else if (name.startsWith('c.')) {
+            const id = name.slice(2);
+            if (value === '' || value === null || value === undefined) delete draft.choices[id];
+            else draft.choices[id] = String(value);
+        } else if (name.startsWith('bio.')) draft.biography[name.slice(4)] = value;
+        else if (name.startsWith('ov.characteristics.') && expert && value !== '') {
+            const key = name.slice('ov.characteristics.'.length);
+            draft.characteristics.rolls[key] = { manual: true, dice: draft.characteristics.rolls[key]?.dice ?? [], value: Number(value) };
+            draft.overrides.push({ what: `${key} set to ${value}`, time: Date.now() });
+        }
+    }
+}

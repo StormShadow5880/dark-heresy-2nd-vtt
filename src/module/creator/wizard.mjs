@@ -7,7 +7,7 @@ import { markTooltips } from '../ui/tooltips.mjs';
 import { aptitudeName, buildQuotes, describeQuote, num } from '../rules/advancement.mjs';
 import { BACKGROUNDS, CHARACTERISTICS, HOMEWORLDS, POINT_BUY, ROLES, byId } from './data.mjs';
 import { STEPS, computeCharacter, newDraft, replayAdvances, stepBlockers, stepStatus } from './character.mjs';
-import { logEvent, markStepDone, pruneChoices, rerollCharacteristic, revalidateAdvances, setBackground, setCharacteristicRoll, setHomeWorld, setRole } from './draft.mjs';
+import { applyFormData, logEvent, markStepDone, pruneChoices, rerollCharacteristic, revalidateAdvances, setBackground, setCharacteristicRoll, setHomeWorld, setRole } from './draft.mjs';
 import { characteristicFormula, characteristicKind, evaluatePointBuy, pointBuyBase, rollBase } from './rules.mjs';
 import { createCompendiumResolver, finalizeCharacter } from './finalize.mjs';
 import { talentQuote } from '../rules/advancement.mjs';
@@ -305,28 +305,13 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
     }
 
     static async #onSubmit(event, form, formData) {
-        const data = formData.object;
-        const d = this.draft;
-        if (data.mode) d.mode = data.mode === 'expert' && game.user.isGM ? 'expert' : 'guided';
-        if (data.method) d.characteristics.method = data.method;
-        if (data.veteranMode) d.characteristics.veteran = data.veteranMode === 'yes' && !!game.settings.get(SYSTEM_ID, CREATOR_SETTINGS.veteran);
-        for (const [id, value] of Object.entries(data.c ?? {})) {
-            if (value === '' || value === null) delete d.choices[id];
-            else d.choices[id] = value;
-        }
-        for (const [key, value] of Object.entries(data.bio ?? {})) d.biography[key] = value;
-        if (data.ov) this.#applyOverrides(data.ov);
+        // FormDataExtended#object has flat names ("c.bg-apt"), applyFormData reads them
+        applyFormData(this.draft, formData.object, {
+            isGM: game.user.isGM,
+            veteranAllowed: !!game.settings.get(SYSTEM_ID, CREATOR_SETTINGS.veteran),
+            expert: this.expert,
+        });
         await this.#changed();
-    }
-
-    /** GM overrides: every manual change is stored with who made it */
-    #applyOverrides(ov) {
-        if (!this.expert) return;
-        for (const [key, value] of Object.entries(ov.characteristics ?? {})) {
-            if (value === '') continue;
-            const dice = this.draft.characteristics.rolls[key];
-            this.draft.characteristics.rolls[key] = { manual: true, dice: dice?.dice ?? [], value: Number(value) };
-        }
     }
 
     static async #onGoStep(event, target) {

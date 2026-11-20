@@ -181,3 +181,20 @@ test('creation log stores the dice and the decisions', () => {
     assert.ok(d.log.some((e) => /rolled 5, 6/.test(e.text)));
     assert.ok(d.log.some((e) => /Home World: Feral World/.test(e.text)));
 });
+
+test('wizard form fields (flat FormData names such as "c.bg-apt") reach the draft', () => {
+    const d = ch.newDraft();
+    dr.setBackground(d, 'background.outcast');
+    dr.applyFormData(d, { 'c.bg-apt': 'Social', 'bio.name': 'Kara', method: 'pointbuy', veteranMode: 'yes', mode: 'expert' }, { isGM: false, veteranAllowed: false });
+    assert.equal(d.choices['bg-apt'], 'Social');
+    assert.equal(d.biography.name, 'Kara');
+    assert.equal(d.characteristics.method, 'pointbuy');
+    assert.equal(d.characteristics.veteran, false); // not allowed by the world setting
+    assert.equal(d.mode, 'guided'); // only a GM may use the expert mode
+    assert.equal(ch.stepStatus(ch.computeCharacter(d, env), d).background, true);
+    // expanded data works as well, an empty answer removes the choice
+    dr.applyFormData(d, { c: { 'bg-apt': '' } });
+    assert.equal(d.choices['bg-apt'], undefined);
+    dr.applyFormData(d, { mode: 'expert' }, { isGM: true });
+    assert.equal(d.mode, 'expert');
+});
