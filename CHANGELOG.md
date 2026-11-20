@@ -43,6 +43,9 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
 - Wounds track: the bar shows wounds taken, minor / serious zone (first 2 × Toughness Bonus), critical damage with
   ten pips (dead at 10). Damage beyond the maximum becomes critical damage, healing reverses it.
 - Experience spending with log (costs are entered by hand, limits and available XP are validated).
+- Characteristic pop-up shows the **stored** values (Initial, Modifier, Unnatural). Before, it showed values that already
+  contained Active Effects (e.g. Unnatural from a sustained power), and saving the sheet made them permanent. The
+  bonus tooltip shows how it is made up (tens digit + unnatural).
 
 ### Psychic powers
 

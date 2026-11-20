@@ -83,18 +83,25 @@ function percent(value, max) {
 export function buildCharacteristics(actor) {
     return CHARACTERISTIC_ORDER.filter((key) => actor.characteristics[key]).map((key) => {
         const c = actor.characteristics[key];
+        // The form fields must show the stored values: actor.characteristics already contains Active Effects
+        // (e.g. Unnatural from a sustained power), and saving those back would make them permanent.
+        const stored = actor._source?.system?.characteristics?.[key] ?? c;
+        const tens = Math.floor(toNumber(c.total) / 10);
         return {
             key,
             short: c.short,
             label: c.label,
-            base: c.base,
-            advance: c.advance,
-            advanceLabel: CHARACTERISTIC_ADVANCE_LEVELS[c.advance] ?? c.advance,
-            advancePips: Array.from({ length: MAX_CHARACTERISTIC_PIPS }, (_, i) => i < toNumber(c.advance)),
-            modifier: c.modifier,
-            unnatural: c.unnatural,
+            base: stored.base,
+            advance: stored.advance,
+            advanceLabel: CHARACTERISTIC_ADVANCE_LEVELS[stored.advance] ?? stored.advance,
+            advancePips: Array.from({ length: MAX_CHARACTERISTIC_PIPS }, (_, i) => i < toNumber(stored.advance)),
+            modifier: stored.modifier,
+            unnatural: stored.unnatural,
+            effectiveUnnatural: c.unnatural,
+            fromEffects: toNumber(c.unnatural) !== toNumber(stored.unnatural) || toNumber(c.modifier) !== toNumber(stored.modifier),
             total: c.total,
             bonus: c.bonus,
+            bonusText: `${tens} (tens digit)${toNumber(c.unnatural) ? ` + ${toNumber(c.unnatural)} (unnatural)` : ''}`,
             hasBonus: !!c.has_bonus,
             hasNegative: !!c.has_negative,
         };

@@ -9,11 +9,12 @@
                         <span class="char__short" data-tooltip="{{c.label}}">{{c.short}}</span>
                         <button type="button" class="char__roll roll-characteristic" data-characteristic="{{c.key}}" data-tooltip="Roll {{c.label}} test (W100 ≤ {{c.total}})">{{c.total}}</button>
                         <div class="char__foot">
-                            <span class="char__bonus" data-tooltip="Characteristic bonus">Bonus {{c.bonus}}</span>
+                            <span class="char__bonus" data-tooltip="Bonus = {{c.bonusText}}">Bonus {{c.bonus}}</span>
                             <span class="pips" data-tooltip="Advances: {{c.advanceLabel}}">{{#each c.advancePips as |on|}}<i class="pip {{#if on}}on{{/if}}"></i>{{/each}}</span>
                         </div>
                         <div class="char__pop" role="group" aria-label="{{c.label}} details">
                             <header><b>{{c.label}}</b><span>{{c.total}} <small>Bonus {{c.bonus}}</small></span></header>
+                            {{#if c.fromEffects}}<p class="char__note">Includes effects: unnatural {{c.effectiveUnnatural}}. The fields show the stored values.</p>{{/if}}
                             <label data-tooltip="Initial value"><span>Initial</span>
                                 <input type="number" data-dtype="Number" name="system.characteristics.{{c.key}}.base" value="{{c.base}}" /></label>
                             <label data-tooltip="Permanent advances (each +5)"><span>Advances</span>

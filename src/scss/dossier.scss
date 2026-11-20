@@ -1242,6 +1242,7 @@
         &.is-editing {
             z-index: 20;
         }
+        .char__note { margin: 0; font-size: 0.72rem; color: #d8b66a; }
         &:hover .char__pop,
         &:focus-within .char__pop,
         &.is-editing .char__pop {
