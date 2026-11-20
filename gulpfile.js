@@ -45,6 +45,9 @@ async function compilePacks() {
   const tmpRoot = path.resolve(__dirname, "build", ".pack-tmp");
   fs.rmSync(tmpRoot, { recursive: true, force: true });
 
+  // Effects of psychic powers are maintained in src/data/psychic-effects.yml and written into the pack items
+  const psychicEffects = yaml.load(fs.readFileSync(path.join("src", "data", "psychic-effects.yml"), "utf8")) ?? {};
+
   const stableId = (pack, name, index) =>
     crypto.createHash("sha1").update(`${pack}:${name}:${index}`).digest("base64").replace(/[^A-Za-z0-9]/g, "").slice(0, 16);
 
@@ -63,6 +66,10 @@ async function compilePacks() {
         if (doc.data !== undefined && doc.system === undefined) {
           doc.system = doc.data;
           delete doc.data;
+        }
+        if (folder === "psychic-powers" && Array.isArray(psychicEffects[doc.name]) && psychicEffects[doc.name].length) {
+          doc.system = doc.system ?? {};
+          doc.system.autoEffects = psychicEffects[doc.name];
         }
         doc._id = doc._id ?? stableId(folder, doc.name, counter);
         while (seen.has(doc._id)) doc._id = stableId(folder, doc.name, ++counter);
