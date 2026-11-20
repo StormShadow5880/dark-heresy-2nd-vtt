@@ -4,6 +4,7 @@ import { divinations } from '../rules/divinations.mjs';
 import { roles } from '../rules/roles.mjs';
 import { eliteAdvances } from '../rules/elite-advances.mjs';
 import { fieldMatch } from '../rules/config.mjs';
+import { isPsychicPowerActive } from '../actions/psychic-effect-manager.mjs';
 import { prepareSimpleRoll } from '../prompts/simple-prompt.mjs';
 import { DHTargetedActionManager } from '../actions/targeted-action-manager.mjs';
 import { prepareDamageRoll } from '../prompts/damage-prompt.mjs';
@@ -160,6 +161,10 @@ export class DarkHeresyAcolyte extends DarkHeresyBaseActor {
                 }
                 return;
             case 'psychicPower':
+                if (isPsychicPowerActive(this, item)) {
+                    ui.notifications.warn(`${item.name} is already running. End it first.`);
+                    return;
+                }
                 if(game.settings.get(SYSTEM_ID, DarkHeresySettings.SETTINGS.simplePsychicRolls)) {
                     await this.rollCharacteristic('willpower',  item.name)
                 } else {

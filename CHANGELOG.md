@@ -52,6 +52,8 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
   bonus tooltip shows how it is made up (tens digit + unnatural).
 
 ### Psychic powers
+- Power list: the hourglass is only an indicator for a running power (not clickable). A running power cannot be
+  manifested again (Manifest greyed out); ending it is done under Sustained Powers.
 - Deleting a power that is in effect ends it: its Active Effect (and so its bonus) is removed and it stops counting as
   sustained.
 - Psychic tab redesigned (single column): header strip, compact profile card (ring, key figures, discipline chips,

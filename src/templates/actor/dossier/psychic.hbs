@@ -53,7 +53,7 @@
                             {{#if p.active}}<span class="pill pill--on" data-tooltip="In effect, sustained">Active</span>{{/if}}
                             <i class="fa-solid fa-chevron-down pw__chev"></i>
                         </button>
-                        {{#if p.activatable}}<button type="button" class="icon-btn {{#if p.active}}on{{/if}}" data-action="togglePsychicEffect" data-item-id="{{p.id}}" aria-pressed="{{p.active}}" data-tooltip="{{#if p.active}}In effect and sustained - click to end{{else}}Not in effect - click to switch on at the current psy rating{{/if}}"><i class="fa-solid fa-hourglass-half"></i></button>{{/if}}
+                        {{#if p.active}}<span class="pw__running" data-tooltip="This power is running. End it under Sustained Powers."><i class="fa-solid fa-hourglass-half"></i></span>{{/if}}
                     </div>
                     <div class="pw__detail" hidden>
                                                     <dl class="pw__facts">
@@ -68,7 +68,7 @@
                                                     {{#if p.effectLine}}<p class="pw__line"><b>Effect</b> <span class="effect-text" data-tooltip="Applied after a successful manifestation">{{p.effectLine}}</span></p>{{/if}}
                                                     <div class="pw__desc prose">{{{p.descriptionHtml}}}</div>
                                                     <div class="pw__buttons">
-                                                        <button type="button" class="btn btn--manifest item-roll" data-item-id="{{p.id}}" data-tooltip="Focus power test"><i class="fa-solid fa-eye"></i> Manifest</button>
+                                                        <button type="button" class="btn btn--manifest item-roll" data-item-id="{{p.id}}" {{#if p.active}}disabled data-tooltip="Already running - end it under Sustained Powers first"{{else}}data-tooltip="Focus power test"{{/if}}><i class="fa-solid fa-eye"></i> Manifest</button>
                                                         {{#if p.isAttack}}<button type="button" class="btn item-damage" data-item-id="{{p.id}}"><i class="fa-solid fa-burst"></i> Damage</button>{{/if}}
                                                         <button type="button" class="btn item-vocalize" data-item-id="{{p.id}}"><i class="fa-solid fa-comment"></i> Chat</button>
                                                         <button type="button" class="btn item-edit" data-item-id="{{p.id}}"><i class="fa-solid fa-pen"></i> Edit</button>

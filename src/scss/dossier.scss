@@ -2170,6 +2170,16 @@
         padding: 6px 10px;
         color: var(--ds-muted);
     }
+    .pw__running {
+        color: var(--psy-accent);
+        padding: 0 6px;
+        cursor: default;
+    }
+    .btn--manifest[disabled] {
+        opacity: 0.4;
+        filter: grayscale(0.7);
+        cursor: not-allowed;
+    }
     .btn--manifest {
         background: linear-gradient(180deg, #5a2323, #3a1414);
         border-color: var(--ds-gold);
