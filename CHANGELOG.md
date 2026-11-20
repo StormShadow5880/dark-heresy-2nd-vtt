@@ -39,6 +39,8 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
   (one root element per window part), dice formulas given as numbers.
 
 ### Character sheet
+- The images of the dossier sheet are loaded and decoded once when the world starts, so switching tabs no longer waits
+  for them (flicker).
 - Overview: the ten characteristics and the four status tiles (Fatigue, Fate, Corruption, Insanity) form one horizontal row (two rows of seven on
   narrow windows); the detail pop-up opens towards the inside of the sheet.
 

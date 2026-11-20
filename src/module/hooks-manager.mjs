@@ -41,6 +41,7 @@ import * as documents from './documents/_module.mjs'
 
 import { SYSTEM_ID } from './system-id.mjs';
 import { onPsychicEffectRemoved, onPsychicPowerDeleted, refreshPsychicEffects } from './actions/psychic-effect-manager.mjs';
+import { preloadDossierImages } from './ui/preload-images.mjs';
 import { registerWoundsSyncHooks, syncAllWounds } from './actions/wounds-sync.mjs';
 export { SYSTEM_ID };
 
@@ -140,6 +141,7 @@ Enable Debug with: game.dh.debug = true
     static async ready() {
         console.log(`DH2e Loaded!`);
         DarkHeresySettings.applyDarkChat();
+        preloadDossierImages();
         await syncAllWounds();
         await checkAndMigrateWorld();
 
