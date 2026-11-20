@@ -365,6 +365,17 @@ export async function buildTalentsAndTraits(actor) {
     };
 }
 
+const DISCIPLINE_ICONS = {
+    Biomancy: 'fa-shield-halved',
+    Telepathy: 'fa-eye',
+    Telekinesis: 'fa-bolt',
+    Pyromancy: 'fa-fire',
+    Divination: 'fa-eye',
+    'Void Frost': 'fa-snowflake',
+    Minor: 'fa-eye',
+    default: 'fa-wand-sparkles',
+};
+
 export function buildPsychic(actor) {
     const psy = actor.psy;
     const powers = actor.items
@@ -382,6 +393,8 @@ export function buildPsychic(actor) {
             damage: item.system.damage,
             penetration: item.system.penetration,
             attackType: item.system.attackType,
+            icon: DISCIPLINE_ICONS[item.system.discipline] ?? DISCIPLINE_ICONS.default,
+            subtitle: item.system.sustained && item.system.sustained !== 'No' ? 'Sustained' : (item.system.damage && item.system.damage !== 0 && item.system.damage !== '0' ? 'Attack' : (item.system.subtype ?? '')),
             hasEffect: hasEffect(item),
             effectLine: effectLine(item),
             canSustain: canSustain(item),
@@ -392,14 +405,7 @@ export function buildPsychic(actor) {
         .sort((a, b) => (a.discipline ?? '').localeCompare(b.discipline ?? '') || a.name.localeCompare(b.name));
     const disciplines = [...new Set(powers.map((p) => p.discipline).filter(Boolean))];
     const sustainedPowers = buildSustainedPowers(actor, powers);
-    const groups = disciplines.map((name) => {
-        const list = powers.filter((p) => p.discipline === name);
-        return { name, count: list.length, activeCount: list.filter((p) => p.active).length, powers: list };
-    });
-    const ungrouped = powers.filter((p) => !p.discipline);
-    if (ungrouped.length) groups.push({ name: 'Other', count: ungrouped.length, activeCount: ungrouped.filter((p) => p.active).length, powers: ungrouped });
     return {
-        groups,
         sustainedPowers,
         hasSustained: sustainedPowers.length > 0,
         rating: psy.rating,

@@ -48,9 +48,9 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
   bonus tooltip shows how it is made up (tens digit + unnatural).
 
 ### Psychic powers
-- Psychic tab redesigned: compact profile (ring, key figures, discipline chips; values editable in a fold-out), slim
-  Active Powers line under it, powers grouped by discipline in foldable groups, Manifest button inside the expanded
-  power, slim Psychic Phenomena / Perils of the Warp buttons; sheet palette with violet only as accent.
+- Psychic tab redesigned (single column): header strip, compact profile card (ring, key figures, discipline chips,
+  values in a fold-out), slim Sustained Powers line, flat power list with icon tiles that unfold on click, Manifest
+  button inside the unfolded power, slim Psychic Phenomena / Perils of the Warp buttons; violet only as accent.
 
 - A successful manifestation switches a power on if it can be sustained (*Sustained* not *No*): it counts as sustained
   (psy rating reduced) and is listed as active until it is ended by hand.
