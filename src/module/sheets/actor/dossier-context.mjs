@@ -371,6 +371,7 @@ export function buildPsychic(actor) {
             subtype: item.system.subtype,
             sustained: item.system.sustained,
             range: item.system.range,
+            prerequisite: item.system.prerequisite,
             damage: item.system.damage,
             penetration: item.system.penetration,
             attackType: item.system.attackType,
@@ -527,4 +528,13 @@ export function buildStatusTiles(actor) {
         { id: 'corruption', label: 'Corruption', path: 'system.corruption', value: r.corruption.value, max: null, tooltip: `Corruption ${r.corruption.value} · ${r.corruption.note}` },
         { id: 'insanity', label: 'Insanity', path: 'system.insanity', value: r.insanity.value, max: null, tooltip: `Insanity ${r.insanity.value} · ${r.insanity.note}` },
     ];
+}
+
+/** Enriched description of every power (inline rolls like [[@pr/2]] use the psy rating of the actor) */
+export async function enrichPowerDescriptions(actor, powers) {
+    const enrich = foundry.applications.ux.TextEditor.implementation.enrichHTML;
+    for (const p of powers) {
+        const item = actor.items.get(p.id);
+        p.descriptionHtml = await enrich(item?.system?.description ?? '', { rollData: { actor, item, pr: actor.psy?.rating ?? 0 } });
+    }
 }

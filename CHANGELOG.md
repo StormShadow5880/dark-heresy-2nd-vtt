@@ -42,6 +42,8 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
 - Effects of powers (Active Effects on characteristics) are defined in `src/data/psychic-effects.yml`, written into the
   compendium at build time and editable on the power sheet (tab *effects*, read-only in locked compendiums).
   Iron Arm is defined; the other sustainable powers are prepared.
+- Psychic tab: *Active Powers* are listed above the power list; the list shows one line per power, details
+  (values, prerequisite, effect, description, actions) open on click.
 - Derived values (armour, skills, encumbrance) are calculated after Active Effects.
 
 ### Chat and dialogs

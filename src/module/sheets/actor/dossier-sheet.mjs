@@ -10,6 +10,7 @@ import {
     buildProgression,
     buildPsychic,
     buildQuickSkills,
+    enrichPowerDescriptions,
     buildRelations,
     buildResources,
     buildStatusTiles,
@@ -54,6 +55,7 @@ export class AcolyteDossierSheet extends AcolyteSheet {
             toggleCharEdit: AcolyteDossierSheet.#onToggleCharEdit,
             adjustDamage: AcolyteDossierSheet.#onAdjustDamage,
             togglePsychicEffect: AcolyteDossierSheet.#onTogglePsychicEffect,
+            togglePowerDetail: AcolyteDossierSheet.#onTogglePowerDetail,
             setCritical: AcolyteDossierSheet.#onSetCritical,
         },
     };
@@ -77,6 +79,8 @@ export class AcolyteDossierSheet extends AcolyteSheet {
     _gearFilter = 'all';
     /** Characteristic tiles that are currently open for editing (kept across re-renders) */
     _openCharEdits = new Set();
+    /** Psychic powers whose details are expanded (kept across re-renders) */
+    _openPowers = new Set();
 
     async _prepareContext(options) {
         const context = await super._prepareContext(options);
@@ -117,6 +121,7 @@ export class AcolyteDossierSheet extends AcolyteSheet {
             isGM: game.user.isGM,
         };
         Object.assign(context.dossier, await buildTalentsAndTraits(actor));
+        await enrichPowerDescriptions(actor, context.dossier.psychic.powers);
         context.dossier.tabs = [
             { id: 'overview', label: 'Overview', icon: 'fa-solid fa-id-card' },
             { id: 'skills', label: 'Skills', icon: 'fa-solid fa-list-check' },
@@ -144,6 +149,7 @@ export class AcolyteDossierSheet extends AcolyteSheet {
                 this.render();
             }),
         );
+        this.element.querySelectorAll('.pw[data-power]').forEach((row) => this._setPowerOpen(row, this._openPowers.has(row.dataset.power)));
         this.element.querySelectorAll('.char').forEach((tile) => tile.classList.toggle('is-editing', this._openCharEdits.has(tile.dataset.char)));
         // Buttons inside <summary> must not toggle the surrounding <details>
         this.element.querySelectorAll('summary button').forEach((b) => b.addEventListener('click', (ev) => ev.preventDefault()));
@@ -211,6 +217,22 @@ export class AcolyteDossierSheet extends AcolyteSheet {
         const level = Number(target.dataset.level);
         const current = Number(foundry.utils.getProperty(this.actor, path) ?? 0);
         await this.actor.update({ [path]: current === level ? level - 1 : level });
+    }
+
+    _setPowerOpen(row, open) {
+        row.classList.toggle('is-open', open);
+        row.querySelector('.pw__detail')?.toggleAttribute('hidden', !open);
+        row.querySelector('.pw__toggle')?.setAttribute('aria-expanded', String(open));
+    }
+
+    /** Click on a power: show / hide its details (no re-render, the state survives re-renders) */
+    static #onTogglePowerDetail(event, target) {
+        const id = target.dataset.power;
+        const row = target.closest('.pw');
+        const open = !this._openPowers.has(id);
+        if (open) this._openPowers.add(id);
+        else this._openPowers.delete(id);
+        this._setPowerOpen(row, open);
     }
 
     /** Ends an active power by hand, or switches a power with an effect on at the actor's psy rating */
