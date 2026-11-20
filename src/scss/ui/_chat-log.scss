@@ -1,0 +1,111 @@
+// Dark chat: the whole chat of the client (sidebar tab, popout window, notification popups) in the imperial style.
+// Switched by the client setting "Dark Chat", which puts the class .dh-dark-chat on the body. Without the class
+// nothing here applies. Only colours are set, the layout of Foundry is left alone.
+
+body.dh-dark-chat {
+    // colour tokens of the chat for every control inside of it (Foundry's own variables)
+    --dh-chat-bg: #0e0d0b;
+    --dh-chat-bg-2: #16130f;
+    --dh-chat-line: #3a3126;
+    --dh-chat-text: #d9d0bd;
+    --dh-chat-muted: #92918c;
+    --dh-chat-gold: #b69a62;
+
+    #chat,
+    .chat-popout,
+    #chat-notifications,
+    #chat-notifications .chat-message {
+        --color-text-primary: var(--dh-chat-text);
+        --color-text-secondary: var(--dh-chat-muted);
+        --color-text-subtle: var(--dh-chat-muted);
+        --color-text-dark-primary: var(--dh-chat-text);
+        --color-border-light-primary: var(--dh-chat-line);
+        --color-border-light-secondary: var(--dh-chat-line);
+        color: var(--dh-chat-text);
+        color-scheme: dark;
+    }
+
+    // the sidebar tab and the popout window
+    #chat,
+    .chat-popout,
+    .chat-popout .window-content {
+        background: var(--dh-chat-bg);
+    }
+    #chat .chat-log,
+    .chat-popout .chat-log,
+    #chat .chat-scroll,
+    .chat-popout .chat-scroll {
+        background: var(--dh-chat-bg);
+    }
+
+    // all messages (our cards bring their own dark surface, this covers messages of Foundry and other modules)
+    #chat .chat-message,
+    .chat-popout .chat-message,
+    #chat-notifications .chat-message {
+        background: var(--dh-chat-bg-2);
+        background-image: none;
+        border: 1px solid var(--dh-chat-line);
+        color: var(--dh-chat-text);
+        .message-header,
+        .message-sender,
+        .message-metadata,
+        .message-timestamp,
+        .message-delete {
+            color: #b8a98a;
+        }
+        .message-content,
+        .dice-roll,
+        .dice-result,
+        .dice-formula,
+        .dice-tooltip {
+            color: var(--dh-chat-text);
+        }
+        .dice-roll .dice-total,
+        .dice-total {
+            background: #0c0b09;
+            border-color: var(--dh-chat-line);
+            color: #fff;
+        }
+        .dice-formula,
+        .dice-tooltip {
+            background: #0c0b09;
+            border-color: var(--dh-chat-line);
+        }
+    }
+
+    // input area
+    #chat .chat-form,
+    .chat-popout .chat-form,
+    #chat .chat-controls,
+    .chat-popout .chat-controls {
+        background: var(--dh-chat-bg);
+        border-color: var(--dh-chat-line);
+    }
+    #chat textarea,
+    .chat-popout textarea,
+    #chat #chat-message,
+    .chat-popout #chat-message {
+        background: #0c0b09;
+        border: 1px solid var(--dh-chat-line);
+        color: var(--dh-chat-text);
+        &::placeholder {
+            color: var(--dh-chat-muted);
+        }
+        &:focus {
+            border-color: var(--dh-chat-gold);
+            box-shadow: 0 0 0 1px var(--dh-chat-gold);
+            outline: none;
+        }
+    }
+    #chat .chat-controls button,
+    #chat .chat-control-icon,
+    .chat-popout .chat-controls button {
+        color: var(--dh-chat-text);
+    }
+    #chat select,
+    .chat-popout select {
+        background: #0c0b09;
+        border-color: var(--dh-chat-line);
+        color: var(--dh-chat-text);
+    }
+}

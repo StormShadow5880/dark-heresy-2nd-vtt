@@ -136,6 +136,7 @@ Enable Debug with: game.dh.debug = true
 
     static async ready() {
         console.log(`DH2e Loaded!`);
+        DarkHeresySettings.applyDarkChat();
         await checkAndMigrateWorld();
 
         game.tours.register(SYSTEM_ID, "main-tour", new DHTourMain());
