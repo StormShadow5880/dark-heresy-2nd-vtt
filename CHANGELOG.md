@@ -8,7 +8,7 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
 
 ### Imported from Imperium Maledictum
 
-- **[IM-001] Maximum wounds.** `Max Wounds = Strength Bonus + (2 × Toughness Bonus) + Willpower Bonus`, calculated
+- **[IM-001] Maximum wounds (switched off by default; enable with the world setting *Maximum Wounds Rule*).** `Max Wounds = Strength Bonus + (2 × Toughness Bonus) + Willpower Bonus`, calculated
   automatically for player characters. The maximum updates when a trait, talent, item, Active Effect or an active
   psychic power changes a characteristic; the damage a character has taken stays the same. New field
   *Wounds modifier*; world setting *Maximum Wounds Rule* (*Imperium Maledictum* / *Manual*) switches back to the

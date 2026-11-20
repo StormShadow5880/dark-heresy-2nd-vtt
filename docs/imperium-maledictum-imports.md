@@ -16,7 +16,7 @@ the system comes from IM and which from DH2.
 
 | ID | Rule | Source | System version | Setting | Replaces (DH2) |
 |---|---|---|---|---|---|
-| IM-001 | Maximum wounds | Imperium Maledictum | 1.9.0 | `wounds-formula` (world), default *Imperium Maledictum* | Maximum wounds entered by hand / rolled from the home world |
+| IM-001 | Maximum wounds | Imperium Maledictum | 1.9.0 | `wounds-formula` (world), default *Manual* (IM-001 is **switched off by default**, code and tests are kept) | Maximum wounds entered by hand / rolled from the home world |
 
 ---
 
