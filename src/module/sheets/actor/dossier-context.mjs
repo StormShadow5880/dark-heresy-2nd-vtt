@@ -392,7 +392,14 @@ export function buildPsychic(actor) {
         .sort((a, b) => (a.discipline ?? '').localeCompare(b.discipline ?? '') || a.name.localeCompare(b.name));
     const disciplines = [...new Set(powers.map((p) => p.discipline).filter(Boolean))];
     const sustainedPowers = buildSustainedPowers(actor, powers);
+    const groups = disciplines.map((name) => {
+        const list = powers.filter((p) => p.discipline === name);
+        return { name, count: list.length, activeCount: list.filter((p) => p.active).length, powers: list };
+    });
+    const ungrouped = powers.filter((p) => !p.discipline);
+    if (ungrouped.length) groups.push({ name: 'Other', count: ungrouped.length, activeCount: ungrouped.filter((p) => p.active).length, powers: ungrouped });
     return {
+        groups,
         sustainedPowers,
         hasSustained: sustainedPowers.length > 0,
         rating: psy.rating,

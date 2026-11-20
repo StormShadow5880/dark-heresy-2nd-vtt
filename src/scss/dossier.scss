@@ -1967,22 +1967,145 @@
         gap: 0 12px;
     }
 
-    // ------------------------------------------------ Psychic: colder, darker, ritual
+    // ------------------------------------------------ Psychic: the sheet palette (anthracite, gold, burgundy), violet only as accent
     .dossier-tab--psychic {
-        --ds-gold: #a79bc9;
-        --ds-line: #3d3752;
-        --ds-oxblood: #4c3a78;
-        --ds-burgundy: #2c2347;
-        background:
-            radial-gradient(circle at 85% 8%, rgba(123, 106, 168, 0.16), transparent 45%),
-            repeating-radial-gradient(circle at 85% 8%, transparent 0 38px, rgba(123, 106, 168, 0.07) 38px 39px),
-            rgba(8, 7, 14, 0.55);
-        .panel {
-            background: var(--ds-grain), #14121c;
+        --psy-accent: #a79bc9;
+        background: radial-gradient(circle at 12% 6%, rgba(123, 106, 168, 0.1), transparent 40%), rgba(8, 7, 10, 0.4);
+        .ring--psy {
+            border-color: var(--psy-accent);
+            color: #e6e0f5;
         }
-        .panel__title {
-            background: linear-gradient(90deg, #4c3a78, #2c2347 60%, #1d1730);
+        .panel--psyprofile .panel__title {
+            background: linear-gradient(90deg, #3a2a5e, var(--ds-burgundy) 70%);
         }
+    }
+    .psyp {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 10px 12px 4px;
+        .ring--psy {
+            flex: none;
+            transform: scale(0.82);
+            margin: -6px -6px -6px -4px;
+        }
+        &__stats {
+            flex: 1;
+            margin: 0;
+            display: grid;
+            gap: 2px;
+            > div {
+                display: flex;
+                justify-content: space-between;
+                gap: 8px;
+                border-bottom: 1px solid rgba(80, 70, 56, 0.4);
+            }
+            dt {
+                font-size: 0.74rem;
+                color: var(--ds-muted);
+            }
+            dd {
+                margin: 0;
+                font-weight: 700;
+                color: #f3ead2;
+            }
+        }
+        &__tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            padding: 4px 12px 8px;
+        }
+        &__edit {
+            border-top: 1px solid rgba(80, 70, 56, 0.4);
+            summary {
+                cursor: pointer;
+                padding: 3px 12px;
+                font-size: 0.72rem;
+                text-transform: uppercase;
+                letter-spacing: 0.1em;
+                color: var(--ds-muted);
+            }
+        }
+    }
+    .chip {
+        padding: 1px 9px;
+        border-radius: 999px;
+        font-size: 0.74rem;
+        background: rgba(167, 155, 201, 0.14);
+        border: 1px solid rgba(167, 155, 201, 0.35);
+        color: #d9d2ec;
+    }
+    .warp-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+        .btn--warp {
+            height: 28px;
+            font-size: 0.78rem;
+            letter-spacing: 0.05em;
+            border-radius: 2px;
+            background: rgba(60, 40, 90, 0.45);
+            border: 1px solid rgba(167, 155, 201, 0.4);
+            &.btn--danger {
+                background: rgba(90, 24, 24, 0.5);
+                border-color: rgba(190, 90, 80, 0.5);
+            }
+        }
+    }
+    .empty--slim {
+        text-align: center;
+        font-style: italic;
+        padding: 6px 10px;
+        color: var(--ds-muted);
+    }
+    // Discipline groups: entries of a grimoire
+    .pdisc {
+        border-top: 1px solid var(--ds-line);
+        &__head {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            height: 30px;
+            padding: 0 10px;
+            background: linear-gradient(90deg, rgba(167, 155, 201, 0.12), transparent);
+            border: 0;
+            color: var(--ds-gold-soft);
+            font-family: var(--ds-font-title);
+            font-variant: small-caps;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            text-align: left;
+            > i {
+                font-size: 0.7rem;
+                transition: transform 0.12s;
+            }
+        }
+        &__count {
+            margin-left: auto;
+            font-size: 0.72rem;
+            color: var(--ds-muted);
+            font-variant: normal;
+            letter-spacing: 0;
+        }
+        &.is-closed > .pw-list {
+            display: none;
+        }
+        &.is-closed > .pdisc__head > i {
+            transform: rotate(-90deg);
+        }
+        .pw__name b {
+            font-family: var(--ds-font-title);
+            letter-spacing: 0.03em;
+        }
+    }
+    .btn--manifest {
+        background: linear-gradient(180deg, #5a2323, #3a1414);
+        border-color: var(--ds-gold);
+        color: #f3ead2;
+        font-weight: 700;
+        letter-spacing: 0.06em;
     }
     .psy-rating {
         display: flex;

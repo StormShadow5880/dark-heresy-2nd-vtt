@@ -1,58 +1,69 @@
 <section class="tab dossier-tab dossier-tab--psychic" data-tab="psychic" data-group="primary">
     <div class="two-col two-col--narrow-left">
         <div class="stack">
-        <article class="panel">
-            <h2 class="panel__title">Psychic Profile</h2>
-            <div class="psy-rating" data-tooltip="Current Psy Rating (rating minus sustained powers)">
-                <span class="ring ring--psy"><b>{{dossier.psychic.current}}</b><small>PR</small></span>
-                <span class="psy-rating__label">Psy Rating {{dossier.psychic.rating}}</span>
+        <article class="panel panel--psyprofile">
+            <h2 class="panel__title">Psychic Profile <span class="panel__hint">Psychic dossier</span></h2>
+            <div class="psyp">
+                <span class="ring ring--psy" data-tooltip="Current Psy Rating (rating minus sustained powers)"><b>{{dossier.psychic.current}}</b><small>PR</small></span>
+                <dl class="psyp__stats">
+                    <div><dt>Psy Rating</dt><dd>{{dossier.psychic.rating}}</dd></div>
+                    <div><dt>Sustained powers</dt><dd>{{dossier.psychic.sustainedPowers.length}}</dd></div>
+                    <div><dt>Classification</dt><dd>{{#if dossier.psychic.class}}{{dossier.psychic.class}}{{else}}—{{/if}}</dd></div>
+                </dl>
             </div>
-            <div class="panel__body details">
-                <label><span>Psy Rating</span><input type="number" data-dtype="Number" name="system.psy.rating" value="{{actor.system.psy.rating}}" /></label>
-                <label><span>Sustained</span><input type="number" data-dtype="Number" name="system.psy.sustained" value="{{actor.system.psy.sustained}}" data-tooltip="Number of powers currently sustained" /></label>
-                <label><span>Current PR</span><span class="static strong" data-tooltip="Psy Rating minus sustained powers">{{dossier.psychic.current}}</span></label>
-                <label><span>Class</span>
-                    <input type="text" name="system.psy.class" value="{{actor.system.psy.class}}" /></label>
-                <label><span>Has focus</span><input type="checkbox" name="system.psy.hasFocus" data-dtype="Boolean" {{checked actor.system.psy.hasFocus}} /></label>
-                <label><span>Disciplines</span><span class="static">{{#each dossier.psychic.disciplines as |d|}}{{d}}{{#unless @last}}, {{/unless}}{{else}}—{{/each}}</span></label>
-            </div>
-            <div class="btn-row">
-                <button type="button" class="btn" data-action="rollTable" data-table="Psychic Phenomena"><i class="fa-solid fa-burst"></i> Psychic Phenomena</button>
-                <button type="button" class="btn btn--danger" data-action="rollTable" data-table="Perils of the Warp"><i class="fa-solid fa-skull"></i> Perils of the Warp</button>
-            </div>
-            <p class="hint">Tables are drawn from the system compendium. Rules for when to roll them are in the rulebook.</p>
+            <div class="psyp__tags">{{#each dossier.psychic.disciplines as |d|}}<span class="chip">{{d}}</span>{{/each}}</div>
+            <details class="psyp__edit">
+                <summary>Edit values</summary>
+                <div class="panel__body details">
+                    <label><span>Psy Rating</span><input type="number" data-dtype="Number" name="system.psy.rating" value="{{actor.system.psy.rating}}" /></label>
+                    <label><span>Sustained</span><input type="number" data-dtype="Number" name="system.psy.sustained" value="{{actor.system.psy.sustained}}" data-tooltip="Number of powers currently sustained" /></label>
+                    <label><span>Class</span><input type="text" name="system.psy.class" value="{{actor.system.psy.class}}" /></label>
+                    <label><span>Has focus</span><input type="checkbox" name="system.psy.hasFocus" data-dtype="Boolean" {{checked actor.system.psy.hasFocus}} /></label>
+                </div>
+            </details>
         </article>
+
+        <article class="panel panel--sustained">
+            <h2 class="panel__title">Active Powers
+                <span class="panel__hint">{{dossier.psychic.sustainedPowers.length}} active</span>
+            </h2>
+            <ul class="pw-list">
+                {{#each dossier.psychic.sustainedPowers as |p|}}
+                    <li class="pw pw--active item-drag" data-item-id="{{p.id}}">
+                        <div class="pw__row">
+                            <span class="pw__name"><b>{{p.name}}</b>
+                                <small>{{p.discipline}} · sustain {{p.sustainAction}} · PR {{p.pr}}</small>
+                                {{#if p.effectText}}<small class="effect-text">{{p.effectText}}</small>{{/if}}
+                            </span>
+                            <button type="button" class="icon-btn on" data-action="togglePsychicEffect" data-item-id="{{p.id}}" data-tooltip="End this power (gives back the psy rating)"><i class="fa-solid fa-hourglass-end"></i></button>
+                            <button type="button" class="icon-btn item-edit" data-item-id="{{p.id}}" data-tooltip="Edit"><i class="fa-solid fa-pen"></i></button>
+                        </div>
+                    </li>
+                {{else}}
+                    <li class="empty empty--slim">No powers currently sustained</li>
+                {{/each}}
+            </ul>
+        </article>
+
+        <div class="warp-row">
+            <button type="button" class="btn btn--warp" data-action="rollTable" data-table="Psychic Phenomena" data-tooltip="Roll on the Psychic Phenomena table"><i class="fa-solid fa-burst"></i> Psychic Phenomena</button>
+            <button type="button" class="btn btn--warp btn--danger" data-action="rollTable" data-table="Perils of the Warp" data-tooltip="Roll on the Perils of the Warp table"><i class="fa-solid fa-skull"></i> Perils of the Warp</button>
+        </div>
         </div>
 
         <div class="stack">
-            <article class="panel panel--sustained">
-                <h2 class="panel__title">Active Powers
-                    <span class="panel__hint">{{dossier.psychic.sustainedPowers.length}} active · current PR {{dossier.psychic.current}} of {{dossier.psychic.rating}}</span>
-                </h2>
-                <ul class="pw-list">
-                    {{#each dossier.psychic.sustainedPowers as |p|}}
-                        <li class="pw pw--active item-drag" data-item-id="{{p.id}}">
-                            <div class="pw__row">
-                                <span class="pw__name"><b>{{p.name}}</b>
-                                    <small>{{p.discipline}} · sustain {{p.sustainAction}} · PR {{p.pr}}</small>
-                                    {{#if p.effectText}}<small class="effect-text">{{p.effectText}}</small>{{/if}}
-                                </span>
-                                <button type="button" class="icon-btn on" data-action="togglePsychicEffect" data-item-id="{{p.id}}" data-tooltip="End this power (gives back the psy rating)"><i class="fa-solid fa-hourglass-end"></i></button>
-                                <button type="button" class="icon-btn item-edit" data-item-id="{{p.id}}" data-tooltip="Edit"><i class="fa-solid fa-pen"></i></button>
-                            </div>
-                        </li>
-                    {{else}}
-                        <li class="empty">No active power. A successful manifestation of a sustainable power lists it here.</li>
-                    {{/each}}
-                </ul>
-            </article>
-
             <article class="panel panel--powers">
-                <h2 class="panel__title">Psychic Powers
+                <h2 class="panel__title">Psychic Disciplines
                     <button type="button" class="icon-btn item-create" data-type="psychicPower" data-tooltip="New psychic power"><i class="fa-solid fa-plus"></i></button>
                 </h2>
+                {{#each dossier.psychic.groups as |g|}}
+                <section class="pdisc" data-discipline="{{g.name}}">
+                    <button type="button" class="pdisc__head" data-action="toggleDiscipline" aria-expanded="true">
+                        <i class="fa-solid fa-chevron-down"></i><b>{{g.name}}</b>
+                        <span class="pdisc__count">{{g.count}}{{#if g.activeCount}} · {{g.activeCount}} active{{/if}}</span>
+                    </button>
                 <ul class="pw-list">
-                    {{#each dossier.psychic.powers as |p|}}
+                    {{#each g.powers as |p|}}
                         <li class="pw {{#if p.active}}is-active{{/if}} item-drag" data-item-id="{{p.id}}" data-power="{{p.id}}">
                             <div class="pw__row">
                                 <button type="button" class="pw__toggle" data-action="togglePowerDetail" data-power="{{p.id}}" aria-expanded="false" data-tooltip="Show details">
@@ -63,7 +74,6 @@
                                 </button>
                                 {{#if p.active}}<span class="pill pill--on" data-tooltip="In effect, sustained">Active</span>{{/if}}
                                 {{#if p.activatable}}<button type="button" class="icon-btn {{#if p.active}}on{{/if}}" data-action="togglePsychicEffect" data-item-id="{{p.id}}" aria-pressed="{{p.active}}" data-tooltip="{{#if p.active}}In effect and sustained - click to end{{else}}Not in effect - click to switch on at the current psy rating{{/if}}"><i class="fa-solid fa-hourglass-half"></i></button>{{/if}}
-                                <button type="button" class="icon-btn item-roll" data-item-id="{{p.id}}" data-tooltip="Manifest (focus power test)"><i class="fa-solid fa-eye"></i></button>
                             </div>
                             <div class="pw__detail" hidden>
                                 <dl class="pw__facts">
@@ -78,6 +88,7 @@
                                 {{#if p.effectLine}}<p class="pw__line"><b>Effect</b> <span class="effect-text" data-tooltip="Applied after a successful manifestation">{{p.effectLine}}</span></p>{{/if}}
                                 <div class="pw__desc prose">{{{p.descriptionHtml}}}</div>
                                 <div class="pw__buttons">
+                                    <button type="button" class="btn btn--manifest item-roll" data-item-id="{{p.id}}" data-tooltip="Focus power test"><i class="fa-solid fa-eye"></i> Manifest</button>
                                     {{#if p.isAttack}}<button type="button" class="btn item-damage" data-item-id="{{p.id}}"><i class="fa-solid fa-burst"></i> Damage</button>{{/if}}
                                     <button type="button" class="btn item-vocalize" data-item-id="{{p.id}}"><i class="fa-solid fa-comment"></i> Chat</button>
                                     <button type="button" class="btn item-edit" data-item-id="{{p.id}}"><i class="fa-solid fa-pen"></i> Edit</button>
@@ -85,10 +96,12 @@
                                 </div>
                             </div>
                         </li>
-                    {{else}}
-                        <li class="empty">No psychic powers. Drag powers from the compendium onto the sheet.</li>
                     {{/each}}
                 </ul>
+                </section>
+                {{else}}
+                <p class="empty">No psychic powers. Drag powers from the compendium onto the sheet.</p>
+                {{/each}}
             </article>
         </div>
     </div>

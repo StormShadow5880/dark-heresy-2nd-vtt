@@ -56,6 +56,7 @@ export class AcolyteDossierSheet extends AcolyteSheet {
             adjustDamage: AcolyteDossierSheet.#onAdjustDamage,
             togglePsychicEffect: AcolyteDossierSheet.#onTogglePsychicEffect,
             togglePowerDetail: AcolyteDossierSheet.#onTogglePowerDetail,
+            toggleDiscipline: AcolyteDossierSheet.#onToggleDiscipline,
             setCritical: AcolyteDossierSheet.#onSetCritical,
         },
     };
@@ -81,6 +82,8 @@ export class AcolyteDossierSheet extends AcolyteSheet {
     _openCharEdits = new Set();
     /** Psychic powers whose details are expanded (kept across re-renders) */
     _openPowers = new Set();
+    /** Disciplines that are folded in (kept across re-renders); all groups start open */
+    _closedDisciplines = new Set();
 
     async _prepareContext(options) {
         const context = await super._prepareContext(options);
@@ -149,6 +152,7 @@ export class AcolyteDossierSheet extends AcolyteSheet {
                 this.render();
             }),
         );
+        this.element.querySelectorAll('.pdisc[data-discipline]').forEach((g) => g.classList.toggle('is-closed', this._closedDisciplines.has(g.dataset.discipline)));
         this.element.querySelectorAll('.pw[data-power]').forEach((row) => this._setPowerOpen(row, this._openPowers.has(row.dataset.power)));
         this.element.querySelectorAll('.char').forEach((tile) => tile.classList.toggle('is-editing', this._openCharEdits.has(tile.dataset.char)));
         // Buttons inside <summary> must not toggle the surrounding <details>
@@ -233,6 +237,17 @@ export class AcolyteDossierSheet extends AcolyteSheet {
         if (open) this._openPowers.add(id);
         else this._openPowers.delete(id);
         this._setPowerOpen(row, open);
+    }
+
+    /** Folds a discipline group of the psychic tab in or out */
+    static #onToggleDiscipline(event, target) {
+        const group = target.closest('.pdisc');
+        const name = group.dataset.discipline;
+        const closed = !this._closedDisciplines.has(name);
+        if (closed) this._closedDisciplines.add(name);
+        else this._closedDisciplines.delete(name);
+        group.classList.toggle('is-closed', closed);
+        target.setAttribute('aria-expanded', String(!closed));
     }
 
     /** Ends an active power by hand, or switches a power with an effect on at the actor's psy rating */
