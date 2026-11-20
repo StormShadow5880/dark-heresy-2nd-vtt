@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildChanges, computeValue, describeEffects, getEffectDefinitions, hasEffect, MODE_ADD } from '../src/module/rules/psychic-effects.mjs';
+import { buildChanges, canSustain, computeValue, describeEffects, getEffectDefinitions, hasEffect, MODE_ADD } from '../src/module/rules/psychic-effects.mjs';
 import { installFoundryStubs } from './helpers.mjs';
 
 installFoundryStubs();
@@ -65,7 +65,7 @@ test('switching on: creates one effect, counts the power as sustained (psy ratin
     const power = { ...ironArm, setFlag: async (s, k, v) => (flagged = v), getFlag: () => flagged, unsetFlag: async () => (flagged = null) };
     actor.items.set('p1', power);
     const text = await mgr.activatePsychicEffect(actor, power, 5);
-    assert.equal(text, 'Unnatural Toughness +3, Unnatural Strength +3, Agility -10');
+    assert.deepEqual(text, { active: true, text: 'Unnatural Toughness +3, Unnatural Strength +3, Agility -10' });
     assert.equal(actor.effects.length, 1);
     assert.equal(actor.system.psy.sustained, 1);
     assert.equal(flagged, true);
@@ -93,6 +93,38 @@ test('ending by hand removes the effect and reduces the sustained count, never b
     low.system.psy.sustained = 0; // edited by hand in the meantime
     await mgr.deactivatePsychicEffect(low, 'p1');
     assert.equal(low.system.psy.sustained, 0);
+});
+
+test('sustainable means the Sustained field is not "No" - independent of effect definitions', () => {
+    for (const v of ['Free Action', 'Half Action', 'Full Action', 'Special']) assert.equal(canSustain({ system: { sustained: v } }), true, v);
+    for (const v of ['No', 'no', '', undefined, null]) assert.equal(canSustain({ system: { sustained: v } }), false, String(v));
+    assert.equal(canSustain({}), false);
+});
+
+test('a sustainable power without effect definitions is switched on: sustained +1, marker set, no Active Effect', async () => {
+    const actor = fakeActor(0);
+    let flagged = null;
+    const aura = { id: 'p2', name: 'Aura of Fear', img: 'x', uuid: 'u2', system: { sustained: 'Half Action' }, setFlag: async (s, k, v) => (flagged = v), getFlag: () => flagged, unsetFlag: async () => (flagged = null) };
+    actor.items.set('p2', aura);
+    const result = await mgr.activatePsychicPower(actor, aura, 3);
+    assert.deepEqual(result, { active: true, text: '' });
+    assert.equal(actor.effects.length, 0);
+    assert.equal(actor.system.psy.sustained, 1);
+    assert.equal(flagged, true);
+    // casting it again does not count twice
+    await mgr.activatePsychicPower(actor, aura, 3);
+    assert.equal(actor.system.psy.sustained, 1);
+    // ending it by hand reduces the count again
+    await mgr.deactivatePsychicEffect(actor, 'p2');
+    assert.equal(actor.system.psy.sustained, 0);
+    assert.equal(flagged, null);
+});
+
+test('a power with Sustained "No" and no effect cannot be switched on', async () => {
+    const actor = fakeActor(0);
+    const smite = { id: 'p3', name: 'Smite', system: { sustained: 'No' }, getFlag: () => undefined };
+    assert.equal(await mgr.activatePsychicPower(actor, smite, 3), null);
+    assert.equal(actor.system.psy.sustained, 0);
 });
 
 test('a power without effect definitions changes nothing', async () => {

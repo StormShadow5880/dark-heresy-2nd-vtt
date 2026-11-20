@@ -39,7 +39,7 @@
                                 <td>{{p.sustained}}</td>
                                 <td>{{#if p.isAttack}}{{p.damage}} <small>pen {{p.penetration}}</small>{{else}}—{{/if}}</td>
                                 <td class="act actions">
-                                    {{#if p.hasEffect}}<button type="button" class="icon-btn {{#if p.active}}on{{/if}}" data-action="togglePsychicEffect" data-item-id="{{p.id}}" aria-pressed="{{p.active}}" data-tooltip="{{#if p.active}}In effect and sustained - click to end{{else}}Not in effect - click to switch on at the current psy rating{{/if}}"><i class="fa-solid fa-hourglass-half"></i></button>{{/if}}
+                                    {{#if p.activatable}}<button type="button" class="icon-btn {{#if p.active}}on{{/if}}" data-action="togglePsychicEffect" data-item-id="{{p.id}}" aria-pressed="{{p.active}}" data-tooltip="{{#if p.active}}In effect and sustained - click to end{{else}}Not in effect - click to switch on at the current psy rating{{/if}}"><i class="fa-solid fa-hourglass-half"></i></button>{{/if}}
                                     <button type="button" class="icon-btn item-roll" data-item-id="{{p.id}}" data-tooltip="Manifest (focus power test)"><i class="fa-solid fa-eye"></i></button>
                                     {{#if p.isAttack}}<button type="button" class="icon-btn item-damage" data-item-id="{{p.id}}" data-tooltip="Roll damage"><i class="fa-solid fa-burst"></i></button>{{/if}}
                                     <button type="button" class="icon-btn item-vocalize" data-item-id="{{p.id}}" data-tooltip="Show in chat"><i class="fa-solid fa-comment"></i></button>

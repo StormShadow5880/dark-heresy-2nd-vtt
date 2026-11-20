@@ -24,7 +24,7 @@ import {
 import { removeLogEntry } from '../../rules/experience.mjs';
 import { MAX_CRITICAL, adjustDamage, applyTypedDamage } from '../../rules/wounds.mjs';
 import { stepCounter } from '../../rules/counters.mjs';
-import { activatePsychicEffect, deactivatePsychicEffect, findPsychicEffect } from '../../actions/psychic-effect-manager.mjs';
+import { activatePsychicPower, deactivatePsychicEffect, isPsychicPowerActive } from '../../actions/psychic-effect-manager.mjs';
 import { prepareAwardExperience, prepareSpendExperience } from '../../prompts/experience-prompt.mjs';
 import { confirmDialog } from '../../prompts/dialog-helpers.mjs';
 
@@ -218,10 +218,10 @@ export class AcolyteDossierSheet extends AcolyteSheet {
         if (!this.isEditable) return;
         const power = this.actor.items.get(target.dataset.itemId);
         if (!power) return;
-        if (findPsychicEffect(this.actor, power.id)) {
+        if (isPsychicPowerActive(this.actor, power)) {
             await deactivatePsychicEffect(this.actor, power.id);
         } else {
-            await activatePsychicEffect(this.actor, power, this.actor.system.psy.rating);
+            await activatePsychicPower(this.actor, power, this.actor.system.psy.rating);
         }
     }
 

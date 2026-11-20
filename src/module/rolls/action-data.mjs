@@ -5,8 +5,7 @@ import { refundAmmo, useAmmo } from '../rules/ammo.mjs';
 import { DHBasicActionManager } from '../actions/basic-action-manager.mjs';
 import { SYSTEM_ID } from '../hooks-manager.mjs';
 import { DarkHeresySettings } from '../dark-heresy-settings.mjs';
-import { activatePsychicEffect, deactivatePsychicEffect } from '../actions/psychic-effect-manager.mjs';
-import { hasEffect } from '../rules/psychic-effects.mjs';
+import { activatePsychicPower, deactivatePsychicEffect, isActivatable } from '../actions/psychic-effect-manager.mjs';
 
 export class ActionData {
     id = uuid();
@@ -362,20 +361,24 @@ export class PsychicActionData extends ActionData {
     }
 
     /**
-     * A successful manifestation switches the effect of the power on (sustained, psy rating reduced, active effect).
+     * A successful manifestation of a sustainable power (Sustained is not "No") or of a power with effects switches it on:
+     * it counts as sustained (psy rating reduced) and its effect, if it has one, is applied.
      * A failed re-roll of an action that had switched it on ends it again.
      */
     async applyResultEffects() {
         const power = this.rollData.power;
         const actor = this.rollData.sourceActor;
-        if (!power || !actor || !hasEffect(power)) return;
+        if (!power || !actor || !isActivatable(power)) return;
+        this.sustainedPower = false;
         this.activeEffectText = '';
         if (this.rollData.success) {
-            this._psyEffectPowerId = power.id;
-            this.activeEffectText = await activatePsychicEffect(actor, power, this.rollData.pr);
-        } else if (this._psyEffectPowerId) {
-            await deactivatePsychicEffect(actor, this._psyEffectPowerId);
-            this._psyEffectPowerId = null;
+            this._psyPowerId = power.id;
+            const result = await activatePsychicPower(actor, power, this.rollData.pr);
+            this.sustainedPower = !!result?.active;
+            this.activeEffectText = result?.text ?? '';
+        } else if (this._psyPowerId) {
+            await deactivatePsychicEffect(actor, this._psyPowerId);
+            this._psyPowerId = null;
         }
     }
 

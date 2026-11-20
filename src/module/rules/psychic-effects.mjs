@@ -30,6 +30,15 @@ export function getEffectDefinitions(power) {
     return PSYCHIC_EFFECTS[power?.name] ?? [];
 }
 
+/**
+ * A power can be sustained when the item says so: its "Sustained" field is not empty and not "No".
+ * Sustaining needs no effect definitions: the power counts against the psy rating and is marked as active.
+ */
+export function canSustain(power) {
+    const value = String(power?.system?.sustained ?? 'No').trim();
+    return value !== '' && value.toLowerCase() !== 'no';
+}
+
 export function hasEffect(power) {
     return getEffectDefinitions(power).length > 0;
 }

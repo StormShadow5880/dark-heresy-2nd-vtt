@@ -22,8 +22,8 @@
                 <span class="dh-mod"><b>Opposed {{opposedChar}}</b> {{opposedRoll.total}} vs {{opposedTarget}}{{#if opposedSuccess}} ({{opposedDos}}){{/if}}</span>
             </div>
         {{/if}}
-        {{#if @root.activeEffectText}}
-            <p class="dh-note"><b>In effect</b> – {{@root.activeEffectText}}. The power is sustained until you end it.</p>
+        {{#if @root.sustainedPower}}
+            <p class="dh-note"><b>Sustained</b> – {{#if @root.activeEffectText}}{{@root.activeEffectText}}. {{/if}}The power stays in effect until you end it; it reduces your current psy rating.</p>
         {{/if}}
         {{#each @root.effectOutput as |effect|}}
             <p class="dh-note"><b>{{effect.name}}</b> – {{effect.effect}}</p>
