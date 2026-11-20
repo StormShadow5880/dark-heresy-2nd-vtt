@@ -691,9 +691,10 @@
 
     // ------------------------------------------------ Layouts
     .ov-layout {
+        // characteristics as one row of square tiles on top, the rest below
         display: grid;
-        grid-template-columns: minmax(310px, 350px) minmax(0, 1fr);
-        gap: 0 14px;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0;
         align-items: start;
     }
     .ov-main {
@@ -825,11 +826,6 @@
     @container dossier (max-width: 1000px) {
         .stat-row {
             grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
-    }
-    @container dossier (max-width: 900px) {
-        .ov-layout {
-            grid-template-columns: 1fr;
         }
     }
     .combat-layout {
@@ -1032,9 +1028,9 @@
     // ------------------------------------------------ Characteristics (tiles, two columns; details in a hover pop-up)
     .chars {
         display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(10, minmax(0, 1fr));
         gap: 6px;
-        padding: 8px 8px 8px;
+        padding: 10px 8px 8px;
     }
     // Card: the supplied brass frame as 9-slice (corner plates keep their size), eagle laid on top
     .char {
@@ -1043,7 +1039,10 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 1px;
+        justify-content: center;
+        aspect-ratio: 1;
+        min-width: 0;
+        gap: 2px;
         padding: 3px 3px 0;
         border: 9px solid transparent;
         border-image: var(--ds-img-card) 150 / 9px / 0 stretch;
@@ -1228,8 +1227,8 @@
                 font-size: 0.85rem;
             }
         }
-        // the right tile of each pair opens its pop-up to the left, so it stays inside the column
-        &:nth-child(even) .char__pop {
+        // the right half of the row opens its pop-up to the left, so it stays inside the sheet
+        &:nth-child(n + 6) .char__pop {
             left: auto;
             right: 0;
             &::before {
@@ -1249,8 +1248,8 @@
             display: block;
         }
     }
-    @container dossier (max-width: 900px) {
-        // single column layout: ten tiles in rows of five
+    @container dossier (max-width: 820px) {
+        // narrow: ten tiles in two rows of five
         .chars {
             grid-template-columns: repeat(5, minmax(0, 1fr));
         }
