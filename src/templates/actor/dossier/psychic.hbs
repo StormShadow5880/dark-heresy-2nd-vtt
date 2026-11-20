@@ -1,5 +1,6 @@
 <section class="tab dossier-tab dossier-tab--psychic" data-tab="psychic" data-group="primary">
     <div class="two-col two-col--narrow-left">
+        <div class="stack">
         <article class="panel">
             <h2 class="panel__title">Psychic Profile</h2>
             <div class="psy-rating" data-tooltip="Current Psy Rating (rating minus sustained powers)">
@@ -21,6 +22,27 @@
             </div>
             <p class="hint">Tables are drawn from the system compendium. Rules for when to roll them are in the rulebook.</p>
         </article>
+        <article class="panel panel--sustained">
+            <h2 class="panel__title">Sustained Powers
+                <span class="panel__hint">{{dossier.psychic.sustainedPowers.length}} active · current PR {{dossier.psychic.current}}</span>
+            </h2>
+            <ul class="rows">
+                {{#each dossier.psychic.sustainedPowers as |p|}}
+                    <li class="item-drag" data-item-id="{{p.id}}">
+                        <span class="grow"><b class="strong">{{p.name}}</b>
+                            <small>{{p.discipline}} · sustain: {{p.sustainAction}} · PR {{p.pr}}</small>
+                            {{#if p.effectText}}<br /><small class="effect-text">{{p.effectText}}</small>{{/if}}
+                        </span>
+                        <button type="button" class="icon-btn on" data-action="togglePsychicEffect" data-item-id="{{p.id}}" data-tooltip="End this power (gives back the psy rating)"><i class="fa-solid fa-hourglass-end"></i></button>
+                        <button type="button" class="icon-btn item-vocalize" data-item-id="{{p.id}}" data-tooltip="Show in chat"><i class="fa-solid fa-comment"></i></button>
+                        <button type="button" class="icon-btn item-edit" data-item-id="{{p.id}}" data-tooltip="Edit"><i class="fa-solid fa-pen"></i></button>
+                    </li>
+                {{else}}
+                    <li class="empty">No power is sustained. A successful manifestation of a sustainable power lists it here.</li>
+                {{/each}}
+            </ul>
+        </article>
+        </div>
 
         <article class="panel">
             <h2 class="panel__title">Psychic Powers

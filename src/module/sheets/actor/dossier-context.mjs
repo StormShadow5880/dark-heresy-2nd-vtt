@@ -5,7 +5,7 @@
  */
 import { SYSTEM_ID } from '../../system-id.mjs';
 import { woundBar } from '../../rules/wounds.mjs';
-import { canSustain, hasEffect } from '../../rules/psychic-effects.mjs';
+import { canSustain, describeEffects, hasEffect } from '../../rules/psychic-effects.mjs';
 
 export const CHARACTERISTIC_ORDER = [
     'weaponSkill',
@@ -379,7 +379,10 @@ export function buildPsychic(actor) {
         }))
         .sort((a, b) => (a.discipline ?? '').localeCompare(b.discipline ?? '') || a.name.localeCompare(b.name));
     const disciplines = [...new Set(powers.map((p) => p.discipline).filter(Boolean))];
+    const sustainedPowers = buildSustainedPowers(actor, powers);
     return {
+        sustainedPowers,
+        hasSustained: sustainedPowers.length > 0,
         rating: psy.rating,
         current: psy.currentRating,
         sustained: psy.sustained,
@@ -389,6 +392,28 @@ export function buildPsychic(actor) {
         powers,
         disciplines,
     };
+}
+
+/**
+ * The powers that are currently sustained, in the order they are listed on the sheet.
+ * `effectText` shows what the power changes at the psy rating it was manifested with.
+ */
+export function buildSustainedPowers(actor, powers) {
+    return powers
+        .filter((p) => p.active)
+        .map((p) => {
+            const item = actor.items.get(p.id);
+            const effect = actor.effects.find((e) => e.getFlag(SYSTEM_ID, 'psyEffect')?.powerId === p.id);
+            const pr = effect?.getFlag(SYSTEM_ID, 'psyEffect')?.pr ?? actor.psy.rating;
+            return {
+                id: p.id,
+                name: p.name,
+                discipline: p.discipline,
+                sustainAction: p.sustained,
+                pr,
+                effectText: p.hasEffect && item ? describeEffects(item, pr) : '',
+            };
+        });
 }
 
 export function buildDevelopment(actor) {

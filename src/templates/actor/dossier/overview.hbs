@@ -68,6 +68,20 @@
                 </ul>
             </article>
 
+            {{#if dossier.psychic.hasSustained}}
+                <article class="panel panel--sustained-mini">
+                    <h2 class="panel__title">Sustained Powers <span class="panel__hint">current PR {{dossier.psychic.current}} / {{dossier.psychic.rating}}</span></h2>
+                    <ul class="rows rows--compact">
+                        {{#each dossier.psychic.sustainedPowers as |p|}}
+                            <li>
+                                <span class="grow">{{p.name}}{{#if p.effectText}} <small>{{p.effectText}}</small>{{/if}}</span>
+                                <button type="button" class="icon-btn on" data-action="togglePsychicEffect" data-item-id="{{p.id}}" data-tooltip="End this power"><i class="fa-solid fa-hourglass-end"></i></button>
+                            </li>
+                        {{/each}}
+                    </ul>
+                </article>
+            {{/if}}
+
             <article class="note">
                 <i class="note__pin" aria-hidden="true"></i>
                 <h2 class="note__title">Personal File</h2>

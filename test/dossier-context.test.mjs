@@ -68,3 +68,22 @@ test('resources expose the damage bar', () => {
     assert.equal(wounds.bar.damage, 8);
     assert.equal(wounds.bar.minorLimit, 6); // toughness bonus of the test actor is 3
 });
+
+test('sustained powers: only active powers are listed, with the effect text at the psy rating they were cast at', () => {
+    const actor = makeActor();
+    actor.psy = { rating: 5 };
+    const ironArm = { id: 'a', name: 'Iron Arm', system: {}, getFlag: () => undefined };
+    actor.items = new Map([['a', ironArm]]);
+    actor.items.get = Map.prototype.get.bind(actor.items);
+    actor.effects = [{ getFlag: () => ({ powerId: 'a', pr: 4 }) }];
+    actor.effects.find = Array.prototype.find.bind(actor.effects);
+    const powers = [
+        { id: 'a', name: 'Iron Arm', active: true, hasEffect: true, discipline: 'Biomancy', sustained: 'Free Action' },
+        { id: 'b', name: 'Smite', active: false, hasEffect: false },
+    ];
+    const list = ctx.buildSustainedPowers(actor, powers);
+    assert.equal(list.length, 1);
+    assert.equal(list[0].name, 'Iron Arm');
+    assert.equal(list[0].pr, 4);
+    assert.equal(list[0].effectText, 'Unnatural Toughness +2, Unnatural Strength +2, Agility -10');
+});

@@ -2039,3 +2039,14 @@
         }
     }
 }
+
+// Sustained powers list (psychic tab and overview)
+.application.dossier .panel--sustained,
+.application.dossier .panel--sustained-mini {
+    .effect-text {
+        color: var(--ds-gold-soft);
+    }
+    .rows--compact > li {
+        padding: 2px 10px;
+    }
+}
