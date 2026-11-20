@@ -171,7 +171,7 @@ const purchasesRunning = new Set();
  *                    prerequisitesConfirmed?: boolean, note?: string}}
  * @returns {Promise<{ok: boolean, errors: string[], quote?: object}>}
  */
-export async function purchaseAdvancement(actor, { kind, key, talent = null, choice = '', prerequisitesConfirmed = false, note = '' }) {
+export async function purchaseAdvancement(actor, { kind, key, talent = null, choice = '', prerequisitesConfirmed = false, note = '', silent = false }) {
     const lock = `${actor.id ?? actor.name}`;
     if (purchasesRunning.has(lock)) return { ok: false, errors: ['Another purchase is still being processed.'] };
     purchasesRunning.add(lock);
@@ -243,7 +243,7 @@ export async function purchaseAdvancement(actor, { kind, key, talent = null, cho
     }
 
     function fail(errors, quote) {
-        for (const message of errors) ui.notifications.warn(message);
+        if (!silent) for (const message of errors) ui.notifications.warn(message);
         return { ok: false, errors, quote };
     }
 }
