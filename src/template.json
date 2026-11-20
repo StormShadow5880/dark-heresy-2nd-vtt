@@ -1125,6 +1125,7 @@
             "containerTypes": ["attackSpecial"],
             "cost": 0,
             "sustained": "No",
+            "autoEffects": [],
             "discipline": "",
             "subtype": "Concentration",
             "action": "Half Action",

@@ -23,11 +23,53 @@ export const PSYCHIC_EFFECTS = {
     ],
 };
 
+export const CHARACTERISTIC_LABELS = {
+    weaponSkill: 'Weapon Skill',
+    ballisticSkill: 'Ballistic Skill',
+    strength: 'Strength',
+    toughness: 'Toughness',
+    agility: 'Agility',
+    intelligence: 'Intelligence',
+    perception: 'Perception',
+    willpower: 'Willpower',
+    fellowship: 'Fellowship',
+    influence: 'Influence',
+};
+export const EFFECT_FIELDS = { unnatural: 'Unnatural', modifier: 'Modifier' };
+
+/**
+ * Brings a definition into one shape. The item sheet stores rows as `{ characteristic, field, value, pr }`,
+ * the registry (and advanced users) may give a plain `path`. A missing or blank `value` means "from the psy rating".
+ */
+export function normalizeDefinition(def) {
+    const path = def.path || (def.characteristic && def.field ? `system.characteristics.${def.characteristic}.${def.field}` : '');
+    const match = /^system\.characteristics\.(\w+)\.(\w+)$/.exec(path);
+    const label =
+        def.label ??
+        (match
+            ? `${match[2] === 'unnatural' ? 'Unnatural ' : ''}${CHARACTERISTIC_LABELS[match[1]] ?? match[1]}${match[2] === 'modifier' ? ' modifier' : ''}`
+            : path);
+    const blank = def.value === undefined || def.value === null || def.value === '';
+    return { ...def, path, label, value: blank ? undefined : Number(def.value), mode: def.mode ?? MODE_ADD };
+}
+
+/** The stored rows may be an array or (after a form submit) an object keyed by index */
+function asList(value) {
+    if (Array.isArray(value)) return value;
+    if (value && typeof value === 'object') return Object.keys(value).sort((a, b) => a - b).map((k) => value[k]);
+    return [];
+}
+
 /** @returns {object[]} the effect definitions of a power (empty when it has none) */
 export function getEffectDefinitions(power) {
-    const own = power?.system?.autoEffects;
-    if (Array.isArray(own) && own.length) return own;
-    return PSYCHIC_EFFECTS[power?.name] ?? [];
+    const own = asList(power?.system?.autoEffects).filter((d) => d && (d.path || (d.characteristic && d.field)));
+    const defs = own.length ? own : (PSYCHIC_EFFECTS[power?.name] ?? []);
+    return defs.map(normalizeDefinition);
+}
+
+/** Rows of the item sheet editor */
+export function effectRows(power) {
+    return asList(power?.system?.autoEffects);
 }
 
 /**
@@ -45,7 +87,7 @@ export function hasEffect(power) {
 
 /** Value of one definition for a psy rating */
 export function computeValue(def, pr) {
-    if (def.value !== undefined && def.value !== null) return Number(def.value);
+    if (def.value !== undefined && def.value !== null && def.value !== '') return Number(def.value);
     const rating = Math.max(0, Number(pr) || 0);
     const divide = Number(def.pr?.divide) || 1;
     const multiply = Number(def.pr?.multiply) || 1;

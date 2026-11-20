@@ -57,6 +57,9 @@
                         <a class="item" data-tab="stats" data-group="primary">action</a>
                     </label>
                     <label class="dh-navigation__item">
+                        <a class="item" data-tab="effects" data-group="primary">effects</a>
+                    </label>
+                    <label class="dh-navigation__item">
                         <a class="item" data-tab="description" data-group="primary">description</a>
                     </label>
                 </div>
@@ -194,6 +197,34 @@
                                     {{/if}}
                                 {{/each}}
                             </div>
+                        </div>
+                    </div>
+                    <div class="tab" data-group="primary" data-tab="effects">
+                        <div class="dh-panel dh-grid-col-6">
+                            <h1 class="dh-panel__header">While the power is in effect</h1>
+                            <p class="dh-effect-help">After a successful manifestation these changes are applied to the psyker as an Active Effect
+                                (only for powers that can be sustained, the Sustained field is not "No"). Leave <em>Fixed</em> empty to calculate the
+                                value from the psy rating: psy rating ÷ <em>Divide</em>, rounded as selected.</p>
+                            <table class="dh-effect-table">
+                                <thead>
+                                    <tr><th>Characteristic</th><th>Field</th><th>Fixed</th><th>PR ÷</th><th>Rounding</th><th></th></tr>
+                                </thead>
+                                <tbody>
+                                    {{#each effectRows as |row i|}}
+                                        <tr>
+                                            <td><select name="system.autoEffects.{{i}}.characteristic">{{selectOptions @root.effectCharacteristics selected=row.characteristic}}</select></td>
+                                            <td><select name="system.autoEffects.{{i}}.field">{{selectOptions @root.effectFields selected=row.field}}</select></td>
+                                            <td><input type="number" data-dtype="Number" name="system.autoEffects.{{i}}.value" value="{{row.value}}" placeholder="from PR" /></td>
+                                            <td><input type="number" data-dtype="Number" name="system.autoEffects.{{i}}.pr.divide" value="{{row.pr.divide}}" /></td>
+                                            <td><select name="system.autoEffects.{{i}}.pr.round">{{selectOptions @root.effectRounding selected=row.pr.round}}</select></td>
+                                            <td><button type="button" data-action="removePsychicEffect" data-index="{{i}}" aria-label="Remove effect">✕</button></td>
+                                        </tr>
+                                    {{else}}
+                                        <tr><td colspan="6">No effects. The power can still be sustained, it just does not change any values.</td></tr>
+                                    {{/each}}
+                                </tbody>
+                            </table>
+                            <button type="button" data-action="addPsychicEffect">+ Add effect</button>
                         </div>
                     </div>
                     <div class="tab" data-group="primary" data-tab="description">

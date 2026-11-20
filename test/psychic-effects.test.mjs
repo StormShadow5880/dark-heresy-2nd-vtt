@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildChanges, canSustain, computeValue, describeEffects, getEffectDefinitions, hasEffect, MODE_ADD } from '../src/module/rules/psychic-effects.mjs';
+import { buildChanges, canSustain, effectRows, normalizeDefinition, computeValue, describeEffects, getEffectDefinitions, hasEffect, MODE_ADD } from '../src/module/rules/psychic-effects.mjs';
 import { installFoundryStubs } from './helpers.mjs';
 
 installFoundryStubs();
@@ -132,4 +132,35 @@ test('a power without effect definitions changes nothing', async () => {
     assert.equal(await mgr.activatePsychicEffect(actor, { id: 'x', name: 'Smite', system: {} }, 3), null);
     assert.equal(actor.effects.length, 0);
     assert.equal(actor.system.psy.sustained, 0);
+});
+
+test('item sheet rows (characteristic + field) become definitions; a blank fixed value means "from the psy rating"', () => {
+    const power = {
+        name: 'Test',
+        system: {
+            autoEffects: [
+                { characteristic: 'toughness', field: 'unnatural', value: '', pr: { divide: 2, round: 'up' } },
+                { characteristic: 'agility', field: 'modifier', value: -10 },
+            ],
+        },
+    };
+    const defs = getEffectDefinitions(power);
+    assert.equal(defs[0].path, 'system.characteristics.toughness.unnatural');
+    assert.equal(defs[1].path, 'system.characteristics.agility.modifier');
+    assert.equal(defs[0].label, 'Unnatural Toughness');
+    assert.equal(defs[1].label, 'Agility modifier');
+    assert.deepEqual(buildChanges(power, 5).map((c) => c.value), ['3', '-10']);
+    assert.equal(describeEffects(power, 5), 'Unnatural Toughness +3, Agility modifier -10');
+});
+
+test('rows that came back from a form as an object keyed by index are understood, empty rows are ignored', () => {
+    const power = { name: 'Test', system: { autoEffects: { 1: { characteristic: 'strength', field: 'unnatural', value: 2 }, 0: { characteristic: 'toughness', field: 'unnatural', value: 1 }, 2: {} } } };
+    assert.deepEqual(getEffectDefinitions(power).map((d) => d.path), ['system.characteristics.toughness.unnatural', 'system.characteristics.strength.unnatural']);
+    assert.equal(effectRows(power).length, 3);
+});
+
+test('item data wins over the registry, so the compendium entry can define the effects of Iron Arm itself', () => {
+    const own = { name: 'Iron Arm', system: { autoEffects: [{ characteristic: 'strength', field: 'unnatural', value: 1 }] } };
+    assert.deepEqual(getEffectDefinitions(own).map((d) => d.path), ['system.characteristics.strength.unnatural']);
+    assert.equal(normalizeDefinition({ path: 'system.foo', value: 3 }).label, 'system.foo');
 });
