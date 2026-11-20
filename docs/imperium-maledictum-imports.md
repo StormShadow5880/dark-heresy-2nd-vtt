@@ -41,8 +41,10 @@ Max Wounds = Strength Bonus + (2 × Toughness Bonus) + Willpower Bonus
 
 **Behaviour and decisions** (these are our decisions, not text of IM or DH2)
 
-1. **Bonus:** the characteristic bonus of the sheet is used (tens digit of the characteristic plus the *unnatural*
-   bonus). The **fatigue penalty is not applied**: the maximum must not move up and down with fatigue.
+1. **Bonus:** only the **tens digit** of the characteristic (advances and modifier included) is used, the "wound
+   bonus". The *unnatural* bonus is **not** part of it, and neither is the fatigue penalty: wounds are strictly
+   separated from them. (The sheet's characteristic bonus, which includes unnatural, stays what it is for armour,
+   damage and tests.) The wound track's minor zone (2 × Toughness Bonus) uses the same wound bonus.
 2. **Only player characters (`acolyte`).** NPCs and vehicles keep the values entered on the sheet.
 3. **Automatic updates.** The maximum is a derived value, calculated after Active Effects are applied. When a power
    becomes active (for example Iron Arm raising Toughness and Strength), when a trait, talent or other item changes, or

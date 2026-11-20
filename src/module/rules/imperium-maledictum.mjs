@@ -25,8 +25,8 @@ export const IM_IMPORTS = {
  * IM-001: Maximum wounds.
  *   Max Wounds = Strength Bonus + (2 × Toughness Bonus) + Willpower Bonus
  *
- * The bonuses are the characteristic bonuses of the sheet (tens digit of the characteristic plus unnatural
- * bonus). A modifier can be added for special cases (talents, traits, Active Effects).
+ * The bonuses are the tens digits of the characteristics ("wound bonus"). The unnatural bonus and the fatigue
+ * penalty are NOT included: wounds are strictly separated from them. A modifier can be added for special cases.
  *
  * @param bonuses {{strength: number, toughness: number, willpower: number}}
  * @param modifier {number} flat bonus or malus

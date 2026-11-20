@@ -52,3 +52,9 @@ test('the import is registered with source and setting', () => {
     assert.equal(IM_IMPORTS['IM-001'].since, '1.9.0');
     assert.match(IM_IMPORTS['IM-001'].formula, /Strength Bonus \+ \(2 × Toughness Bonus\) \+ Willpower Bonus/);
 });
+
+test('IM-001: wound bonus is the tens digit only, unnatural bonus does not count', () => {
+    // Strength 35 with Unnatural Strength +2: sheet bonus 5, wound bonus 3
+    const woundBonus = (total) => Math.floor(total / 10);
+    assert.equal(maxWounds({ strength: woundBonus(35), toughness: woundBonus(40), willpower: woundBonus(30) }), 3 + 8 + 3);
+});

@@ -12,7 +12,9 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
   automatically for player characters. The maximum updates when a trait, talent, item, Active Effect or an active
   psychic power changes a characteristic; the damage a character has taken stays the same. New field
   *Wounds modifier*; world setting *Maximum Wounds Rule* (*Imperium Maledictum* / *Manual*) switches back to the
-  entered maximum. NPCs and vehicles are unchanged. Details and decisions:
+  entered maximum. NPCs and vehicles are unchanged. The bonuses are the tens digits only: **Unnatural bonus and the
+  fatigue penalty do not count** towards wounds (e.g. Iron Arm's Unnatural Toughness does not raise the maximum).
+  Details and decisions:
   [docs/imperium-maledictum-imports.md](docs/imperium-maledictum-imports.md#im-001--maximum-wounds).
   Files: `src/module/rules/imperium-maledictum.mjs`, `src/module/documents/acolyte.mjs`,
   `src/module/actions/wounds-sync.mjs`.
@@ -45,11 +47,13 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
 - Wounds track: the bar shows wounds taken, minor / serious zone (first 2 × Toughness Bonus), critical damage with
   ten pips (dead at 10). Damage beyond the maximum becomes critical damage, healing reverses it.
 - Experience spending with log (costs are entered by hand, limits and available XP are validated).
-- Characteristic pop-up shows the **stored** values (Initial, Modifier, Unnatural). Before, it showed values that already
+- Characteristic fields (dossier pop-up and classic sheet) show the **stored** values (Initial, Modifier, Unnatural). Before, it showed values that already
   contained Active Effects (e.g. Unnatural from a sustained power), and saving the sheet made them permanent. The
   bonus tooltip shows how it is made up (tens digit + unnatural).
 
 ### Psychic powers
+- Deleting a power that is in effect ends it: its Active Effect (and so its bonus) is removed and it stops counting as
+  sustained.
 - Psychic tab redesigned (single column): header strip, compact profile card (ring, key figures, discipline chips,
   values in a fold-out), slim Sustained Powers line, flat power list with icon tiles that unfold on click, Manifest
   button inside the unfolded power, slim Psychic Phenomena / Perils of the Warp buttons; violet only as accent.

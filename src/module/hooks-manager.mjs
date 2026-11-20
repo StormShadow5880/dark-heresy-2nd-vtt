@@ -40,7 +40,7 @@ import { DHTourMain } from './tours/main-tour.mjs';
 import * as documents from './documents/_module.mjs'
 
 import { SYSTEM_ID } from './system-id.mjs';
-import { onPsychicEffectRemoved, refreshPsychicEffects } from './actions/psychic-effect-manager.mjs';
+import { onPsychicEffectRemoved, onPsychicPowerDeleted, refreshPsychicEffects } from './actions/psychic-effect-manager.mjs';
 import { registerWoundsSyncHooks, syncAllWounds } from './actions/wounds-sync.mjs';
 export { SYSTEM_ID };
 
@@ -52,6 +52,7 @@ export class HooksManager {
         Hooks.on('ready', HooksManager.ready);
         Hooks.on('hotbarDrop', HooksManager.hotbarDrop);
         Hooks.on('deleteActiveEffect', HooksManager.deleteActiveEffect);
+        Hooks.on('deleteItem', HooksManager.deleteItem);
         Hooks.on('updateActor', HooksManager.updateActor);
         registerWoundsSyncHooks();
 
@@ -154,6 +155,11 @@ Enable Debug with: game.dh.debug = true
     static async deleteActiveEffect(effect, options, userId) {
         if (userId !== game.user.id) return;
         await onPsychicEffectRemoved(effect);
+    }
+
+    static async deleteItem(item, options, userId) {
+        if (userId !== game.user.id) return;
+        await onPsychicPowerDeleted(item);
     }
 
     /** Active psychic effects follow a changed psy rating */

@@ -122,7 +122,7 @@ export function buildResources(actor) {
             breakdown: s.wounds.breakdown ?? '',
             modifier: Number(s.wounds.modifier) || 0,
             pct: percent(s.wounds.value, s.wounds.max),
-            bar: woundBar(s.wounds.value, s.wounds.max, s.wounds.critical, actor.characteristics.toughness?.bonus),
+            bar: woundBar(s.wounds.value, s.wounds.max, s.wounds.critical, actor.characteristics.toughness?.woundBonus ?? actor.characteristics.toughness?.bonus),
             tone: 'wounds',
             note: s.wounds.critical ? `Critical: ${s.wounds.critical}` : '',
         },

@@ -87,6 +87,18 @@ export async function onPsychicEffectRemoved(effect) {
     await endSustained(actor, actor.items.get(info.powerId));
 }
 
+/**
+ * Deleting a power that is in effect ends it: its Active Effect goes away (the bonus must not stay behind) and it
+ * no longer counts as sustained.
+ */
+export async function onPsychicPowerDeleted(item) {
+    const actor = item.parent;
+    if (!(actor instanceof Actor) || !item.isPsychicPower) return;
+    const effect = findPsychicEffect(actor, item.id);
+    if (effect) await effect.delete(); // deleteActiveEffect hook ends the sustained count
+    else if (item.getFlag?.(SYSTEM_ID, 'sustainedActive')) await endSustained(actor, null);
+}
+
 /** The values of active effects follow a changed psy rating of the actor */
 export async function refreshPsychicEffects(actor) {
     for (const effect of actor.effects.filter((e) => e.getFlag(SYSTEM_ID, 'psyEffect'))) {

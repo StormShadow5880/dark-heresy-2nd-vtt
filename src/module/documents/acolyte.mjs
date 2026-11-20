@@ -250,8 +250,9 @@ export class DarkHeresyAcolyte extends DarkHeresyBaseActor {
         for (const [name, characteristic] of Object.entries(this.characteristics)) {
             characteristic.total = characteristic.base + characteristic.advance * 5 + characteristic.modifier;
             characteristic.bonus = Math.floor(characteristic.total / 10) + characteristic.unnatural;
-            // bonus before the fatigue penalty: the maximum wounds must not change with fatigue
-            characteristic.bonusNoFatigue = characteristic.bonus;
+            // Bonus for the wounds: tens digit only. Unnatural bonus and the fatigue penalty are NOT part of it
+            // (wounds are strictly separated from them, see docs/imperium-maledictum-imports.md)
+            characteristic.woundBonus = Math.floor(characteristic.total / 10);
 
             // Homeworld Bonus or Negative
             if (this.backgroundEffects.homeworld) {
@@ -283,7 +284,7 @@ export class DarkHeresyAcolyte extends DarkHeresyBaseActor {
     _computeWounds() {
         if (this.type !== 'acolyte' || !woundsFormulaIsIM()) return;
         const c = this.characteristics;
-        const bonuses = { strength: c.strength.bonusNoFatigue, toughness: c.toughness.bonusNoFatigue, willpower: c.willpower.bonusNoFatigue };
+        const bonuses = { strength: c.strength.woundBonus, toughness: c.toughness.woundBonus, willpower: c.willpower.woundBonus };
         const modifier = Number(this.system.wounds.modifier) || 0;
         this.system.wounds.max = maxWounds(bonuses, modifier);
         this.system.wounds.derived = true;
