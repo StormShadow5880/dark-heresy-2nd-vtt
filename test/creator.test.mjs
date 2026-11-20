@@ -272,3 +272,22 @@ test('step status: nothing is complete on an empty draft, biography needs a name
     assert.equal(st.welcome, true);
     assert.equal(st.review, false);
 });
+
+test('blockers explain what is open in every step and match the step status', () => {
+    const d = ch.newDraft();
+    let state = ch.computeCharacter(d, env);
+    let blockers = ch.stepBlockers(state, d);
+    assert.deepEqual(blockers.homeworld, ['Choose a home world.']);
+    assert.ok(blockers.characteristics[0].includes('home world'));
+    d.homeWorldId = 'homeworld.forge-world';
+    d.backgroundId = 'background.outcast';
+    state = ch.computeCharacter(d, env);
+    blockers = ch.stepBlockers(state, d);
+    assert.ok(blockers.homeworld[0].includes("Omnissiah's Chosen"));
+    assert.ok(blockers.background[0].includes('background aptitude'));
+    const status = ch.stepStatus(state, d);
+    for (const step of Object.keys(blockers)) {
+        if (['welcome', 'elite', 'xp', 'review'].includes(step)) continue;
+        assert.equal(status[step], blockers[step].length === 0, step);
+    }
+});

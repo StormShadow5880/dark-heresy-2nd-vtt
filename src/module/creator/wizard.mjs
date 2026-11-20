@@ -6,7 +6,7 @@ import { SYSTEM_ID } from '../system-id.mjs';
 import { markTooltips } from '../ui/tooltips.mjs';
 import { aptitudeName, buildQuotes, describeQuote, num } from '../rules/advancement.mjs';
 import { BACKGROUNDS, CHARACTERISTICS, HOMEWORLDS, POINT_BUY, ROLES, byId } from './data.mjs';
-import { STEPS, computeCharacter, newDraft, replayAdvances, stepStatus } from './character.mjs';
+import { STEPS, computeCharacter, newDraft, replayAdvances, stepBlockers, stepStatus } from './character.mjs';
 import { logEvent, markStepDone, pruneChoices, rerollCharacteristic, revalidateAdvances, setBackground, setCharacteristicRoll, setHomeWorld, setRole } from './draft.mjs';
 import { characteristicFormula, characteristicKind, evaluatePointBuy, pointBuyBase, rollBase } from './rules.mjs';
 import { createCompendiumResolver, finalizeCharacter } from './finalize.mjs';
@@ -141,6 +141,7 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
             canBack: stepIndex > 0,
             canNext: stepIndex < STEPS.length - 1 && (this.expert || status[current.id] || current.optional),
             isLast: stepIndex === STEPS.length - 1,
+            blockers: this.expert ? [] : (stepBlockers(state, draft)[this.step] ?? []),
             progress: Math.round((steps.filter((s) => s.complete && s.id !== 'review').length / (STEPS.length - 1)) * 100),
             draft,
             state,
@@ -166,7 +167,7 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
         context.backgrounds = BACKGROUNDS.map((b) => ({
             ...b,
             selected: b.id === draft.backgroundId,
-            skillText: b.skills.map((s) => (s.pick ? 'Scholastic Lore (pick)' : s.options.map((o) => `${o.skill}${o.spec ? ` (${o.spec})` : ''}`).join(' / '))).join('; '),
+            skillText: b.skills.map((s) => (s.pick ? 'Scholastic Lore (pick)' : s.options.map((o) => `${skillName(o.skill)}${o.spec ? ` (${o.spec})` : ''}`).join(' / '))).join('; '),
             talentText: b.talents.map((t) => (t.options ? t.options.map((p) => p.map((x) => `${x.talent} (${x.spec})`).join(' + ')).join(' or ') : `${t.talent}${t.spec ? ` (${t.spec})` : ''}`)).join('; '),
             aptitudeText: b.aptitudeChoice.join(' or '),
         }));
@@ -508,6 +509,8 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
         }
     }
 }
+
+const skillName = (key) => key.replace(/([A-Z])/g, ' $1').replace(/^./, (c) => c.toUpperCase());
 
 function label(key) {
     return CHARACTERISTICS.find((c) => c.key === key)?.label ?? key ?? '–';

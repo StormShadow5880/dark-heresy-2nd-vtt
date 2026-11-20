@@ -20,6 +20,11 @@
     <section class="creator__main">
         <h3 class="creator__step-title">{{stepLabel}}{{#if optional}} <small>(optional)</small>{{/if}}</h3>
 
+        {{#if blockers.length}}
+            <div class="blockers" role="status"><b><i class="fa-solid fa-circle-exclamation"></i> Before you can continue:</b>
+                <ul>{{#each blockers as |b|}}<li>{{b}}</li>{{/each}}</ul></div>
+        {{/if}}
+
         {{!-- 1 welcome --}}
         {{#if at.welcome}}
             <div class="panel">
@@ -46,6 +51,10 @@
         {{!-- 2 home world --}}
         {{#if at.homeworld}}
             <p class="hint">The home world decides which characteristics are rolled with advantage or disadvantage, your fate, wounds and first aptitude. Unusual combinations are allowed.</p>
+            {{#each hwChoices as |c|}}
+                <div class="field"><label>{{c.label}}</label>
+                    <select name="c.{{c.id}}"><option value="">– choose –</option>{{#each c.options as |o|}}<option value="{{o.value}}" {{#if o.selected}}selected{{/if}}>{{o.label}}</option>{{/each}}</select></div>
+            {{/each}}
             <div class="cards">
                 {{#each homeWorlds as |h|}}
                     <button type="button" class="card {{#if h.selected}}is-selected{{/if}}" data-action="selectHomeWorld" data-id="{{h.id}}" aria-pressed="{{h.selected}}">
@@ -64,10 +73,6 @@
                     </button>
                 {{/each}}
             </div>
-            {{#each hwChoices as |c|}}
-                <div class="field"><label>{{c.label}}</label>
-                    <select name="c.{{c.id}}"><option value="">– choose –</option>{{#each c.options as |o|}}<option value="{{o.value}}" {{#if o.selected}}selected{{/if}}>{{o.label}}</option>{{/each}}</select></div>
-            {{/each}}
         {{/if}}
 
         {{!-- 3 characteristics --}}
@@ -126,6 +131,10 @@
         {{!-- 4 background --}}
         {{#if at.background}}
             <p class="hint">The background grants five skills, talents, equipment, a bonus and an aptitude of your choice.</p>
+            {{#if bgChoice}}
+                <div class="field warnbox"><label>Background aptitude</label>
+                    <select name="c.bg-apt"><option value="">– choose –</option>{{#each bgChoice.options as |o|}}<option value="{{o.value}}" {{#if o.selected}}selected{{/if}}>{{o.label}}</option>{{/each}}</select></div>
+            {{/if}}
             <div class="cards">
                 {{#each backgrounds as |b|}}
                     <button type="button" class="card {{#if b.selected}}is-selected{{/if}}" data-action="selectBackground" data-id="{{b.id}}" aria-pressed="{{b.selected}}">
@@ -140,14 +149,15 @@
                     </button>
                 {{/each}}
             </div>
-            {{#if bgChoice}}
-                <div class="field"><label>Background aptitude</label>
-                    <select name="c.bg-apt"><option value="">– choose –</option>{{#each bgChoice.options as |o|}}<option value="{{o.value}}" {{#if o.selected}}selected{{/if}}>{{o.label}}</option>{{/each}}</select></div>
-            {{/if}}
         {{/if}}
 
         {{!-- 5 role --}}
         {{#if at.role}}
+            {{#each roleChoices as |c|}}
+                <div class="field"><label>{{c.label}}</label>
+                    {{#if c.text}}<input type="text" name="c.{{c.id}}" value="{{c.textValue}}" placeholder="e.g. Orks, Mutants, ..." />
+                    {{else}}<select name="c.{{c.id}}"><option value="">– choose –</option>{{#each c.options as |o|}}<option value="{{o.value}}" {{#if o.selected}}selected{{/if}}>{{o.label}}</option>{{/each}}</select>{{/if}}</div>
+            {{/each}}
             <div class="cards">
                 {{#each roles as |r|}}
                     <button type="button" class="card {{#if r.selected}}is-selected{{/if}}" data-action="selectRole" data-id="{{r.id}}" aria-pressed="{{r.selected}}">
@@ -162,11 +172,6 @@
                     </button>
                 {{/each}}
             </div>
-            {{#each roleChoices as |c|}}
-                <div class="field"><label>{{c.label}}</label>
-                    {{#if c.text}}<input type="text" name="c.{{c.id}}" value="{{c.textValue}}" placeholder="e.g. Orks, Mutants, ..." />
-                    {{else}}<select name="c.{{c.id}}"><option value="">– choose –</option>{{#each c.options as |o|}}<option value="{{o.value}}" {{#if o.selected}}selected{{/if}}>{{o.label}}</option>{{/each}}</select>{{/if}}</div>
-            {{/each}}
         {{/if}}
 
         {{!-- 6 aptitudes and bonuses --}}

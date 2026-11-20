@@ -474,4 +474,44 @@ export function stepStatus(state, draft) {
     return done;
 }
 
+/**
+ * What is still open in each step, as readable sentences (shown above the step so the player knows why "Next" is
+ * disabled). A step is complete exactly when its list is empty (optional steps never block).
+ */
+export function stepBlockers(state, draft) {
+    const open = (step) => state.choices.filter((c) => c.step === step && c.required && !c.resolved).map((c) => `Choose: ${c.label}`);
+    const homeFirst = state.homeWorld ? [] : ['Choose a home world first.'];
+    const characteristics = [...homeFirst];
+    if (state.homeWorld && !state.characteristicsComplete) {
+        if (draft.characteristics.method === 'pointbuy') characteristics.push(...(state.pointBuy?.errors ?? []));
+        else {
+            const missing = CHARACTERISTIC_KEYS.filter((k) => state.characteristics[k] === undefined).length;
+            characteristics.push(`Roll the remaining ${missing} characteristic${missing === 1 ? '' : 's'}.`);
+        }
+    }
+    const vitals = [...homeFirst];
+    if (state.homeWorld) {
+        if (!state.wounds) vitals.push('Roll the wounds (1d5).');
+        if (!state.fate) vitals.push("Roll the Emperor's Blessing (1d10).");
+    }
+    if (!state.divination) vitals.push('Roll the divination (1d100).');
+    vitals.push(...open('vitals'));
+    const needBg = state.background ? [] : ['Choose a background first.'];
+    return {
+        welcome: [],
+        homeworld: [...(state.homeWorld ? [] : ['Choose a home world.']), ...open('homeworld')],
+        characteristics,
+        background: [...(state.background ? [] : ['Choose a background.']), ...(state.background && !state.choices.find((c) => c.id === 'bg-apt')?.resolved ? ['Choose the background aptitude (selection above the cards).'] : [])],
+        role: [...(state.role ? [] : ['Choose a role.']), ...open('role')],
+        aptitudes: [...(state.background ? [] : needBg), ...(state.role ? [] : ['Choose a role first.']), ...open('aptitudes')],
+        skills: [...needBg, ...open('skills')],
+        vitals,
+        elite: state.corruptionPending ? ['Roll the corruption of the rogue psyker (1d10).'] : [],
+        xp: [],
+        equipment: [...needBg, ...open('equipment')],
+        biography: String(draft.biography?.name ?? '').trim() ? [] : ['Enter a character name.'],
+        review: [],
+    };
+}
+
 export { APTITUDES };
