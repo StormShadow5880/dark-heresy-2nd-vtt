@@ -1,0 +1,342 @@
+<div class="creator">
+    {{!-- ================= left: navigation ================= --}}
+    <nav class="creator__nav" aria-label="Creation steps">
+        <h2 class="creator__title">Acolyte Creation</h2>
+        <div class="creator__progress" data-tooltip="Completed steps"><span style="width: {{progress}}%"></span></div>
+        <ol class="steps">
+            {{#each steps as |s|}}
+                <li class="step {{#if s.current}}is-current{{/if}} {{#if s.complete}}is-done{{/if}} {{#if s.locked}}is-locked{{/if}}">
+                    <button type="button" data-action="goStep" data-step="{{s.id}}" {{#if s.locked}}disabled{{/if}}>
+                        <span class="step__no">{{#if s.complete}}<i class="fa-solid fa-check"></i>{{else}}{{s.index}}{{/if}}</span>
+                        <span class="step__label">{{s.label}}{{#if s.optional}} <small>optional</small>{{/if}}</span>
+                    </button>
+                </li>
+            {{/each}}
+        </ol>
+        {{#if expert}}<p class="creator__badge" data-tooltip="Manual changes are recorded as GM override">GM / Expert mode</p>{{/if}}
+    </nav>
+
+    {{!-- ================= middle: current step ================= --}}
+    <section class="creator__main">
+        <h3 class="creator__step-title">{{stepLabel}}{{#if optional}} <small>(optional)</small>{{/if}}</h3>
+
+        {{!-- 1 welcome --}}
+        {{#if at.welcome}}
+            <div class="panel">
+                <p>This wizard creates a complete Dark Heresy 2nd Edition acolyte from the core rulebook: home world, characteristics, background, role, aptitudes, starting skills and talents, wounds, fate, divination, starting experience and equipment. Everything you decide is saved as a draft, so you can stop and continue later.</p>
+                {{#if resumed}}<p class="note"><i class="fa-solid fa-floppy-disk"></i> A saved draft was loaded. Use "Start over" to discard it.</p>{{/if}}
+                <div class="field"><label>Creation mode</label>
+                    <label class="radio"><input type="radio" name="mode" value="guided" {{#unless expert}}checked{{/unless}} /> Guided (rules enforced)</label>
+                    {{#if isGM}}<label class="radio"><input type="radio" name="mode" value="expert" {{#if expert}}checked{{/if}} /> GM / Expert (overrides allowed, recorded)</label>{{/if}}
+                </div>
+                <dl class="facts">
+                    <div><dt>Starting experience</dt><dd>{{startingXp}} XP</dd></div>
+                    <div><dt>Rule source</dt><dd>Dark Heresy 2E core rulebook (dh2-core)</dd></div>
+                </dl>
+                {{#if randomAllowed}}
+                    <div class="btn-row">
+                        <button type="button" class="btn" data-action="randomPick" data-what="homeworld"><i class="fa-solid fa-dice"></i> Random home world</button>
+                        <button type="button" class="btn" data-action="randomPick" data-what="background"><i class="fa-solid fa-dice"></i> Random background</button>
+                        <button type="button" class="btn" data-action="randomPick" data-what="role"><i class="fa-solid fa-dice"></i> Random role</button>
+                    </div>
+                {{/if}}
+            </div>
+        {{/if}}
+
+        {{!-- 2 home world --}}
+        {{#if at.homeworld}}
+            <p class="hint">The home world decides which characteristics are rolled with advantage or disadvantage, your fate, wounds and first aptitude. Unusual combinations are allowed.</p>
+            <div class="cards">
+                {{#each homeWorlds as |h|}}
+                    <button type="button" class="card {{#if h.selected}}is-selected{{/if}}" data-action="selectHomeWorld" data-id="{{h.id}}" aria-pressed="{{h.selected}}">
+                        <b>{{h.name}}</b>
+                        <em>{{h.description}}</em>
+                        <dl>
+                            <div><dt>Positive</dt><dd>{{h.positiveText}}</dd></div>
+                            <div><dt>Negative</dt><dd>{{h.negativeText}}</dd></div>
+                            <div><dt>Fate</dt><dd>{{h.fateThreshold}} (blessing {{h.blessing}}+)</dd></div>
+                            <div><dt>Wounds</dt><dd>{{h.woundsText}}</dd></div>
+                            <div><dt>Aptitude</dt><dd>{{h.aptitude}}</dd></div>
+                        </dl>
+                        <p class="bonus"><b>{{h.bonus.name}}.</b> {{h.bonus.benefit}}</p>
+                        <small class="why">{{h.hint}}</small>
+                        <small class="src">{{h.bookPage}}</small>
+                    </button>
+                {{/each}}
+            </div>
+            {{#each hwChoices as |c|}}
+                <div class="field"><label>{{c.label}}</label>
+                    <select name="c.{{c.id}}"><option value="">– choose –</option>{{#each c.options as |o|}}<option value="{{o.value}}" {{#if o.selected}}selected{{/if}}>{{o.label}}</option>{{/each}}</select></div>
+            {{/each}}
+        {{/if}}
+
+        {{!-- 3 characteristics --}}
+        {{#if at.characteristics}}
+            <div class="field"><label>Method</label>
+                <label class="radio"><input type="radio" name="method" value="roll" {{#if (eqs method "roll")}}checked{{/if}} /> Roll (20 + 2d10)</label>
+                <label class="radio"><input type="radio" name="method" value="pointbuy" {{#if (eqs method "pointbuy")}}checked{{/if}} {{#if veteran}}disabled{{/if}} /> Point buy ({{pointBuy.total}} points)</label>
+                {{#if veteranAllowed}}
+                    <label>Veteran base 25 <select name="veteranMode"><option value="no" {{#unless veteran}}selected{{/unless}}>No</option><option value="yes" {{#if veteran}}selected{{/if}}>Yes</option></select></label>
+                {{/if}}
+            </div>
+            {{#unless draft.homeWorldId}}<p class="warn">Choose a home world first: it decides which characteristics are rolled with advantage.</p>{{/unless}}
+            {{#if (eqs method "roll")}}
+                <table class="table">
+                    <thead><tr><th>Characteristic</th><th>Dice</th><th>Rolled</th><th class="num">Value</th><th></th></tr></thead>
+                    <tbody>
+                        {{#each chars as |c|}}
+                            <tr class="kind-{{c.kind}}">
+                                <td><b>{{c.label}}</b> <small>{{c.short}}</small></td>
+                                <td>{{c.formula}}</td>
+                                <td>{{#if c.rolled}}{{c.dice}}{{#if c.previous}} <small data-tooltip="First roll, replaced by the re-roll">(was {{c.previous}})</small>{{/if}}{{/if}}</td>
+                                <td class="num strong">{{#if c.value}}{{c.value}}{{else}}–{{/if}}</td>
+                                <td class="act">
+                                    {{#unless c.rolled}}<button type="button" class="btn" data-action="rollCharacteristic" data-key="{{c.key}}"><i class="fa-solid fa-dice-d10"></i> Roll</button>{{/unless}}
+                                    {{#if c.canReroll}}<button type="button" class="icon-btn" data-action="reroll" data-key="{{c.key}}" data-tooltip="Re-roll (only once for the whole generation, the second result counts)"><i class="fa-solid fa-rotate"></i></button>{{/if}}
+                                </td>
+                            </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+                <div class="btn-row"><button type="button" class="btn btn--primary" data-action="rollAll"><i class="fa-solid fa-dice"></i> Roll all</button>
+                    <span class="hint">{{#if rerollUsed}}Re-roll used.{{else}}One re-roll is available (the second result counts).{{/if}}</span></div>
+            {{else}}
+                <table class="table">
+                    <thead><tr><th>Characteristic</th><th class="num">Start</th><th class="num">Points</th><th class="num">Value</th><th></th></tr></thead>
+                    <tbody>
+                        {{#each chars as |c|}}
+                            <tr class="kind-{{c.kind}}">
+                                <td><b>{{c.label}}</b> <small>{{c.short}}</small></td>
+                                <td class="num">{{c.base}}</td>
+                                <td class="num">{{c.points}}</td>
+                                <td class="num strong">{{c.value}}</td>
+                                <td class="act"><button type="button" class="icon-btn" data-action="pointBuy" data-key="{{c.key}}" data-delta="-1" aria-label="Fewer points">−</button><button type="button" class="icon-btn" data-action="pointBuy" data-key="{{c.key}}" data-delta="1" aria-label="More points">+</button></td>
+                            </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+                <p class="{{#if pointBuy.ok}}ok{{else}}warn{{/if}}">Spent {{pointBuy.spent}} of {{pointBuy.total}}, remaining {{pointBuy.remaining}}. Maximum value {{chars.0.max}}.{{#each pointBuy.errors as |e|}} {{e}}{{/each}}</p>
+            {{/if}}
+            {{#if expert}}
+                <details class="gm"><summary>GM override: set values</summary>
+                    <div class="grid2">{{#each chars as |c|}}<label>{{c.short}}<input type="number" name="ov.characteristics.{{c.key}}" value="" placeholder="{{c.value}}" /></label>{{/each}}</div></details>
+            {{/if}}
+        {{/if}}
+
+        {{!-- 4 background --}}
+        {{#if at.background}}
+            <p class="hint">The background grants five skills, talents, equipment, a bonus and an aptitude of your choice.</p>
+            <div class="cards">
+                {{#each backgrounds as |b|}}
+                    <button type="button" class="card {{#if b.selected}}is-selected{{/if}}" data-action="selectBackground" data-id="{{b.id}}" aria-pressed="{{b.selected}}">
+                        <b>{{b.name}}</b>
+                        <dl>
+                            <div><dt>Aptitude</dt><dd>{{b.aptitudeText}}</dd></div>
+                            <div><dt>Skills</dt><dd>{{b.skillText}}</dd></div>
+                            <div><dt>Talents</dt><dd>{{b.talentText}}</dd></div>
+                        </dl>
+                        <p class="bonus"><b>{{b.bonus.name}}.</b> {{b.bonus.benefit}}</p>
+                        <small class="src">{{b.bookPage}}</small>
+                    </button>
+                {{/each}}
+            </div>
+            {{#if bgChoice}}
+                <div class="field"><label>Background aptitude</label>
+                    <select name="c.bg-apt"><option value="">– choose –</option>{{#each bgChoice.options as |o|}}<option value="{{o.value}}" {{#if o.selected}}selected{{/if}}>{{o.label}}</option>{{/each}}</select></div>
+            {{/if}}
+        {{/if}}
+
+        {{!-- 5 role --}}
+        {{#if at.role}}
+            <div class="cards">
+                {{#each roles as |r|}}
+                    <button type="button" class="card {{#if r.selected}}is-selected{{/if}}" data-action="selectRole" data-id="{{r.id}}" aria-pressed="{{r.selected}}">
+                        <b>{{r.name}}</b>
+                        <dl>
+                            <div><dt>Aptitudes</dt><dd>{{r.aptitudeText}}</dd></div>
+                            <div><dt>Talent</dt><dd>{{r.talentText}}</dd></div>
+                        </dl>
+                        <p class="bonus"><b>{{r.bonus.name}}.</b> {{r.bonus.benefit}}</p>
+                        {{#if r.grantsElite}}<small class="why">Grants the {{r.grantsElite}} elite advance at creation.</small>{{/if}}
+                        <small class="src">{{r.bookPage}}</small>
+                    </button>
+                {{/each}}
+            </div>
+            {{#each roleChoices as |c|}}
+                <div class="field"><label>{{c.label}}</label>
+                    {{#if c.text}}<input type="text" name="c.{{c.id}}" value="{{c.textValue}}" placeholder="e.g. Orks, Mutants, ..." />
+                    {{else}}<select name="c.{{c.id}}"><option value="">– choose –</option>{{#each c.options as |o|}}<option value="{{o.value}}" {{#if o.selected}}selected{{/if}}>{{o.label}}</option>{{/each}}</select>{{/if}}</div>
+            {{/each}}
+        {{/if}}
+
+        {{!-- 6 aptitudes and bonuses --}}
+        {{#if at.aptitudes}}
+            <p class="hint">Aptitudes come from General, your home world, background and role. A duplicate gives no extra advantage: choose a replacement aptitude. The same prices are used here and in the Advancement tab.</p>
+            <div class="chips">{{#each state.aptitudes as |a|}}<span class="chip {{#if a.replacement}}is-replaced{{/if}}" data-tooltip="{{a.source}}{{#if a.replacement}} - replaces {{a.original}}{{/if}}">{{a.name}} <small>{{a.source}}</small></span>{{/each}}</div>
+            {{#each aptitudeChoices as |c|}}
+                <div class="field warnbox"><label>{{c.label}}</label>
+                    <select name="c.{{c.id}}"><option value="">– choose a replacement –</option>{{#each c.options as |o|}}<option value="{{o.value}}" {{#if o.selected}}selected{{/if}}>{{o.label}}</option>{{/each}}</select></div>
+            {{/each}}
+            <h4>Starting bonuses</h4>
+            <ul class="list">
+                {{#each state.bonuses as |b|}}
+                    <li><b>{{b.name}}</b> <small>{{b.source}}</small>
+                        <span class="tag tag--{{b.mechanic}}" data-tooltip="A: existing mechanic, B: new mechanic, C: rule entry shown on the sheet (not yet automated)">{{#if (eqs b.mechanic "A")}}automatic{{else}}rule entry{{/if}}</span>
+                        <br /><small>{{b.benefit}}</small></li>
+                {{/each}}
+            </ul>
+        {{/if}}
+
+        {{!-- 7 skills and talents --}}
+        {{#if at.skills}}
+            <p class="hint">Starting skills are granted at rank Known without XP. A skill granted twice gains one more rank.</p>
+            {{#each skillChoices as |c|}}
+                <div class="field"><label>{{c.label}}</label>
+                    <select name="c.{{c.id}}"><option value="">– choose –</option>{{#each c.options as |o|}}<option value="{{o.value}}" {{#if o.selected}}selected{{/if}}>{{o.label}}</option>{{/each}}</select></div>
+            {{/each}}
+            <div class="grid2">
+                <div><h4>Skills</h4><ul class="list">{{#each skillList as |s|}}<li>{{s.name}} <small>rank {{s.rank}}</small></li>{{else}}<li class="empty">Choose a background first.</li>{{/each}}</ul></div>
+                <div><h4>Talents</h4><ul class="list">{{#each state.talents as |t|}}<li>{{t.name}} <small>{{t.source}}</small></li>{{else}}<li class="empty">None yet.</li>{{/each}}</ul>
+                    <h4>Traits</h4><ul class="list">{{#each state.traits as |t|}}<li>{{t.name}} <small>{{t.source}}</small>{{#if t.note}}<br /><small>{{t.note}}</small>{{/if}}</li>{{else}}<li class="empty">None.</li>{{/each}}</ul></div>
+            </div>
+        {{/if}}
+
+        {{!-- 8 wounds, fate, divination --}}
+        {{#if at.vitals}}
+            {{#unless vitals.hasHomeWorld}}<p class="warn">Choose a home world first.</p>{{/unless}}
+            <div class="panel">
+                <h4>Wounds</h4>
+                {{#if vitals.wounds}}<p>Rolled {{vitals.woundsRoll}}: <b>{{vitals.wounds.max}} wounds</b> ({{state.homeWorld.wounds.base}} + 1d5).{{#if derivedWounds}} <small>With the Imperium Maledictum wound rule (world setting) the sheet shows the calculated maximum.</small>{{/if}}</p>
+                {{else}}<button type="button" class="btn" data-action="rollVital" data-what="wounds"><i class="fa-solid fa-dice-d6"></i> Roll 1d5</button>{{/if}}
+                <h4>Fate</h4>
+                {{#if vitals.fate}}<p>Emperor's Blessing rolled {{vitals.fate.roll}}: {{#if vitals.fate.blessing}}blessed, +1{{else}}no blessing{{/if}}. <b>Fate threshold {{vitals.fate.threshold}}</b>, you start with {{vitals.fate.current}} fate points.</p>
+                {{else}}<button type="button" class="btn" data-action="rollVital" data-what="fate"><i class="fa-solid fa-dice-d10"></i> Roll Emperor's Blessing (1d10)</button>{{/if}}
+                <h4>Divination</h4>
+                {{#if vitals.divination}}
+                    <p><b>"{{vitals.divination.name}}"</b> <small>(rolled {{vitals.divinationRoll}})</small></p>
+                    <p>{{vitals.divination.effect}}</p>
+                    {{#each vitalChoices as |c|}}
+                        <div class="field"><label>{{c.label}}</label>
+                            {{#if c.text}}<input type="text" name="c.{{c.id}}" value="{{c.textValue}}" />
+                            {{else}}<select name="c.{{c.id}}"><option value="">– choose –</option>{{#each c.options as |o|}}<option value="{{o.value}}" {{#if o.selected}}selected{{/if}}>{{o.label}}</option>{{/each}}</select>{{/if}}</div>
+                    {{/each}}
+                    {{#if vitals.divinationNotes.length}}<p class="note"><i class="fa-solid fa-triangle-exclamation"></i> Not automated, applies as rule text (shown on the sheet): {{#each vitals.divinationNotes as |n|}}{{n}} {{/each}}</p>{{/if}}
+                {{else}}<button type="button" class="btn" data-action="rollVital" data-what="divination"><i class="fa-solid fa-dice"></i> Roll Divination (1d100)</button>{{/if}}
+            </div>
+        {{/if}}
+
+        {{!-- 9 elite and psychic --}}
+        {{#if at.elite}}
+            {{#if elite.psyker}}
+                <div class="panel">
+                    <p>The <b>Mystic</b> role grants the <b>Psyker</b> elite advance at creation, at no XP cost: Psyker trait, Psyker aptitude, psy rating 1.</p>
+                    {{#if elite.sanctioned}}<p class="ok">Adeptus Astra Telepathica: the character is <b>sanctioned</b> (Sanctioned trait).</p>
+                    {{else}}<p class="warn">Without the Adeptus Astra Telepathica background the psyker is <b>not sanctioned</b> (rogue psyker) and gains 1d10+3 corruption points.</p>
+                        {{#if elite.corruptionPending}}<button type="button" class="btn" data-action="rollVital" data-what="corruption"><i class="fa-solid fa-dice-d10"></i> Roll 1d10 corruption</button>
+                        {{else}}<p>Corruption: <b>{{elite.corruption}}</b></p>{{/if}}{{/if}}
+                    <p class="hint">Psychic powers are bought on the Psychic / Advancement tabs of the finished character. Having the Psyker aptitude alone does not allow psychic powers.</p>
+                </div>
+            {{else}}
+                <div class="panel"><p>No elite advance at character creation for this role. Elite advances can be bought later on the Advancement tab.</p></div>
+            {{/if}}
+        {{/if}}
+
+        {{!-- 10 experience --}}
+        {{#if at.xp}}
+            <div class="panel">
+                <p>Starting experience: <b>{{xp.total}} XP</b>, spent <b>{{xp.spent}}</b>, available <b>{{xp.available}}</b>. Unspent XP stays available. Start skills, talents and traits are free.</p>
+                {{#each xp.failed as |f|}}<p class="warn">Purchase removed: {{f.label}} ({{f.errors}})</p>{{/each}}
+                {{#if xp.purchases.length}}
+                    <h4>Planned purchases</h4>
+                    <ul class="list">{{#each xp.purchases as |p|}}<li>{{p.label}} <b>{{p.cost}} XP</b> <button type="button" class="icon-btn" data-action="removeAdvance" data-index="{{p.index}}" aria-label="Remove"><i class="fa-solid fa-trash"></i></button></li>{{/each}}</ul>
+                {{/if}}
+            </div>
+            <div class="grid2">
+                <div><h4>Characteristics</h4>
+                    <ul class="list buy">{{#each xp.characteristics as |q|}}<li data-tooltip="{{q.detail}}"><span>{{q.label}} <small>{{q.fromName}} → {{#if q.maxed}}Maximum{{else}}{{q.toName}}{{/if}}</small></span><span class="num">{{q.matches}}/2</span><b class="num">{{#unless q.maxed}}{{q.cost}}{{/unless}}</b><button type="button" class="icon-btn" data-action="buy" data-kind="{{q.kind}}" data-key="{{q.key}}" {{#unless q.buyable}}disabled{{/unless}}><i class="fa-solid fa-coins"></i></button></li>{{/each}}</ul></div>
+                <div><h4>Skills</h4>
+                    <ul class="list buy">{{#each xp.skills as |q|}}<li data-tooltip="{{q.detail}}"><span>{{q.label}} <small>{{q.fromName}} → {{#if q.maxed}}Maximum{{else}}{{q.toName}}{{/if}}</small></span><span class="num">{{q.matches}}/2</span><b class="num">{{#unless q.maxed}}{{q.cost}}{{/unless}}</b><button type="button" class="icon-btn" data-action="buy" data-kind="{{q.kind}}" data-key="{{q.key}}" {{#unless q.buyable}}disabled{{/unless}}><i class="fa-solid fa-coins"></i></button></li>{{/each}}</ul></div>
+            </div>
+            <div class="panel">
+                <h4>Talent</h4>
+                {{#if xp.talentsLoaded}}
+                    <div class="field"><select id="creator-talent">{{#each xp.talents as |t|}}<option value="{{t.id}}">{{t.name}} (tier {{t.tier}}; {{t.aptitudes}})</option>{{/each}}</select>
+                        <input type="text" id="creator-talent-choice" placeholder="choice (e.g. Las), for talents that need one" />
+                        <label class="radio"><input type="checkbox" id="creator-talent-prereq" /> prerequisites checked</label>
+                        <button type="button" class="btn" data-action="buyTalent"><i class="fa-solid fa-coins"></i> Buy</button></div>
+                {{else}}<p class="hint">Loading talents ...</p>{{/if}}
+            </div>
+        {{/if}}
+
+        {{!-- 11 equipment --}}
+        {{#if at.equipment}}
+            <p class="hint">Starting equipment of your background. Items are taken from the system compendia; anything the compendium does not contain is listed when you finalize.</p>
+            {{#each equipmentChoices as |c|}}
+                <div class="field"><label>{{c.label}}</label>
+                    <select name="c.{{c.id}}"><option value="">– choose –</option>{{#each c.options as |o|}}<option value="{{o.value}}" {{#if o.selected}}selected{{/if}}>{{o.label}}</option>{{/each}}</select></div>
+            {{/each}}
+            <h4>Your equipment</h4>
+            <ul class="list">{{#each equipment as |e|}}<li>{{e.text}}</li>{{else}}<li class="empty">Choose a background first.</li>{{/each}}</ul>
+        {{/if}}
+
+        {{!-- 12 biography --}}
+        {{#if at.biography}}
+            <div class="grid2">
+                <label class="field-block">Character name *<input type="text" name="bio.name" value="{{bio.name}}" /></label>
+                <label class="field-block">Gender<input type="text" name="bio.gender" value="{{bio.gender}}" /></label>
+                <label class="field-block">Age<input type="text" name="bio.age" value="{{bio.age}}" /></label>
+                <label class="field-block">Home world name<input type="text" name="bio.homeWorldName" value="{{bio.homeWorldName}}" /></label>
+                <label class="field-block">Appearance<input type="text" name="bio.appearance" value="{{bio.appearance}}" /></label>
+                <label class="field-block">Distinguishing features<input type="text" name="bio.distinguishing" value="{{bio.distinguishing}}" /></label>
+                <label class="field-block">Portrait (image path)<input type="text" name="bio.portrait" value="{{bio.portrait}}" placeholder="path to an image" /></label>
+            </div>
+            <label class="field-block">Origin details<textarea name="bio.origin" rows="2">{{bio.origin}}</textarea></label>
+            <label class="field-block">Personality<textarea name="bio.personality" rows="2">{{bio.personality}}</textarea></label>
+            <label class="field-block">Motivation<textarea name="bio.motivation" rows="2">{{bio.motivation}}</textarea></label>
+            <label class="field-block">Personal history<textarea name="bio.history" rows="3">{{bio.history}}</textarea></label>
+            <label class="field-block">Relationship to the Inquisitor<textarea name="bio.inquisitor" rows="2">{{bio.inquisitor}}</textarea></label>
+        {{/if}}
+
+        {{!-- 13 review --}}
+        {{#if at.review}}
+            <div class="panel">
+                <ul class="checklist">{{#each review.checklist as |c|}}<li class="{{#if c.done}}ok{{else}}warn{{/if}}"><i class="fa-solid {{#if c.done}}fa-check{{else}}fa-xmark{{/if}}"></i> {{c.label}}{{#if c.optional}} <small>(optional)</small>{{/if}}</li>{{/each}}</ul>
+                {{#each review.warnings as |w|}}<p class="note"><i class="fa-solid fa-triangle-exclamation"></i> {{w}}</p>{{/each}}
+                <p class="hint">Finalizing creates the acolyte with all items in one step. If anything fails, nothing is created.</p>
+                <button type="button" class="btn btn--primary" data-action="finalize" {{#unless review.ready}}disabled{{/unless}}><i class="fa-solid fa-stamp"></i> Finalize Character</button>
+            </div>
+        {{/if}}
+
+        {{#if showLog}}<div class="panel log"><h4>Creation log</h4><ul class="list">{{#each log as |e|}}<li><small>{{e.date}}</small> {{e.text}}</li>{{/each}}</ul></div>{{/if}}
+    </section>
+
+    {{!-- ================= right: summary ================= --}}
+    <aside class="creator__summary">
+        <details open>
+            <summary>Character summary</summary>
+            <h3>{{summary.name}}</h3>
+            <dl class="facts">
+                <div><dt>Home World</dt><dd>{{summary.homeWorld}}</dd></div>
+                <div><dt>Background</dt><dd>{{summary.background}}</dd></div>
+                <div><dt>Role</dt><dd>{{summary.role}}</dd></div>
+                <div><dt>Wounds</dt><dd>{{summary.wounds}}</dd></div>
+                <div><dt>Fate</dt><dd>{{summary.fate}}</dd></div>
+                <div><dt>Available XP</dt><dd>{{summary.xp}}</dd></div>
+            </dl>
+            <div class="sumchars">{{#each summary.chars as |c|}}<span class="sc kind-{{c.kind}}"><small>{{c.short}}</small><b>{{c.value}}</b></span>{{/each}}</div>
+            <h4>Aptitudes</h4>
+            <div class="chips">{{#each summary.aptitudes as |a|}}<span class="chip">{{a}}</span>{{else}}<span class="empty">–</span>{{/each}}</div>
+        </details>
+    </aside>
+
+    {{!-- ================= footer ================= --}}
+    <footer class="creator__foot">
+        <button type="button" class="btn" data-action="back" {{#unless canBack}}disabled{{/unless}}><i class="fa-solid fa-chevron-left"></i> Back</button>
+        {{#unless isLast}}<button type="button" class="btn btn--primary" data-action="next" {{#unless canNext}}disabled{{/unless}}>Next <i class="fa-solid fa-chevron-right"></i></button>{{/unless}}
+        <span class="spacer"></span>
+        <button type="button" class="btn" data-action="toggleLog"><i class="fa-solid fa-scroll"></i> Log</button>
+        <button type="button" class="btn" data-action="saveDraft"><i class="fa-solid fa-floppy-disk"></i> Save Draft</button>
+        <button type="button" class="btn" data-action="restart"><i class="fa-solid fa-rotate-left"></i> Start over</button>
+        <button type="button" class="btn btn--danger" data-action="cancel"><i class="fa-solid fa-xmark"></i> Cancel</button>
+    </footer>
+</div>

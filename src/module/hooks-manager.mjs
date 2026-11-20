@@ -41,6 +41,7 @@ import * as documents from './documents/_module.mjs'
 
 import { SYSTEM_ID } from './system-id.mjs';
 import { onPsychicEffectRemoved, onPsychicPowerDeleted, refreshPsychicEffects } from './actions/psychic-effect-manager.mjs';
+import { CharacterCreator } from './creator/wizard.mjs';
 import { preloadDossierImages } from './ui/preload-images.mjs';
 import { registerWoundsSyncHooks, syncAllWounds } from './actions/wounds-sync.mjs';
 export { SYSTEM_ID };
@@ -54,6 +55,7 @@ export class HooksManager {
         Hooks.on('hotbarDrop', HooksManager.hotbarDrop);
         Hooks.on('deleteActiveEffect', HooksManager.deleteActiveEffect);
         Hooks.on('deleteItem', HooksManager.deleteItem);
+        Hooks.on('renderActorDirectory', HooksManager.renderActorDirectory);
         Hooks.on('updateActor', HooksManager.updateActor);
         registerWoundsSyncHooks();
 
@@ -83,6 +85,7 @@ Enable Debug with: game.dh.debug = true
             rollItemMacro,
             rollSkillMacro,
             rollCharacteristicMacro,
+            openCreator: () => CharacterCreator.open(),
         };
 
         //CONFIG.debug.hooks = true;
@@ -157,6 +160,20 @@ Enable Debug with: game.dh.debug = true
     static async deleteActiveEffect(effect, options, userId) {
         if (userId !== game.user.id) return;
         await onPsychicEffectRemoved(effect);
+    }
+
+    /** Button "Create Acolyte" in the actor directory (opens the character creation wizard) */
+    static renderActorDirectory(app, html) {
+        const root = html instanceof HTMLElement ? html : html[0];
+        if (!root || root.querySelector('.dh-create-acolyte')) return;
+        if (!game.user.hasPermission('ACTOR_CREATE')) return;
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'dh-create-acolyte';
+        button.innerHTML = '<i class="fa-solid fa-user-plus"></i> Create Acolyte';
+        button.addEventListener('click', () => CharacterCreator.open());
+        const header = root.querySelector('.directory-header .header-actions') ?? root.querySelector('.directory-header') ?? root.querySelector('header');
+        header?.append(button);
     }
 
     static async deleteItem(item, options, userId) {

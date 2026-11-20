@@ -9,6 +9,9 @@ export class DarkHeresySettings {
         processActiveEffectsDuringCombat: 'active-effects-during-combat',
         darkChat: 'dark-chat',
         woundsFormula: 'wounds-formula',
+        creatorStartingXp: 'creator-starting-xp',
+        creatorVeteran: 'creator-veteran',
+        creatorRandom: 'creator-random',
 
     }
 
@@ -33,6 +36,31 @@ export class DarkHeresySettings {
                 manual: 'Manual (as entered)',
             },
             onChange: () => game.actors?.forEach((a) => a.prepareData?.()),
+        });
+        // Character creation wizard
+        game.settings.register(SYSTEM_ID, DarkHeresySettings.SETTINGS.creatorStartingXp, {
+            name: 'Creation: Starting XP',
+            hint: 'Experience points a new acolyte has to spend in the character creation wizard (core rulebook: 1000).',
+            scope: 'world',
+            config: true,
+            default: 1000,
+            type: Number,
+        });
+        game.settings.register(SYSTEM_ID, DarkHeresySettings.SETTINGS.creatorVeteran, {
+            name: 'Creation: Veteran Variant',
+            hint: 'Allows the optional variant in the wizard: characteristics are rolled with a base of 25 instead of 20 (point buy is not available with it).',
+            scope: 'world',
+            config: true,
+            default: false,
+            type: Boolean,
+        });
+        game.settings.register(SYSTEM_ID, DarkHeresySettings.SETTINGS.creatorRandom, {
+            name: 'Creation: Random Choices',
+            hint: 'Players may pick a random home world, background and role in the wizard (the GM always may).',
+            scope: 'world',
+            config: true,
+            default: true,
+            type: Boolean,
         });
         game.settings.register(SYSTEM_ID, DarkHeresySettings.SETTINGS.darkChat, {
             name: 'Dark Chat',

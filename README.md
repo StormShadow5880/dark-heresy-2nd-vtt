@@ -42,3 +42,5 @@ See the [changelog](CHANGELOG.md). Rules taken over from Imperium Maledictum are
 
 ## License
 [GNU General Public License v3.0](https://choosealicense.com/licenses/gpl-3.0/)
+
+- Character creation wizard: [docs/character-creator.md](docs/character-creator.md)

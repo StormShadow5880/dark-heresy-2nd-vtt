@@ -78,6 +78,11 @@ export function registerHandlebarsHelpers() {
         return CONFIG.dh.bio[field];
     });
 
+    // string comparison for the character creator ({{#if (eqs method "roll")}})
+    Handlebars.registerHelper('eqs', function(a, b) {
+        return String(a) === String(b);
+    });
+
     Handlebars.registerHelper('and', function(obj1, obj2) {
         return obj1 && obj2;
     });

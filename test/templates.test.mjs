@@ -24,6 +24,8 @@ for (const name of ['selectOptions', 'arrayToObject', 'checked', 'toLowerCase', 
     hbs.registerHelper(name, () => '');
 }
 
+hbs.registerHelper('eqs', (a, b) => String(a) === String(b));
+
 const VOID = new Set(['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'source', 'track', 'wbr']);
 
 /** Counts the top-level elements of an HTML fragment (comments and text are ignored). */
@@ -48,7 +50,7 @@ function countRoots(html) {
 // Templates that are used as the (only) part of an ApplicationV2 window
 const parts = all
     .map((f) => path.relative(ROOT, f).replaceAll('\\', '/'))
-    .filter((rel) => /^(actor\/dossier\/[^/]+|actor\/actor-[^/]+-sheet|item\/item-[^/]+-sheet|prompt\/(weapon|psychic|force|assign)[^/]*)\.hbs$/.test(rel));
+    .filter((rel) => /^(actor\/dossier\/[^/]+|actor\/actor-[^/]+-sheet|item\/item-[^/]+-sheet|prompt\/(weapon|psychic|force|assign)[^/]*|creator\/creator)\.hbs$/.test(rel));
 
 const context = {
     actor: { system: { bio: {} }, items: [] },
@@ -116,4 +118,29 @@ test('the root counter detects a second top-level element', () => {
     assert.equal(countRoots('<div><p>a</p></div>'), 1);
     assert.equal(countRoots('<div></div><div></div>'), 2);
     assert.equal(countRoots('<!-- c --><div><img src="x"><input></div>'), 1);
+});
+
+test('creator wizard: every step renders with exactly one root and a navigation', () => {
+    const template = hbs.compile(fs.readFileSync(path.join(ROOT, 'creator/creator.hbs'), 'utf8'));
+    for (const step of ['welcome', 'homeworld', 'characteristics', 'background', 'role', 'aptitudes', 'skills', 'vitals', 'elite', 'xp', 'equipment', 'biography', 'review']) {
+        for (const method of ['roll', 'pointbuy']) {
+            const html = template({
+                at: { [step]: true },
+                method,
+                steps: [{ id: 'welcome', label: 'Welcome', index: 1, current: true }],
+                chars: [{ key: 'strength', label: 'Strength', short: 'S', kind: 'positive', formula: '3d10', rolled: false }],
+                xp: { talents: [], characteristics: [], skills: [], purchases: [], failed: [] },
+                vitals: {},
+                elite: {},
+                state: { aptitudes: [], bonuses: [], talents: [], traits: [] },
+                summary: { chars: [], aptitudes: [] },
+                review: { checklist: [], warnings: [], ready: false },
+                bio: {},
+                pointBuy: { errors: [] },
+            });
+            assert.equal(countRoots(html), 1, `${step}/${method}`);
+            assert.match(html, /creator__nav/);
+            assert.match(html, /data-action="next"/);
+        }
+    }
 });

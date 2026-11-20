@@ -55,6 +55,15 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
   contained Active Effects (e.g. Unnatural from a sustained power), and saving the sheet made them permanent. The
   bonus tooltip shows how it is made up (tens digit + unnatural).
 
+### Character creation wizard
+
+- New **Create Acolyte** wizard (Actors directory): 13 steps (home world, characteristics by dice or point buy, background, role, aptitudes,
+  starting skills/talents, wounds/fate/divination, elite advance (Mystic = Psyker), starting XP, equipment, biography, review). Drafts are
+  saved and can be continued; GM / expert mode records overrides. Finalizing creates the actor and all items in one step (rollback on error).
+- Uses the same cost function as the Advancement tab for the 1000 starting XP (settings: starting XP, veteran variant, random choices).
+- Home world wounds corrected: Hive World 8+1d5, Shrine World 7+1d5.
+- Documentation, known limits and open rule data: [docs/character-creator.md](docs/character-creator.md).
+
 ### Advancement (automatic XP prices)
 
 - **Characteristic, skill and talent advances are priced automatically** from the aptitudes of the character
