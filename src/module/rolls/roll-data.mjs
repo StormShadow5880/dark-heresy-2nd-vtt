@@ -359,13 +359,19 @@ export class PsychicRollData extends RollData {
         this.modifiers['bonus'] = 0;
         this.modifiers['difficulty'] = 0;
         this.modifiers['modifier'] = 0;
-        this.pr = this.sourceActor.psy.rating ?? 0;
+        this.pr = this.availableRating();
         this.hasFocus = !!this.sourceActor.psy.hasFocus;
 
         this.powerSelect = this.psychicPowers.length > 1;
         this.power = this.psychicPowers[0];
         this.power.isSelected = true;
         this.hasDamage = this.power.system.subtype.includes('Attack');
+    }
+
+    /** Psy rating that is still free: the rating minus the powers that are sustained */
+    availableRating() {
+        const psy = this.sourceActor.psy;
+        return Math.max(0, psy.currentRating ?? (psy.rating ?? 0) - (psy.sustained ?? 0));
     }
 
     selectPower(powerName) {
@@ -375,7 +381,7 @@ export class PsychicRollData extends RollData {
     }
 
     async update() {
-        this.modifiers['bonus'] = 10 * Math.floor(this.sourceActor.psy.rating - this.pr);
+        this.modifiers['bonus'] = 10 * Math.floor(this.availableRating() - this.pr);
         this.modifiers['focus'] = this.hasFocus ? 10 : 0;
         this.modifiers['power'] = this.power.system.target.bonus ?? 0;
         this.hasDamage = this.power.system.subtype.includes('Attack');

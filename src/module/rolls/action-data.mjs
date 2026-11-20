@@ -26,7 +26,7 @@ export class ActionData {
 
     async checkForPerils() {
         if (this.rollData.power) {
-            if(this.rollData.sourceActor.psy.rating < this.rollData.pr) {
+            if(this.rollData.availableRating() < this.rollData.pr) {
                 if (!/^(.)\1+$/.test(this.rollData.roll.total)) {
                     this.addEffect('Psychic Phenomena', 'The warp convulses with energy!');
                 }

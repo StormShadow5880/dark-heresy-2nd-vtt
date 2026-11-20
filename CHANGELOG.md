@@ -18,6 +18,8 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
   `src/module/actions/wounds-sync.mjs`.
 
 ### Changed rules
+- Psychic power roll: the psy rating in the prompt starts at the **free** rating (rating minus sustained powers) instead of
+  the maximum. The +10 per level below it and the Psychic Phenomena check (pushing above it) use that free rating.
 
 - **Degrees of success and failure** are shown as the difference of the tens digits of target and roll: roll 69 against
   70 is **+1** (before: +2, one degree was added for the success itself); equal tens digits are **+0**; failures the same
