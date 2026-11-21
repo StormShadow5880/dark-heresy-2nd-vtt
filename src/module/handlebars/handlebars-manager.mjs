@@ -12,6 +12,8 @@ export class HandlebarManager {
     static preloadHandlebarsTemplates() {
         return foundry.applications.handlebars.loadTemplates([
             'systems/dark-heresy-2nd/templates/creator/creator.hbs',
+            'systems/dark-heresy-2nd/templates/chat/partials/damage-calc.hbs',
+            'systems/dark-heresy-2nd/templates/chat/attack-card-chat.hbs',
             // Actor partials.
             'systems/dark-heresy-2nd/templates/actor/panel/active-effects-panel.hbs',
             'systems/dark-heresy-2nd/templates/actor/panel/aptitude-panel.hbs',

@@ -432,3 +432,50 @@
         color: #fff;
     }
 }
+
+
+// Attack card: one row per target
+.dh-card .dh-target {
+    margin: 4px 0;
+    padding: 4px 8px;
+    border: 1px solid rgba(182, 154, 98, 0.35);
+    background: rgba(0, 0, 0, 0.2);
+    border-left: 3px solid var(--ds-gold, #b69a62);
+    text-align: left;
+    &.is-done.dh-target--hit,
+    &.is-done.dh-target--partial {
+        border-left-color: var(--ds-fail, #b8514b);
+    }
+    &.is-done.dh-target--missed {
+        border-left-color: var(--ds-ok, #6f9a5c);
+    }
+    &__head {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        b {
+            font-family: var(--ds-font-title);
+            font-size: 1rem;
+            color: #f3ead2;
+        }
+    }
+    &__meta {
+        flex: 1;
+        font-size: 0.74rem;
+        color: var(--ds-muted, #92918c);
+    }
+    &__badge {
+        padding: 0 8px;
+        border: 1px solid currentColor;
+        border-radius: 10px;
+        font-size: 0.76rem;
+    }
+    &__details summary {
+        cursor: pointer;
+        font-size: 0.78rem;
+        color: var(--ds-gold-soft, #c9ae78);
+    }
+    .dh-card__foot {
+        flex-wrap: wrap;
+    }
+}

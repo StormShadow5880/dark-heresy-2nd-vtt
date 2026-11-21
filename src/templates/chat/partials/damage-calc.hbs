@@ -1,0 +1,13 @@
+<section class="dh-calc">
+    <h4 class="dh-calc__title">Hit · {{location}} <span>{{damageType}}</span></h4>
+    <dl>
+        <div><dt>Damage</dt><dd>{{#if damageFormula}}{{damageFormula}} → {{damageDice}}{{#each damageModifiers as |m|}} {{m.text}} <small>{{m.name}}</small>{{/each}} = <b>{{rawDamage}}</b>{{else}}<b>{{rawDamage}}</b>{{/if}}</dd></div>
+        <div><dt>Armour</dt><dd>{{armour}} − penetration {{penetration}}{{#each penetrationModifiers as |m|}} <small>({{m.name}} {{m.text}})</small>{{/each}} = <b>{{usableArmour}}</b> <small>(not below 0)</small></dd></div>
+        <div><dt>Toughness bonus</dt><dd><b>{{toughnessBonus}}</b></dd></div>
+        <div><dt>Absorbed</dt><dd>{{usableArmour}} + {{toughnessBonus}} = <b>{{reduction}}</b></dd></div>
+        <div class="dh-calc__sum"><dt>Damage taken</dt><dd>{{rawDamage}} − {{reduction}} = <b>{{reducedDamage}}</b>{{#if critical}} → {{wounds}} wounds + <span class="warn">{{critical}} critical</span>{{else}} → <b>{{wounds}} wounds</b>{{/if}}</dd></div>
+        {{#if trueGrit}}<div><dt>True Grit</dt><dd>critical damage {{criticalBeforeGrit}} reduced by the toughness bonus (not below 1) = {{critical}}</dd></div>{{/if}}
+        <div><dt>Wounds</dt><dd>{{woundsBefore}} → <b>{{woundsAfter}}</b></dd></div>
+        {{#if fatigue}}<div><dt>Fatigue</dt><dd>+{{fatigue}}</dd></div>{{/if}}
+    </dl>
+</section>

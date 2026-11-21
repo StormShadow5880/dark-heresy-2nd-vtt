@@ -85,7 +85,7 @@ const chatContext = {
     actor: { name: 'Severin', uuid: 'Actor.abc', system: { wounds: { value: 3, max: 12, critical: 0 }, fatigue: { value: 0, max: 5 } } },
     damage: 5, hit: { location: 'Body', damageType: 'Energy' }, hasDamage: true, damageTaken: 4,
 };
-const chatTemplates = all.map((f) => path.relative(ROOT, f).replaceAll('\\', '/')).filter((rel) => rel.startsWith('chat/'));
+const chatTemplates = all.map((f) => path.relative(ROOT, f).replaceAll('\\', '/')).filter((rel) => rel.startsWith('chat/') && !rel.includes('/partials/'));
 
 for (const rel of chatTemplates) {
     test(`${rel} renders one dark card (dh-ui dh-card) and no legacy markup`, () => {
@@ -145,75 +145,47 @@ test('creator wizard: every step renders with exactly one root and a navigation'
     }
 });
 
-test('attack automation chat cards render their data', () => {
-    const request = hbs.compile(fs.readFileSync(path.join(ROOT, 'chat/defence-request-chat.hbs'), 'utf8'))({
-        targetName: 'Cultist', attackerName: 'Voss', weaponName: 'Lasgun', hitCount: 2, multiple: true,
-        choices: [{ id: 'dodge', label: 'Dodge', icon: 'fa-person-running', target: 45 }, { id: 'none', label: 'Take the hit', icon: 'fa-burst' }],
-    });
-    assert.match(request, /Cultist/);
-    assert.match(request, /2 hits/);
-    assert.match(request, /data-choice="dodge"/);
-    assert.match(request, /data-choice="none"/);
-    const result = hbs.compile(fs.readFileSync(path.join(ROOT, 'chat/attack-result-chat.hbs'), 'utf8'))({
-        attackerName: 'Voss', targetName: 'Cultist', weaponName: 'Lasgun', evaded: false, maxWounds: 12,
-        evasion: { label: 'Dodge', roll: 80, target: 45, success: false },
-        result: { damage: 6, critical: 0, wounds: 6, criticalTotal: 0, hits: [{
-            location: 'Body', rawDamage: 12, damageType: 'Energy', damageFormula: '1d10+3', damageDice: '7 + 3', damageModifiers: [{ name: 'strength bonus', value: 2, text: '+2' }],
-            armour: 4, penetration: 1, penetrationModifiers: [], usableArmour: 3, toughnessBonus: 3, reduction: 6, reducedDamage: 6, woundsBefore: 12, woundsAfter: 6, wounds: 6, critical: 0, fatigue: 0,
-        }] },
-    });
-    assert.match(result, /Dodge failed/);
-    assert.match(result, /1d10\+3 → 7 \+ 3 \+2 <small>strength bonus<\/small> = <b>12<\/b>/);
-    assert.match(result, /4 − penetration 1 = <b>3<\/b>/);
-    assert.match(result, /3 \+ 3 = <b>6<\/b>/);
-    assert.match(result, /12 − 6 = <b>6<\/b> → <b>6 wounds<\/b>/);
-    assert.match(result, /12 → <b>6<\/b>/);
-    assert.match(result, /6 \/ 12/);
-    const evaded = hbs.compile(fs.readFileSync(path.join(ROOT, 'chat/attack-result-chat.hbs'), 'utf8'))({ targetName: 'X', evaded: true, evasion: { label: 'Parry', roll: 10, target: 40, success: true, degrees: 4 } });
-    assert.match(evaded, /Parry succeeded/);
-    assert.match(evaded, /no damage/);
-});
-
-test('barrage / storm chat cards', () => {
-    const request = hbs.compile(fs.readFileSync(path.join(ROOT, 'chat/spread-request-chat.hbs'), 'utf8'))({
+test('barrage / storm and blast request cards', () => {
+    const spread = hbs.compile(fs.readFileSync(path.join(ROOT, 'chat/spread-request-chat.hbs'), 'utf8'))({
         attackType: 'Psychic Barrage', powerName: 'Mind Lash', attackerName: 'Voss', targetName: 'Cultist', hitCount: 3, extraHits: 2, manyExtra: true, range: 2,
     });
-    assert.match(request, /Choose 2 targets/);
-    assert.match(request, /within 2 metres/);
-    assert.match(request, /dh-spread__choose/);
-    const result = hbs.compile(fs.readFileSync(path.join(ROOT, 'chat/spread-result-chat.hbs'), 'utf8'))({
-        attackType: 'Psychic Storm', powerName: 'X', groups: [{ targetName: 'A', count: 1, many: false }, { targetName: 'B', count: 2, many: true }],
-    });
-    assert.match(result, /<b>A<\/b>: 1 hit – answers in the chat/);
-    assert.match(result, /<b>B<\/b>: 2 hits/);
+    assert.match(spread, /Choose 2 targets/);
+    assert.match(spread, /within 2 metres/);
+    assert.match(spread, /dh-spread__choose/);
+    const blast = hbs.compile(fs.readFileSync(path.join(ROOT, 'chat/blast-request-chat.hbs'), 'utf8'))({ label: 'Psychic Blast', powerName: 'Flame', attackerName: 'Voss', targetName: 'Cultist', radius: 4 });
+    assert.match(blast, /\(4 m\)/);
+    assert.match(blast, /dh-blast__choose/);
 });
 
-test('blast chat cards', () => {
-    const request = hbs.compile(fs.readFileSync(path.join(ROOT, 'chat/blast-request-chat.hbs'), 'utf8'))({ label: 'Psychic Blast', powerName: 'Flame', attackerName: 'Voss', targetName: 'Cultist', radius: 4 });
-    assert.match(request, /\(4 m\)/);
-    assert.match(request, /dh-blast__choose/);
-    const result = hbs.compile(fs.readFileSync(path.join(ROOT, 'chat/blast-result-chat.hbs'), 'utf8'))({
-        label: 'Blast', powerName: 'Frag', radius: 4, count: 2, many: true, targets: [{ name: 'A', distance: 0 }, { name: 'B', distance: 3, blocked: true }],
-    });
-    assert.match(result, /2 targets in 4 m/);
-    assert.match(result, /<b>B<\/b> · 3 m from the centre · way out blocked/);
-});
-
-test('defence cards show the rules for several hits and for areas', () => {
-    const request = hbs.compile(fs.readFileSync(path.join(ROOT, 'chat/defence-request-chat.hbs'), 'utf8'))({
-        targetName: 'A', attackerName: 'B', weaponName: 'W', hitCount: 3, multiple: true, notes: ['Each degree of success prevents one hit.'], choices: [{ id: 'none', label: 'Take the hit', icon: 'fa-burst' }],
-    });
-    assert.match(request, /Each degree of success prevents one hit/);
-    const partial = hbs.compile(fs.readFileSync(path.join(ROOT, 'chat/attack-result-chat.hbs'), 'utf8'))({
-        targetName: 'A', evaded: false, partial: true, prevented: 1, total: 3, manyHits: true, maxWounds: 10,
-        evasion: { label: 'Dodge', roll: 44, target: 45, success: true, degrees: 1 },
-        result: { damage: 4, critical: 0, wounds: 6, criticalTotal: 0, hits: [] },
-    });
-    assert.match(partial, /1 degree of success: 1 of 3 hits prevented/);
-    assert.match(partial, /1 of 3 hits prevented, the others strike/);
-    const missed = hbs.compile(fs.readFileSync(path.join(ROOT, 'chat/attack-result-chat.hbs'), 'utf8'))({
-        targetName: 'A', evaded: true, prevented: 3, total: 3, manyHits: true,
-        evasion: { label: 'Dodge', roll: 10, target: 45, success: true, degrees: 4 },
-    });
-    assert.match(missed, /the attack missed/);
+test('attack card: one message, one row per target, open rows have buttons, answered rows the damage calculation', async () => {
+    const { attackCardView } = await import('../src/module/rules/combat-resolution.mjs');
+    hbs.registerPartial('systems/dark-heresy-2nd/templates/chat/partials/damage-calc.hbs', fs.readFileSync(path.join(ROOT, 'chat/partials/damage-calc.hbs'), 'utf8'));
+    const hitCalc = {
+        location: 'Body', rawDamage: 12, damageType: 'Energy', damageFormula: '1d10+3', damageDice: '7 + 3', damageModifiers: [{ name: 'strength bonus', value: 2, text: '+2' }],
+        armour: 4, penetration: 1, penetrationModifiers: [], usableArmour: 3, toughnessBonus: 3, reduction: 6, reducedDamage: 6, woundsBefore: 12, woundsAfter: 6, wounds: 6, critical: 0, fatigue: 0,
+    };
+    const attack = {
+        label: 'Psychic Blast', weaponName: 'Flame', attackerName: 'Voss', template: null,
+        targets: [
+            { uuid: 'A', name: 'Cultist', hits: [{}], state: 'open', notes: ['Dodging works if Cultist can leave the area: 2 m to the edge, Agility bonus 3.'], choices: [{ id: 'dodge', label: 'Dodge', icon: 'fa-person-running', target: 45 }, { id: 'none', label: 'Take the hit', icon: 'fa-burst', target: null }], area: { distance: 1.5 } },
+            { uuid: 'B', name: 'Brute', hits: [{}], state: 'done', choice: 'dodge', evasion: { label: 'Dodge', roll: 80, target: 45, success: false, degrees: 0 }, outcome: { prevented: 0, missed: false }, maxWounds: 12, result: { damage: 6, critical: 0, wounds: 6, hits: [hitCalc] }, choices: [] },
+            { uuid: 'C', name: 'Thug', hits: [{}, {}, {}], state: 'done', choice: 'dodge', evasion: { label: 'Dodge', roll: 10, target: 45, success: true, degrees: 4 }, outcome: { prevented: 3, missed: true }, maxWounds: 10, result: null, choices: [] },
+        ],
+    };
+    const view = attackCardView(attack);
+    assert.equal(view.answered, 2);
+    assert.equal(view.allDone, false);
+    assert.equal(view.totalWounds, 6);
+    const html = hbs.compile(fs.readFileSync(path.join(ROOT, 'chat/attack-card-chat.hbs'), 'utf8'))(view);
+    assert.match(html, /2 of 3 answered/);
+    assert.match(html, /data-uuid="A"/);
+    assert.match(html, /data-choice="dodge"/);
+    assert.match(html, /Dodge failed|Dodge 80 vs 45 – failed/);
+    assert.match(html, /12 − 6 = <b>6<\/b> → <b>6 wounds<\/b>/);
+    assert.match(html, /The attack missed/);
+    assert.match(html, /3 of 3 hits prevented/);
+    // an answered row has no buttons any more
+    const done = hbs.compile(fs.readFileSync(path.join(ROOT, 'chat/attack-card-chat.hbs'), 'utf8'))(attackCardView({ ...attack, targets: attack.targets.slice(1) }));
+    assert.ok(!done.includes('data-choice='));
+    assert.match(done, /2 of 2 answered · 6 wounds in total/);
 });

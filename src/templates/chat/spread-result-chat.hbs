@@ -1,8 +1,0 @@
-<div class="dh-ui dh-card dh-card--ornate">
-    <div class="dh-card__eyebrow">{{attackType}} · {{powerName}}</div>
-    <h2 class="dh-card__name">Targets chosen</h2>
-    <div class="dh-rule"></div>
-    {{#each groups as |g|}}
-        <p class="dh-detail-line"><b>{{g.targetName}}</b>: {{g.count}} hit{{#if g.many}}s{{/if}} – answers in the chat</p>
-    {{/each}}
-</div>

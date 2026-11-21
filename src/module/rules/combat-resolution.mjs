@@ -232,3 +232,82 @@ export function distanceProblem({ name, from, distance, allowed }) {
     if (distance <= allowed) return null;
     return `${name} is ${metres(distance)} m away from ${from}, but only ${metres(allowed)} m are allowed.`;
 }
+
+/* -------------------------------------------------------------------------- */
+/*  The attack card: ONE chat message per attack with one row per target       */
+/* -------------------------------------------------------------------------- */
+
+/** Rule notes shown in the row of a target */
+export function targetNotes({ name, hits, storm = false, area = null }) {
+    const notes = [];
+    if (hits.length > 1) notes.push(storm ? 'Each degree of success prevents two hits.' : 'Each degree of success prevents one hit.');
+    if (area) {
+        notes.push(
+            area.canDodge
+                ? `Dodging works if ${name} can leave the area: ${area.toEdge} m to the edge, Agility bonus ${area.agilityBonus}.`
+                : area.blocked
+                  ? 'An obstacle blocks the way out of the area: dodging is not possible.'
+                  : `${name} cannot leave the area: ${area.toEdge} m to the edge, Agility bonus ${area.agilityBonus}. Dodging is not possible.`,
+        );
+    }
+    return notes;
+}
+
+/**
+ * One row of the attack card.
+ * @param target {{uuid: string, name: string, skills?: object}} the target actor
+ */
+export function newTargetEntry({ target, hits, melee = false, storm = false, area = null }) {
+    return {
+        uuid: target.uuid,
+        name: target.name,
+        hits: hits.map(serializeHit),
+        melee,
+        storm,
+        area,
+        choices: defenceChoices(target, { melee, noDodge: !!area && !area.canDodge }),
+        notes: targetNotes({ name: target.name, hits, storm, area }),
+        state: 'open',
+    };
+}
+
+/** What the template shows: the rows with their state and the totals in the header */
+export function attackCardView(attack) {
+    const targets = attack.targets.map((t) => {
+        const done = t.state === 'done';
+        const ev = t.evasion;
+        let verdict = '';
+        if (done) {
+            if (t.outcome?.missed) verdict = 'missed';
+            else if (t.outcome?.prevented > 0) verdict = 'partial';
+            else verdict = 'hit';
+        }
+        return {
+            ...t,
+            open: !done,
+            hitCount: t.hits.length,
+            manyHits: t.hits.length > 1,
+            verdict,
+            missed: verdict === 'missed',
+            partial: verdict === 'partial',
+            tookHit: done && !ev,
+            evasionText: ev ? `${ev.label} ${ev.roll} vs ${ev.target}${ev.success ? ` – ${ev.degrees} degree${ev.degrees > 1 ? 's' : ''} of success` : ' – failed'}` : '',
+            preventedText: done && t.outcome?.prevented > 0 ? `${t.outcome.prevented} of ${t.hits.length} hit${t.hits.length > 1 ? 's' : ''} prevented` : '',
+            damage: t.result?.damage ?? 0,
+            critical: t.result?.critical ?? 0,
+        };
+    });
+    const answered = targets.filter((t) => !t.open).length;
+    return {
+        label: attack.label,
+        weaponName: attack.weaponName,
+        attackerName: attack.attackerName,
+        targets,
+        count: targets.length,
+        answered,
+        allDone: answered === targets.length,
+        manyTargets: targets.length > 1,
+        totalWounds: targets.reduce((sum, t) => sum + t.damage, 0),
+        totalCritical: targets.reduce((sum, t) => sum + t.critical, 0),
+    };
+}

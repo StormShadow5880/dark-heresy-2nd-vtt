@@ -1,7 +1,0 @@
-<div class="dh-ui dh-card dh-card--ornate">
-    <div class="dh-card__eyebrow">{{label}} · {{powerName}}</div>
-    <h2 class="dh-card__name">{{count}} target{{#if many}}s{{/if}} in {{radius}} m</h2>
-    <div class="dh-rule"></div>
-    {{#each targets as |t|}}<p class="dh-detail-line"><b>{{t.name}}</b> · {{t.distance}} m from the centre{{#if t.blocked}} · way out blocked{{/if}}</p>{{/each}}
-    <p class="dh-note">Each target answers on its own card below. Armour and toughness bonus are subtracted per target.</p>
-</div>

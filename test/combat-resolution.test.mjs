@@ -196,3 +196,22 @@ test('True Grit reduces the critical damage and says so', async () => {
     assert.equal(r.hits[0].critical, 9);
     assert.equal(r.hits[0].trueGrit, true);
 });
+
+test('the attack card view counts the answered targets and sums the wounds', async () => {
+    const { attackCardView, newTargetEntry } = await import('../src/module/rules/combat-resolution.mjs');
+    const entry = newTargetEntry({ target: { uuid: 'Actor.a', name: 'A', ...actor() }, hits: [{ location: 'Body', totalDamage: 9 }, { location: 'Head', totalDamage: 7 }], melee: true, storm: false });
+    assert.equal(entry.state, 'open');
+    assert.deepEqual(entry.choices.map((c) => c.id), ['dodge', 'parry', 'none']);
+    assert.deepEqual(entry.notes, ['Each degree of success prevents one hit.']);
+    const storm = newTargetEntry({ target: { uuid: 'Actor.b', name: 'B', ...actor() }, hits: [{}, {}], storm: true });
+    assert.deepEqual(storm.notes, ['Each degree of success prevents two hits.']);
+    const blocked = newTargetEntry({ target: { uuid: 'Actor.c', name: 'C', ...actor() }, hits: [{}], area: { canDodge: false, blocked: true, toEdge: 3, agilityBonus: 2 } });
+    assert.deepEqual(blocked.choices.map((c) => c.id), ['none']);
+    assert.match(blocked.notes[0], /obstacle/);
+    const view = attackCardView({ label: 'x', weaponName: 'w', attackerName: 'a', targets: [{ ...entry, state: 'done', evasion: null, outcome: { prevented: 0, missed: false }, result: { damage: 4, critical: 1, wounds: 8, hits: [] } }, storm] });
+    assert.equal(view.answered, 1);
+    assert.equal(view.totalWounds, 4);
+    assert.equal(view.totalCritical, 1);
+    assert.equal(view.targets[0].tookHit, true);
+    assert.equal(view.targets[1].open, true);
+});

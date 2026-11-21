@@ -18,6 +18,7 @@
   "esmodules": [
     "module/dark-heresy-2nd.mjs"
   ],
+  "socket": true,
   "styles": [
     "css/dark-heresy-2nd.css",
     "css/ui.css",
