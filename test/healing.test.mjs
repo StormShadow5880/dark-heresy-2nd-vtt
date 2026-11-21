@@ -145,3 +145,14 @@ test('healing card: view of results and a compilable template', () => {
     assert.match(html, /First Aid/);
     assert.match(html, /4 healed/);
 });
+
+import { firstAidRangeProblem } from '../src/module/rules/healing.mjs';
+
+test('First Aid range: 1.5 m in an active combat only, never for self-treatment', () => {
+    assert.equal(firstAidRangeProblem({ inCombat: false, distance: 20 }), null);
+    assert.equal(firstAidRangeProblem({ inCombat: true, distance: 1 }), null);
+    assert.equal(firstAidRangeProblem({ inCombat: true, distance: 1.5 }), null);
+    assert.match(firstAidRangeProblem({ inCombat: true, distance: 2, patientName: 'Bob' }), /Bob is 2 m away/);
+    assert.equal(firstAidRangeProblem({ inCombat: true, self: true, distance: 99 }), null);
+    assert.match(firstAidRangeProblem({ inCombat: true, distance: NaN }), /needs a token/);
+});

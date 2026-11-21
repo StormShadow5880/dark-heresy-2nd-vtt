@@ -27,6 +27,7 @@ import {
     enduranceTargets,
     firstAidHealing,
     firstAidModifiers,
+    firstAidRangeProblem,
     firstAidStartsLock,
     healingCardView,
     healingPowerKind,
@@ -272,6 +273,16 @@ export async function startFirstAid(healer, { self = false } = {}) {
     if (!['acolyte', 'npc'].includes(patient.type) || !patient.system?.wounds) return ui.notifications.warn(`${patient.name} cannot be treated (no wounds).`);
     const medicae = healer.system.skills?.medicae;
     if (!medicae || !(Number(medicae.advance) >= 1)) return ui.notifications.warn(`${healer.name} is not trained in Medicae.`);
+
+    // in an active combat the healer has to be next to the patient (1.5 m); outside of combat there is no limit
+    const inCombat = !!game.combat?.started;
+    if (inCombat && patient !== healer) {
+        const a = tokenOf(healer);
+        const b = tokenOf(patient);
+        const distance = a && b && canvas?.grid ? canvas.grid.measurePath([a.center, b.center]).distance : NaN;
+        const problem = firstAidRangeProblem({ inCombat, self: false, distance, patientName: patient.name });
+        if (problem) return ui.notifications.warn(`${problem} No test was rolled.`);
+    }
 
     const injury = actorInjury(patient);
     if (injury.state === 'none') return ui.notifications.info(`${patient.name} is not damaged.`);

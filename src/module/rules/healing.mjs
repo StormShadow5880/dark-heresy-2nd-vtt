@@ -86,6 +86,20 @@ export function firstAidHealing({ intelligenceBonus, ruleDegrees }) {
     return { amount: bonus + degrees, bonus, degrees };
 }
 
+/** First Aid in an active combat needs the healer next to the patient (metres) */
+export const FIRST_AID_COMBAT_RANGE = 1.5;
+
+/**
+ * Range check of First Aid. Outside of combat there is no limit. In combat the patient must be within 1.5 m; treating yourself is always possible.
+ * @returns {string|null} the reason why it is refused, or null
+ */
+export function firstAidRangeProblem({ inCombat, self = false, distance, patientName = 'The patient' }) {
+    if (!inCombat || self) return null;
+    if (!Number.isFinite(distance)) return `${patientName} needs a token next to the healer: during combat First Aid works within ${FIRST_AID_COMBAT_RANGE} m.`;
+    if (distance > FIRST_AID_COMBAT_RANGE) return `${patientName} is ${Math.round(distance * 10) / 10} m away: during combat First Aid works within ${FIRST_AID_COMBAT_RANGE} m.`;
+    return null;
+}
+
 /* ----------------------------- Time locks ----------------------------- */
 
 /**

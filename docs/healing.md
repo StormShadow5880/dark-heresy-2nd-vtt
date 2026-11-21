@@ -19,6 +19,7 @@ This is the project's reading; compare it with page 244 and tell us if it differ
 
 ## First Aid (Combat tab, "First Aid (Target)" / "Treat myself")
 - Needs Medicae trained and a patient (Target, or yourself). No patient → message, **no roll**.
+- **Range:** only in an active combat (`game.combat.started`) the patient must be within **1.5 m** of the healer (centre to centre); outside of combat there is no limit, and treating yourself is always possible. Too far or no token in combat → message, no roll.
 - Challenging (+0); −10 for Heavily Damaged; −10 per critical point for Critically Damaged; free extra modifier in the dialog.
 - Healing = Intelligence Bonus + degrees of success. **Degrees = rule count (`ruleDos`)**: the success itself is the first degree, every
   further tens digit one more; the card shows the shown value (+0 for a plain success) and the rule count. The first success is not counted twice.
