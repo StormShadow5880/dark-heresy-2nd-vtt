@@ -144,3 +144,25 @@ test('creator wizard: every step renders with exactly one root and a navigation'
         }
     }
 });
+
+test('attack automation chat cards render their data', () => {
+    const request = hbs.compile(fs.readFileSync(path.join(ROOT, 'chat/defence-request-chat.hbs'), 'utf8'))({
+        targetName: 'Cultist', attackerName: 'Voss', weaponName: 'Lasgun', hitCount: 2, multiple: true,
+        choices: [{ id: 'dodge', label: 'Dodge', icon: 'fa-person-running', target: 45 }, { id: 'none', label: 'Take the hit', icon: 'fa-burst' }],
+    });
+    assert.match(request, /Cultist/);
+    assert.match(request, /2 hits/);
+    assert.match(request, /data-choice="dodge"/);
+    assert.match(request, /data-choice="none"/);
+    const result = hbs.compile(fs.readFileSync(path.join(ROOT, 'chat/attack-result-chat.hbs'), 'utf8'))({
+        attackerName: 'Voss', targetName: 'Cultist', weaponName: 'Lasgun', evaded: false, maxWounds: 12,
+        evasion: { label: 'Dodge', roll: 80, target: 45 },
+        result: { damage: 6, critical: 0, wounds: 6, criticalTotal: 0, hits: [{ location: 'Body', rawDamage: 12, damageType: 'Energy', usableArmour: 3, toughnessBonus: 3, wounds: 6, critical: 0, fatigue: 0 }] },
+    });
+    assert.match(result, /Dodge failed/);
+    assert.match(result, /12 Energy − armour 3 − TB 3 = 6/);
+    assert.match(result, /6 \/ 12/);
+    const evaded = hbs.compile(fs.readFileSync(path.join(ROOT, 'chat/attack-result-chat.hbs'), 'utf8'))({ targetName: 'X', evaded: true, evasion: { label: 'Parry', roll: 10, target: 40 } });
+    assert.match(evaded, /Parry succeeded/);
+    assert.match(evaded, /no damage/);
+});

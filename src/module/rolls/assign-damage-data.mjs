@@ -11,6 +11,8 @@ export class AssignDamageData {
 
     armour = 0;
     tb = 0;
+    usableArmour = 0;
+    reduction = 0;
 
     hasFatigueDamage = false;
     fatigueTaken = 0;
@@ -31,7 +33,7 @@ export class AssignDamageData {
         this.tb = 0;
         const location = this.hit?.location;
         if(location) {
-            for(const [name, locationArmour] of Object.entries(this.actor.system.armour)) {
+            for(const [name, locationArmour] of Object.entries(this.actor.system.armour ?? {})) {
                 if(location.replace(/\s/g, "").toUpperCase() === name.toUpperCase()) {
                     this.armour = locationArmour.value;
                     this.tb = locationArmour.toughnessBonus;
@@ -55,6 +57,8 @@ export class AssignDamageData {
         }
 
         const reduction = usableArmour + this.tb;
+        this.usableArmour = usableArmour;
+        this.reduction = reduction;
         const reducedDamage = totalDamage - reduction;
         // We have damage to process
         if(reducedDamage > 0) {
@@ -80,7 +84,7 @@ export class AssignDamageData {
         if(this.criticalDamageTaken > 0) {
 
             // Handle True Grit Talent
-            if(this.actor.hasTalent('True Grit')) {
+            if(this.actor.hasTalent?.('True Grit')) {
                 // Reduces by Toughness Bonus to minimum of 1
                 this.criticalDamageTaken = this.criticalDamageTaken - this.tb < 1 ? 1 : this.criticalDamageTaken - this.tb;
             }
@@ -96,6 +100,21 @@ export class AssignDamageData {
         if(this.damageTaken > 0){
             this.hasDamage = true;
         }
+    }
+
+    /** Writes the calculated damage to the actor (no chat message) */
+    async apply() {
+        await this.actor.update({
+            system: {
+                wounds: {
+                    value: this.actor.system.wounds.value - this.damageTaken,
+                    critical: this.actor.system.wounds.critical + this.criticalDamageTaken,
+                },
+                fatigue: {
+                    value: this.actor.system.fatigue.value + this.fatigueTaken
+                }
+            }
+        });
     }
 
     async performActionAndSendToChat() {

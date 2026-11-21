@@ -9,6 +9,7 @@ export class DarkHeresySettings {
         processActiveEffectsDuringCombat: 'active-effects-during-combat',
         darkChat: 'dark-chat',
         woundsFormula: 'wounds-formula',
+        autoCombat: 'auto-combat',
         creatorStartingXp: 'creator-starting-xp',
         creatorVeteran: 'creator-veteran',
         creatorRandom: 'creator-random',
@@ -42,6 +43,14 @@ export class DarkHeresySettings {
             scope: 'world',
             config: false,
             default: false,
+            type: Boolean,
+        });
+        game.settings.register(SYSTEM_ID, DarkHeresySettings.SETTINGS.autoCombat, {
+            name: 'Automatic Attack Resolution',
+            hint: 'An attack with a targeted token that hits asks the target (its owner or the GM) in the chat to dodge, parry or take the hit. The evasion test is rolled, failed evasion applies the damage (armour, penetration, toughness bonus) to the target and one result card shows the damage.',
+            scope: 'world',
+            config: true,
+            default: true,
             type: Boolean,
         });
         // Character creation wizard

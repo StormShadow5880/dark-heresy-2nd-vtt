@@ -1,3 +1,4 @@
+import { requestDefence } from '../actions/combat-resolution-manager.mjs';
 import { PsychicRollData, RollData, WeaponRollData } from './roll-data.mjs';
 import { Hit, PsychicDamageData, scatterDirection, WeaponDamageData } from './damage-data.mjs';
 import { getOpposedDegrees, roll1d100, sendActionDataToChat, uuid } from './roll-helpers.mjs';
@@ -338,6 +339,9 @@ export class ActionData {
 
         // Send to Chat
         await sendActionDataToChat(this);
+
+        // Attack on a targeted token: the target answers in the chat, then the damage is applied
+        if (this.rollData.action !== 'Stun') await requestDefence(this);
     }
 }
 

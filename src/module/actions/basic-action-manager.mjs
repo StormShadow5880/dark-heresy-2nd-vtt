@@ -1,3 +1,4 @@
+import { bindDefenceMessage, refreshAnsweredRequest } from './combat-resolution-manager.mjs';
 import { refundAmmo } from '../rules/ammo.mjs';
 import { uuid } from '../rolls/roll-helpers.mjs';
 import { AssignDamageData } from '../rolls/assign-damage-data.mjs';
@@ -14,12 +15,14 @@ export class BasicActionManager {
     storedRolls = {};
 
     initializeHooks() {
+        Hooks.on('createChatMessage', (message) => refreshAnsweredRequest(message));
         // Add show/hide support for chat messages
         Hooks.on('renderChatMessageHTML', (message, html, data) => {
             game.dh.log('renderChatMessageHTML', { message, html, data });
             if (html.querySelector('.dh-card')) markTooltips(html);
             const bind = (selector, handler) =>
                 html.querySelectorAll(selector).forEach((el) => el.addEventListener('click', async (ev) => await handler(ev)));
+            bindDefenceMessage(message, html);
             bind('.roll-control__hide-control', (ev) => this._toggleExpandChatMessage(ev));
             bind('.roll-control__refund', (ev) => this._refundResources(ev));
             bind('.roll-control__fate-reroll', (ev) => this._fateReroll(ev));
