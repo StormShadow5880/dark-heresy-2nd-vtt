@@ -44,6 +44,7 @@ import { onPsychicEffectRemoved, onPsychicPowerDeleted, refreshPsychicEffects } 
 import { aptitudesLocked, isCreatorGranted } from './rules/aptitude-lock.mjs';
 import { applyRulebookStyles, ensureImportMacro, importRulebookPages } from './tools/rulebook-import.mjs';
 import { registerCombatSocket } from './actions/combat-resolution-manager.mjs';
+import { registerHealingSocket, registerHealingLockSocket } from './actions/healing-manager.mjs';
 import { CharacterCreator } from './creator/wizard.mjs';
 import { preloadDossierImages } from './ui/preload-images.mjs';
 import { registerWoundsSyncHooks, syncAllWounds } from './actions/wounds-sync.mjs';
@@ -153,6 +154,8 @@ Enable Debug with: game.dh.debug = true
         DarkHeresySettings.applyDarkChat();
         preloadDossierImages();
         registerCombatSocket();
+        registerHealingSocket();
+        registerHealingLockSocket();
         applyRulebookStyles();
         ensureImportMacro().catch((e) => console.warn('Dark Heresy 2e | macro could not be created', e));
         await syncAllWounds();
@@ -175,7 +178,16 @@ Enable Debug with: game.dh.debug = true
     /** Button "Create Acolyte" in the actor directory (opens the character creation wizard) */
     static renderActorDirectory(app, html) {
         const root = html instanceof HTMLElement ? html : html[0];
-        if (!root || root.querySelector('.dh-create-acolyte')) return;
+        if (!root) return;
+        if (game.user.isGM && !root.querySelector('.dh-finish-rest')) {
+            const rest = document.createElement('button');
+            rest.type = 'button';
+            rest.className = 'dh-finish-rest';
+            rest.innerHTML = '<i class="fa-solid fa-bed"></i> 24 h rest';
+            rest.addEventListener('click', async () => (await import('./actions/healing-manager.mjs')).finishRest());
+            (root.querySelector('.directory-header .header-actions') ?? root.querySelector('.directory-header') ?? root.querySelector('header'))?.append(rest);
+        }
+        if (root.querySelector('.dh-create-acolyte')) return;
         if (!game.user.hasPermission('ACTOR_CREATE')) return;
         const button = document.createElement('button');
         button.type = 'button';

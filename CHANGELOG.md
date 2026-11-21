@@ -6,6 +6,10 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
 
 ## [1.9.0] – Unreleased
 
+### Healing
+
+- First Aid, Fate: Heal 1d5, Biomancy Endurance / Invigourate and a GM dialog for 24 hours of rest, all through one healing card that the GM client applies exactly once. Critical damage first, never above the maximum, injury states Lightly/Heavily/Critically Damaged. New setting *First Aid: what starts the 24 hour limit*. See [docs/healing.md](docs/healing.md).
+
 ### Imported from Imperium Maledictum
 
 - **[IM-001] Maximum wounds (switched off by default; enable with the world setting *Maximum Wounds Rule*).** `Max Wounds = Strength Bonus + (2 × Toughness Bonus) + Willpower Bonus`, calculated

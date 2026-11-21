@@ -1,3 +1,4 @@
+import { requestHealingPower } from '../actions/healing-manager.mjs';
 import { requestDefence } from '../actions/combat-resolution-manager.mjs';
 import { PsychicRollData, RollData, WeaponRollData } from './roll-data.mjs';
 import { Hit, PsychicDamageData, scatterDirection, WeaponDamageData } from './damage-data.mjs';
@@ -372,6 +373,12 @@ export class PsychicActionData extends ActionData {
             this.template = 'systems/dark-heresy-2nd/templates/chat/psychic-action-chat.hbs';
         }
         await super.performActionAndSendToChat();
+        // Biomancy Endurance / Invigourate: choose the allies and heal
+        try {
+            await requestHealingPower(this);
+        } catch (error) {
+            console.error('Dark Heresy 2e | healing power failed', error);
+        }
     }
 
     /**

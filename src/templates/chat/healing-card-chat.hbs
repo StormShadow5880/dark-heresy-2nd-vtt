@@ -1,0 +1,48 @@
+<div class="dh-ui dh-card dh-card--ornate dh-healing {{#if rejected}}dh-card--fail{{else if done}}dh-card--success{{/if}}">
+    <div class="dh-card__eyebrow">{{eyebrow}}</div>
+    <h2 class="dh-card__name">{{title}}</h2>
+    <div class="dh-card__sub">{{healerName}}{{#if subtitle}} · {{subtitle}}{{/if}}</div>
+    <div class="dh-rule"></div>
+
+    {{#if roll}}
+        <div class="dh-vs">
+            <div class="dh-vs__value"><span>Roll</span><strong>{{roll.roll}}</strong></div>
+            <div class="dh-vs__sep">vs</div>
+            <div class="dh-vs__value"><span>Target</span><strong>{{roll.target}}</strong></div>
+        </div>
+        <div class="dh-mods dh-mods--center">
+            <span class="dh-mod"><b>{{roll.skill}}</b> {{roll.base}}</span>
+            {{#each rollModifiers as |m|}}<span class="dh-mod"><b>{{m.name}}</b> {{#if m.value}}{{m.value}}{{else}}+0{{/if}}</span>{{/each}}
+        </div>
+        <div class="dh-verdict {{#if roll.success}}dh-verdict--success{{else}}dh-verdict--fail{{/if}}">{{#if roll.success}}Success{{else}}Failure{{/if}}</div>
+        {{#if roll.success}}<p class="dh-detail-line">Degrees of success: {{roll.ruleDegrees}} <small>(the success itself counts as the first, shown +{{roll.shown}})</small></p>{{/if}}
+    {{/if}}
+
+    {{#each info as |i|}}<p class="dh-detail-line">{{i}}</p>{{/each}}
+    {{#each skipped as |s|}}<p class="dh-note"><b>Skipped: {{s.name}}</b> – {{s.reason}}</p>{{/each}}
+
+    {{#each entries as |e|}}
+        <section class="dh-target is-done">
+            <header class="dh-target__head"><b>{{e.name}}</b>{{#if e.done}}<span class="dh-target__badge">{{e.line}}</span>{{/if}}</header>
+            {{#if e.pending}}
+                <p class="dh-detail-line">{{#if e.op.amount}}{{e.op.amount}} {{#if (eq e.op.type "fatigue")}}fatigue level(s){{else}}to heal{{/if}}{{/if}} – waiting for the GM client.</p>
+            {{else if e.done}}
+                <p class="dh-detail-line">{{#if e.criticalLine}}{{e.criticalLine}}{{/if}}{{#if e.woundsLine}}{{#if e.criticalLine}} + {{/if}}{{e.woundsLine}}{{/if}}{{#if e.after}} · {{e.after}}{{/if}}</p>
+                {{#if e.stateLine}}<p class="dh-detail-line"><small>{{e.stateLine}}</small></p>{{/if}}
+                {{#if e.wastedLine}}<p class="dh-note">{{e.wastedLine}}.</p>{{/if}}
+                {{#if e.result.pinning}}<p class="dh-detail-line"><small>Pinning overcome.</small></p>{{/if}}
+            {{else}}
+                <p class="dh-note">{{e.reason}}</p>
+            {{/if}}
+        </section>
+    {{/each}}
+
+    {{#if rejected}}<p class="dh-note dh-note--alert">{{reason}}</p>{{/if}}
+    {{#if done}}{{#if manyEntries}}<p class="dh-detail-line"><b>{{totalHealed}}</b> in total.</p>{{/if}}{{/if}}
+    {{#if pending}}
+        <footer class="dh-card__foot dh-card__foot--center dh-healing__buttons">
+            <button type="button" class="dh-btn dh-healing__apply"><i class="fa-solid fa-hand-holding-medical"></i><span>Apply now</span></button>
+        </footer>
+        <p class="dh-detail-line dh-healing__text">Waiting for the GM client to apply the healing.</p>
+    {{/if}}
+</div>

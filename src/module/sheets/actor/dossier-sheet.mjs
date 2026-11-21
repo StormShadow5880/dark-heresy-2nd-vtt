@@ -62,6 +62,9 @@ export class AcolyteDossierSheet extends AcolyteSheet {
             toggleSkillDetail: AcolyteDossierSheet.#onToggleSkillDetail,
             goTab: AcolyteDossierSheet.#onGoTab,
             setCritical: AcolyteDossierSheet.#onSetCritical,
+            firstAid: AcolyteDossierSheet.#onFirstAid,
+            firstAidSelf: AcolyteDossierSheet.#onFirstAidSelf,
+            fateHeal: AcolyteDossierSheet.#onFateHeal,
         },
     };
 
@@ -290,6 +293,22 @@ export class AcolyteDossierSheet extends AcolyteSheet {
     }
 
     /** Clicking a critical pip sets that level, clicking the highest filled one lowers it by one */
+    static async #onFirstAid() {
+        const { startFirstAid } = await import('../../actions/healing-manager.mjs');
+        await startFirstAid(this.actor);
+    }
+
+    static async #onFirstAidSelf() {
+        const { startFirstAid } = await import('../../actions/healing-manager.mjs');
+        await startFirstAid(this.actor, { self: true });
+    }
+
+    static async #onFateHeal() {
+        if (!this.isEditable) return;
+        const { startFateHeal } = await import('../../actions/healing-manager.mjs');
+        await startFateHeal(this.actor);
+    }
+
     static async #onSetCritical(event, target) {
         if (!this.isEditable) return;
         const level = Number(target.dataset.level);

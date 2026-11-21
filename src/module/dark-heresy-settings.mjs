@@ -14,6 +14,7 @@ export class DarkHeresySettings {
         creatorVeteran: 'creator-veteran',
         creatorRandom: 'creator-random',
         rulebookMacro: 'rulebook-macro-created',
+        healingFirstAidLock: 'healing-firstaid-lock',
 
     }
 
@@ -44,6 +45,15 @@ export class DarkHeresySettings {
             config: false,
             default: false,
             type: Boolean,
+        });
+        game.settings.register(SYSTEM_ID, DarkHeresySettings.SETTINGS.healingFirstAidLock, {
+            name: 'First Aid: what starts the 24 hour limit',
+            hint: 'A patient can be treated with First Aid once per 24 hours. Default: only a successful treatment starts the limit. Alternative: every attempt does.',
+            scope: 'world',
+            config: true,
+            default: 'success',
+            type: String,
+            choices: { success: 'Only a successful treatment', attempt: 'Every attempt' },
         });
         game.settings.register(SYSTEM_ID, DarkHeresySettings.SETTINGS.autoCombat, {
             name: 'Automatic Attack Resolution',

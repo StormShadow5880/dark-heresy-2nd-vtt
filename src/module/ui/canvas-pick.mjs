@@ -2,19 +2,21 @@
  * Lets the user pick tokens on the canvas with the left mouse button (no need to target them first).
  * A small bar at the top shows the picks and offers Undo / Cancel; Esc cancels. The picked tokens carry a target marker while picking.
  *
- * @param count {number} how many clicks are expected (the same token may be picked several times if `accept` allows it)
+ * @param count {number} the most clicks (the same token may be picked several times if `accept` allows it)
+ * @param minCount {number} the fewest picks; with minCount < count a Done button ends the picking early
+ * @param onRefuse {(reason: string, token: Token) => void} called when `accept` refuses a token
  * @param title {string} text of the bar
  * @param label {(index: number) => string} what the next click is for, e.g. "Hit 2"
  * @param accept {(token: Token, picks: Token[]) => true|string} true, or the reason why the token cannot be picked
  * @returns {Promise<Token[]|null>} the tokens in the order of the clicks, null if cancelled
  */
-export function pickTokensOnCanvas({ count, title, label = (i) => `Pick ${i + 1}`, accept = () => true }) {
+export function pickTokensOnCanvas({ count, minCount = count, title, label = (i) => `Pick ${i + 1}`, accept = () => true, onRefuse = null }) {
     return new Promise((resolve) => {
         const picks = [];
         const view = canvas.app.view;
         const bar = document.createElement('div');
         bar.className = 'dh-ui dh-pick';
-        bar.innerHTML = '<div class="dh-pick__title"></div><ol class="dh-pick__list"></ol><div class="dh-pick__buttons"><button type="button" data-undo><i class="fa-solid fa-rotate-left"></i> Undo</button><button type="button" data-cancel><i class="fa-solid fa-xmark"></i> Cancel</button></div>';
+        bar.innerHTML = '<div class="dh-pick__title"></div><ol class="dh-pick__list"></ol><div class="dh-pick__buttons"><button type="button" data-done><i class="fa-solid fa-check"></i> Done</button><button type="button" data-undo><i class="fa-solid fa-rotate-left"></i> Undo</button><button type="button" data-cancel><i class="fa-solid fa-xmark"></i> Cancel</button></div>';
         document.body.append(bar);
 
         const refresh = () => {
@@ -24,6 +26,9 @@ export function pickTokensOnCanvas({ count, title, label = (i) => `Pick ${i + 1}
                 return `<li class="${t ? 'is-set' : i === picks.length ? 'is-next' : ''}">${foundry.utils.escapeHTML(label(i))}: ${t ? foundry.utils.escapeHTML(t.name) : '…'}</li>`;
             }).join('');
             bar.querySelector('[data-undo]').disabled = !picks.length;
+            const done = bar.querySelector('[data-done]');
+            done.hidden = minCount >= count;
+            done.disabled = picks.length < minCount;
         };
 
         const markers = () => {
@@ -49,7 +54,10 @@ export function pickTokensOnCanvas({ count, title, label = (i) => `Pick ${i + 1}
             event.stopPropagation();
             event.preventDefault();
             const verdict = accept(token, picks);
-            if (verdict !== true) return ui.notifications.warn(verdict);
+            if (verdict !== true) {
+                onRefuse?.(verdict, token);
+                return ui.notifications.warn(verdict);
+            }
             picks.push(token);
             markers();
             refresh();
@@ -68,6 +76,7 @@ export function pickTokensOnCanvas({ count, title, label = (i) => `Pick ${i + 1}
             refresh();
         });
         bar.querySelector('[data-cancel]').addEventListener('click', () => finish(null));
+        bar.querySelector('[data-done]').addEventListener('click', () => finish([...picks]));
         view.addEventListener('pointerdown', onPointer, true);
         document.addEventListener('keydown', onKey, true);
         refresh();
