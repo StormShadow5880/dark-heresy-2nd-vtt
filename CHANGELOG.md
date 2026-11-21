@@ -99,6 +99,8 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
 
 - **Private rulebook page import**: macro *Import Rulebook Pages* (`game.dh.importRulebookPages()`) reads a page package from your own Foundry data folder (default `dh2-rulebook`) into the journal *Rulebook (private import)*. The packages themselves are not in the repository. See [docs/rulebook-import.md](docs/rulebook-import.md).
 
+- Rulebook import: finds packages up to five folders deep, accepts a pasted full server path, handles encoded paths from the file browser and says where it looked when nothing was found.
+
 ### Psychic powers
 - Power list: the hourglass is only an indicator for a running power (not clickable). A running power cannot be
   manifested again (Manifest greyed out); ending it is done under Sustained Powers.

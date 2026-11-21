@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { assetUrl, buildPageHtml, collectIds, rewriteCssUrls, rewriteFragment, scopeCss } from '../src/module/tools/rulebook-import-lib.mjs';
+import { assetUrl, decodePath, normalizeFolder, buildPageHtml, collectIds, rewriteCssUrls, rewriteFragment, scopeCss } from '../src/module/tools/rulebook-import-lib.mjs';
 
 const css = "*{box-sizing:border-box}body{margin:0;background:#29241c}.dh2-page{position:relative;background:url(assets/page-background.jpg) center no-repeat}h2,h3{color:#211407}#mechanic,#dice{font-size:30px}.rule:before,.rule:after{content:''}@media(max-width:700px){.dh2-page{padding:40px}.dh2-grid{gap:12px}}";
 const fragment = '<article class="dh2-page"><h2 id="dice">Game Dice</h2><img class="dice" src="assets/dice.png"/><a href="#dice">Game Dice</a><a href="https://example.org">x</a></article>';
@@ -47,4 +47,19 @@ test('the real package css (if present locally) scopes without global selectors'
     if (!file || !fs.existsSync(file)) return t.skip('no local package');
     const out = scopeCss(fs.readFileSync(file, 'utf8'), { ids: ['dice', 'mechanic'], prefix: 'p22-' });
     assert.ok(!/(^|\n)(\*|body|h2|h3|p|a)[{,]/.test(out));
+});
+
+test('folder input: relative, full server path and windows slashes all end up relative to the Data folder', () => {
+    assert.equal(normalizeFolder('dh2-rulebook'), 'dh2-rulebook');
+    assert.equal(normalizeFolder(' /dh2-rulebook/ '), 'dh2-rulebook');
+    assert.equal(normalizeFolder('/home/amp/.ampdata/instances/TTRPGServer01/foundry-vtt/data/Data/dh2-rulebook'), 'dh2-rulebook');
+    assert.equal(normalizeFolder('C:\\FoundryData\\Data\\dh2-rulebook\\page 22'), 'dh2-rulebook/page 22');
+    assert.equal(normalizeFolder('dh2-rulebook/data/pages'), 'dh2-rulebook/data/pages'); // relative folders stay as typed
+    assert.equal(normalizeFolder(''), '');
+});
+
+test('encoded paths from the file browser are not encoded twice', () => {
+    assert.equal(decodePath('dh2-rulebook/Seite%2022'), 'dh2-rulebook/Seite 22');
+    assert.equal(assetUrl('dh2-rulebook/Seite%2022', 'assets/dice.png'), 'dh2-rulebook/Seite%2022/assets/dice.png');
+    assert.equal(decodePath('100%'), '100%'); // not decodable: unchanged
 });

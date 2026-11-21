@@ -8,10 +8,32 @@
 
 const SCOPE = 'dh2-rulebook';
 
+/** Foundry's file browser may return encoded paths (%20): decode first, so encoding later never doubles */
+export function decodePath(path) {
+    try {
+        return decodeURI(String(path));
+    } catch {
+        return String(path);
+    }
+}
+
+/**
+ * The folder as typed by the user -> path relative to the Foundry Data directory.
+ * Accepts "dh2-rulebook", "/dh2-rulebook/", Windows slashes and a pasted full server path ("/home/.../Data/dh2-rulebook").
+ */
+export function normalizeFolder(input) {
+    let path = String(input ?? '').trim().replace(/\\/g, '/');
+    // a pasted server path: everything after the LAST "/Data/" is relative to the Data folder
+    const absolute = /^([a-z]:)?\//i.test(path) && path.toLowerCase().includes('/data/');
+    const marker = path.toLowerCase().lastIndexOf('/data/');
+    if (absolute && marker >= 0) path = path.slice(marker + 6);
+    return path.replace(/^\/+|\/+$/g, '');
+}
+
 /** assets/dice.png -> <base>/assets/dice.png (spaces and umlauts encoded) */
 export function assetUrl(base, relative) {
-    const clean = String(relative).replace(/^\.?\//, '');
-    return encodeURI(`${String(base).replace(/\/+$/, '')}/${clean}`);
+    const clean = decodePath(relative).replace(/^\.?\//, '');
+    return encodeURI(`${decodePath(base).replace(/\/+$/, '')}/${clean}`);
 }
 
 export function rewriteCssUrls(css, base) {

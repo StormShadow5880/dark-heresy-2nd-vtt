@@ -8,7 +8,7 @@
  * A folder that directly contains metadata.json is one package, otherwise every sub folder is tried.
  */
 import { SYSTEM_ID } from '../system-id.mjs';
-import { buildPageHtml } from './rulebook-import-lib.mjs';
+import { buildPageHtml, decodePath, normalizeFolder } from './rulebook-import-lib.mjs';
 
 const DEFAULT_FOLDER = 'dh2-rulebook';
 const JOURNAL_NAME = 'Rulebook (private import)';
@@ -17,20 +17,22 @@ const FLAG = 'rulebookPage';
 const picker = () => foundry.applications.apps.FilePicker.implementation;
 
 async function fetchText(path) {
-    const response = await fetch(encodeURI(path));
+    const response = await fetch(encodeURI(decodePath(path)));
     if (!response.ok) throw new Error(`${path}: ${response.status}`);
     return response.text();
 }
 
-/** Package folders below (or at) the given folder */
-async function findPackages(folder) {
+const MAX_DEPTH = 5;
+const isMeta = (file) => decodePath(file).split('/').pop().toLowerCase() === 'metadata.json';
+
+/** Package folders (they contain metadata.json) at or below the given folder, searched up to a few levels deep */
+async function findPackages(folder, seen = [], depth = 0) {
     const here = await picker().browse('data', folder);
-    if (here.files.some((f) => f.endsWith('/metadata.json') || f === 'metadata.json')) return [here.target];
+    seen.push(`${decodePath(here.target)}: ${here.dirs.length} folder(s), ${here.files.length} file(s)`);
+    if (here.files.some(isMeta)) return [decodePath(here.target)];
+    if (depth >= MAX_DEPTH) return [];
     const found = [];
-    for (const dir of here.dirs) {
-        const sub = await picker().browse('data', dir);
-        if (sub.files.some((f) => f.endsWith('metadata.json'))) found.push(sub.target);
-    }
+    for (const dir of here.dirs) found.push(...(await findPackages(decodePath(dir), seen, depth + 1)));
     return found;
 }
 
@@ -50,15 +52,21 @@ async function ensureJournal() {
 /** Creates or updates one journal page per package; returns what happened */
 export async function importRulebookPages(folder = null) {
     if (!game.user.isGM) return ui.notifications.warn('Only a GM can import rulebook pages.');
-    const path = folder ?? (await askFolder());
-    if (!path) return;
+    const typed = folder ?? (await askFolder());
+    if (!typed) return;
+    const path = normalizeFolder(typed);
+    const seen = [];
     let dirs;
     try {
-        dirs = await findPackages(path);
+        dirs = await findPackages(path, seen);
     } catch (error) {
-        return ui.notifications.error(`Folder "${path}" could not be read in your Foundry data: ${error.message}`);
+        console.error('Dark Heresy 2e | rulebook import: folder could not be read', error);
+        return ui.notifications.error(`Folder "${path}" could not be read in your Foundry data (relative to the Data folder): ${error.message}`);
     }
-    if (!dirs.length) return ui.notifications.warn(`No rulebook package (metadata.json) found in "${path}".`);
+    if (!dirs.length) {
+        console.warn('Dark Heresy 2e | rulebook import: no metadata.json found. Looked at:', seen);
+        return ui.notifications.warn(`No rulebook package (metadata.json) found in "${path}" or below it. Looked at: ${seen.slice(0, 4).join(' | ')} (details in the console, F12).`);
+    }
 
     const entry = await ensureJournal();
     const done = [];
