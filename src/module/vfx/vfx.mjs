@@ -92,8 +92,21 @@ export function effectOfRoll(rd) {
     });
 }
 
+/** Muzzle flash, sound and shot from one token to another; resolves when the shot is over */
+async function shotBetween(name, from, to) {
+    const shot = asset(name, 'shot');
+    if (!shot) return skip(`no JB2A asset for ${name}.shot`);
+    const seq = new globalThis.Sequence();
+    const muzzle = asset(name, 'muzzle');
+    if (muzzle) seq.effect().file(muzzle).atLocation(from).rotateTowards(to).scaleToObject(1.5);
+    seq.effect().file(shot).atLocation(from).stretchTo(to).waitUntilFinished(-150);
+    playSound(name);
+    await seq.play();
+}
+
 /**
- * The attack is executed: muzzle flash and shot from the attacker to the target. Called whether it hits or not.
+ * The attack is executed and nothing is left to resolve in the chat (a miss, or an attack the card does not handle): muzzle flash and
+ * shot at once. A hit with an attack card plays its shot later, when the target has answered (playResolution).
  * Needs a target token; without one (no roll happened) nothing plays.
  */
 export async function playShot(rd) {
@@ -103,16 +116,27 @@ export async function playShot(rd) {
     const from = tokenOfActor(rd.sourceActor);
     const to = tokenOfActor(rd.targetActor);
     if (!from || !to || from === to) return skip(`token missing (attacker: ${!!from}, target: ${!!to})`);
-    await safely(`${name} shot`, async () => {
-        const shot = asset(name, 'shot');
-        if (!shot) return skip(`no JB2A asset for ${name}.shot`);
-        const seq = new globalThis.Sequence();
-        const muzzle = asset(name, 'muzzle');
-        if (muzzle) seq.effect().file(muzzle).atLocation(from).rotateTowards(to).scaleToObject(1.5);
-        seq.effect().file(shot).atLocation(from).stretchTo(to);
-        playSound(name);
-        await seq.play();
+    await safely(`${name} shot`, () => shotBetween(name, from, to));
+}
+
+/**
+ * The target has answered (Dodge / Parry / Take the hit): shot, wait until it arrives, then what the result was: impact and the
+ * floating number on a real hit, nothing on a miss or a full evasion. Called by the GM client once per resolved target row.
+ */
+export async function playResolution({ effect, attackerUuid, targetUuid, impact, lines }) {
+    if (!vfxAvailable({ notify: false })) return;
+    await safely('resolution', async () => {
+        const from = tokenOfActor(await actorOfUuid(attackerUuid));
+        const to = tokenOfActor(await actorOfUuid(targetUuid));
+        if (effect && EFFECTS[effect]?.kind === 'projectile' && from && to && from !== to) await shotBetween(effect, from, to);
+        if (impact) await playImpact(effect, targetUuid);
+        await playFloatingNumbers(targetUuid, lines);
     });
+}
+
+async function actorOfUuid(uuid) {
+    const doc = await fromUuid(uuid);
+    return doc?.actor ?? doc ?? null;
 }
 
 /** A hit that really did damage (after Dodge / Parry / Take the hit): impact at the target */

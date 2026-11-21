@@ -344,9 +344,10 @@ export class ActionData {
 
         // Attack on a targeted token: the target answers in the chat, then the damage is applied
         if (this.rollData.action !== 'Stun') {
-            // animation: the attack is executed (hit or miss), only with a target; never blocks the rest
-            if (this.rollData.targetActor) await playShot(this.rollData).catch(() => {});
-            await requestDefence(this);
+            // A hit with an attack card plays its shot when the target has answered (shot, wait, result).
+            // Everything else (a miss, no card) shows the shot now. Animations never block the rest.
+            const handled = await requestDefence(this);
+            if (!handled && this.rollData.targetActor) await playShot(this.rollData).catch(() => {});
         }
     }
 }

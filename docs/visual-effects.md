@@ -24,7 +24,7 @@ JB2A Free has no *red* ray other than the lasershot, and no dedicated warp explo
 If no candidate of a slot is known, that slot is skipped and one console warning names the candidates. `vfxReport()` in `vfx.mjs` lists what resolves.
 
 ## When something plays
-- **Shot** (muzzle + beam / bolt): when the attack is executed and a target token exists (`ActionData`, before the defence request). Hit or miss
+- **Shot** (muzzle + beam / bolt + sound): a hit with an attack card plays it when the target has answered (Dodge / Parry / Take the hit): shot, wait until it arrives, then impact and floating number on a real hit, nothing after a miss or full evasion. A miss or an attack without a card shows the shot immediately. Needs a target token; no target → no roll → no animation.
   alike. No target → no roll → no animation.
 - **Impact**: when the GM client resolves a target row (`resolveTarget`) and damage was really applied: not on a missed attack, a prevented hit
   or a successful Dodge/Parry (`showsImpact`). Several targets (Barrage etc.) use the already resolved rows; nothing is recalculated.

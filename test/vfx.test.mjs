@@ -49,7 +49,7 @@ async function runtime({ sequencer = true, jb2a = true, enabled = true, known = 
     class Seq {
         constructor() { this.steps = []; }
         sound() { return this.effect(); }
-        effect() { const step = { calls: [] }; this.steps.push(step); const proxy = new Proxy({}, { get: (_, m) => (...a) => { step.calls.push([m, a]); return proxy; } }); return proxy; }
+        effect() { const step = { calls: [] }; this.steps.push(step); const proxy = new Proxy({}, { get: (_, m) => (m === 'then' ? undefined : m === 'play' ? () => this.play() : (...a) => { step.calls.push([m, a]); return proxy; }) }); return proxy; }
         async play() { played.push(this.steps); }
     }
     globalThis.Sequence = Seq;
@@ -151,5 +151,19 @@ test('floating numbers: red for wounds, orange for critical, green for healing, 
     await vfx.playFloatingNumbers('x', vfx.damageLines({ damage: 3 }));
     assert.equal(played.length, 1);
     await vfx.playFloatingNumbers('x', []);
+    assert.equal(played.length, 1);
+});
+
+test('resolution: shot first, then impact and number on a hit; shot only on a miss; numbers only without an effect', async () => {
+    const { vfx, played } = await runtime();
+    const actors = { a: { getActiveTokens: () => [token(0)] }, t: { getActiveTokens: () => [token(300)] } };
+    globalThis.fromUuid = async (u) => ({ actor: actors[u] });
+    await vfx.playResolution({ effect: 'laser', attackerUuid: 'a', targetUuid: 't', impact: true, lines: vfx.damageLines({ damage: 2 }) });
+    assert.equal(played.length, 3); // shot, impact, number (in this order)
+    played.length = 0;
+    await vfx.playResolution({ effect: 'laser', attackerUuid: 'a', targetUuid: 't', impact: false, lines: [] });
+    assert.equal(played.length, 1);
+    played.length = 0;
+    await vfx.playResolution({ effect: null, attackerUuid: 'a', targetUuid: 't', impact: false, lines: vfx.damageLines({ damage: 1 }) });
     assert.equal(played.length, 1);
 });

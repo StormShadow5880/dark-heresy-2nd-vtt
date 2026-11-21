@@ -12,7 +12,7 @@
  * The rules (what a defence prevents, armour and toughness, distances) are in rules/combat-resolution.mjs.
  */
 import { SYSTEM_ID } from '../system-id.mjs';
-import { damageLines, effectOfRoll, playBlast, playFloatingNumbers, playImpact } from '../vfx/vfx.mjs';
+import { damageLines, effectOfRoll, playBlast, playResolution } from '../vfx/vfx.mjs';
 import { toFormula } from '../rules/formula.mjs';
 import {
     SPREAD_RANGE_M,
@@ -154,10 +154,14 @@ async function resolveTarget(messageId, targetUuid, choice, userId) {
         maxWounds: target.system.wounds.max,
     });
     await message.update({ content: await renderCard(attack), [`flags.${SYSTEM_ID}.${ATTACK}`]: attack });
-    // the damage is applied: impact on a real hit only (not on a miss, a prevented hit or a successful evasion)
-    if (attack.vfx && showsImpact(entry)) playImpact(attack.vfx, entry.uuid).catch(() => {});
-    // the lost wounds float up from the token (every weapon and power, once, from this GM client)
-    if (!outcome.missed) playFloatingNumbers(entry.uuid, damageLines(result)).catch(() => {});
+    // animation: shot, waiting, then the result (impact and floating number only after a real hit). Once per row, not awaited.
+    playResolution({
+        effect: attack.vfx,
+        attackerUuid: attack.attackerUuid,
+        targetUuid: entry.uuid,
+        impact: !!attack.vfx && showsImpact(entry),
+        lines: outcome.missed ? [] : damageLines(result),
+    }).catch(() => {});
     if (attack.targets.every((t) => t.state === 'done')) await removeBlastTemplate(attack.template);
 }
 
