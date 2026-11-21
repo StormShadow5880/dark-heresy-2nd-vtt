@@ -104,8 +104,8 @@ test('runtime: psychic bolt uses its own effect; blast is sized to the radius of
     assert.equal(played.length, 1);
     const blast = { power: { name: 'Blast', system: { attackType: 'Psychic Blast' } } };
     for (const radius of [2, 5]) {
-        await vfx.playBlast(blast, token(100), radius);
-        const sizes = played.at(-1).map((s) => s.calls.find(([m]) => m === 'size')[1][0]);
+        await vfx.playBlast({ ...blast, sourceActor: rollOf().sourceActor }, token(100), radius);
+        const sizes = played.at(-1).map((s) => s.calls.find(([m]) => m === 'size')?.[1][0]).filter((x) => x !== undefined);
         assert.deepEqual(sizes, [radius * 2, radius * 2]);
     }
     // blast is not shot like a projectile

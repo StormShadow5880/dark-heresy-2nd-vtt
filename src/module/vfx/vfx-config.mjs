@@ -30,6 +30,7 @@ export const EFFECTS = {
     psychicBlast: {
         label: 'Psychic Blast (warp explosion)',
         kind: 'area',
+        shot: ['jb2a.eldritch_blast.purple', 'jb2a.magic_missile.purple'],
         ring: ['jb2a.magic_signs.circle.02.illusion.complete.dark_purple', 'jb2a.magic_signs.circle.02.illusion.complete.purple'],
         burst: ['jb2a.explosion.04.blue', 'jb2a.explosion.02.blue', 'jb2a.explosion.01.orange'],
     },

@@ -109,8 +109,12 @@ export async function playBlast(rd, centreToken, radius) {
         const seq = new globalThis.Sequence();
         const ring = asset(name, 'ring');
         const burst = asset(name, 'burst');
-        if (!ring && !burst) return;
+        if (!ring && !burst) return skip('no JB2A asset for psychicBlast.ring / burst');
         const at = { x: centreToken.center.x, y: centreToken.center.y };
+        // first the energy bolt from the psyker to the centre, the explosion starts just before it arrives
+        const from = tokenOfActor(rd.sourceActor);
+        const shot = from && from !== centreToken ? asset(name, 'shot') : null;
+        if (shot) seq.effect().file(shot).atLocation(from).stretchTo(at).waitUntilFinished(-300);
         if (ring) seq.effect().file(ring).atLocation(at).size(squares, { gridUnits: true }).belowTokens().fadeOut(400);
         if (burst) seq.effect().file(burst).atLocation(at).size(squares, { gridUnits: true });
         await seq.play();

@@ -28,7 +28,7 @@ If no candidate of a slot is known, that slot is skipped and one console warning
   alike. No target → no roll → no animation.
 - **Impact**: when the GM client resolves a target row (`resolveTarget`) and damage was really applied: not on a missed attack, a prevented hit
   or a successful Dodge/Parry (`showsImpact`). Several targets (Barrage etc.) use the already resolved rows; nothing is recalculated.
-- **Blast**: at the first target's token (the centre the rules use) when the attack hit, sized to the blast radius the rules calculated
+- **Blast**: an energy bolt flies from the psyker to the first target's token (the centre the rules use), then ring + explosion appear there when the attack hit, sized to the blast radius the rules calculated (`2 × radius / scene grid distance` squares). Missed blasts show no explosion. If the power has no radius data (GM enters one by hand) no animation is played.
   (`2 × radius / scene grid distance` squares). If the power has no radius data (GM enters one by hand) no animation is played.
 - Animations never decide targets, dice or damage; every call is wrapped in try/catch.
 
