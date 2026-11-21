@@ -32,3 +32,14 @@ No calendar module is needed. Existing worlds keep their data: nothing is migrat
 3. Make a First Aid, jump +8 h (still locked, remaining time on the sheet), +24 h (ready). Same with Endurance and 12 h.
 4. Set the world time back (e.g. Simple Calendar or `game.time.advance(-3600)` in the console): warning, locks stay, flags unchanged.
 5. Jump time with injured characters: nobody is healed. 6. Narrow window / phone width: bar stays readable. 7. Disable the setting: the bar disappears.
+
+## Design (imperial assets)
+Images live in `src/images/timeline/` (WebP with alpha, transparent margins cropped). Source: the three provided images (frame, button plaque, chronometer);
+the project folder `Imperiale_Zeitleiste_Assets/` was not part of the checkout, so the images attached to the request were used. Replace the WebP files with the originals if you like (same names).
+- **Frame** (top bar): **not stretched.** The frame has a text field of only 42 % of its height and ornamental ends, so it is drawn at a fixed height (`--bar-h`, 56 / 50 / 44 px) from four pieces:
+  left cap, right cap, centre piece and a tile that repeats along the bar. Width follows the content, the proportions are never distorted. The dark text field is a CSS surface placed over the frame's field.
+- **Plaque**: used as a 9-slice `border-image` for all buttons (corner rivets and gold edge keep their size) and for the second row. Active mode = a CSS gold plate. Hover = brighter, keyboard focus = 2 px light outline, `is-alert` pulses (not with reduced motion), disabled = greyed.
+- **Chronometer**: 28 px icon in front of the date (CSS background, decorative, `aria-hidden`).
+- All texts and buttons are real text and real `<button>` elements (tab order, Enter/Space). The gear has an `aria-label`. Missing images only remove the artwork: the bar falls back to dark red CSS surfaces and nothing blocks.
+- **Narrow windows:** below 1000 px the time jumps and the gear move to the second row (the same buttons, one set visible), below 640 px the mission text goes. The bar never covers the Foundry controls at the top left on windows narrower than about 1000 px because it is centred and shrinks with its content.
+- Rows: top = icon, date, time, mission day, jumps, gear; second = status and controls (Pause, Normal (1:1), Roleplay (1:3), Rest …; during a rest: Pause/Resume, Skip, Cancel, Decide …).

@@ -59,3 +59,10 @@ test('clock: a set-back world time is recognised and finds timers in the future 
     assert.deepEqual(timersInFuture(stored, 5000), ['firstAid']);
     assert.deepEqual(stored, { firstAid: 9000, endurance: 100 });
 });
+
+import { existsSync } from 'node:fs';
+test('clock bar: the image assets of the design are part of the system', () => {
+    for (const f of ['frame-cap-left', 'frame-cap-right', 'frame-center', 'frame-tile', 'button-plaque', 'chronometer']) {
+        assert.ok(existsSync(new URL(`../src/images/timeline/${f}.webp`, import.meta.url)), `${f}.webp is missing`);
+    }
+});

@@ -94,19 +94,22 @@ export function renderClock() {
     const el = clockElement();
     const gm = game.user.isGM;
     el.innerHTML = `
-        <span class="dh-clock__seal" aria-hidden="true"><i class="fa-solid fa-skull"></i></span>
+        <span class="dh-clock__chrono" aria-hidden="true"></span>
         <span class="dh-clock__date">${esc(parts.date)}</span>
         <span class="dh-clock__star" aria-hidden="true">✦</span>
         <span class="dh-clock__time">${esc(parts.time)}</span>
         ${parts.mission ? `<span class="dh-clock__missionwrap"><span class="dh-clock__star" aria-hidden="true">✦</span> <span class="dh-clock__mission">${esc(parts.mission)}</span></span>` : ''}
         ${
             gm
-                ? `<span class="dh-clock__jumps">${JUMPS.map((j) => `<button type="button" data-jump="${j.seconds}" title="Advance the world time by ${esc(j.label.slice(1))}">${esc(j.label)}</button>`).join('')}
-                   <button type="button" data-config="1" class="dh-clock__gear" title="Date, time and mission start"><i class="fa-solid fa-gear"></i></button></span>`
+                ? `<span class="dh-clock__jumps">${jumpButtons()}</span>`
                 : ''
         }`;
     renderSub();
 }
+
+/** The time jumps and the gear: in the top row on wide screens, in the second row on narrow ones (CSS decides which one shows) */
+const jumpButtons = () =>
+    `${JUMPS.map((j) => `<button type="button" data-jump="${j.seconds}" title="Advance the world time by ${esc(j.label.slice(1))}">${esc(j.label)}</button>`).join('')}<button type="button" data-config="1" class="dh-clock__gear" title="Date, time and mission start" aria-label="Date, time and mission start"><i class="fa-solid fa-gear"></i></button>`;
 
 /** Second slim row: automatic clock (buttons for the GM) and the rest */
 function renderSub() {
@@ -154,12 +157,15 @@ function renderSub() {
                 .join('')}<button type="button" data-rest="start">Rest …</button></span>`;
         }
     }
+    if (gm) html += `<span class="dh-clock-sub__buttons dh-clock-sub__jumps">${jumpButtons()}</span>`;
     el.innerHTML = html;
 }
 
 async function onSubClick(event) {
     const b = event.target.closest('button');
     if (!b || !game.user.isGM) return;
+    if (b.dataset.jump) return game.time.advance(Number(b.dataset.jump));
+    if (b.dataset.config) return openClockConfig();
     if (b.dataset.mode) return setClockMode(b.dataset.mode);
     const act = b.dataset.rest;
     if (act === 'start') return (await import('./rest-dialog.mjs')).openRestDialog();

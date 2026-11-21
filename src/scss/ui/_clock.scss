@@ -1,45 +1,74 @@
 // The imperial clock bar (ui/world-clock.mjs): a slim dark red bar at the top centre with gold accents. It covers as little of the
 // canvas as possible: the width follows the content, small windows hide the mission text and shrink the buttons.
+// Asset paths (src/images/timeline): frame caps, centre piece and tile are cut from the provided frame, the plaque is the button
+// template, the chronometer the icon. If an image is missing the CSS colours below still draw a dark red / gold bar.
+$tl: '../images/timeline';
+
 .dh-clock {
+    --bar-h: 56px; // the frame is drawn at this height (its proportions are kept); the text field of the frame is 42 % of it
     position: fixed;
-    top: 4px;
+    top: 2px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 35;
     display: flex;
     align-items: center;
     gap: 0.55rem;
-    max-width: calc(100vw - 24px);
-    height: 34px;
-    padding: 0 0.7rem;
+    width: max-content; // fixed + left 50 % would otherwise shrink the box to half of the window
+    max-width: calc(100vw - 16px);
+    height: var(--bar-h);
+    // inside the dark field of the frame: 28 % above, 29 % below, 67 % of the height on both sides (the caps)
+    padding: calc(var(--bar-h) * 0.28) calc(var(--bar-h) * 0.7) calc(var(--bar-h) * 0.29);
     box-sizing: border-box;
     overflow: hidden;
     white-space: nowrap;
-    color: var(--ds-ink, #e6d7b4);
+    color: #f1e4c4;
     font-family: var(--ds-font-title, Georgia, serif);
     letter-spacing: 0.04em;
-    background: linear-gradient(180deg, #5a1b21 0%, #3b1216 100%);
-    border: 1px solid var(--ds-gold, #b69a62);
-    border-radius: 3px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(0, 0, 0, 0.5);
+    // layers: caps, centre piece, tile (repeats along the bar), plain colours as the fallback
+    background:
+        url('#{$tl}/frame-cap-left.webp') left center / auto 100% no-repeat,
+        url('#{$tl}/frame-cap-right.webp') right center / auto 100% no-repeat,
+        url('#{$tl}/frame-center.webp') center / auto 100% no-repeat,
+        url('#{$tl}/frame-tile.webp') center / auto 100% repeat-x,
+        linear-gradient(180deg, #4a1519, #2a0d10);
+    filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.6));
     pointer-events: auto;
 
-    &__seal {
-        color: var(--ds-gold, #b69a62);
-        font-size: 0.95rem;
+    // the dark text field sits on the frame: make the text field itself a calm dark red
+    &::before {
+        content: '';
+        position: absolute;
+        z-index: -1;
+        left: calc(var(--bar-h) * 0.62);
+        right: calc(var(--bar-h) * 0.62);
+        top: calc(var(--bar-h) * 0.28);
+        bottom: calc(var(--bar-h) * 0.29);
+        background: linear-gradient(180deg, #230c0f, #170709);
+        border-radius: 2px;
+    }
+
+    &__chrono {
+        flex: none;
+        width: calc(var(--bar-h) * 0.5);
+        height: calc(var(--bar-h) * 0.5);
+        margin: 0 0 0 -0.2rem;
+        background: url('#{$tl}/chronometer.webp') center / contain no-repeat;
+        opacity: 0.92;
     }
 
     &__date,
     &__time,
     &__mission {
         font-size: 0.95rem;
+        line-height: 1;
         text-transform: uppercase;
         text-shadow: 0 1px 2px #000;
     }
 
     &__star {
-        color: var(--ds-gold, #b69a62);
-        font-size: 0.8rem;
+        color: #c9a15b;
+        font-size: 0.75rem;
     }
 
     &__jumps {
@@ -47,55 +76,106 @@
         gap: 0.3rem;
         margin-left: 0.4rem;
         padding-left: 0.6rem;
-        border-left: 1px solid rgba(182, 154, 98, 0.5);
-
-        button {
-            all: unset;
-            box-sizing: border-box;
-            cursor: pointer;
-            padding: 0.1rem 0.5rem;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            color: var(--ds-ink, #e6d7b4);
-            border: 1px solid var(--ds-gold, #b69a62);
-            border-radius: 2px;
-            background: rgba(0, 0, 0, 0.25);
-
-            &:hover,
-            &:focus-visible {
-                background: rgba(182, 154, 98, 0.25);
-            }
-        }
+        border-left: 1px solid rgba(201, 161, 91, 0.45);
     }
 
-    @media (max-width: 900px) {
-        gap: 0.35rem;
-        padding: 0 0.45rem;
+    // narrow windows: the time jumps move into the second row (the same buttons), the mission text disappears
+    @media (max-width: 1000px) {
+        --bar-h: 50px;
+        gap: 0.4rem;
 
-        &__missionwrap {
+        &__jumps {
             display: none;
         }
     }
 
-    @media (max-width: 560px) {
-        &__seal {
+    @media (max-width: 640px) {
+        --bar-h: 44px;
+
+        &__missionwrap {
             display: none;
         }
 
         &__date,
         &__time {
-            font-size: 0.8rem;
+            font-size: 0.82rem;
         }
+    }
 
-        &__jumps {
-            margin-left: 0.1rem;
-            padding-left: 0.3rem;
-
-            button {
-                padding: 0.1rem 0.3rem;
-                font-size: 0.68rem;
-            }
+    @media (max-width: 400px) {
+        &__chrono {
+            display: none;
         }
+    }
+}
+
+// the buttons of both rows: the plaque is the template (corner rivets, gold edge); active = gold plate
+.dh-clock__jumps button,
+.dh-clock-sub__buttons button {
+    all: unset;
+    box-sizing: border-box;
+    cursor: pointer;
+    min-height: 22px;
+    padding: 0 0.6rem;
+    font-family: var(--ds-font-title, Georgia, serif);
+    font-size: 0.72rem;
+    line-height: 20px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #f1e4c4;
+    text-shadow: 0 1px 1px #000;
+    background: #5a1b21;
+    border: 5px solid transparent;
+    border-image: url('#{$tl}/button-plaque.webp') 70 fill / 5px stretch;
+    white-space: nowrap;
+
+    &:hover {
+        filter: brightness(1.3);
+    }
+
+    &:focus-visible {
+        outline: 2px solid #f1e4c4;
+        outline-offset: 1px;
+    }
+
+    &:active {
+        filter: brightness(0.85);
+    }
+
+    &.is-active,
+    &[aria-pressed='true'] {
+        color: #1a1008;
+        text-shadow: none;
+        font-weight: 700;
+        background: linear-gradient(180deg, #e0be78, #b08a4c);
+        border-image: none;
+        border: 1px solid #f1e4c4;
+        box-shadow: inset 0 0 0 1px #6b4a1a;
+        padding: 0 calc(0.6rem + 4px);
+    }
+
+    &.is-alert {
+        color: #ffcf8a;
+        animation: dh-clock-alert 1.4s ease-in-out infinite;
+    }
+
+    &:disabled,
+    &[aria-disabled='true'] {
+        cursor: not-allowed;
+        filter: grayscale(0.8) brightness(0.7);
+        animation: none;
+    }
+}
+
+@keyframes dh-clock-alert {
+    50% {
+        filter: brightness(1.5);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .dh-clock-sub__buttons button.is-alert {
+        animation: none;
     }
 }
 
@@ -169,7 +249,15 @@
 // second row: automatic clock and rest (ui/world-clock.mjs renderSub)
 .dh-clock-sub {
     position: fixed;
-    top: 42px;
+    top: 62px;
+
+    @media (max-width: 1000px) {
+        top: 56px;
+    }
+
+    @media (max-width: 640px) {
+        top: 50px;
+    }
     left: 50%;
     transform: translateX(-50%);
     z-index: 34;
@@ -177,15 +265,16 @@
     align-items: center;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 0.5rem;
-    max-width: calc(100vw - 24px);
-    padding: 0.15rem 0.6rem;
-    color: var(--ds-ink, #e6d7b4);
+    gap: 0.4rem 0.6rem;
+    width: max-content;
+    max-width: calc(100vw - 16px);
+    padding: 3px 0.9rem;
+    color: #f1e4c4;
     font-size: 0.8rem;
-    background: rgba(40, 14, 18, 0.92);
-    border: 1px solid rgba(182, 154, 98, 0.6);
-    border-radius: 3px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+    background: linear-gradient(180deg, #2c0f13, #1c0809);
+    border: 6px solid transparent;
+    border-image: url('#{$tl}/button-plaque.webp') 70 fill / 6px stretch;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
 
     &__state b {
         font-weight: 600;
@@ -196,12 +285,13 @@
         width: 0.6rem;
         height: 0.6rem;
         border-radius: 50%;
-        background: var(--ds-muted, #92918c);
+        background: #7c7a74;
+        border: 1px solid #000;
     }
 
     &__state.is-on &__dot {
-        background: var(--ds-ok, #6f9a5c);
-        box-shadow: 0 0 6px var(--ds-ok, #6f9a5c);
+        background: #6fd05c;
+        box-shadow: 0 0 6px #6fd05c;
     }
 
     &__bar {
@@ -209,12 +299,12 @@
         width: 120px;
         height: 6px;
         background: rgba(0, 0, 0, 0.5);
-        border: 1px solid rgba(182, 154, 98, 0.5);
+        border: 1px solid rgba(201, 161, 91, 0.55);
 
         i {
             display: block;
             height: 100%;
-            background: var(--ds-gold, #b69a62);
+            background: #c9a15b;
         }
     }
 
@@ -222,33 +312,14 @@
         display: flex;
         flex-wrap: wrap;
         gap: 0.3rem;
+    }
 
-        button {
-            all: unset;
-            box-sizing: border-box;
-            cursor: pointer;
-            padding: 0.1rem 0.5rem;
-            font-size: 0.75rem;
-            color: var(--ds-ink, #e6d7b4);
-            border: 1px solid var(--ds-gold, #b69a62);
-            border-radius: 2px;
-            background: rgba(0, 0, 0, 0.25);
+    // time jumps in the second row: only on narrow windows
+    &__jumps {
+        display: none !important;
 
-            &:hover,
-            &:focus-visible {
-                background: rgba(182, 154, 98, 0.25);
-            }
-
-            &.is-active {
-                background: var(--ds-gold, #b69a62);
-                color: #1a1410;
-                font-weight: 600;
-            }
-
-            &.is-alert {
-                border-color: var(--ds-warn, #c9923a);
-                color: var(--ds-warn, #c9923a);
-            }
+        @media (max-width: 1000px) {
+            display: flex !important;
         }
     }
 }
