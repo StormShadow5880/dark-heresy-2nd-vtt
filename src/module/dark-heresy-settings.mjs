@@ -47,7 +47,7 @@ export class DarkHeresySettings {
         });
         game.settings.register(SYSTEM_ID, DarkHeresySettings.SETTINGS.autoCombat, {
             name: 'Automatic Attack Resolution',
-            hint: 'An attack with a targeted token that hits asks the target (its owner or the GM) in the chat to dodge, parry or take the hit. The evasion test is rolled, failed evasion applies the damage (armour, penetration, toughness bonus) to the target and one result card shows the damage.',
+            hint: 'A weapon attack needs a targeted token (no roll without one). An attack that hits asks the target (its owner or the GM) in the chat to dodge, parry or take the hit. The evasion test is rolled, failed evasion applies the damage (armour, penetration, toughness bonus) to the target and one result card shows the damage.',
             scope: 'world',
             config: true,
             default: true,

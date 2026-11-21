@@ -3,6 +3,7 @@ import { preparePsychicPowerRoll } from '../prompts/psychic-power-prompt.mjs';
 import { PsychicActionData, WeaponActionData } from '../rolls/action-data.mjs';
 import { DarkHeresySettings } from '../dark-heresy-settings.mjs';
 import { SYSTEM_ID } from '../hooks-manager.mjs';
+import { autoCombatEnabled } from './combat-resolution-manager.mjs';
 
 export class TargetedActionManager {
 
@@ -124,6 +125,12 @@ export class TargetedActionManager {
         game.dh.log('performWeaponAttack', { source, target, weapon });
         const rollData = this.createSourceAndTargetData(source, target);
         if (!rollData) return;
+
+        // With the attack automation a weapon attack needs a target, otherwise the target would have to be added afterwards
+        if (autoCombatEnabled() && !rollData.target) {
+            ui.notifications.warn('Target the token you attack first (select it and press T, or right click > Target). Without a target no attack roll is made.');
+            return;
+        }
 
         // Weapon
         const weapons = weapon ? [weapon] : rollData.actor.items.filter((item) => item.type === 'weapon').filter((item) => item.system.equipped);
