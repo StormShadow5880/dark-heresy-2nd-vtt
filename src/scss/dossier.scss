@@ -1090,7 +1090,8 @@
         }
     }
 
-    button,
+    // not the window header controls: they are buttons that draw their icon with the Font Awesome font itself
+    button:not(.header-control),
     .btn {
         font-family: var(--ds-font);
     }

@@ -93,6 +93,8 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
 - Overview rebuilt after the supplied layout: characteristics row, Status (wounds, fatigue, fate, corruption, insanity with −/+) next to Combat Reference, Key Skills next to Equipped Weapons (table), Active Effects & Conditions (including sustained powers), and a Quick Info column (influence, aptitudes, key talents, traits, bonuses; pencil buttons open the matching tab).
 - *Personal File* moved from the Overview to the Biography tab.
 
+- Fixed the window header buttons (configure, controls, close) of the character sheet that showed empty boxes: a font rule for all buttons also hit them and replaced the Font Awesome icon font.
+
 ### Psychic powers
 - Power list: the hourglass is only an indicator for a running power (not clickable). A running power cannot be
   manifested again (Manifest greyed out); ending it is done under Sustained Powers.
