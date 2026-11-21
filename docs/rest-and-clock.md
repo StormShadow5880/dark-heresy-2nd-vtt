@@ -59,5 +59,5 @@ At a stop (encounter, pause) the display may snap back by up to one tick of the 
 9. Reload the GM during a rest: it comes back paused, resume. 10. Two GM clients / a player client at the same time.
 
 ## Encounter table
-`docs/tables/rest-encounters.json` is a ready-made Foundry RollTable (d100, 16 generic entries, original text). Import: Roll Tables sidebar → ⚙ (or right-click a folder) → *Import Data*, or create a table and use *Import* from the JSON. Then pick it in the rest dialog.
+`docs/tables/rest-encounters.json` is a ready-made Foundry RollTable (d100, 40 generic entries that grow worse with the roll (harmless 01–24, minor trouble 25–49, serious 50–70, dangerous 71–90, grave 91–100; many are not fights), original text). Import: Roll Tables sidebar → ⚙ (or right-click a folder) → *Import Data*, or create a table and use *Import* from the JSON. Then pick it in the rest dialog.
 The table result (name and description) is shown only to the GM. Edit, add or reweight the entries freely.
