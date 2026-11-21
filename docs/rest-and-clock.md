@@ -57,3 +57,7 @@ At a stop (encounter, pause) the display may snap back by up to one tick of the 
 3. Manual jumps work in every mode. 4. Eventless rest to the end (summary, no healing). 5. Encounter in the middle (use chance 100): dialog, play out, continue, cancel; players see only "Rest paused".
 6. Watches with gap/overlap, unguarded period, sleep checks (every watch / fatigued). 7. Skip with checks and encounters due. 8. Look at a First Aid timer on the sheet while the lapse runs.
 9. Reload the GM during a rest: it comes back paused, resume. 10. Two GM clients / a player client at the same time.
+
+## Encounter table
+`docs/tables/rest-encounters.json` is a ready-made Foundry RollTable (d100, 16 generic entries, original text). Import: Roll Tables sidebar → ⚙ (or right-click a folder) → *Import Data*, or create a table and use *Import* from the JSON. Then pick it in the rest dialog.
+The table result (name and description) is shown only to the GM. Edit, add or reweight the entries freely.

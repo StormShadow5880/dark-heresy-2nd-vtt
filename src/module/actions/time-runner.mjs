@@ -154,7 +154,8 @@ function handlers() {
                 if (table) {
                     tableName = table.name;
                     const draw = await table.draw({ displayChat: false });
-                    text = draw.results.map((r) => r.name || r.description || r.text || '').filter(Boolean).join('; ') || `${table.name}: no result`;
+                    const plain = (html) => String(html ?? '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+                    text = draw.results.map((r) => [r.name, plain(r.description ?? r.text)].filter(Boolean).join(': ')).filter(Boolean).join('; ') || `${table.name}: no result`;
                 }
             }
             return { triggered: true, text, tableName };
