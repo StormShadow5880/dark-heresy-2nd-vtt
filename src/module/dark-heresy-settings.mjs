@@ -15,6 +15,7 @@ export class DarkHeresySettings {
         creatorRandom: 'creator-random',
         rulebookMacro: 'rulebook-macro-created',
         healingFirstAidLock: 'healing-firstaid-lock',
+        vfx: 'vfx-enabled',
 
     }
 
@@ -44,6 +45,14 @@ export class DarkHeresySettings {
             scope: 'world',
             config: false,
             default: false,
+            type: Boolean,
+        });
+        game.settings.register(SYSTEM_ID, DarkHeresySettings.SETTINGS.vfx, {
+            name: 'Visual Effects (Sequencer + JB2A)',
+            hint: 'Play animations for Las weapons, Psychic Bolt and Psychic Blast. Needs the modules Sequencer and JB2A Free Content; without them everything works as before.',
+            scope: 'world',
+            config: true,
+            default: true,
             type: Boolean,
         });
         game.settings.register(SYSTEM_ID, DarkHeresySettings.SETTINGS.healingFirstAidLock, {

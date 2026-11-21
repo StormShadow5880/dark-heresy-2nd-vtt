@@ -12,6 +12,7 @@
  * The rules (what a defence prevents, armour and toughness, distances) are in rules/combat-resolution.mjs.
  */
 import { SYSTEM_ID } from '../system-id.mjs';
+import { effectOfRoll, playBlast, playImpact } from '../vfx/vfx.mjs';
 import { toFormula } from '../rules/formula.mjs';
 import {
     SPREAD_RANGE_M,
@@ -26,6 +27,7 @@ import {
     newTargetEntry,
     serializeHit,
 } from '../rules/combat-resolution.mjs';
+import { showsImpact } from '../vfx/vfx-config.mjs';
 
 const ATTACK = 'attack';
 const SPREAD = 'spread';
@@ -72,13 +74,14 @@ async function renderCard(attack) {
  * Creates the attack card.
  * @param extraFlags flags of the card, e.g. { spreadResolves: <id of the request card> }
  */
-async function createAttackCard({ attacker, weaponName, label, template = null, targets, extraFlags = {} }) {
+async function createAttackCard({ attacker, weaponName, label, template = null, targets, extraFlags = {}, vfx = null }) {
     const attack = {
         attackerUuid: attacker.uuid,
         attackerName: attacker.name,
         weaponName,
         label,
         template,
+        vfx,
         targets: targets.map((t) => newTargetEntry(t)),
     };
     await ChatMessage.create({
@@ -151,6 +154,8 @@ async function resolveTarget(messageId, targetUuid, choice, userId) {
         maxWounds: target.system.wounds.max,
     });
     await message.update({ content: await renderCard(attack), [`flags.${SYSTEM_ID}.${ATTACK}`]: attack });
+    // the damage is applied: impact on a real hit only (not on a miss, a prevented hit or a successful evasion)
+    if (attack.vfx && showsImpact(entry)) playImpact(attack.vfx, entry.uuid).catch(() => {});
     if (attack.targets.every((t) => t.state === 'done')) await removeBlastTemplate(attack.template);
 }
 
@@ -217,6 +222,7 @@ export async function requestDefence(actionData) {
         weaponName: rd.name,
         label: rd.weapon ? 'Attack' : attackItem.system?.attackType || 'Psychic attack',
         targets: [{ target: rd.targetActor, hits, melee: kind.melee, storm }],
+        vfx: effectOfRoll(rd),
     });
     return true;
 }
@@ -275,6 +281,8 @@ async function blastRadius(attackItem, pr) {
 async function requestBlast({ rd, hits, radius, label }) {
     const centreToken = rd.targetActor.token?.object ?? rd.targetActor.getActiveTokens?.()[0];
     const template = radius && centreToken ? await drawBlastTemplate(centreToken, radius) : null;
+    // animation: centre and radius are the ones of the rules (the area is checked afterwards in the chat)
+    if (radius && centreToken && rd.power) playBlast(rd, centreToken, radius).catch(() => {});
     const flags = {
         template,
         attackerUuid: rd.sourceActor.uuid,

@@ -1,3 +1,4 @@
+import { playShot } from '../vfx/vfx.mjs';
 import { requestHealingPower } from '../actions/healing-manager.mjs';
 import { requestDefence } from '../actions/combat-resolution-manager.mjs';
 import { PsychicRollData, RollData, WeaponRollData } from './roll-data.mjs';
@@ -342,7 +343,11 @@ export class ActionData {
         await sendActionDataToChat(this);
 
         // Attack on a targeted token: the target answers in the chat, then the damage is applied
-        if (this.rollData.action !== 'Stun') await requestDefence(this);
+        if (this.rollData.action !== 'Stun') {
+            // animation: the attack is executed (hit or miss), only with a target; never blocks the rest
+            if (this.rollData.targetActor) await playShot(this.rollData).catch(() => {});
+            await requestDefence(this);
+        }
     }
 }
 

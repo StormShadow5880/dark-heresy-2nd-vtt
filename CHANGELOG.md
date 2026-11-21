@@ -6,6 +6,10 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
 
 ## [1.9.0] – Unreleased
 
+### Visual effects
+
+- Optional Sequencer + JB2A Free animations for Las weapons (red beam), Psychic Bolt and Psychic Blast (area sized to the blast radius), impact only after a real hit. New setting *Visual Effects*. See [docs/visual-effects.md](docs/visual-effects.md).
+
 ### Healing
 
 - First Aid, Fate: Heal 1d5, Biomancy Endurance / Invigourate and a GM dialog for 24 hours of rest, all through one healing card that the GM client applies exactly once. Critical damage first, never above the maximum, injury states Lightly/Heavily/Critically Damaged. New setting *First Aid: what starts the 24 hour limit*. See [docs/healing.md](docs/healing.md).
