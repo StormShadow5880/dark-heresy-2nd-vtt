@@ -131,3 +131,37 @@
         }
     }
 }
+
+// warning in the psychic power dialog when the psyker pushes (rules/psychic-push.mjs)
+.dh-push {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    margin: 0.4rem 0;
+    padding: 0.4rem 0.55rem;
+    color: var(--ds-ink, #e6d7b4);
+    background: rgba(201, 146, 58, 0.14);
+    border: 1px solid var(--ds-warn, #c9923a);
+    border-left-width: 4px;
+    border-radius: 2px;
+
+    b {
+        color: var(--ds-warn, #c9923a);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    span {
+        font-size: 0.85rem;
+        line-height: 1.3;
+    }
+
+    &--over {
+        background: rgba(184, 81, 75, 0.16);
+        border-color: var(--ds-fail, #b8514b);
+
+        b {
+            color: var(--ds-fail, #b8514b);
+        }
+    }
+}

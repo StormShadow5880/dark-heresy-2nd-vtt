@@ -82,6 +82,12 @@
                         <span class="dh-field__span">Psychic Rating</span>
                         <input class="dh-field__input" type="number" data-dtype="Number" id="pr" name="pr" value="{{pr}}" />
                     </div>
+                    {{#if push.pushing}}
+                        <div class="dh-push {{#if push.over}}dh-push--over{{/if}}" role="alert">
+                            <b><i class="fa-solid fa-triangle-exclamation"></i> Pushing{{#if push.extra}} (+{{push.extra}}){{/if}}</b>
+                            <span>{{push.message}}</span>
+                        </div>
+                    {{/if}}
                     {{#if this.modifiers.bonus}}
                         <div class="dh-field__wrapper">
                             <span class="dh-field__span">Rating Bonus</span>

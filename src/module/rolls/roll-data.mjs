@@ -1,3 +1,4 @@
+import { pushStatus } from '../rules/psychic-push.mjs';
 import { rollDifficulties } from '../rules/difficulties.mjs';
 import { aimModifiers } from '../rules/aim.mjs';
 import { calculatePsychicPowerRange, calculateWeaponRange } from '../rules/range.mjs';
@@ -348,6 +349,8 @@ export class PsychicRollData extends RollData {
 
     maxPr = 0;
     pr = 0;
+    /** Pushing information for the dialog (rules/psychic-push.mjs) */
+    push = null;
 
     constructor() {
         super();
@@ -381,6 +384,8 @@ export class PsychicRollData extends RollData {
     }
 
     async update() {
+        const psy = this.sourceActor.psy;
+        this.push = pushStatus({ pr: this.pr, available: this.availableRating(), baseRating: psy.rating, psyClass: psy.class });
         this.modifiers['bonus'] = 10 * Math.floor(this.availableRating() - this.pr);
         this.modifiers['focus'] = this.hasFocus ? 10 : 0;
         this.modifiers['power'] = this.power.system.target.bonus ?? 0;

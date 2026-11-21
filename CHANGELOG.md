@@ -6,6 +6,10 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
 
 ## [1.9.0] – Unreleased
 
+### Psychic
+
+- The power dialog warns when the chosen Psy Rating is above the current rating (pushing) and enforces the maximum of the kind of psyker (Bound +2, Unbound +4, Daemonic +3). See [docs/psychic-push.md](docs/psychic-push.md).
+
 ### Imperial clock
 
 - Slim date/time bar on the Foundry world time (GM time jumps +10 min / +1 h / +8 h / +24 h, GM-configured date and optional mission day), timers of First Aid and the Psychic recovery on the combat tab, a warning when the world time is set back. Nothing heals by time alone. See [docs/world-clock.md](docs/world-clock.md).

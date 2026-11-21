@@ -49,6 +49,11 @@ export class PsychicPowerDialog extends DHPromptApplication {
     }
 
     async _rollPower(event) {
+        // pushing further than the kind of psyker allows is not possible
+        if (this.data.push?.over) {
+            ui.notifications.warn(this.data.push.message);
+            return;
+        }
         // With the attack automation a psychic attack needs a target, like a weapon attack
         if (this.data.hasDamage && !this.data.targetActor && autoCombatEnabled()) {
             ui.notifications.warn('Target the token you attack first (select it and press T, or right click > Target). Without a target no attack roll is made.');
