@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { EFFECTS, blastDiameterInSquares, effectFor, resolveAsset, showsImpact } from '../src/module/vfx/vfx-config.mjs';
+import { cleanSoundPath, EFFECTS, blastDiameterInSquares, effectFor, resolveAsset, showsImpact } from '../src/module/vfx/vfx-config.mjs';
 import { readFileSync } from 'node:fs';
 
 test('mapping: Las weapons, Psychic Bolt and Blast; everything else has no effect', () => {
@@ -44,10 +44,11 @@ test('impact only after a real hit: miss, full evasion and prevented hits show n
 });
 
 /* ---- runtime with fake Foundry / Sequencer globals ---- */
-async function runtime({ sequencer = true, jb2a = true, enabled = true, known = () => true } = {}) {
+async function runtime({ sequencer = true, jb2a = true, enabled = true, known = () => true, sounds = {} } = {}) {
     const played = [];
     class Seq {
         constructor() { this.steps = []; }
+        sound() { return this.effect(); }
         effect() { const step = { calls: [] }; this.steps.push(step); const proxy = new Proxy({}, { get: (_, m) => (...a) => { step.calls.push([m, a]); return proxy; } }); return proxy; }
         async play() { played.push(this.steps); }
     }
@@ -58,7 +59,7 @@ async function runtime({ sequencer = true, jb2a = true, enabled = true, known = 
     globalThis.fromUuid = async () => null;
     globalThis.game = {
         user: { isGM: false },
-        settings: { get: () => enabled },
+        settings: { get: (ns, key) => (String(key).startsWith('vfx-sound') ? sounds[key] ?? '' : enabled) },
         modules: { get: (id) => ({ active: id === 'sequencer' ? sequencer : jb2a }) },
     };
     const vfx = await import('../src/module/vfx/vfx.mjs');
@@ -112,4 +113,43 @@ test('runtime: psychic bolt uses its own effect; blast is sized to the radius of
     const before = played.length;
     await vfx.playShot({ ...blast, sourceActor: rollOf().sourceActor, targetActor: rollOf().targetActor });
     assert.equal(played.length, before);
+});
+
+test('sound: only with a configured file, in its own sequence, with the animation', async () => {
+    assert.equal(cleanSoundPath('modules/x/laser.ogg'), 'modules/x/laser.ogg');
+    assert.equal(cleanSoundPath(''), '');
+    assert.equal(cleanSoundPath('notaudio.png'), '');
+    const silent = await runtime();
+    await silent.vfx.playShot(rollOf());
+    assert.equal(silent.played.length, 1);
+    const loud = await runtime({ sounds: { 'vfx-sound-laser': 'modules/x/laser.ogg' } });
+    await loud.vfx.playShot(rollOf());
+    assert.equal(loud.played.length, 2); // animation + sound
+    assert.ok(loud.played.flat().some((s) => s.calls.some(([m]) => m === 'file')));
+});
+
+test('sound: a failing sound does not stop the animation; no sound without the module', async () => {
+    const r = await runtime({ sounds: { 'vfx-sound-laser': 'a/b.ogg' } });
+    const Base = globalThis.Sequence;
+    globalThis.Sequence = class extends Base { sound() { throw new Error('no audio'); } };
+    await r.vfx.playShot(rollOf());
+    assert.equal(r.played.length, 1);
+    const off = await runtime({ sequencer: false, sounds: { 'vfx-sound-laser': 'a/b.ogg' } });
+    await off.vfx.playShot(rollOf());
+    assert.equal(off.played.length, 0);
+});
+
+test('floating numbers: red for wounds, orange for critical, green for healing, nothing for no loss', async () => {
+    const { vfx, played } = await runtime();
+    assert.deepEqual(vfx.damageLines({ damage: 3, wounds: 7, critical: 0 }), [{ text: '-3', color: '#ff3030' }]);
+    assert.equal(vfx.damageLines({ damage: 2, critical: 1 }).length, 2);
+    assert.deepEqual(vfx.damageLines({ damage: 0, wounds: 12, critical: 0 }), []);
+    assert.deepEqual(vfx.healingLines({ healed: 4 }), [{ text: '+4', color: '#3ddc6b' }]);
+    assert.deepEqual(vfx.healingLines({ removed: 2 }), [{ text: '+2', color: '#3ddc6b' }]);
+    assert.deepEqual(vfx.healingLines({ healed: 0 }), []);
+    globalThis.fromUuid = async () => ({ actor: { getActiveTokens: () => [token(0)] } });
+    await vfx.playFloatingNumbers('x', vfx.damageLines({ damage: 3 }));
+    assert.equal(played.length, 1);
+    await vfx.playFloatingNumbers('x', []);
+    assert.equal(played.length, 1);
 });

@@ -12,6 +12,7 @@
  * The rules (amounts, order, states, timers) are pure functions in rules/healing.mjs. docs/healing.md lists the readings.
  */
 import { SYSTEM_ID } from '../system-id.mjs';
+import { healingLines, playFloatingNumbers } from '../vfx/vfx.mjs';
 import {
     FIRST_AID_HOURS,
     HARDY_NOTE,
@@ -210,6 +211,7 @@ async function resolveCard(messageId, userId) {
         }
         if (op.timer) await startTimer(actor, op.timer.key);
         entry.state = 'done';
+        playFloatingNumbers(entry.uuid, healingLines(entry.result)).catch(() => {});
     }
     if (card.lockKey) {
         const patient = card.entries[0] && (await actorOf(card.entries[0].uuid));

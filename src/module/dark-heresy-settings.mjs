@@ -1,4 +1,5 @@
 import { SYSTEM_ID } from './hooks-manager.mjs';
+import { SOUND_SETTINGS, SOUND_VOLUME_SETTING } from './vfx/vfx-config.mjs';
 
 export class DarkHeresySettings {
 
@@ -54,6 +55,33 @@ export class DarkHeresySettings {
             config: true,
             default: true,
             type: Boolean,
+        });
+        for (const { key, name } of Object.values(SOUND_SETTINGS)) {
+            game.settings.register(SYSTEM_ID, key, {
+                name,
+                hint: 'Audio file played with the animation (needs Sequencer). Empty = silent. Example: modules/my-sounds/laser.ogg',
+                scope: 'world',
+                config: true,
+                default: '',
+                type: String,
+                filePicker: 'audio',
+            });
+        }
+        game.settings.register(SYSTEM_ID, 'vfx-floating-numbers', {
+            name: 'Floating damage and healing numbers',
+            hint: 'Shows "-3" in red above a token that loses wounds and "+4" in green when it is healed (needs Sequencer).',
+            scope: 'world',
+            config: true,
+            default: true,
+            type: Boolean,
+        });
+        game.settings.register(SYSTEM_ID, SOUND_VOLUME_SETTING, {
+            name: 'Sound volume of the effects',
+            scope: 'world',
+            config: true,
+            default: 0.6,
+            type: Number,
+            range: { min: 0, max: 1, step: 0.05 },
         });
         game.settings.register(SYSTEM_ID, DarkHeresySettings.SETTINGS.healingFirstAidLock, {
             name: 'First Aid: what starts the 24 hour limit',

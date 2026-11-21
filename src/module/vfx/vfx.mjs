@@ -8,7 +8,7 @@
  *   impact        the GM client that resolves the target row (once, the row is marked done before)
  */
 import { SYSTEM_ID } from '../system-id.mjs';
-import { EFFECTS, REQUIRED_MODULES, blastDiameterInSquares, effectFor, resolveAsset } from './vfx-config.mjs';
+import { EFFECTS, REQUIRED_MODULES, SOUND_SETTINGS, SOUND_VOLUME_SETTING, blastDiameterInSquares, cleanSoundPath, effectFor, resolveAsset } from './vfx-config.mjs';
 
 export const VFX_SETTING = 'vfx-enabled';
 let warned = false;
@@ -50,6 +50,32 @@ const skip = (why) => console.info(`Dark Heresy 2e | no animation: ${why}`);
 
 const tokenOfActor = (actor) => actor?.token?.object ?? actor?.getActiveTokens?.()[0] ?? null;
 
+/**
+ * Sound of an effect (file from the world settings), played with the animation. A separate sequence: a missing or broken audio file
+ * can never cancel the animation. Sequencer plays it on every client, like the animation.
+ */
+function playSound(slot, delay = 0) {
+    const path = cleanSoundPath(safeSetting(SOUND_SETTINGS[slot]?.key));
+    if (!path) return;
+    const volume = Math.min(1, Math.max(0, Number(safeSetting(SOUND_VOLUME_SETTING)) || 0.6));
+    try {
+        const seq = new globalThis.Sequence();
+        const sound = seq.sound().file(path).volume(volume);
+        if (delay > 0) sound.delay(delay);
+        Promise.resolve(seq.play()).catch((error) => console.warn(`Dark Heresy 2e | sound ${path} failed`, error));
+    } catch (error) {
+        console.warn(`Dark Heresy 2e | sound ${path} failed`, error);
+    }
+}
+
+function safeSetting(key) {
+    try {
+        return key ? game.settings.get(SYSTEM_ID, key) : undefined;
+    } catch {
+        return undefined;
+    }
+}
+
 async function safely(label, fn) {
     try {
         await fn();
@@ -84,6 +110,7 @@ export async function playShot(rd) {
         const muzzle = asset(name, 'muzzle');
         if (muzzle) seq.effect().file(muzzle).atLocation(from).rotateTowards(to).scaleToObject(1.5);
         seq.effect().file(shot).atLocation(from).stretchTo(to);
+        playSound(name);
         await seq.play();
     });
 }
@@ -96,6 +123,7 @@ export async function playImpact(effectName, targetUuid) {
     await safely(`${effectName} impact`, async () => {
         const impact = asset(effectName, 'impact');
         if (impact) await new globalThis.Sequence().effect().file(impact).atLocation(to).scaleToObject(1.4).play();
+        playSound('impact');
     });
 }
 
@@ -117,6 +145,7 @@ export async function playBlast(rd, centreToken, radius) {
         if (shot) seq.effect().file(shot).atLocation(from).stretchTo(at).waitUntilFinished(-300);
         if (ring) seq.effect().file(ring).atLocation(at).size(squares, { gridUnits: true }).belowTokens().fadeOut(400);
         if (burst) seq.effect().file(burst).atLocation(at).size(squares, { gridUnits: true });
+        playSound(name, shot ? 600 : 0);
         await seq.play();
     });
 }
@@ -129,4 +158,45 @@ export function vfxReport() {
         for (const slot of Object.keys(def).filter((k) => Array.isArray(def[k]))) lines.push(`${name}.${slot}: ${resolveAsset(def[slot], exists) ?? 'MISSING'}`);
     }
     return lines.join('\n');
+}
+
+/**
+ * Floating number above a token ("-3" in red for lost wounds, "+4" in green for healing). Needs only Sequencer (no JB2A asset), which
+ * shows it on every client. `lines`: [{ text, color }], stacked upwards.
+ */
+export async function playFloatingNumbers(targetUuid, lines) {
+    if (!lines?.length || !vfxAvailable({ notify: false }) || safeSetting('vfx-floating-numbers') === false) return;
+    const doc = await fromUuid(targetUuid);
+    const token = tokenOfActor(doc?.actor ?? doc);
+    if (!token) return;
+    await safely('floating number', async () => {
+        const seq = new globalThis.Sequence();
+        lines.forEach((line, i) => {
+            seq.effect()
+                .atLocation(token)
+                .text(String(line.text), { fill: line.color, fontSize: 44, fontWeight: 'bold', stroke: '#000000', strokeThickness: 6, dropShadow: true })
+                .animateProperty('sprite', 'position.y', { from: -0.3 - i * 0.5, to: -1.3 - i * 0.5, duration: 1600, gridUnits: true, ease: 'easeOutQuad' })
+                .fadeIn(150)
+                .fadeOut(500)
+                .duration(1800);
+        });
+        await seq.play();
+    });
+}
+
+/** Lines for an applied damage result of applyHits(): lost wounds in red, critical damage in orange; nothing if nothing was lost */
+export function damageLines(result) {
+    const lines = [];
+    // result.damage = wounds lost by all hits (result.wounds would be the wounds left)
+    const wounds = Number(result?.damage ?? 0);
+    const critical = Number(result?.critical ?? 0);
+    if (wounds > 0) lines.push({ text: `-${wounds}`, color: '#ff3030' });
+    if (critical > 0) lines.push({ text: `-${critical} crit.`, color: '#ff9a2e' });
+    return lines;
+}
+
+/** Lines for a healing result of the healing card */
+export function healingLines(result) {
+    const healed = Number(result?.healed ?? result?.removed ?? 0);
+    return healed > 0 ? [{ text: `+${healed}`, color: '#3ddc6b' }] : [];
 }

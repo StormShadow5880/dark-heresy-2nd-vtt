@@ -80,3 +80,15 @@ export function showsImpact(entry) {
     // applyHits() returns the hits that were really applied: none left means everything was prevented
     return Array.isArray(r.hits) && r.hits.length > 0;
 }
+
+/** World settings with an audio file per effect (empty = silent). The impact sound plays with the impact of a real hit. */
+export const SOUND_SETTINGS = {
+    laser: { key: 'vfx-sound-laser', name: 'Sound: Las weapon shot' },
+    psychicBolt: { key: 'vfx-sound-psychicBolt', name: 'Sound: Psychic Bolt' },
+    psychicBlast: { key: 'vfx-sound-psychicBlast', name: 'Sound: Psychic Blast explosion' },
+    impact: { key: 'vfx-sound-impact', name: 'Sound: impact of a hit' },
+};
+export const SOUND_VOLUME_SETTING = 'vfx-sound-volume';
+
+/** A usable audio path from a setting value, or '' */
+export const cleanSoundPath = (value) => (typeof value === 'string' && /\.(ogg|oga|mp3|wav|flac|webm|m4a|aac)$/i.test(value.trim()) ? value.trim() : '');

@@ -45,3 +45,13 @@ matching point.
 2. Same with a miss and with a successful Dodge → beam, no impact. No target → warning, no roll, no animation.
 3. Psychic Bolt → purple energy to the target; Psychic Blast → ring + explosion around the first target, scale matches the radius circle.
 4. Disable Sequencer / JB2A or the setting → attacks work, one info for the GM. 5. Two connected clients → one animation each.
+
+## Sound
+World settings *Sound: Las weapon shot / Psychic Bolt / Psychic Blast explosion / impact of a hit* take an audio file (file picker, empty = silent) and *Sound volume*.
+The sound is its own Sequencer sequence, started with the animation (blast: with the explosion), so a missing or broken file never cancels the animation.
+No sound files are shipped with the system (no source of CC0 audio could be reached from the build environment): enter your own files, e.g. from a sound module.
+A later media module can be added as another source behind these settings.
+
+## Floating numbers
+Setting *Floating damage and healing numbers*: "-3" in red (lost wounds, `applyHits().damage`), "-2 crit." in orange (critical damage) above the token after a hit
+that did damage, and "+4" in green after healing (healing card). Only Sequencer is needed (no JB2A asset). Not shown on a miss or a full evasion.
