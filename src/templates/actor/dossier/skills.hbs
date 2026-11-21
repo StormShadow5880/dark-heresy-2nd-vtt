@@ -40,14 +40,14 @@
                     <span class="num">{{#if (gt s.trainingBonus 0)}}+{{/if}}{{s.trainingBonus}}</span>
                     <span class="num strong">{{s.total}}</span>
                     <button type="button" class="icon-btn roll-skill" data-skill="{{s.skillKey}}" data-specialty="{{s.specKey}}" data-tooltip="Roll {{s.label}} (W100 ≤ {{s.total}})"><i class="fa-solid fa-dice-d20"></i></button>
-                    <div class="skill-detail" hidden>
+                    <div class="skill-detail"><div class="fold__inner">
                         <dl class="skill-facts">
                             <div><dt>Type</dt><dd>{{#if s.detail.specialist}}Specialist skill{{else}}Basic skill{{/if}} · {{s.characteristic}}</dd></div>
                             {{#if s.detail.aptitudes}}<div><dt>Aptitudes</dt><dd>{{s.detail.aptitudes}} <small>(matching {{s.detail.matches}}/2)</small></dd></div>{{/if}}
                             {{#if s.detail.next}}<div><dt>Next advance</dt><dd>{{s.detail.next}}{{#if s.detail.cost}} · <b>{{s.detail.cost}} EP</b>{{/if}}</dd></div>{{/if}}
                         </dl>
                         <div class="prose">{{#if s.detail.description}}{{{s.detail.description}}}{{else}}<small class="empty-note">No rulebook description in the system data yet.</small>{{/if}}</div>
-                    </div>
+                    </div></div>
                 </div>
             {{/each}}
         </div>

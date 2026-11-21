@@ -236,7 +236,7 @@ export class AcolyteDossierSheet extends AcolyteSheet {
 
     _setSkillOpen(row, open) {
         row.classList.toggle('is-open', open);
-        row.querySelector('.skill-detail')?.toggleAttribute('hidden', !open);
+        row.querySelector('.skill-detail')?.setAttribute('aria-hidden', String(!open));
         row.querySelector('.skill-toggle')?.setAttribute('aria-expanded', String(open));
     }
 
@@ -251,7 +251,7 @@ export class AcolyteDossierSheet extends AcolyteSheet {
 
     _setPowerOpen(row, open) {
         row.classList.toggle('is-open', open);
-        row.querySelector('.pw__detail')?.toggleAttribute('hidden', !open);
+        row.querySelector('.pw__detail')?.setAttribute('aria-hidden', String(!open));
         row.querySelector('.pw__toggle')?.setAttribute('aria-expanded', String(open));
     }
 

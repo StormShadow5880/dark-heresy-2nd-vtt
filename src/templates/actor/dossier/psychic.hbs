@@ -55,7 +55,7 @@
                         </button>
                         {{#if p.active}}<span class="pw__running" data-tooltip="This power is running. End it under Sustained Powers."><i class="fa-solid fa-hourglass-half"></i></span>{{/if}}
                     </div>
-                    <div class="pw__detail" hidden>
+                    <div class="pw__detail"><div class="fold__inner">
                                                     <dl class="pw__facts">
                                                         <div><dt>XP</dt><dd>{{p.cost}}</dd></div>
                                                         <div><dt>Action</dt><dd>{{p.action}}</dd></div>
@@ -74,7 +74,7 @@
                                                         <button type="button" class="btn item-edit" data-item-id="{{p.id}}"><i class="fa-solid fa-pen"></i> Edit</button>
                                                         <button type="button" class="btn btn--danger item-delete" data-item-id="{{p.id}}"><i class="fa-solid fa-trash"></i> Delete</button>
                                                     </div>
-                                                </div>
+                                                </div></div>
                 </li>
             {{else}}
                 <li class="psy__none">No psychic powers. Drag powers from the compendium onto the sheet.</li>
