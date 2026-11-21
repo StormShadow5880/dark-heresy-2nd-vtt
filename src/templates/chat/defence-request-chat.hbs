@@ -3,6 +3,7 @@
     <h2 class="dh-card__name">{{targetName}}</h2>
     <div class="dh-card__sub">{{attackerName}} · {{weaponName}} · {{hitCount}} hit{{#if multiple}}s{{/if}}</div>
     <div class="dh-rule"></div>
+    {{#each notes as |n|}}<p class="dh-note">{{n}}</p>{{/each}}
     <p class="dh-detail-line dh-defence__text">Choose how {{targetName}} reacts.</p>
     <footer class="dh-card__foot dh-card__foot--center dh-defence__buttons">
         {{#each choices as |c|}}

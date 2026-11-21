@@ -9,12 +9,14 @@
             <div class="dh-vs__sep">vs</div>
             <div class="dh-vs__value"><span>Target</span><strong>{{evasion.target}}</strong></div>
         </div>
-        <div class="dh-verdict {{#if evaded}}dh-verdict--success{{else}}dh-verdict--fail{{/if}}">{{#if evaded}}{{evasion.label}} succeeded{{else}}{{evasion.label}} failed{{/if}}</div>
+        <div class="dh-verdict {{#if evasion.success}}dh-verdict--success{{else}}dh-verdict--fail{{/if}}">{{#if evasion.success}}{{evasion.label}} succeeded{{else}}{{evasion.label}} failed{{/if}}</div>
+        {{#if evasion.success}}<p class="dh-detail-line">{{evasion.degrees}} degree{{#if multipleDegrees}}s{{/if}} of success: {{prevented}} of {{total}} hit{{#if manyHits}}s{{/if}} prevented.</p>{{/if}}
     {{/if}}
 
     {{#if evaded}}
-        <p class="dh-detail-line">The attack is avoided, no damage.</p>
+        <p class="dh-detail-line">{{#if evasion}}All hits are prevented: the attack missed, no damage.{{else}}The attack is avoided, no damage.{{/if}}</p>
     {{else}}
+        {{#if partial}}<p class="dh-note">{{prevented}} of {{total}} hits prevented, the others strike.</p>{{/if}}
         <div class="dh-badge dh-badge--damage" data-tooltip="Wounds taken"><span class="dh-badge__num">{{result.damage}}</span></div>
         <div class="dh-verdict dh-verdict--fail">{{#if result.damage}}wounds{{else}}no wounds{{/if}}</div>
         {{#each result.hits as |h|}}

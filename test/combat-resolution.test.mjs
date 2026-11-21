@@ -115,3 +115,37 @@ test('blast: everyone within the radius is listed, nearest first', () => {
     assert.deepEqual(inBlastRadius(tokens, 1).map((t) => t.id), ['centre']);
     assert.deepEqual(inBlastRadius([], 5), []);
 });
+
+test('prevented hits: the RULE degrees count, a plain success prevents one hit (page 220)', async () => {
+    const { preventedHits, evasionOutcome } = await import('../src/module/rules/combat-resolution.mjs');
+    const { degreesOfSuccess, toRuleDegrees } = await import('../src/module/rules/degrees.mjs');
+    // single hit: success prevents it
+    assert.equal(preventedHits({ ruleDos: 1, total: 1 }), 1);
+    // the displayed degrees (tens difference) are 0 for a plain success, the rule count is 1
+    const shown = degreesOfSuccess(44, 45);
+    assert.equal(shown, 0);
+    assert.equal(toRuleDegrees(shown), 1);
+    assert.equal(preventedHits({ ruleDos: toRuleDegrees(shown), total: 3 }), 1); // roll 44 vs 45: 1 of 3 hits prevented
+    assert.equal(preventedHits({ ruleDos: toRuleDegrees(degreesOfSuccess(21, 45)), total: 5 }), 3); // 21 vs 45: shown +2, rule 3
+    assert.equal(preventedHits({ ruleDos: 3, total: 2 }), 2); // never more than the hits
+    // storm: two per degree
+    assert.equal(preventedHits({ ruleDos: 1, total: 6, storm: true }), 2);
+    assert.equal(preventedHits({ ruleDos: 2, total: 3, storm: true }), 3);
+    assert.equal(preventedHits({ ruleDos: 0, total: 3 }), 0);
+    const hits = [{ n: 1 }, { n: 2 }, { n: 3 }];
+    assert.deepEqual(evasionOutcome({ success: true, ruleDos: 1, hits }), { prevented: 1, remaining: [{ n: 1 }, { n: 2 }], missed: false });
+    assert.equal(evasionOutcome({ success: true, ruleDos: 3, hits }).missed, true); // all prevented = the attack missed
+    assert.deepEqual(evasionOutcome({ success: false, ruleDos: 0, hits }), { prevented: 0, remaining: hits, missed: false });
+});
+
+test('blast / spray: dodging needs a way to the edge no longer than the Agility Bonus, an obstacle prevents it', async () => {
+    const { blastDodge } = await import('../src/module/rules/combat-resolution.mjs');
+    assert.deepEqual(blastDodge({ distanceFromCentre: 1, radius: 4, agilityBonus: 3 }), { toEdge: 3, agilityBonus: 3, blocked: false, canDodge: true });
+    assert.equal(blastDodge({ distanceFromCentre: 0, radius: 4, agilityBonus: 3 }).canDodge, false); // 4 m to the edge
+    assert.equal(blastDodge({ distanceFromCentre: 3, radius: 4, agilityBonus: 1 }).canDodge, true);
+    assert.equal(blastDodge({ distanceFromCentre: 1, radius: 4, agilityBonus: 3, blocked: true }).canDodge, false);
+    assert.equal(blastDodge({ distanceFromCentre: 5, radius: 4, agilityBonus: 0 }).toEdge, 0); // outside: nothing to cross
+    const { defenceChoices } = await import('../src/module/rules/combat-resolution.mjs');
+    const a = { skills: { dodge: { current: 40 }, parry: { current: 30 } } };
+    assert.deepEqual(defenceChoices(a, { melee: false, noDodge: true }).map((c) => c.id), ['none']);
+});

@@ -156,13 +156,13 @@ test('attack automation chat cards render their data', () => {
     assert.match(request, /data-choice="none"/);
     const result = hbs.compile(fs.readFileSync(path.join(ROOT, 'chat/attack-result-chat.hbs'), 'utf8'))({
         attackerName: 'Voss', targetName: 'Cultist', weaponName: 'Lasgun', evaded: false, maxWounds: 12,
-        evasion: { label: 'Dodge', roll: 80, target: 45 },
+        evasion: { label: 'Dodge', roll: 80, target: 45, success: false },
         result: { damage: 6, critical: 0, wounds: 6, criticalTotal: 0, hits: [{ location: 'Body', rawDamage: 12, damageType: 'Energy', usableArmour: 3, toughnessBonus: 3, wounds: 6, critical: 0, fatigue: 0 }] },
     });
     assert.match(result, /Dodge failed/);
     assert.match(result, /12 Energy − armour 3 − TB 3 = 6/);
     assert.match(result, /6 \/ 12/);
-    const evaded = hbs.compile(fs.readFileSync(path.join(ROOT, 'chat/attack-result-chat.hbs'), 'utf8'))({ targetName: 'X', evaded: true, evasion: { label: 'Parry', roll: 10, target: 40 } });
+    const evaded = hbs.compile(fs.readFileSync(path.join(ROOT, 'chat/attack-result-chat.hbs'), 'utf8'))({ targetName: 'X', evaded: true, evasion: { label: 'Parry', roll: 10, target: 40, success: true, degrees: 4 } });
     assert.match(evaded, /Parry succeeded/);
     assert.match(evaded, /no damage/);
 });
@@ -175,26 +175,38 @@ test('barrage / storm chat cards', () => {
     assert.match(request, /within 2 metres/);
     assert.match(request, /dh-spread__choose/);
     const result = hbs.compile(fs.readFileSync(path.join(ROOT, 'chat/spread-result-chat.hbs'), 'utf8'))({
-        attackType: 'Psychic Storm', powerName: 'X',
-        groups: [{ targetName: 'A', count: 1, many: false }, { targetName: 'B', count: 2, many: true, targetUuid: 'Actor.b', hits: [{ location: 'Body', totalDamage: 7, damageType: 'Energy' }] }],
+        attackType: 'Psychic Storm', powerName: 'X', groups: [{ targetName: 'A', count: 1, many: false }, { targetName: 'B', count: 2, many: true }],
     });
     assert.match(result, /<b>A<\/b>: 1 hit – answers in the chat/);
     assert.match(result, /<b>B<\/b>: 2 hits/);
-    assert.match(result, /roll-control__assign-damage/);
 });
 
 test('blast chat cards', () => {
-    const request = hbs.compile(fs.readFileSync(path.join(ROOT, 'chat/blast-request-chat.hbs'), 'utf8'))({ powerName: 'Flame', attackerName: 'Voss', targetName: 'Cultist', radius: 4 });
+    const request = hbs.compile(fs.readFileSync(path.join(ROOT, 'chat/blast-request-chat.hbs'), 'utf8'))({ label: 'Psychic Blast', powerName: 'Flame', attackerName: 'Voss', targetName: 'Cultist', radius: 4 });
     assert.match(request, /\(4 m\)/);
     assert.match(request, /dh-blast__choose/);
     const result = hbs.compile(fs.readFileSync(path.join(ROOT, 'chat/blast-result-chat.hbs'), 'utf8'))({
-        powerName: 'Flame', radius: 4, count: 2, many: true, targets: [{ name: 'A', distance: 0 }, { name: 'B', distance: 3 }], hit: { totalDamage: 12, damageType: 'Energy', totalPenetration: 2 },
+        label: 'Blast', powerName: 'Frag', radius: 4, count: 2, many: true, targets: [{ name: 'A', distance: 0 }, { name: 'B', distance: 3, blocked: true }],
     });
     assert.match(result, /2 targets in 4 m/);
-    assert.match(result, /<b>B<\/b> · 3 m from the centre/);
-    assert.match(result, /dh-blast__apply/);
-    const damage = hbs.compile(fs.readFileSync(path.join(ROOT, 'chat/blast-damage-chat.hbs'), 'utf8'))({
-        powerName: 'Flame', targets: [{ name: 'A', damage: 5, critical: 1, wounds: 3, maxWounds: 12, hit: { rawDamage: 12, damageType: 'Energy', usableArmour: 2, toughnessBonus: 3 } }],
+    assert.match(result, /<b>B<\/b> · 3 m from the centre · way out blocked/);
+});
+
+test('defence cards show the rules for several hits and for areas', () => {
+    const request = hbs.compile(fs.readFileSync(path.join(ROOT, 'chat/defence-request-chat.hbs'), 'utf8'))({
+        targetName: 'A', attackerName: 'B', weaponName: 'W', hitCount: 3, multiple: true, notes: ['Each degree of success prevents one hit.'], choices: [{ id: 'none', label: 'Take the hit', icon: 'fa-burst' }],
     });
-    assert.match(damage, /12 Energy − armour 2 − TB 3 = <b>5<\/b> wounds/);
+    assert.match(request, /Each degree of success prevents one hit/);
+    const partial = hbs.compile(fs.readFileSync(path.join(ROOT, 'chat/attack-result-chat.hbs'), 'utf8'))({
+        targetName: 'A', evaded: false, partial: true, prevented: 1, total: 3, manyHits: true, maxWounds: 10,
+        evasion: { label: 'Dodge', roll: 44, target: 45, success: true, degrees: 1 },
+        result: { damage: 4, critical: 0, wounds: 6, criticalTotal: 0, hits: [] },
+    });
+    assert.match(partial, /1 degree of success: 1 of 3 hits prevented/);
+    assert.match(partial, /1 of 3 hits prevented, the others strike/);
+    const missed = hbs.compile(fs.readFileSync(path.join(ROOT, 'chat/attack-result-chat.hbs'), 'utf8'))({
+        targetName: 'A', evaded: true, prevented: 3, total: 3, manyHits: true,
+        evasion: { label: 'Dodge', roll: 10, target: 45, success: true, degrees: 4 },
+    });
+    assert.match(missed, /the attack missed/);
 });

@@ -19,9 +19,10 @@ export const DEFENCES = {
  * The defences of an actor against an attack: dodge always, parry only against melee attacks. Each with the target
  * number of the evasion test; defences without a trained skill or a value are not offered.
  */
-export function defenceChoices(actor, { melee = false } = {}) {
+export function defenceChoices(actor, { melee = false, noDodge = false } = {}) {
     const choices = [];
     for (const [id, def] of Object.entries(DEFENCES)) {
+        if (id === 'dodge' && noDodge) continue;
         if (!def.skill) {
             choices.push({ id, label: def.label, icon: def.icon, target: null });
             continue;
@@ -148,4 +149,44 @@ export function inBlastRadius(tokens, radius) {
     return tokens
         .filter((t) => Number.isFinite(t.distance) && t.distance <= radius)
         .sort((a, b) => a.distance - b.distance);
+}
+
+/**
+ * Hits prevented by a successful defence test (rulebook page 220).
+ *  - a single hit: a success prevents it
+ *  - several hits (burst, Swift / Lightning Attack, Barrage, ...): the degrees of success prevent hits, one per degree
+ *  - Psychic Storm: two hits per degree
+ * The degrees are the RULE count (`ruleDos`: the success itself is one degree, every further tens digit one more), so a plain
+ * success always prevents at least one hit. The displayed degrees (`dos`) start at 0 and must NOT be used here.
+ * @param ruleDos {number} degrees of success of the defence test in the rule count (>= 1 for a success)
+ * @param total {number} hits that strike this target
+ * @returns {number} never more than `total`
+ */
+export function preventedHits({ ruleDos, total, storm = false }) {
+    const degrees = Math.max(0, Math.floor(Number(ruleDos) || 0));
+    return Math.min(total, degrees * (storm ? 2 : 1));
+}
+
+/**
+ * The outcome of an evasion test against the hits of one target.
+ * @returns {{prevented: number, remaining: object[], missed: boolean}} the last hits are removed first; all hits prevented = the attack missed
+ */
+export function evasionOutcome({ success, ruleDos, hits, storm = false }) {
+    const prevented = success ? preventedHits({ ruleDos, total: hits.length, storm }) : 0;
+    const remaining = hits.slice(0, hits.length - prevented);
+    return { prevented, remaining, missed: remaining.length === 0 };
+}
+
+/**
+ * Blast and spray: a successful dodge only helps if the character can reach the edge of the area and leave it. The way to the edge
+ * may not be longer than the Agility Bonus in metres; an obstacle on the way makes dodging impossible.
+ * @param distanceFromCentre {number} metres from the centre of the blast
+ * @param radius {number} metres
+ * @param agilityBonus {number}
+ * @param blocked {boolean} an obstacle is in the way
+ */
+export function blastDodge({ distanceFromCentre, radius, agilityBonus, blocked = false }) {
+    const toEdge = Math.max(0, Math.round((radius - distanceFromCentre) * 10) / 10);
+    const bonus = Math.max(0, Number(agilityBonus) || 0);
+    return { toEdge, agilityBonus: bonus, blocked: !!blocked, canDodge: !blocked && toEdge <= bonus };
 }

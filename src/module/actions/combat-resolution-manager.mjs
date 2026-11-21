@@ -9,16 +9,14 @@
  */
 import { SYSTEM_ID } from '../system-id.mjs';
 import { toFormula } from '../rules/formula.mjs';
-import { SPREAD_RANGE_M, applyHits, inBlastRadius, automatedAttack, defenceChoices, groupHitsByTarget, serializeHit, withinSpread } from '../rules/combat-resolution.mjs';
+import { SPREAD_RANGE_M, applyHits, automatedAttack, blastDodge, defenceChoices, evasionOutcome, groupHitsByTarget, inBlastRadius, serializeHit, withinSpread } from '../rules/combat-resolution.mjs';
 
 const FLAG = 'defence';
 const RESOLVES = 'defenceResolves';
 const SPREAD = 'spread';
 const SPREAD_RESOLVES = 'spreadResolves';
 const BLAST = 'blast';
-const BLAST_RESULT = 'blastResult';
 const BLAST_RESOLVES = 'blastResolves';
-const BLAST_APPLIED = 'blastApplied';
 
 export const autoCombatEnabled = () => {
     try {
@@ -33,18 +31,30 @@ async function actorFromUuid(uuid) {
     return doc?.actor ?? doc ?? null;
 }
 
-const resolutionOf = (messageId) => game.messages.find((m) => [RESOLVES, SPREAD_RESOLVES, BLAST_RESOLVES, BLAST_APPLIED].some((key) => m.getFlag(SYSTEM_ID, key) === messageId));
+const resolutionOf = (messageId) => game.messages.find((m) => [RESOLVES, SPREAD_RESOLVES, BLAST_RESOLVES].some((key) => m.getFlag(SYSTEM_ID, key) === messageId));
 
 /** One defence request card for the hit(s) that strike one target */
-async function postDefenceRequest({ attacker, target, weaponName, hits, melee }) {
-    const choices = defenceChoices(target, { melee });
-    const flags = { attackerUuid: attacker.uuid, targetUuid: target.uuid, weaponName, hits: hits.map(serializeHit) };
+async function postDefenceRequest({ attacker, target, weaponName, hits, melee, storm = false, area = null }) {
+    const choices = defenceChoices(target, { melee, noDodge: !!area && !area.canDodge });
+    const flags = { attackerUuid: attacker.uuid, targetUuid: target.uuid, weaponName, hits: hits.map(serializeHit), storm, area };
+    const notes = [];
+    if (hits.length > 1) notes.push(storm ? 'Each degree of success prevents two hits.' : 'Each degree of success prevents one hit.');
+    if (area) {
+        notes.push(
+            area.canDodge
+                ? `Dodging works if ${target.name} can leave the area: ${area.toEdge} m to the edge, Agility bonus ${area.agilityBonus}.`
+                : area.blocked
+                  ? 'An obstacle blocks the way out of the area: dodging is not possible.'
+                  : `${target.name} cannot leave the area: ${area.toEdge} m to the edge, Agility bonus ${area.agilityBonus}. Dodging is not possible.`,
+        );
+    }
     const content = await foundry.applications.handlebars.renderTemplate('systems/dark-heresy-2nd/templates/chat/defence-request-chat.hbs', {
         targetName: target.name,
         attackerName: attacker.name,
         weaponName,
         hitCount: hits.length,
         multiple: hits.length > 1,
+        notes,
         choices,
     });
     await ChatMessage.create({
@@ -69,14 +79,21 @@ export async function requestDefence(actionData) {
         if (kind.reason) ui.notifications.info(kind.reason);
         return false;
     }
-    if (kind.spread && hits.length > 1) return requestSpread({ rd, hits, attackItem });
-    if (kind.blast) return requestBlast({ rd, hits, attackItem });
-    // Several hits (bursts, Twin-Linked): dodging them follows the auto-fire rules (rulebook page 220), not in the system data yet
-    if (hits.length > 1) {
-        ui.notifications.info('This attack has several hits: the rule for dodging them is not automated yet, use the hit buttons of the attack card.');
+    // Spray (flame weapons) hits everybody in a cone: no cone targeting yet
+    if (rd.weapon && rd.hasAttackSpecial?.('Spray')) {
+        ui.notifications.info('Spray attacks hit a whole cone: not automated yet, use the hit buttons of the attack card.');
         return false;
     }
-    await postDefenceRequest({ attacker: rd.sourceActor, target: rd.targetActor, weaponName: rd.name, hits, melee: kind.melee });
+    // Weapons with the Blast quality: the area around the target is checked like a psychic blast
+    if (rd.weapon && rd.hasAttackSpecial?.('Blast')) {
+        const level = Number(rd.getAttackSpecial('Blast')?.level);
+        return requestBlast({ rd, hits, attackItem, radius: Number.isFinite(level) && level > 0 ? level : null, label: 'Blast' });
+    }
+    if (kind.blast) return requestBlast({ rd, hits, attackItem, radius: await blastRadius(attackItem, rd.pr), label: 'Psychic Blast' });
+    const storm = String(attackItem.system?.attackType ?? '').toLowerCase() === 'psychic storm';
+    if (kind.spread && hits.length > 1) return requestSpread({ rd, hits, attackItem });
+    // one target: a single hit, or several hits of one attack (bursts, Swift / Lightning Attack, Barrage, Storm)
+    await postDefenceRequest({ attacker: rd.sourceActor, target: rd.targetActor, weaponName: rd.name, hits, melee: kind.melee, storm });
     return true;
 }
 
@@ -92,17 +109,18 @@ async function blastRadius(attackItem, pr) {
     }
 }
 
-/** Psychic Blast: the card with the button that checks who is inside the area */
-async function requestBlast({ rd, hits, attackItem }) {
-    const radius = await blastRadius(attackItem, rd.pr);
+/** Blast (power or weapon): the card with the button that checks who is inside the area */
+async function requestBlast({ rd, hits, radius, label }) {
     const flags = {
         attackerUuid: rd.sourceActor.uuid,
         centreUuid: rd.targetActor.uuid,
         powerName: rd.name,
+        label,
         radius,
         hit: serializeHit(hits[0]),
     };
     const content = await foundry.applications.handlebars.renderTemplate('systems/dark-heresy-2nd/templates/chat/blast-request-chat.hbs', {
+        label,
         powerName: rd.name,
         attackerName: rd.sourceActor.name,
         targetName: rd.targetActor.name,
@@ -145,7 +163,6 @@ async function requestSpread({ rd, hits, attackItem }) {
 export async function bindDefenceMessage(message, html) {
     if (message.getFlag?.(SYSTEM_ID, SPREAD)) return bindSpreadMessage(message, html);
     if (message.getFlag?.(SYSTEM_ID, BLAST)) return bindBlastMessage(message, html);
-    if (message.getFlag?.(SYSTEM_ID, BLAST_RESULT)) return bindBlastResult(message, html);
     const flags = message.getFlag?.(SYSTEM_ID, FLAG);
     if (!flags) return;
     const box = html.querySelector('.dh-defence__buttons');
@@ -252,9 +269,9 @@ export async function chooseSpreadTargets(message) {
     const summary = [];
     for (const group of groups) {
         const target = byUuid.get(group.targetId);
-        summary.push({ targetName: target.name, targetUuid: target.uuid, count: group.hits.length, many: group.hits.length > 1, hits: group.hits });
-        // one hit on a target: it answers like against a bolt; several hits on one target stay manual (see the result card)
-        if (group.hits.length === 1) await postDefenceRequest({ attacker, target, weaponName: flags.powerName, hits: group.hits, melee: false });
+        summary.push({ targetName: target.name, count: group.hits.length, many: group.hits.length > 1 });
+        // every target answers for the hits that strike it (degrees of success prevent hits, Storm two per degree)
+        await postDefenceRequest({ attacker, target, weaponName: flags.powerName, hits: group.hits, melee: false, storm: /storm/i.test(flags.attackType) });
     }
     const content = await foundry.applications.handlebars.renderTemplate('systems/dark-heresy-2nd/templates/chat/spread-result-chat.hbs', {
         attackType: flags.attackType,
@@ -280,24 +297,31 @@ export async function resolveDefence(message, choice) {
     if (!game.user.isGM && !target.isOwner) return ui.notifications.warn(`Only the owner of ${target.name} can answer.`);
 
     let evasion = null;
-    let evaded = false;
+    let outcome = { prevented: 0, remaining: flags.hits, missed: false };
     const rolls = [];
     if (choice === 'dodge' || choice === 'parry') {
         const targetNumber = Number(target.skills?.[choice]?.current);
         if (!Number.isFinite(targetNumber)) return ui.notifications.warn(`${target.name} has no ${choice} value.`);
+        if (choice === 'dodge' && flags.area && !flags.area.canDodge) return ui.notifications.warn(`${target.name} cannot leave the area and cannot dodge.`);
         const check = await target.rollCheck(targetNumber);
-        evaded = check.success;
+        // the RULE degrees: a plain success is one degree and prevents one hit
+        outcome = evasionOutcome({ success: check.success, ruleDos: check.ruleDos, hits: flags.hits, storm: !!flags.storm });
         rolls.push(check.roll);
-        evasion = { label: choice === 'dodge' ? 'Dodge' : 'Parry', roll: check.roll.total, target: targetNumber };
+        evasion = { label: choice === 'dodge' ? 'Dodge' : 'Parry', roll: check.roll.total, target: targetNumber, success: check.success, degrees: check.ruleDos };
     }
-
-    const result = evaded ? null : await applyHits(target, flags.hits);
+    const evaded = outcome.missed;
+    const result = evaded ? null : await applyHits(target, outcome.remaining);
     const content = await foundry.applications.handlebars.renderTemplate('systems/dark-heresy-2nd/templates/chat/attack-result-chat.hbs', {
         attackerName: attacker?.name ?? 'Attacker',
         targetName: target.name,
         weaponName: flags.weaponName,
         evasion,
         evaded,
+        prevented: outcome.prevented,
+        total: flags.hits.length,
+        partial: outcome.prevented > 0 && !evaded,
+        multipleDegrees: evasion?.degrees > 1,
+        manyHits: flags.hits.length > 1,
         result,
         maxWounds: target.system.wounds.max,
     });
@@ -312,7 +336,7 @@ export async function resolveDefence(message, choice) {
 
 /** When a result message arrives, the request message it answers is drawn again (its buttons disappear on every client) */
 export function refreshAnsweredRequest(message) {
-    const requestId = [RESOLVES, SPREAD_RESOLVES, BLAST_RESOLVES, BLAST_APPLIED].map((key) => message.getFlag?.(SYSTEM_ID, key)).find(Boolean);
+    const requestId = [RESOLVES, SPREAD_RESOLVES, BLAST_RESOLVES].map((key) => message.getFlag?.(SYSTEM_ID, key)).find(Boolean);
     if (!requestId) return;
     const request = game.messages.get(requestId);
     if (request) ui.chat?.updateMessage?.(request);
@@ -349,26 +373,6 @@ function bindBlastMessage(message, html) {
     box.querySelector('.dh-blast__choose')?.addEventListener('click', async (ev) => {
         ev.preventDefault();
         await checkBlastArea(message);
-    });
-}
-
-function bindBlastResult(message, html) {
-    const box = html.querySelector('.dh-blast__applybox');
-    if (!box) return;
-    if (resolutionOf(message.id)) {
-        box.remove();
-        html.querySelector('.dh-blast__applytext')?.replaceChildren('Damage applied, see below.');
-        return;
-    }
-    if (!game.user.isGM) {
-        box.remove();
-        html.querySelector('.dh-blast__applytext')?.replaceChildren('The GM applies the damage to all targets.');
-        return;
-    }
-    box.querySelector('.dh-blast__apply')?.addEventListener('click', async (ev) => {
-        ev.preventDefault();
-        ev.currentTarget.disabled = true;
-        await applyBlastDamage(message);
     });
 }
 
@@ -424,65 +428,49 @@ export async function checkBlastArea(message) {
     const rows = inside
         .map((i) => {
             const own = attacker && i.id === attacker.uuid;
-            return `<div class="form-group"><label><input type="checkbox" name="t" value="${esc(i.id)}" ${own ? '' : 'checked'} /> ${esc(i.name)}${own ? ' <em>(the psyker)</em>' : ''}</label><span>${Math.round(i.distance * 10) / 10} m</span></div>`;
+            return `<div class="form-group"><label><input type="checkbox" name="t" value="${esc(i.id)}" ${own ? '' : 'checked'} /> ${esc(i.name)}${own ? ' <em>(the attacker)</em>' : ''}</label><span>${Math.round(i.distance * 10) / 10} m</span><label title="An obstacle in the way makes dodging impossible"><input type="checkbox" name="b" value="${esc(i.id)}" /> blocked</label></div>`;
         })
         .join('');
     let picked = null;
     try {
         picked = await foundry.applications.api.DialogV2.prompt({
             window: { title: `Blast: ${radius} m around ${centre.name}` },
-            content: `<p>${inside.length} token(s) inside the ${radius} m area (centre to centre). Uncheck anyone who is not hit (cover, line of sight, ...).</p>${rows}`,
-            ok: { label: 'Confirm targets', callback: (event, button) => [...button.form.querySelectorAll('input[name=t]:checked')].map((i) => i.value) },
+            content: `<p>${inside.length} token(s) inside the ${radius} m area (centre to centre). Uncheck anyone who is not hit (cover, line of sight, ...). Tick <em>blocked</em> if an obstacle stops a target from leaving the area (then it cannot dodge).</p>${rows}`,
+            ok: {
+                label: 'Confirm targets',
+                callback: (event, button) => ({
+                    hit: [...button.form.querySelectorAll('input[name=t]:checked')].map((i) => i.value),
+                    blocked: [...button.form.querySelectorAll('input[name=b]:checked')].map((i) => i.value),
+                }),
+            },
             rejectClose: false,
             modal: false,
         });
     } finally {
         if (templateId) canvas.scene.deleteEmbeddedDocuments('MeasuredTemplate', [templateId]).catch(() => {});
     }
-    if (!picked || !picked.length) return;
+    if (!picked || !picked.hit.length) return;
     if (resolutionOf(message.id)) return ui.notifications.warn('The area has been checked already.');
 
-    const targets = inside.filter((i) => picked.includes(i.id)).map((i) => ({ uuid: i.id, name: i.name, distance: Math.round(i.distance * 10) / 10 }));
+    const targets = inside.filter((i) => picked.hit.includes(i.id)).map((i) => ({ uuid: i.id, name: i.name, distance: Math.round(i.distance * 10) / 10, blocked: picked.blocked.includes(i.id), token: i.token }));
     const content = await foundry.applications.handlebars.renderTemplate('systems/dark-heresy-2nd/templates/chat/blast-result-chat.hbs', {
+        label: flags.label,
         powerName: flags.powerName,
         radius,
         count: targets.length,
         many: targets.length !== 1,
-        targets,
-        hit: flags.hit,
+        targets: targets.map(({ name, distance, blocked }) => ({ name, distance, blocked })),
     });
     await ChatMessage.create({
         author: game.user.id,
         content,
         style: CONST.CHAT_MESSAGE_STYLES.OTHER,
-        flags: { [SYSTEM_ID]: { [BLAST_RESULT]: { powerName: flags.powerName, targets, hit: flags.hit }, [BLAST_RESOLVES]: message.id } },
+        flags: { [SYSTEM_ID]: { [BLAST_RESOLVES]: message.id } },
     });
-}
-
-/** The GM applies the blast damage to every confirmed target; one card shows the damage of each */
-export async function applyBlastDamage(message) {
-    const data = message.getFlag(SYSTEM_ID, BLAST_RESULT);
-    if (!data || resolutionOf(message.id)) return;
-    const lines = [];
-    for (const t of data.targets) {
-        const actor = await actorFromUuid(t.uuid);
-        if (!actor) continue;
-        const result = await applyHits(actor, [data.hit]);
-        lines.push({
-            name: actor.name,
-            hit: result.hits[0],
-            damage: result.damage,
-            critical: result.critical,
-            criticalEffect: result.hits[0].criticalEffect,
-            wounds: result.wounds,
-            maxWounds: actor.system.wounds.max,
-        });
+    // every target answers on its own card: dodging only helps if it can leave the area
+    for (const t of targets) {
+        const actor = t.token.actor;
+        const area = blastDodge({ distanceFromCentre: t.distance, radius, agilityBonus: actor.characteristics?.agility?.bonus, blocked: t.blocked });
+        await postDefenceRequest({ attacker, target: actor, weaponName: flags.powerName, hits: [flags.hit], melee: false, area });
     }
-    const content = await foundry.applications.handlebars.renderTemplate('systems/dark-heresy-2nd/templates/chat/blast-damage-chat.hbs', { powerName: data.powerName, targets: lines });
-    await ChatMessage.create({
-        author: game.user.id,
-        content,
-        style: CONST.CHAT_MESSAGE_STYLES.OTHER,
-        flags: { [SYSTEM_ID]: { [BLAST_APPLIED]: message.id } },
-    });
 }
