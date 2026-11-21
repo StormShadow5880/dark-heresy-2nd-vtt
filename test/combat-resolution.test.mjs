@@ -78,3 +78,19 @@ test('a target without armour data (npc) is damaged by toughness only', async ()
     assert.equal(r.hits[0].reduction, 0);
     assert.equal(r.damage, 8);
 });
+
+test('automated attacks: weapons and Psychic Bolt, the other psychic attacks wait for the auto-fire / area effect dodging rules', async () => {
+    const { automatedAttack } = await import('../src/module/rules/combat-resolution.mjs');
+    assert.deepEqual(automatedAttack({ type: 'weapon', isMelee: true }), { automated: true, melee: true, ranged: false });
+    assert.deepEqual(automatedAttack({ type: 'weapon', isMelee: false }), { automated: true, melee: false, ranged: true });
+    // a bolt is a ranged attack: dodge only, no parry
+    const bolt = automatedAttack({ type: 'psychicPower', system: { attackType: 'Psychic Bolt' } });
+    assert.deepEqual(bolt, { automated: true, melee: false, ranged: true });
+    assert.deepEqual(defenceChoices(actor(), { melee: bolt.melee }).map((c) => c.id), ['dodge', 'none']);
+    for (const type of ['Psychic Barrage', 'Psychic Storm', 'Psychic Blast']) {
+        const r = automatedAttack({ type: 'psychicPower', system: { attackType: type } });
+        assert.equal(r.automated, false);
+        assert.match(r.reason, /not automated yet/);
+    }
+    assert.equal(automatedAttack(null).automated, false);
+});

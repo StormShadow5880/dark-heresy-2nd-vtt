@@ -1,3 +1,4 @@
+import { autoCombatEnabled } from '../actions/combat-resolution-manager.mjs';
 import { DHPromptApplication } from './dh-prompt-base.mjs';
 
 export class PsychicPowerDialog extends DHPromptApplication {
@@ -47,6 +48,11 @@ export class PsychicPowerDialog extends DHPromptApplication {
     }
 
     async _rollPower(event) {
+        // With the attack automation a psychic attack needs a target, like a weapon attack
+        if (this.data.hasDamage && !this.data.targetActor && autoCombatEnabled()) {
+            ui.notifications.warn('Target the token you attack first (select it and press T, or right click > Target). Without a target no attack roll is made.');
+            return;
+        }
         await this.data.finalize();
         await this.psychicAttackData.performActionAndSendToChat();
         await this.close();

@@ -8,7 +8,7 @@
  * The data travels in message flags, so the target's owner needs nothing from the attacker's client.
  */
 import { SYSTEM_ID } from '../system-id.mjs';
-import { applyHits, defenceChoices, serializeHit } from '../rules/combat-resolution.mjs';
+import { applyHits, automatedAttack, defenceChoices, serializeHit } from '../rules/combat-resolution.mjs';
 
 const FLAG = 'defence';
 const RESOLVES = 'defenceResolves';
@@ -35,8 +35,19 @@ const resolutionOf = (messageId) => game.messages.find((m) => m.getFlag(SYSTEM_I
 export async function requestDefence(actionData) {
     const rd = actionData.rollData;
     const hits = actionData.damageData?.hits ?? [];
-    if (!autoCombatEnabled() || !rd?.weapon || !rd.targetActor || !rd.success || !hits.length) return false;
-    const choices = defenceChoices(rd.targetActor, { melee: !!rd.weapon.isMelee });
+    const attackItem = rd?.weapon ?? (rd?.hasDamage ? rd?.power : null);
+    if (!autoCombatEnabled() || !attackItem || !rd.targetActor || !rd.success || !hits.length) return false;
+    const kind = automatedAttack(attackItem);
+    if (!kind.automated) {
+        if (kind.reason) ui.notifications.info(kind.reason);
+        return false;
+    }
+    // Several hits (bursts, Twin-Linked): dodging them follows the auto-fire rules (rulebook page 220), not in the system data yet
+    if (hits.length > 1) {
+        ui.notifications.info('This attack has several hits: the rule for dodging them is not automated yet, use the hit buttons of the attack card.');
+        return false;
+    }
+    const choices = defenceChoices(rd.targetActor, { melee: kind.melee });
     const flags = {
         attackerUuid: rd.sourceActor.uuid,
         targetUuid: rd.targetActor.uuid,

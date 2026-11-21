@@ -90,3 +90,26 @@ export async function applyHits(actor, hits) {
         criticalTotal: actor.system.wounds.critical,
     };
 }
+
+/**
+ * Which attacks the automation handles.
+ *  - weapon attacks
+ *  - Psychic Bolt: "can be dodged as if it were any other ranged attack. A successful Dodge test is sufficient to avoid a normal
+ *    Psychic Bolt" (core rulebook, Psychic Powers)
+ * Psychic Barrage / Storm / Blast follow the rules for dodging auto-fire and area effect attacks (rulebook page 220), which are not
+ * in the system data yet: they are not automated and stay with the manual hit buttons.
+ * @param attackItem a weapon or psychic power item
+ * @returns {{automated: boolean, ranged: boolean, melee: boolean, reason?: string}}
+ */
+export function automatedAttack(attackItem) {
+    if (!attackItem) return { automated: false, ranged: false, melee: false };
+    if (attackItem.type === 'weapon') return { automated: true, melee: !!attackItem.isMelee, ranged: !attackItem.isMelee };
+    if (attackItem.type === 'psychicPower') {
+        const type = String(attackItem.system?.attackType ?? '').toLowerCase();
+        const bolt = type === 'psychic bolt' || type === 'psychic-bolt';
+        return bolt
+            ? { automated: true, melee: false, ranged: true }
+            : { automated: false, melee: false, ranged: true, reason: `${attackItem.system?.attackType || 'This power'}: the rules for dodging it are not automated yet.` };
+    }
+    return { automated: false, ranged: false, melee: false };
+}
