@@ -1,4 +1,5 @@
 import { SYSTEM_ID } from './hooks-manager.mjs';
+import { registerClockSettings } from './ui/world-clock.mjs';
 import { SOUND_SETTINGS, SOUND_VOLUME_SETTING } from './vfx/vfx-config.mjs';
 
 export class DarkHeresySettings {
@@ -56,6 +57,7 @@ export class DarkHeresySettings {
             default: true,
             type: Boolean,
         });
+        registerClockSettings();
         for (const { key, name } of Object.values(SOUND_SETTINGS)) {
             game.settings.register(SYSTEM_ID, key, {
                 name,

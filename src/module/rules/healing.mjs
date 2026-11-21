@@ -103,16 +103,30 @@ export function firstAidRangeProblem({ inCombat, self = false, distance, patient
 /* ----------------------------- Time locks ----------------------------- */
 
 /**
- * Is a lock over? `lastTime` and `now` are world times in seconds.
- * @returns {{ready: boolean, remaining: number, text: string}}
+ * Is a lock over? `lastTime` and `now` are world times in seconds. The stored timestamp is never changed here.
+ * state: 'none' (nothing stored), 'invalid' (stored, but not a number: ignored, but shown), 'rewound' (the world time is EARLIER than
+ * the stored time: the clock was set back; the lock stays and the GM decides), 'locked', 'ready'.
+ * @returns {{ready: boolean, remaining: number, text: string, state: string}}
  */
 export function timerStatus({ lastTime, now, hours }) {
-    if (lastTime === undefined || lastTime === null || !Number.isFinite(Number(lastTime))) return { ready: true, remaining: 0, text: '' };
-    const remaining = Math.max(0, Number(lastTime) + hours * HOURS - Number(now));
-    if (remaining <= 0) return { ready: true, remaining: 0, text: '' };
+    if (lastTime === undefined || lastTime === null || lastTime === '') return { ready: true, remaining: 0, text: '', state: 'none' };
+    const last = Number(lastTime);
+    if (!Number.isFinite(last) || !Number.isFinite(Number(now))) return { ready: true, remaining: 0, text: 'timestamp invalid, ignored', state: 'invalid' };
+    const remaining = Math.max(0, last + hours * HOURS - Number(now));
+    if (remaining <= 0) return { ready: true, remaining: 0, text: '', state: 'ready' };
     const h = Math.floor(remaining / HOURS);
     const m = Math.ceil((remaining % HOURS) / 60);
-    return { ready: false, remaining, text: `${h} h ${m} min` };
+    const text = `${h} h ${m} min`;
+    if (last > Number(now)) return { ready: false, remaining, text: `${text} (world time was set back)`, state: 'rewound' };
+    return { ready: false, remaining, text, state: 'locked' };
+}
+
+/** The timers of an actor as rows for the sheet: { key, label, ready, text, state } (only timers that exist) */
+export const TIMER_LABELS = { firstAid: ['First Aid', 24], endurance: ['Endurance', 12], invigourate: ['Invigourate', 12] };
+export function timerRows(timers, now) {
+    return Object.entries(TIMER_LABELS)
+        .filter(([key]) => timers && timers[key] !== undefined && timers[key] !== null)
+        .map(([key, [label, hours]]) => ({ key, label, hours, ...timerStatus({ lastTime: timers[key], now, hours }) }));
 }
 
 export const FIRST_AID_HOURS = 24;

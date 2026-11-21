@@ -6,6 +6,10 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
 
 ## [1.9.0] – Unreleased
 
+### Imperial clock
+
+- Slim date/time bar on the Foundry world time (GM time jumps +10 min / +1 h / +8 h / +24 h, GM-configured date and optional mission day), timers of First Aid and the Psychic recovery on the combat tab, a warning when the world time is set back. Nothing heals by time alone. See [docs/world-clock.md](docs/world-clock.md).
+
 ### Visual effects
 
 - Optional Sequencer + JB2A Free animations for Las weapons (red beam), Psychic Bolt and Psychic Blast (area sized to the blast radius), impact only after a real hit. New setting *Visual Effects*. See [docs/visual-effects.md](docs/visual-effects.md).

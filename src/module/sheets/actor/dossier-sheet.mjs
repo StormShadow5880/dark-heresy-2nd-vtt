@@ -30,6 +30,7 @@ import { stepCounter } from '../../rules/counters.mjs';
 import { activatePsychicPower, deactivatePsychicEffect, isPsychicPowerActive } from '../../actions/psychic-effect-manager.mjs';
 import { prepareAwardExperience, prepareSpendExperience } from '../../prompts/experience-prompt.mjs';
 import { confirmDialog } from '../../prompts/dialog-helpers.mjs';
+import { timerRows } from '../../rules/healing.mjs';
 
 const T = 'systems/dark-heresy-2nd/templates/actor/dossier';
 
@@ -130,6 +131,7 @@ export class AcolyteDossierSheet extends AcolyteSheet {
             trainingLevels: TRAINING_LEVELS,
             skillUi: this._skillUi,
             isGM: game.user.isGM,
+            timers: timerRows(actor.getFlag(SYSTEM_ID, 'healingTimers'), game.time.worldTime),
         };
         Object.assign(context.dossier, await buildTalentsAndTraits(actor));
         await enrichPowerDescriptions(actor, context.dossier.psychic.powers);

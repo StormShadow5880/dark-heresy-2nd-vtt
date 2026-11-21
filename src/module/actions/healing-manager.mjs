@@ -90,6 +90,11 @@ const MISSING_TIME = 'The world time does not seem to advance (it is 0): the 24 
 async function timerAllows(actor, key, hours, what) {
     const status = timerOf(actor, key, hours);
     const unreliable = worldTime() === 0 && timersOf(actor)[key] !== undefined;
+    // an unreadable stored time is not a lock: it is shown and the action goes on
+    if (status.state === 'invalid') {
+        ui.notifications.warn(`${actor.name}: the stored time of ${what} is invalid and ignored.`);
+        return true;
+    }
     if (status.ready && !unreliable) return true;
     if (!game.user.isGM) {
         ui.notifications.warn(`${actor.name}: ${what} is not possible yet (${status.text} left). A GM can override this.`);
@@ -98,7 +103,7 @@ async function timerAllows(actor, key, hours, what) {
     return DialogV2.confirm({
         classes: ['dh-ui', 'dh-dialog'],
         window: { title: 'Time limit' },
-        content: `<p>${esc(actor.name)}: ${esc(what)} was used ${status.ready ? 'before' : `${esc(status.text)} ago is not over yet`}.${unreliable ? ` ${esc(MISSING_TIME)}` : ''}</p><p>Continue anyway?</p>`,
+        content: `<p>${esc(actor.name)}: ${esc(what)} is still locked${status.ready ? '' : ` (${esc(status.text)})`}.${unreliable ? ` ${esc(MISSING_TIME)}` : ''}</p><p>Continue anyway? The stored time is not changed by this question.</p>`,
         rejectClose: false,
         modal: false,
     }).then((r) => r === true);

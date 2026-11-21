@@ -156,3 +156,30 @@ test('First Aid range: 1.5 m in an active combat only, never for self-treatment'
     assert.equal(firstAidRangeProblem({ inCombat: true, self: true, distance: 99 }), null);
     assert.match(firstAidRangeProblem({ inCombat: true, distance: NaN }), /needs a token/);
 });
+
+import { timerRows, timerStatus as ts } from '../src/module/rules/healing.mjs';
+
+test('timers: lock before / after 24 h and 12 h, from the stored time and the world time only', () => {
+    const t0 = 1000;
+    assert.equal(ts({ lastTime: t0, now: t0 + 24 * 3600 - 1, hours: 24 }).ready, false);
+    assert.equal(ts({ lastTime: t0, now: t0 + 24 * 3600, hours: 24 }).ready, true);
+    assert.equal(ts({ lastTime: t0, now: t0 + 12 * 3600 - 60, hours: 12 }).text, '0 h 1 min');
+    assert.equal(ts({ lastTime: t0, now: t0 + 12 * 3600, hours: 12 }).ready, true);
+});
+
+test('timers: missing, invalid and set-back clock are shown, never silently released or changed', () => {
+    assert.equal(ts({ lastTime: undefined, now: 5, hours: 24 }).state, 'none');
+    const invalid = ts({ lastTime: 'abc', now: 5, hours: 24 });
+    assert.equal(invalid.state, 'invalid');
+    assert.match(invalid.text, /invalid/);
+    const rewound = ts({ lastTime: 100000, now: 1000, hours: 24 });
+    assert.equal(rewound.state, 'rewound');
+    assert.equal(rewound.ready, false);
+    assert.match(rewound.text, /set back/);
+    const stored = { firstAid: 100000 };
+    const rows = timerRows(stored, 1000);
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0].state, 'rewound');
+    assert.deepEqual(stored, { firstAid: 100000 }); // nothing is written
+    assert.deepEqual(timerRows({}, 0), []);
+});
