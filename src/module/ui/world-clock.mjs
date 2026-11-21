@@ -9,6 +9,35 @@ import { clockStatus, command, currentRest, decide, publicRest, setClockMode } f
 import { DEFAULT_CLOCK, JUMPS, clockParts, normalizeClock, parseTime, timersInFuture } from '../rules/world-clock.mjs';
 
 const ID = 'dh-clock';
+
+/**
+ * Smooth display during a rest: the runner writes the world time only a few times per second (6 game minutes per write at the default
+ * time lapse), so the bar advances the shown time itself between two writes, at the speed of the lapse, and corrects it with every
+ * real update. Only the DISPLAY is interpolated: the world time itself (and with it every timer) is the written value.
+ */
+let sync = { world: 0, at: 0, shown: 0 };
+
+export function markSync() {
+    sync = { world: game.time.worldTime, at: performance.now(), shown: Math.max(sync.shown, game.time.worldTime) };
+}
+
+/** The time the bar shows: the world time, or its smooth prediction while a rest runs */
+export function displayTime() {
+    const world = game.time.worldTime;
+    const rest = game.user.isGM ? currentRest() : publicRest();
+    const running = rest && rest.status === 'running' && !game.paused && !rest.skipping;
+    if (!running) {
+        sync.shown = world;
+        return world;
+    }
+    const perHour = Number(game.user.isGM ? rest.plan.secondsPerHour : rest.secondsPerHour) || 5;
+    const end = rest.startWorldTime + rest.plannedSeconds;
+    // at most 1.5 s ahead of the last real update: if the writer stalls (GM left), the display stops with it
+    const ahead = Math.min(1.5, (performance.now() - sync.at) / 1000);
+    const predicted = Math.min(end, sync.world + ahead * (HOUR / perHour));
+    sync.shown = Math.max(world, Math.max(sync.shown, predicted)); // never backwards while running
+    return sync.shown;
+}
 export const CLOCK_CONFIG = 'clock-config';
 export const CLOCK_VISIBLE = 'clock-visible';
 const { DialogV2 } = foundry.applications.api;
@@ -61,7 +90,7 @@ export function renderClock() {
         document.getElementById(`${ID}-sub`)?.remove();
         return existing?.remove();
     }
-    const parts = clockParts(game.time.worldTime, clockConfig());
+    const parts = clockParts(displayTime(), clockConfig());
     const el = clockElement();
     const gm = game.user.isGM;
     el.innerHTML = `
@@ -98,14 +127,14 @@ function renderSub() {
     if (restOn) {
         const planned = rest.plannedSeconds;
         const start = rest.startWorldTime;
-        const elapsed = Math.min(planned, Math.max(0, game.time.worldTime - start));
+        const elapsed = Math.min(planned, Math.max(0, displayTime() - start));
         const labels = { running: 'Resting', paused: 'Rest paused', encounter: gm ? 'Encounter: decide' : 'Rest paused', interrupted: gm ? 'Rest interrupted' : 'Rest paused', recovery: gm ? 'Check: decide' : 'Rest paused' };
         const plan = gm ? rest.plan : rest;
         const w = currentWatch({ watches: (plan.watches ?? []).map((x) => ({ from: x.from, to: x.to, actors: x.actors ?? x.names ?? [] })) }, elapsed);
         const watchNames = gm ? w.actors.map((id) => rest.characters[id]?.name ?? id) : w.actors;
         const pct = planned ? Math.round((elapsed / planned) * 100) : 0;
         html += `<span class="dh-clock-sub__state is-rest" role="status"><i class="fa-solid fa-campground"></i> <b>${labels[rest.status] ?? 'Rest'}</b>${plan.location ? ` · ${esc(plan.location)}` : ''}
-            · ${hoursText(elapsed / HOUR)} / ${hoursText(planned / HOUR)}${(plan.watches ?? []).length ? ` · Watch: ${watchNames.length ? esc(watchNames.join(', ')) : 'none'}` : ''}</span>
+            · <span class="dh-clock-sub__elapsed">${hoursText(elapsed / HOUR)}</span> / ${hoursText(planned / HOUR)}${(plan.watches ?? []).length ? ` · Watch: ${watchNames.length ? esc(watchNames.join(', ')) : 'none'}` : ''}</span>
             <span class="dh-clock-sub__bar" aria-hidden="true"><i style="width:${pct}%"></i></span>`;
         if (gm) {
             const needs = ['encounter', 'interrupted', 'recovery'].includes(rest.status);
@@ -201,10 +230,44 @@ function refreshSheets() {
     }
 }
 
+function renderSubTexts(sub, shown) {
+    const rest = game.user.isGM ? currentRest() : publicRest();
+    if (!rest?.plannedSeconds) return;
+    const elapsed = Math.min(rest.plannedSeconds, Math.max(0, shown - rest.startWorldTime));
+    const text = sub.querySelector('.dh-clock-sub__elapsed');
+    if (text && text.textContent !== hoursText(elapsed / HOUR)) text.textContent = hoursText(elapsed / HOUR);
+    const bar = sub.querySelector('.dh-clock-sub__bar i');
+    if (bar) bar.style.width = `${Math.round((elapsed / rest.plannedSeconds) * 100)}%`;
+}
+
+/** Light redraw: only the texts that change with the time (the buttons keep their focus and clicks) */
+function paintClock() {
+    const el = document.getElementById(ID);
+    if (!el) return;
+    const shown = displayTime();
+    const parts = clockParts(shown, clockConfig());
+    const set = (selector, text) => {
+        const node = el.querySelector(selector);
+        if (node && node.textContent !== text) node.textContent = text;
+    };
+    set('.dh-clock__date', parts.date);
+    set('.dh-clock__time', parts.time);
+    set('.dh-clock__mission', parts.mission);
+    const sub = document.getElementById(`${ID}-sub`);
+    if (sub) renderSubTexts(sub, shown);
+}
+
 export function initWorldClock() {
+    markSync();
     renderClock();
     window.addEventListener('dh-clock-changed', () => renderClock());
+    // while a rest runs the bar is redrawn ~7 times per second with the predicted time (minute by minute)
+    setInterval(() => {
+        const rest = game.user.isGM ? currentRest() : publicRest();
+        if (rest?.status === 'running' && !game.paused) paintClock();
+    }, 150);
     Hooks.on('updateWorldTime', (worldTime, delta) => {
+        markSync();
         renderClock();
         refreshSheets();
         if (Number(delta) < 0) warnRewind();

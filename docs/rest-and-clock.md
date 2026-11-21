@@ -42,6 +42,11 @@ watches (rows from–to hours with the watching characters; generated rotating o
   a claimed event without result ("check interrupted") is handed to the GM: **roll again** or **skip**. No silent double roll, no double time (time = start + elapsed).
 - Commands from a GM client that is not the active one go to the active GM by socket.
 
+## Smooth display
+The runner writes the world time 4 times per second (6 game minutes per write at the default lapse). The bar therefore advances the *shown* time itself between two writes
+(minute by minute, at the speed of the lapse, at most 1.5 s ahead, never backwards while the rest runs) and corrects it with every real update. Only the display is predicted; the world time and all timers use the written value.
+At a stop (encounter, pause) the display may snap back by up to one tick of the lapse.
+
 ## Limits
 - Verified only with the Node tests (rules, state machine, reload/recovery logic, clock factors); the Foundry UI, the sockets, the journal permission assumption and
   multi-client behaviour have not been run in Foundry.

@@ -33,7 +33,7 @@ import {
 export const CLOCK_RUN = 'clock-run';
 export const REST_PUBLIC = 'rest-public';
 const SOCKET = `system.${SYSTEM_ID}`;
-const TICK_MS = 500;
+const TICK_MS = 250;
 const { DialogV2 } = foundry.applications.api;
 const esc = (s) => foundry.utils.escapeHTML(String(s ?? ''));
 
@@ -117,7 +117,7 @@ async function publish(state) {
     const secretToPublic = { encounter: 'paused', interrupted: 'paused', recovery: 'paused' };
     const watches = state?.plan?.watches?.map((w) => ({ from: w.from, to: w.to, names: w.actors.map((id) => state.characters[id]?.name ?? '?') })) ?? [];
     const value = active
-        ? { active: true, status: secretToPublic[state.status] ?? state.status, startWorldTime: state.startWorldTime, plannedSeconds: state.plannedSeconds, location: state.plan.location, watches }
+        ? { active: true, status: secretToPublic[state.status] ?? state.status, startWorldTime: state.startWorldTime, plannedSeconds: state.plannedSeconds, secondsPerHour: state.plan.secondsPerHour, location: state.plan.location, watches }
         : {};
     if (JSON.stringify(value) !== JSON.stringify(game.settings.get(SYSTEM_ID, REST_PUBLIC) ?? {})) await game.settings.set(SYSTEM_ID, REST_PUBLIC, value);
 }
