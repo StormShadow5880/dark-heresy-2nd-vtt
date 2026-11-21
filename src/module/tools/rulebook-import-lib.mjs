@@ -90,8 +90,7 @@ export function scopeCss(css, { ids = [], prefix = '' } = {}) {
 }
 
 /** Prefixes ids and in-page anchors and points assets to the package folder */
-export function rewriteFragment(html, { prefix, base }) {
-    const ids = collectIds(html);
+export function rewriteFragment(html, { prefix, base, ids = collectIds(html) }) {
     let out = html.replace(/(\sid=")([^"]+)"/g, (m, a, id) => `${a}${prefix}${id}"`);
     out = out.replace(/(\shref=")#([^"]+)"/g, (m, a, id) => `${a}#${ids.includes(id) ? prefix : ''}${id}"`);
     out = out.replace(/(\ssrc=")(?!data:|https?:|\/)([^"]+)"/g, (m, a, path) => `${a}${assetUrl(base, path)}"`);
@@ -106,6 +105,74 @@ export function buildPageHtml({ fragment, css, prefix, base }) {
     const { html, ids } = rewriteFragment(fragment, { prefix, base });
     const style = scopeCss(rewriteCssUrls(css, base), { ids, prefix });
     return { html: `<div class="${SCOPE}">${html}</div>`, css: style };
+}
+
+export const escapeHtml = (text) =>
+    String(text ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+
+/** Package id -> something usable as id prefix / flag value ("dh2-core-chapter-1" -> "dh2-core-chapter-1") */
+export const slugify = (text) =>
+    String(text ?? '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '');
+
+/**
+ * Reads metadata.json of both package formats:
+ *  - format 1.0 (schema_version "1.0"): id, title, entry_points { fragment, stylesheet }, status, source
+ *  - the first single page packages (no schema_version): fragment, stylesheet, printed_page at the top level
+ * Missing required values are reported in `errors` (a readable list, never "undefined" in a request).
+ */
+export function normalizeMetadata(meta, folderName = 'package') {
+    const errors = [];
+    const m = meta && typeof meta === 'object' ? meta : {};
+    const modern = !!m.schema_version;
+    const fragment = modern ? m.entry_points?.fragment : m.fragment;
+    const stylesheet = modern ? m.entry_points?.stylesheet : m.stylesheet;
+    if (!fragment || typeof fragment !== 'string') errors.push(modern ? 'metadata.json: entry_points.fragment is missing' : 'metadata.json: "fragment" is missing');
+    if (!stylesheet || typeof stylesheet !== 'string') errors.push(modern ? 'metadata.json: entry_points.stylesheet is missing' : 'metadata.json: "stylesheet" is missing');
+    const title = m.title || folderName;
+    const id = slugify(m.id || (modern ? title : `page-${m.printed_page ?? folderName}`)) || slugify(folderName);
+    const status = m.status ?? {};
+    return {
+        errors,
+        modern,
+        id,
+        title,
+        fragment,
+        stylesheet,
+        printedPage: m.printed_page ?? null,
+        language: m.language ?? 'en',
+        verified: modern ? status.transcription_verified !== false && status.ready_for_production_import !== false : true,
+        limitations: Array.isArray(status.limitations) ? status.limitations.map(String) : [],
+        rights: m.rights ?? m.provenance_note ?? '',
+    };
+}
+
+/**
+ * Splits a chapter fragment into its pages: every <section class="page" id="..."> is one page.
+ * Header / navigation / preview-only parts around the sections are dropped.
+ * A fragment without such sections is one page (single page packages).
+ * @returns {{id: string, number: number|null, name: string, html: string}[]}
+ */
+export function splitPages(fragment) {
+    const pages = [];
+    for (const m of fragment.matchAll(/<section\b[^>]*\bclass="[^"]*\bpage\b[^"]*"[^>]*>([\s\S]*?)<\/section>/g)) {
+        const tag = m[0].slice(0, m[0].indexOf('>') + 1);
+        const id = /\bid="([^"]+)"/.exec(tag)?.[1] ?? `page-${pages.length + 1}`;
+        let body = m[1];
+        const heading = /<h2[^>]*>([\s\S]*?)<\/h2>/.exec(body);
+        if (heading) body = body.replace(heading[0], ''); // the page name is shown by Foundry
+        const number = /(\d+)$/.exec(id)?.[1];
+        const headingText = heading ? heading[1].replace(/<[^>]+>/g, '').trim() : '';
+        pages.push({ id, number: number ? Number(number) : null, name: number ? `Page ${number}` : headingText || id, html: body.trim() });
+    }
+    if (!pages.length) pages.push({ id: 'page', number: null, name: 'Page', html: fragment, single: true });
+    return pages;
 }
 
 export { SCOPE };

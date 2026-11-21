@@ -103,6 +103,8 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
 
 - Rulebook import: Foundry strips <style> from journal pages, so the scoped css is kept in a page flag and injected into the document instead (the imported page now keeps the look of the original).
 
+- Rulebook import standardised: **package format 1.0** (one chapter per package, one `<section class="page">` per printed page), documented in [docs/rulebook-package-format.md](docs/rulebook-package-format.md) with a GPT prompt and a check script (`node scripts/validate-rulebook-package.mjs <folder>`). The macro imports every package below the chosen folder, one journal per chapter with one page per printed page (searchable per page), an *Import notes* page for unverified drafts, readable error messages. Fixes the import error with chapter packages (`entry_points` in metadata.json were not read).
+
 ### Psychic powers
 - Power list: the hourglass is only an indicator for a running power (not clickable). A running power cannot be
   manifested again (Manifest greyed out); ending it is done under Sustained Powers.

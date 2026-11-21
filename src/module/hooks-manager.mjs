@@ -57,7 +57,7 @@ export class HooksManager {
         Hooks.on('hotbarDrop', HooksManager.hotbarDrop);
         Hooks.on('deleteActiveEffect', HooksManager.deleteActiveEffect);
         Hooks.on('deleteItem', HooksManager.deleteItem);
-        for (const hook of ['createJournalEntryPage', 'updateJournalEntryPage', 'deleteJournalEntryPage']) Hooks.on(hook, () => applyRulebookStyles());
+        for (const hook of ['createJournalEntryPage', 'updateJournalEntryPage', 'deleteJournalEntryPage', 'createJournalEntry', 'updateJournalEntry', 'deleteJournalEntry']) Hooks.on(hook, () => applyRulebookStyles());
         Hooks.on('preCreateItem', HooksManager.preCreateItem);
         Hooks.on('preDeleteItem', HooksManager.preDeleteItem);
         Hooks.on('renderActorDirectory', HooksManager.renderActorDirectory);
