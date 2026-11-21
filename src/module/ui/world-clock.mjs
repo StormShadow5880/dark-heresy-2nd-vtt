@@ -4,6 +4,7 @@
  * rest and treatment still have to be confirmed (docs/world-clock.md).
  */
 import { SYSTEM_ID } from '../system-id.mjs';
+import { timerRows } from '../rules/healing.mjs';
 import { CLOCK_MODES, HOUR, currentWatch, hoursText } from '../rules/rest.mjs';
 import { clockStatus, command, currentRest, decide, publicRest, setClockMode } from '../actions/time-runner.mjs';
 import { DEFAULT_CLOCK, JUMPS, clockParts, normalizeClock, parseTime, timersInFuture } from '../rules/world-clock.mjs';
@@ -229,10 +230,23 @@ function warnRewind() {
     );
 }
 
-/** Open character sheets show timers: redraw their combat tab when the time changes */
+/**
+ * Open character sheets show timers. Only the text of the timer rows is patched: re-rendering a part of the sheet would bind its
+ * click handlers a second time (every handler is bound on the whole sheet element after each render), which made buttons such as
+ * "new entry" fire several times.
+ */
 function refreshSheets() {
     for (const app of foundry.applications.instances.values()) {
-        if (app.actor && app.options?.classes?.includes('dossier') && app.rendered) app.render({ parts: ['combat'] });
+        if (!(app.actor && app.options?.classes?.includes('dossier') && app.rendered)) continue;
+        const list = app.element.querySelector('.healing-timers');
+        const rows = timerRows(app.actor.getFlag(SYSTEM_ID, 'healingTimers'), game.time.worldTime);
+        if (!list) {
+            if (rows.length && app.element.querySelector('.panel--healing')) app.render(); // a timer appeared: one full render
+            continue;
+        }
+        list.innerHTML = rows
+            .map((t) => `<li class="healing-timers__row is-${t.state}"><span>${esc(t.label)} <small>(${t.hours} h)</small></span><b>${esc(t.ready ? t.text || 'ready' : t.text)}</b></li>`)
+            .join('');
     }
 }
 
