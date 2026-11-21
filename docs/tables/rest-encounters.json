@@ -1,7 +1,7 @@
 {
   "name": "Rest Encounter",
   "img": "icons/svg/d20-grey.svg",
-  "description": "<p>Random encounter table for rests (d100). The rest planner draws from it when an encounter check succeeds. The text is only for the GM: the result is whispered and never shown to the players automatically. Edit, add or reweight entries as you like.</p>",
+  "description": "<p>Random encounter table for rests (d100). The rest planner draws from it when an encounter check succeeds. The results get worse the higher the roll: the first entries are harmless or atmospheric, the last are grave threats. Many results are not fights at all. The text is only for the GM and is never shown to the players automatically. Edit, add or reweight entries as you like.</p>",
   "formula": "1d100",
   "replacement": true,
   "displayRoll": false,
@@ -13,224 +13,700 @@
   "flags": {},
   "results": [
     {
-      "_id": "u8jzPde0IgxLd6Gn",
+      "_id": "C3J27XDCG2LmlZGE",
       "type": "text",
-      "name": "Scavengers at the edge of the camp",
-      "description": "<p>Two or three desperate scavengers creep closer to steal supplies or gear. Easily scared off, but they will fight if cornered. Weapons are crude.</p>",
+      "name": "A quiet night with a strange sound",
+      "description": "<p>Something thumps or scrapes in the distance, once. Nothing follows. The watch is uneasy for no reason they can name.</p>",
       "img": "icons/svg/d20-grey.svg",
-      "weight": 8,
+      "weight": 2,
       "range": [
         1,
+        2
+      ],
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "ONYlgCtjfIZ4SOcM",
+      "type": "text",
+      "name": "A stray servo-skull",
+      "description": "<p>A damaged servo-skull drifts through the camp, mumbling half-erased prayers. Nobody claims it; its memory banks may hold a scrap of old data.</p>",
+      "img": "icons/svg/d20-grey.svg",
+      "weight": 2,
+      "range": [
+        3,
+        4
+      ],
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "z9CPVNPkNa1Hedcm",
+      "type": "text",
+      "name": "Flickering lights",
+      "description": "<p>The lumens flicker and die and come back. A tech-priest would call it a petulant machine spirit; to everyone else it is only unsettling.</p>",
+      "img": "icons/svg/d20-grey.svg",
+      "weight": 2,
+      "range": [
+        5,
+        6
+      ],
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "4pMbXDuCL1mHoOsF",
+      "type": "text",
+      "name": "A curious child",
+      "description": "<p>A grubby child watches the camp from the shadows and sells a rumour for a ration bar or a coin.</p>",
+      "img": "icons/svg/d20-grey.svg",
+      "weight": 2,
+      "range": [
+        7,
         8
       ],
       "drawn": false,
       "flags": {}
     },
     {
-      "_id": "cfBAepfJBd0Kh8oO",
+      "_id": "aQfDPrAJ71fTquWo",
       "type": "text",
-      "name": "Vermin swarm",
-      "description": "<p>Rats, hive-roaches or similar pests pour through the rest area, spoil rations and bite sleepers. Nuisance more than danger; may carry disease.</p>",
+      "name": "Rain, steam or a cold draught",
+      "description": "<p>Foul weather or a venting pipe makes the camp miserable. Sleep is poor but nobody is hurt.</p>",
       "img": "icons/svg/d20-grey.svg",
-      "weight": 7,
+      "weight": 2,
       "range": [
         9,
-        15
+        10
       ],
       "drawn": false,
       "flags": {}
     },
     {
-      "_id": "OL8dKLzdocJ2isAj",
+      "_id": "GsbeKXgzg2sye9b2",
       "type": "text",
-      "name": "Lost pilgrims or refugees",
-      "description": "<p>A small group of frightened civilians asks for shelter, food or protection. They may know a rumour, or they may be bait.</p>",
+      "name": "A passing pedlar",
+      "description": "<p>A tired trader pushes a cart past and offers cheap goods, news and gossip. Prices are fair, or nearly.</p>",
       "img": "icons/svg/d20-grey.svg",
-      "weight": 7,
+      "weight": 2,
       "range": [
-        16,
+        11,
+        12
+      ],
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "Rann76dEyTzAeKOm",
+      "type": "text",
+      "name": "Graffiti with a message",
+      "description": "<p>Fresh marks on a wall point to a hidden cache, a gang boundary or a warning. Reading them takes a little attention.</p>",
+      "img": "icons/svg/d20-grey.svg",
+      "weight": 2,
+      "range": [
+        13,
+        14
+      ],
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "XRrvftva9AW7hipT",
+      "type": "text",
+      "name": "A friendly stranger",
+      "description": "<p>A lone traveller shares the fire, a story and a little useful information, and leaves before dawn. Honest, probably.</p>",
+      "img": "icons/svg/d20-grey.svg",
+      "weight": 2,
+      "range": [
+        15,
+        16
+      ],
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "gadDZFlRJmCGmUXi",
+      "type": "text",
+      "name": "A lost animal",
+      "description": "<p>A hungry creature wanders into the camp. Feeding it makes a friend; chasing it away makes noise.</p>",
+      "img": "icons/svg/d20-grey.svg",
+      "weight": 2,
+      "range": [
+        17,
+        18
+      ],
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "APyhzAnar3ZLt4bn",
+      "type": "text",
+      "name": "An old shrine in the ruin",
+      "description": "<p>The group notices a neglected shrine to the Emperor nearby. Prayer here steadies the nerves of the devout.</p>",
+      "img": "icons/svg/d20-grey.svg",
+      "weight": 2,
+      "range": [
+        19,
+        20
+      ],
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "lz2MPKgcjnCqaXNv",
+      "type": "text",
+      "name": "A distant hymn or procession",
+      "description": "<p>Voices, chanting and bells carry from far away: a pilgrimage or a funeral. Harmless, but it shows who is in the area.</p>",
+      "img": "icons/svg/d20-grey.svg",
+      "weight": 2,
+      "range": [
+        21,
         22
       ],
       "drawn": false,
       "flags": {}
     },
     {
-      "_id": "IhKtJ0RlgLKOmxgJ",
+      "_id": "1syeefnLOpaMxxND",
       "type": "text",
-      "name": "Patrol of the local authorities",
-      "description": "<p>Enforcers or militia on patrol ask who the group is and what they carry. Social test or paperwork decides whether this is trouble.</p>",
+      "name": "Gossip over the vox",
+      "description": "<p>A vox picks up fragments of chatter from other groups: rumours, a name, a place worth remembering.</p>",
       "img": "icons/svg/d20-grey.svg",
-      "weight": 7,
+      "weight": 2,
       "range": [
         23,
-        29
+        24
       ],
       "drawn": false,
       "flags": {}
     },
     {
-      "_id": "TeKdNnFRIBXuDL7D",
+      "_id": "i9LE1Ki3ylOjt6o0",
       "type": "text",
-      "name": "Gang members out for a fight",
-      "description": "<p>A street or hive gang claims this place as its own and demands a toll. Roughly equal numbers, mixed weapons.</p>",
+      "name": "Vermin in the supplies",
+      "description": "<p>Rats, hive-roaches or worse chew through packs and spoil rations. A day of food is lost unless someone acts.</p>",
       "img": "icons/svg/d20-grey.svg",
-      "weight": 7,
+      "weight": 2,
       "range": [
-        30,
+        25,
+        26
+      ],
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "NpUmkVO8JmR8y4EM",
+      "type": "text",
+      "name": "A petty thief",
+      "description": "<p>A sneak thief tries to lift a pouch or a trinket while the camp sleeps. Easy to catch if the watch is awake.</p>",
+      "img": "icons/svg/d20-grey.svg",
+      "weight": 2,
+      "range": [
+        27,
+        28
+      ],
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "fAdggcG9qpVTzqA0",
+      "type": "text",
+      "name": "Lost pilgrims",
+      "description": "<p>A small group of frightened pilgrims asks for shelter and protection. They are slow, hungry and talkative.</p>",
+      "img": "icons/svg/d20-grey.svg",
+      "weight": 2,
+      "range": [
+        29,
+        30
+      ],
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "5MFsHl7UeioEJP2N",
+      "type": "text",
+      "name": "Hungry refugees",
+      "description": "<p>A family with nowhere to go begs for food and a place by the fire. Their story hides something.</p>",
+      "img": "icons/svg/d20-grey.svg",
+      "weight": 2,
+      "range": [
+        31,
+        32
+      ],
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "Nern66nVberACpdc",
+      "type": "text",
+      "name": "The authorities ask for papers",
+      "description": "<p>A patrol of enforcers or militia asks questions and wants to see papers. Social skill or a bribe keeps it short.</p>",
+      "img": "icons/svg/d20-grey.svg",
+      "weight": 2,
+      "range": [
+        33,
+        34
+      ],
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "lsxHKifxi5CvQUSH",
+      "type": "text",
+      "name": "A drunk or stimm-addled wanderer",
+      "description": "<p>A wanderer rants, stumbles into the camp and may say something true. Or break something.</p>",
+      "img": "icons/svg/d20-grey.svg",
+      "weight": 2,
+      "range": [
+        35,
         36
       ],
       "drawn": false,
       "flags": {}
     },
     {
-      "_id": "xtpYlSXpfKtHF4vU",
+      "_id": "L8iLc7bE6wSt9cbM",
       "type": "text",
-      "name": "Smugglers on their own business",
-      "description": "<p>Smugglers moving cargo want no witnesses. They bargain, bribe or threaten. Their cargo is contraband worth a closer look.</p>",
+      "name": "Equipment trouble",
+      "description": "<p>A lamp, a vox, a vehicle or a weapon fails at a bad moment. It can be repaired with time and a good test.</p>",
       "img": "icons/svg/d20-grey.svg",
-      "weight": 6,
+      "weight": 2,
       "range": [
         37,
+        38
+      ],
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "OeEeUtuieeCIxVc5",
+      "type": "text",
+      "name": "A rival asks for a toll",
+      "description": "<p>Locals claim this ground and want payment. They back down if the group looks dangerous or pays a modest price.</p>",
+      "img": "icons/svg/d20-grey.svg",
+      "weight": 2,
+      "range": [
+        39,
+        40
+      ],
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "7VVTiY96vwfRE5e3",
+      "type": "text",
+      "name": "Smugglers on their own business",
+      "description": "<p>Smugglers moving goods want no witnesses. They bargain, bribe or threaten; their cargo is worth a closer look.</p>",
+      "img": "icons/svg/d20-grey.svg",
+      "weight": 2,
+      "range": [
+        41,
         42
       ],
       "drawn": false,
       "flags": {}
     },
     {
-      "_id": "CsMehGAkWvj7FAc9",
+      "_id": "2A8Yb3FKaNQyyLaM",
       "type": "text",
-      "name": "Wounded stranger",
-      "description": "<p>A badly hurt stranger stumbles into the camp. First Aid could save them. They carry something, or something follows them.</p>",
+      "name": "A wounded dog or servitor",
+      "description": "<p>A hurt animal or a broken servitor blocks the way. Helping costs time; ignoring it costs sleep.</p>",
       "img": "icons/svg/d20-grey.svg",
-      "weight": 6,
+      "weight": 2,
       "range": [
         43,
+        44
+      ],
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "effOhq4AUvy7VSLD",
+      "type": "text",
+      "name": "Local troublemakers",
+      "description": "<p>A few bored youths throw stones, steal a boot and run. A nuisance, unless the group reacts badly.</p>",
+      "img": "icons/svg/d20-grey.svg",
+      "weight": 2,
+      "range": [
+        45,
+        46
+      ],
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "CD1IfHWGbtMfEbo9",
+      "type": "text",
+      "name": "A hard bargain",
+      "description": "<p>A local offers a safer place to rest for a price, or a guide for the next stretch. Cheap or a trap, it is hard to tell.</p>",
+      "img": "icons/svg/d20-grey.svg",
+      "weight": 2,
+      "range": [
+        47,
         48
       ],
       "drawn": false,
       "flags": {}
     },
     {
-      "_id": "QeWJKY40uvSwMFLZ",
+      "_id": "ShFXNQ6Fq5axtjRN",
       "type": "text",
-      "name": "Strange noises and false alarm",
-      "description": "<p>Unexplained sounds from the dark. The watch is on edge; whoever keeps watch tests their nerve. In the end it may be nothing, or a scouting enemy.</p>",
+      "name": "Disturbed sleep",
+      "description": "<p>Bad dreams afflict one of the group. Something sits on their mind; they do not rest well.</p>",
       "img": "icons/svg/d20-grey.svg",
-      "weight": 7,
+      "weight": 2,
       "range": [
         49,
-        55
+        50
       ],
       "drawn": false,
       "flags": {}
     },
     {
-      "_id": "De1f8rESQedUStPK",
+      "_id": "mHkW5vQ7CF5puzQq",
       "type": "text",
-      "name": "Environmental hazard",
-      "description": "<p>A structural failure, a toxic leak or a sudden flood forces the group to move or take cover. Gear may be lost, fatigue may follow.</p>",
+      "name": "A wounded stranger with pursuers",
+      "description": "<p>A badly hurt stranger stumbles into the camp, followed a little later by the ones who did it. First Aid could save them.</p>",
       "img": "icons/svg/d20-grey.svg",
-      "weight": 7,
+      "weight": 2,
       "range": [
-        56,
+        51,
+        52
+      ],
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "mOBZZW6m4nyoL6un",
+      "type": "text",
+      "name": "Cult watchers",
+      "description": "<p>Followers of a forbidden cult observe from hiding and report to their masters. A trail leads to a hidden meeting place.</p>",
+      "img": "icons/svg/d20-grey.svg",
+      "weight": 2,
+      "range": [
+        53,
+        54
+      ],
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "iiFw152cTe8r0khC",
+      "type": "text",
+      "name": "Theft or sabotage in the night",
+      "description": "<p>Ammunition, a vehicle part or a vox unit goes missing or is tampered with. Who had access?</p>",
+      "img": "icons/svg/d20-grey.svg",
+      "weight": 2,
+      "range": [
+        55,
+        56
+      ],
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "Er7n1AyOHFRuT11N",
+      "type": "text",
+      "name": "A structural failure",
+      "description": "<p>A ceiling, a gantry or a floor gives way. Quick action avoids injury; gear may be buried.</p>",
+      "img": "icons/svg/d20-grey.svg",
+      "weight": 2,
+      "range": [
+        57,
+        58
+      ],
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "Cue1cr3McRTrKwtP",
+      "type": "text",
+      "name": "Toxic leak or foul air",
+      "description": "<p>A pipe vents poison or the air turns bad. The group must move, wear protection or suffer.</p>",
+      "img": "icons/svg/d20-grey.svg",
+      "weight": 2,
+      "range": [
+        59,
+        60
+      ],
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "YKbPizDmbX1rpXjY",
+      "type": "text",
+      "name": "The Mechanicus asks questions",
+      "description": "<p>Tech-priests or their agents ask pointed questions about the group's equipment and want to inspect it.</p>",
+      "img": "icons/svg/d20-grey.svg",
+      "weight": 2,
+      "range": [
+        61,
         62
       ],
       "drawn": false,
       "flags": {}
     },
     {
-      "_id": "R0CsTy4Qwb8DwkNh",
+      "_id": "dOhCgOIPOZx9eRmm",
       "type": "text",
-      "name": "Theft or sabotage in the night",
-      "description": "<p>Something goes missing or is tampered with while the camp sleeps: ammunition, a vehicle part, a vox unit. Who had access?</p>",
+      "name": "Plague carriers",
+      "description": "<p>A group of sick people drifts close. Contact risks infection, and the authorities will not be pleased.</p>",
       "img": "icons/svg/d20-grey.svg",
-      "weight": 6,
+      "weight": 2,
       "range": [
         63,
+        64
+      ],
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "0EqlTaWEITclorXw",
+      "type": "text",
+      "name": "A bounty hunter on the trail",
+      "description": "<p>A professional watches the group and waits for the best moment. Nothing happens tonight, but they know where the camp is.</p>",
+      "img": "icons/svg/d20-grey.svg",
+      "weight": 2,
+      "range": [
+        65,
+        66
+      ],
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "IS8HGNWkz2YS5ofA",
+      "type": "text",
+      "name": "A dream that is not a dream",
+      "description": "<p>A sleeper wakes with a vision or a whisper. It could be an omen, a trick of a psyker, or the warp.</p>",
+      "img": "icons/svg/d20-grey.svg",
+      "weight": 2,
+      "range": [
+        67,
         68
       ],
       "drawn": false,
       "flags": {}
     },
     {
-      "_id": "FdnXsiVpzz63FfkC",
+      "_id": "75UyiCDmO46ayJKP",
       "type": "text",
-      "name": "Cult watchers",
-      "description": "<p>Followers of a forbidden cult observe the group from hiding and report to their masters. A trail leads to a hidden gathering place.</p>",
+      "name": "Deserters",
+      "description": "<p>Armed deserters demand supplies and a way out of the area. Desperate and dangerous, but they may be talked down.</p>",
       "img": "icons/svg/d20-grey.svg",
-      "weight": 6,
+      "weight": 2,
       "range": [
         69,
+        70
+      ],
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "4GY08vDuPngU30ZP",
+      "type": "text",
+      "name": "An informer among them",
+      "description": "<p>Someone the group trusts has been reporting on them. The signs appear tonight.</p>",
+      "img": "icons/svg/d20-grey.svg",
+      "weight": 2,
+      "range": [
+        71,
+        72
+      ],
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "7Thnp5yftIY7uq6T",
+      "type": "text",
+      "name": "A fire in the next building",
+      "description": "<p>A fire starts nearby and spreads. The group must act, flee or let it burn. Smoke and noise draw attention.</p>",
+      "img": "icons/svg/d20-grey.svg",
+      "weight": 2,
+      "range": [
+        73,
         74
       ],
       "drawn": false,
       "flags": {}
     },
     {
-      "_id": "zJr4i0B3JrTAwR4y",
+      "_id": "2bwGfcCvJAXrF6bn",
       "type": "text",
-      "name": "Tech-adept scouts or a malfunctioning servitor",
-      "description": "<p>A servitor or machine spirit acts oddly, or Mechanicus agents appear and ask uncomfortable questions about the group's equipment.</p>",
+      "name": "An ambush at the weakest watch",
+      "description": "<p>A hostile group has tracked the characters and strikes where the watch is weakest. Surprise is likely.</p>",
       "img": "icons/svg/d20-grey.svg",
-      "weight": 6,
+      "weight": 2,
       "range": [
         75,
+        76
+      ],
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "Z3eBZclIvRY6iEjH",
+      "type": "text",
+      "name": "A hive gang attacks",
+      "description": "<p>A gang that claims this ground wants a fight and a trophy. Numbers and mixed weapons.</p>",
+      "img": "icons/svg/d20-grey.svg",
+      "weight": 2,
+      "range": [
+        77,
+        78
+      ],
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "5UH1RSC84FL8SfWo",
+      "type": "text",
+      "name": "Hunters from the dark",
+      "description": "<p>A large predator stalks the camp: a mutant beast, a xenos hunter or something from the sewers.</p>",
+      "img": "icons/svg/d20-grey.svg",
+      "weight": 2,
+      "range": [
+        79,
         80
       ],
       "drawn": false,
       "flags": {}
     },
     {
-      "_id": "9ojfljoQoaF1Llqs",
+      "_id": "CHJs1UJOkHG16Jqt",
       "type": "text",
-      "name": "Ambush",
-      "description": "<p>A hostile group has tracked the characters and strikes at the weakest watch. Roll for surprise; the watch plan decides who is ready.</p>",
+      "name": "Mutant outbreak",
+      "description": "<p>Mutants or the afflicted pour out of the dark, driven by hunger or rage. Many weak enemies and a risk of contamination.</p>",
       "img": "icons/svg/d20-grey.svg",
-      "weight": 6,
+      "weight": 2,
       "range": [
         81,
+        82
+      ],
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "Qy9235Nnt2j9IHrK",
+      "type": "text",
+      "name": "A would-be assassin",
+      "description": "<p>A killer targets one of the group. Poison in the water, a knife in the dark, a trap in the gear.</p>",
+      "img": "icons/svg/d20-grey.svg",
+      "weight": 2,
+      "range": [
+        83,
+        84
+      ],
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "FmAIhGaMybIcH6zI",
+      "type": "text",
+      "name": "Rival agents",
+      "description": "<p>Agents of another power want the group's findings, or the group itself. They offer a deal and bring a threat.</p>",
+      "img": "icons/svg/d20-grey.svg",
+      "weight": 2,
+      "range": [
+        85,
         86
       ],
       "drawn": false,
       "flags": {}
     },
     {
-      "_id": "ajAIxNKu8iS2G8NP",
+      "_id": "ZKhFfSke7IDA69Z7",
       "type": "text",
-      "name": "Warp disturbance",
-      "description": "<p>Dreams turn dark, animals panic, light flickers. A psyker in the camp feels the veil thin. Minor psychic phenomena are possible; the GM chooses the effect.</p>",
+      "name": "A real warp disturbance",
+      "description": "<p>Dreams turn dark, animals panic, light and sound distort. A psyker feels the veil tear. Psychic phenomena are possible; the GM decides the effect.</p>",
       "img": "icons/svg/d20-grey.svg",
-      "weight": 5,
+      "weight": 2,
       "range": [
         87,
-        91
+        88
       ],
       "drawn": false,
       "flags": {}
     },
     {
-      "_id": "RVdD53X83RZJzzzz",
+      "_id": "zrpEFivB50756EHu",
       "type": "text",
-      "name": "Hunters from the dark",
-      "description": "<p>Something large and predatory stalks the camp: a mutant beast, a xenos hunter or a thing from the sewers. Hard to see, hard to kill.</p>",
+      "name": "Cultists at their rite",
+      "description": "<p>The group stumbles on, or is dragged into, a cult's ritual. The cult will not allow witnesses.</p>",
       "img": "icons/svg/d20-grey.svg",
-      "weight": 5,
+      "weight": 2,
       "range": [
-        92,
+        89,
+        90
+      ],
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "gmANb7qiSXbcmjoa",
+      "type": "text",
+      "name": "A large enemy force",
+      "description": "<p>A powerful enemy force enters the area. A straight fight cannot be won: escape, hiding or a bold plan are needed.</p>",
+      "img": "icons/svg/d20-grey.svg",
+      "weight": 2,
+      "range": [
+        91,
+        92
+      ],
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "RsuUwpNFgFULh2GN",
+      "type": "text",
+      "name": "A horror in the dark",
+      "description": "<p>Something terrible hunts the camp. It cannot be met directly. Fear tests, shaken nerves and flight are likely.</p>",
+      "img": "icons/svg/d20-grey.svg",
+      "weight": 2,
+      "range": [
+        93,
+        94
+      ],
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "qTmSH4BbyOA0HNkI",
+      "type": "text",
+      "name": "A daemonic presence",
+      "description": "<p>The warp bleeds into the world here. A creature or a possessed host begins to emerge, and the dead and the living both behave strangely.</p>",
+      "img": "icons/svg/d20-grey.svg",
+      "weight": 2,
+      "range": [
+        95,
         96
       ],
       "drawn": false,
       "flags": {}
     },
     {
-      "_id": "gEOzdmenCkhvMdga",
+      "_id": "n3OIOnHn2INL2io6",
       "type": "text",
-      "name": "Major threat",
-      "description": "<p>A powerful enemy force or a horror arrives. The group cannot win a straight fight; escape, hiding or a bold plan are needed.</p>",
+      "name": "Betrayal",
+      "description": "<p>A trusted contact or an ally turns on the group at the worst time and brings others with them.</p>",
       "img": "icons/svg/d20-grey.svg",
-      "weight": 4,
+      "weight": 2,
       "range": [
         97,
+        98
+      ],
+      "drawn": false,
+      "flags": {}
+    },
+    {
+      "_id": "VOZw5luMu57mnXm4",
+      "type": "text",
+      "name": "A catastrophe",
+      "description": "<p>A collapse, an explosion, a flood or a firestorm hits the area. Everyone must flee, and survival is not guaranteed.</p>",
+      "img": "icons/svg/d20-grey.svg",
+      "weight": 2,
+      "range": [
+        99,
         100
       ],
       "drawn": false,
