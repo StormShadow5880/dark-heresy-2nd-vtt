@@ -101,6 +101,8 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
 
 - Rulebook import: finds packages up to five folders deep, accepts a pasted full server path, handles encoded paths from the file browser and says where it looked when nothing was found.
 
+- Rulebook import: Foundry strips <style> from journal pages, so the scoped css is kept in a page flag and injected into the document instead (the imported page now keeps the look of the original).
+
 ### Psychic powers
 - Power list: the hourglass is only an indicator for a running power (not clickable). A running power cannot be
   manifested again (Manifest greyed out); ending it is done under Sustained Powers.

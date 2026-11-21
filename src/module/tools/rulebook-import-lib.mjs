@@ -7,6 +7,8 @@
  */
 
 const SCOPE = 'dh2-rulebook';
+// The wrapper class is repeated so the rules beat Foundry's own journal styles (which have several classes in front of h2, p, ...)
+const SCOPE_SELECTOR = `.${SCOPE}.${SCOPE}.${SCOPE}.${SCOPE}`;
 
 /** Foundry's file browser may return encoded paths (%20): decode first, so encoding later never doubles */
 export function decodePath(path) {
@@ -65,9 +67,8 @@ function splitRules(css) {
 function scopeSelector(selector, ids, prefix) {
     let sel = selector.trim();
     for (const id of ids) sel = sel.replace(new RegExp(`#${id}(?![\\w-])`, 'g'), `#${prefix}${id}`);
-    if (sel === '*' || sel === 'body' || sel === 'html') return sel === '*' ? `.${SCOPE} *` : `.${SCOPE}`;
-    if (sel.startsWith('*')) return `.${SCOPE} ${sel}`;
-    return `.${SCOPE} ${sel}`;
+    if (sel === '*' || sel === 'body' || sel === 'html') return sel === '*' ? `${SCOPE_SELECTOR} *` : SCOPE_SELECTOR;
+    return `${SCOPE_SELECTOR} ${sel}`;
 }
 
 /**
@@ -97,11 +98,14 @@ export function rewriteFragment(html, { prefix, base }) {
     return { html: out, ids };
 }
 
-/** The complete journal page content: scoped style + wrapper + fragment */
+/**
+ * The journal page content (wrapper + fragment) and the scoped css. Foundry removes <style> from journal pages,
+ * so the css is returned separately: the importer stores it with the page and injects it into the document.
+ */
 export function buildPageHtml({ fragment, css, prefix, base }) {
     const { html, ids } = rewriteFragment(fragment, { prefix, base });
     const style = scopeCss(rewriteCssUrls(css, base), { ids, prefix });
-    return `<style>\n${style}\n</style>\n<div class="${SCOPE}">${html}</div>`;
+    return { html: `<div class="${SCOPE}">${html}</div>`, css: style };
 }
 
 export { SCOPE };

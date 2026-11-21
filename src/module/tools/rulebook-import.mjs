@@ -74,10 +74,10 @@ export async function importRulebookPages(folder = null) {
         try {
             const pkg = await readPackage(dir);
             const prefix = `p${pkg.meta.printed_page ?? done.length + 1}-`;
-            const html = buildPageHtml({ fragment: pkg.fragment, css: pkg.css, prefix, base: dir });
+            const { html, css } = buildPageHtml({ fragment: pkg.fragment, css: pkg.css, prefix, base: dir });
             const name = `Page ${pkg.meta.printed_page ?? '?'} - ${pkg.meta.title ?? dir}`;
             const existing = entry.pages.find((p) => p.getFlag(SYSTEM_ID, FLAG) === dir);
-            const data = { name, type: 'text', text: { format: 1, content: html }, flags: { [SYSTEM_ID]: { [FLAG]: dir } } };
+            const data = { name, type: 'text', text: { format: 1, content: html }, flags: { [SYSTEM_ID]: { [FLAG]: dir, rulebookCss: css } } };
             if (existing) await existing.update(data);
             else await entry.createEmbeddedDocuments('JournalEntryPage', [data]);
             done.push(name);
@@ -86,6 +86,7 @@ export async function importRulebookPages(folder = null) {
             ui.notifications.error(`Import of "${dir}" failed: ${error.message}`);
         }
     }
+    applyRulebookStyles();
     if (done.length) {
         ui.notifications.info(`Imported ${done.length} rulebook page(s) into "${JOURNAL_NAME}".`);
         entry.sheet.render(true);
@@ -117,4 +118,29 @@ export async function ensureImportMacro() {
         });
     }
     await game.settings.set(SYSTEM_ID, 'rulebook-macro-created', true);
+}
+
+const STYLE_ID = 'dh2-rulebook-css';
+
+/**
+ * Foundry removes <style> elements from journal pages. The scoped css of the imported pages (kept in a flag of the
+ * page) is therefore put into one style element of the document. Every rule starts with the wrapper class of the
+ * imported pages, so nothing else in Foundry is affected.
+ */
+export function applyRulebookStyles() {
+    const css = [];
+    for (const entry of game.journal ?? []) {
+        for (const page of entry.pages) {
+            const text = page.getFlag?.(SYSTEM_ID, 'rulebookCss');
+            if (text) css.push(text);
+        }
+    }
+    let style = document.getElementById(STYLE_ID);
+    if (!css.length) return style?.remove();
+    if (!style) {
+        style = document.createElement('style');
+        style.id = STYLE_ID;
+        document.head.append(style);
+    }
+    style.textContent = css.join('\n');
 }

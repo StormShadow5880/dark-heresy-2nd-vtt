@@ -42,7 +42,7 @@ import * as documents from './documents/_module.mjs'
 import { SYSTEM_ID } from './system-id.mjs';
 import { onPsychicEffectRemoved, onPsychicPowerDeleted, refreshPsychicEffects } from './actions/psychic-effect-manager.mjs';
 import { aptitudesLocked, isCreatorGranted } from './rules/aptitude-lock.mjs';
-import { ensureImportMacro, importRulebookPages } from './tools/rulebook-import.mjs';
+import { applyRulebookStyles, ensureImportMacro, importRulebookPages } from './tools/rulebook-import.mjs';
 import { CharacterCreator } from './creator/wizard.mjs';
 import { preloadDossierImages } from './ui/preload-images.mjs';
 import { registerWoundsSyncHooks, syncAllWounds } from './actions/wounds-sync.mjs';
@@ -57,6 +57,7 @@ export class HooksManager {
         Hooks.on('hotbarDrop', HooksManager.hotbarDrop);
         Hooks.on('deleteActiveEffect', HooksManager.deleteActiveEffect);
         Hooks.on('deleteItem', HooksManager.deleteItem);
+        for (const hook of ['createJournalEntryPage', 'updateJournalEntryPage', 'deleteJournalEntryPage']) Hooks.on(hook, () => applyRulebookStyles());
         Hooks.on('preCreateItem', HooksManager.preCreateItem);
         Hooks.on('preDeleteItem', HooksManager.preDeleteItem);
         Hooks.on('renderActorDirectory', HooksManager.renderActorDirectory);
@@ -150,6 +151,7 @@ Enable Debug with: game.dh.debug = true
         console.log(`DH2e Loaded!`);
         DarkHeresySettings.applyDarkChat();
         preloadDossierImages();
+        applyRulebookStyles();
         ensureImportMacro().catch((e) => console.warn('Dark Heresy 2e | macro could not be created', e));
         await syncAllWounds();
         await checkAndMigrateWorld();

@@ -7,12 +7,13 @@ const fragment = '<article class="dh2-page"><h2 id="dice">Game Dice</h2><img cla
 
 test('css is limited to the wrapper: no global selectors remain', () => {
     const out = scopeCss(css, { ids: ['dice', 'mechanic'], prefix: 'p22-' });
-    assert.match(out, /\.dh2-rulebook \*\{box-sizing/);
-    assert.match(out, /\.dh2-rulebook\{margin:0/); // body -> wrapper
-    assert.match(out, /\.dh2-rulebook h2,\.dh2-rulebook h3\{/);
-    assert.match(out, /\.dh2-rulebook #p22-mechanic,\.dh2-rulebook #p22-dice\{/);
-    assert.match(out, /\.dh2-rulebook \.rule:before,\.dh2-rulebook \.rule:after\{/);
-    assert.match(out, /@media\(max-width:700px\)\{\.dh2-rulebook \.dh2-page\{padding:40px\}/);
+    const W = '\\.dh2-rulebook\\.dh2-rulebook\\.dh2-rulebook\\.dh2-rulebook';
+    assert.match(out, new RegExp(`${W} \\*\\{box-sizing`));
+    assert.match(out, new RegExp(`${W}\\{margin:0`)); // body -> wrapper
+    assert.match(out, new RegExp(`${W} h2,${W} h3\\{`));
+    assert.match(out, new RegExp(`${W} #p22-mechanic,${W} #p22-dice\\{`));
+    assert.match(out, new RegExp(`${W} \\.rule:before,${W} \\.rule:after\\{`));
+    assert.match(out, new RegExp(`@media\\(max-width:700px\\)\\{${W} \\.dh2-page\\{padding:40px\\}`));
     for (const line of out.split('\n')) assert.ok(!/^(\*|body|h2|h3|p|a)[{,]/.test(line), line);
 });
 
@@ -33,10 +34,10 @@ test('css urls are rewritten, data and absolute urls are not', () => {
 });
 
 test('complete page html: style, wrapper, fragment', () => {
-    const html = buildPageHtml({ fragment, css, prefix: 'p22-', base: 'dh2-rulebook/page22' });
-    assert.match(html, /^<style>/);
-    assert.match(html, /<div class="dh2-rulebook"><article/);
-    assert.match(html, /url\(dh2-rulebook\/page22\/assets\/page-background\.jpg\)/);
+    const { html, css: scoped } = buildPageHtml({ fragment, css, prefix: 'p22-', base: 'dh2-rulebook/page22' });
+    assert.ok(!html.includes('<style'), 'Foundry removes style elements from journal pages');
+    assert.match(html, /^<div class="dh2-rulebook"><article/);
+    assert.match(scoped, /url\(dh2-rulebook\/page22\/assets\/page-background\.jpg\)/);
     assert.deepEqual(collectIds(fragment), ['dice']);
     assert.equal(assetUrl('a/b/', './c d.png'), 'a/b/c%20d.png');
 });

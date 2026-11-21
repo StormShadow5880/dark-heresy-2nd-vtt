@@ -17,6 +17,7 @@ release. The system only ships the importer.
 * Limits the package CSS to a wrapper class (`body`, `*`, `h2`, ... would restyle the whole of Foundry).
 * Prefixes ids and in-page anchors (`#dice` -> `#p22-dice`) so pages do not clash.
 * Points the images to the package folder in your data directory.
-* Do not edit the page with the visual editor (it removes the inline `<style>`); edit the package and import again.
+* Foundry removes `<style>` from journal pages. The scoped CSS is therefore stored in a flag of the page (`flags.dark-heresy-2nd.rulebookCss`) and injected into the document as one style element (`#dh2-rulebook-css`) when the world starts and whenever a journal page changes. Its rules all start with the wrapper class, so nothing else is affected.
+* Edit the package and import again instead of editing the page.
 
 Code: `src/module/tools/rulebook-import.mjs` (Foundry part), `rulebook-import-lib.mjs` (pure helpers, tested in `test/rulebook-import.test.mjs`).
