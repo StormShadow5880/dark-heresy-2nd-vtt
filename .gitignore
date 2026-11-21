@@ -22,3 +22,8 @@ docker-data
 ## Docker Development
 docker-compose.yml
 conf
+
+## Private rulebook page packages (copyrighted, only for the user's own Foundry data folder)
+dh2-rulebook/
+**/DH2_Page*_Integrationspaket/
+DH2_Page*_Integrationspaket*.zip

@@ -42,6 +42,7 @@ import * as documents from './documents/_module.mjs'
 import { SYSTEM_ID } from './system-id.mjs';
 import { onPsychicEffectRemoved, onPsychicPowerDeleted, refreshPsychicEffects } from './actions/psychic-effect-manager.mjs';
 import { aptitudesLocked, isCreatorGranted } from './rules/aptitude-lock.mjs';
+import { ensureImportMacro, importRulebookPages } from './tools/rulebook-import.mjs';
 import { CharacterCreator } from './creator/wizard.mjs';
 import { preloadDossierImages } from './ui/preload-images.mjs';
 import { registerWoundsSyncHooks, syncAllWounds } from './actions/wounds-sync.mjs';
@@ -89,6 +90,7 @@ Enable Debug with: game.dh.debug = true
             rollSkillMacro,
             rollCharacteristicMacro,
             openCreator: () => CharacterCreator.open(),
+            importRulebookPages,
         };
 
         //CONFIG.debug.hooks = true;
@@ -148,6 +150,7 @@ Enable Debug with: game.dh.debug = true
         console.log(`DH2e Loaded!`);
         DarkHeresySettings.applyDarkChat();
         preloadDossierImages();
+        ensureImportMacro().catch((e) => console.warn('Dark Heresy 2e | macro could not be created', e));
         await syncAllWounds();
         await checkAndMigrateWorld();
 

@@ -1,0 +1,22 @@
+# Rulebook page import (private)
+
+Rulebook page packages (HTML fragment + CSS + assets, e.g. `DH2_Page22_Integrationspaket`) contain copyrighted material
+and are marked for private use. They are therefore **not part of this repository** (see `.gitignore`) and are never built into a
+release. The system only ships the importer.
+
+## Use
+
+1. Copy the package folder into your Foundry **Data** directory, e.g. `Data/dh2-rulebook/DH2_Page22_Integrationspaket/`
+   (the folder that contains `metadata.json`). A folder with several packages as sub folders works as well.
+2. In Foundry run the macro **Import Rulebook Pages** (created once for the GM when the world starts) or `await game.dh.importRulebookPages();`
+   and confirm the folder (default `dh2-rulebook`).
+3. The page appears in the journal **Rulebook (private import)**, one page per package. Running the macro again updates the page.
+
+## What the import does
+
+* Limits the package CSS to a wrapper class (`body`, `*`, `h2`, ... would restyle the whole of Foundry).
+* Prefixes ids and in-page anchors (`#dice` -> `#p22-dice`) so pages do not clash.
+* Points the images to the package folder in your data directory.
+* Do not edit the page with the visual editor (it removes the inline `<style>`); edit the package and import again.
+
+Code: `src/module/tools/rulebook-import.mjs` (Foundry part), `rulebook-import-lib.mjs` (pure helpers, tested in `test/rulebook-import.test.mjs`).

@@ -97,6 +97,8 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
 
 - Fixed the window header buttons (configure, controls, close) of the character sheet that showed empty boxes: a font rule for all buttons also hit them and replaced the Font Awesome icon font.
 
+- **Private rulebook page import**: macro *Import Rulebook Pages* (`game.dh.importRulebookPages()`) reads a page package from your own Foundry data folder (default `dh2-rulebook`) into the journal *Rulebook (private import)*. The packages themselves are not in the repository. See [docs/rulebook-import.md](docs/rulebook-import.md).
+
 ### Psychic powers
 - Power list: the hourglass is only an indicator for a running power (not clickable). A running power cannot be
   manifested again (Manifest greyed out); ending it is done under Sustained Powers.

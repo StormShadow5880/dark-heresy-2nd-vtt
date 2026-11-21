@@ -12,6 +12,7 @@ export class DarkHeresySettings {
         creatorStartingXp: 'creator-starting-xp',
         creatorVeteran: 'creator-veteran',
         creatorRandom: 'creator-random',
+        rulebookMacro: 'rulebook-macro-created',
 
     }
 
@@ -36,6 +37,12 @@ export class DarkHeresySettings {
                 manual: 'Manual (as entered)',
             },
             onChange: () => game.actors?.forEach((a) => a.prepareData?.()),
+        });
+        game.settings.register(SYSTEM_ID, DarkHeresySettings.SETTINGS.rulebookMacro, {
+            scope: 'world',
+            config: false,
+            default: false,
+            type: Boolean,
         });
         // Character creation wizard
         game.settings.register(SYSTEM_ID, DarkHeresySettings.SETTINGS.creatorStartingXp, {
