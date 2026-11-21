@@ -3,31 +3,35 @@
         <h2 class="panel__title">Equipped Weapons
             <button type="button" class="icon-btn item-create" data-type="weapon" data-tooltip="New weapon"><i class="fa-solid fa-plus"></i></button>
         </h2>
-        <ul class="wlist">
-            {{#each dossier.weapons as |w|}}
-                {{#if w.equipped}}
-                    <li class="wrow item-drag" data-item-id="{{w.id}}" data-item-type="weapon" data-tooltip="{{w.name}} · {{w.class}}{{#if w.type}} · {{w.type}}{{/if}} · {{w.damage}} {{w.damageType}} · pen {{w.penetration}} · range {{w.range}} · RoF {{w.rateOfFire}}{{#if w.usesAmmo}} · clip {{w.clipValue}}/{{w.clipMax}} · reload {{w.reload}}{{/if}}{{#if w.specials.length}} · {{#each w.specials as |sp|}}{{sp}}{{#unless @last}}, {{/unless}}{{/each}}{{/if}}">
-                        <span class="wrow__name">{{w.name}}</span>
-                        <span class="wrow__stats">
-                            <span><small>Dmg</small> {{w.damage}} {{w.damageType}}</span>
-                            <span><small>Pen</small> {{w.penetration}}</span>
-                            <span><small>Rng</small> {{w.range}}</span>
-                            <span><small>RoF</small> {{w.rateOfFire}}</span>
-                            {{#if w.usesAmmo}}<span><small>Clip</small> {{w.clipValue}}/{{w.clipMax}}</span>{{/if}}
-                            {{#if w.specials.length}}<span class="wrow__sp">{{#each w.specials as |sp|}}{{sp}}{{#unless @last}}, {{/unless}}{{/each}}</span>{{/if}}
-                        </span>
-                        <button type="button" class="icon-btn icon-btn--act item-roll" data-item-id="{{w.id}}" data-tooltip="Attack"><i class="fa-solid fa-crosshairs"></i></button>
-                        <button type="button" class="icon-btn icon-btn--act item-damage" data-item-id="{{w.id}}" data-tooltip="Damage"><i class="fa-solid fa-burst"></i></button>
-                        {{#if w.usesAmmo}}<button type="button" class="icon-btn" data-action="reloadWeapon" data-item-id="{{w.id}}" data-tooltip="Reload ({{w.reload}})"><i class="fa-solid fa-rotate"></i></button>{{/if}}
-                        <button type="button" class="icon-btn on" data-action="toggleEquipped" data-item-id="{{w.id}}" data-tooltip="Unequip" aria-pressed="true"><i class="fa-solid fa-hand-fist"></i></button>
-                        <button type="button" class="icon-btn item-edit" data-item-id="{{w.id}}" data-tooltip="Edit"><i class="fa-solid fa-pen"></i></button>
-                    </li>
-                {{/if}}
-            {{/each}}
-            {{#unless dossier.hasEquippedWeapon}}
-                <li class="empty">No weapon equipped. Equip a weapon from the list below or from the Gear tab.</li>
-            {{/unless}}
-        </ul>
+        <table class="wtable wtable--full">
+            <thead>
+                <tr><th>Weapon</th><th>Damage</th><th>Pen</th><th>Range</th><th>RoF</th><th>Clip</th><th>Reload</th><th>Special</th><th></th></tr>
+            </thead>
+            <tbody>
+                {{#each dossier.weapons as |w|}}
+                    {{#if w.equipped}}
+                        <tr class="item-drag" data-item-id="{{w.id}}" data-item-type="weapon">
+                            <td class="wtable__name" data-tooltip="{{w.class}}{{#if w.type}} · {{w.type}}{{/if}}"><img src="{{w.img}}" alt="" /> <span>{{w.name}}</span></td>
+                            <td>{{w.damage}} <small>{{w.damageType}}</small></td>
+                            <td>{{w.penetration}}</td>
+                            <td>{{w.range}}</td>
+                            <td>{{w.rateOfFire}}</td>
+                            <td>{{#if w.usesAmmo}}{{w.clipValue}}/{{w.clipMax}}{{else}}—{{/if}}</td>
+                            <td>{{#if w.usesAmmo}}{{w.reload}}{{else}}—{{/if}}</td>
+                            <td class="wtable__sp">{{#each w.specials as |sp|}}{{sp}}{{#unless @last}}, {{/unless}}{{else}}—{{/each}}</td>
+                            <td class="wtable__act">
+                                <button type="button" class="icon-btn icon-btn--act item-roll" data-item-id="{{w.id}}" data-tooltip="Attack"><i class="fa-solid fa-crosshairs"></i></button>
+                                <button type="button" class="icon-btn icon-btn--act item-damage" data-item-id="{{w.id}}" data-tooltip="Damage"><i class="fa-solid fa-burst"></i></button>
+                                {{#if w.usesAmmo}}<button type="button" class="icon-btn" data-action="reloadWeapon" data-item-id="{{w.id}}" data-tooltip="Reload"><i class="fa-solid fa-rotate"></i></button>{{/if}}
+                                <button type="button" class="icon-btn on" data-action="toggleEquipped" data-item-id="{{w.id}}" data-tooltip="Unequip" aria-pressed="true"><i class="fa-solid fa-hand-fist"></i></button>
+                                <button type="button" class="icon-btn item-edit" data-item-id="{{w.id}}" data-tooltip="Edit"><i class="fa-solid fa-pen"></i></button>
+                            </td>
+                        </tr>
+                    {{/if}}
+                {{/each}}
+                {{#unless dossier.hasEquippedWeapon}}<tr><td colspan="9" class="empty">No weapon equipped. Equip a weapon from the list below or from the Gear tab.</td></tr>{{/unless}}
+            </tbody>
+        </table>
     </article>
 
     <div class="combat-layout">
@@ -80,19 +84,33 @@
 
     <article class="panel panel--stowed">
         <h2 class="panel__title">Other Weapons</h2>
-        <ul class="rows">
-            {{#each dossier.weapons as |w|}}
-                {{#unless w.equipped}}
-                    <li class="item-drag is-unequipped" data-item-id="{{w.id}}" data-item-type="weapon">
-                        <span class="grow strong">{{w.name}} <small>{{w.class}} · {{w.damage}} {{w.damageType}} · pen {{w.penetration}}</small></span>
-                        <button type="button" class="btn" data-action="toggleEquipped" data-item-id="{{w.id}}"><i class="fa-solid fa-hand-fist"></i> Equip</button>
-                        <button type="button" class="icon-btn item-edit" data-item-id="{{w.id}}" data-tooltip="Edit"><i class="fa-solid fa-pen"></i></button>
-                        <button type="button" class="icon-btn item-delete" data-item-id="{{w.id}}" data-tooltip="Delete"><i class="fa-solid fa-trash"></i></button>
-                    </li>
-                {{/unless}}
-            {{/each}}
-            {{#unless dossier.hasStowedWeapon}}<li class="empty">No other weapons.</li>{{/unless}}
-        </ul>
+        <table class="wtable wtable--full">
+            <thead>
+                <tr><th>Weapon</th><th>Damage</th><th>Pen</th><th>Range</th><th>RoF</th><th>Clip</th><th>Reload</th><th>Special</th><th></th></tr>
+            </thead>
+            <tbody>
+                {{#each dossier.weapons as |w|}}
+                    {{#unless w.equipped}}
+                        <tr class="item-drag is-unequipped" data-item-id="{{w.id}}" data-item-type="weapon">
+                            <td class="wtable__name" data-tooltip="{{w.class}}{{#if w.type}} · {{w.type}}{{/if}}"><img src="{{w.img}}" alt="" /> <span>{{w.name}}</span></td>
+                            <td>{{w.damage}} <small>{{w.damageType}}</small></td>
+                            <td>{{w.penetration}}</td>
+                            <td>{{w.range}}</td>
+                            <td>{{w.rateOfFire}}</td>
+                            <td>{{#if w.usesAmmo}}{{w.clipValue}}/{{w.clipMax}}{{else}}—{{/if}}</td>
+                            <td>{{#if w.usesAmmo}}{{w.reload}}{{else}}—{{/if}}</td>
+                            <td class="wtable__sp">{{#each w.specials as |sp|}}{{sp}}{{#unless @last}}, {{/unless}}{{else}}—{{/each}}</td>
+                            <td class="wtable__act">
+                                <button type="button" class="icon-btn" data-action="toggleEquipped" data-item-id="{{w.id}}" data-tooltip="Equip"><i class="fa-solid fa-hand-fist"></i></button>
+                                <button type="button" class="icon-btn item-edit" data-item-id="{{w.id}}" data-tooltip="Edit"><i class="fa-solid fa-pen"></i></button>
+                                <button type="button" class="icon-btn item-delete" data-item-id="{{w.id}}" data-tooltip="Delete"><i class="fa-solid fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    {{/unless}}
+                {{/each}}
+                {{#unless dossier.hasStowedWeapon}}<tr><td colspan="9" class="empty">No other weapons.</td></tr>{{/unless}}
+            </tbody>
+        </table>
     </article>
 
     <div class="combat-layout">

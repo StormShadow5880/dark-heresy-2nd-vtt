@@ -2981,3 +2981,65 @@
         }
     }
 }
+
+// ------------------------------------------------ One slim height for every red panel header, weapon tables
+.application.dossier {
+    .panel__title {
+        box-sizing: border-box;
+        height: 28px;
+        min-height: 28px;
+        padding-top: 0;
+        padding-bottom: 0;
+        font-size: 1rem;
+        line-height: 1;
+        overflow: hidden;
+        .icon-btn {
+            width: 22px;
+            height: 22px;
+        }
+        .panel__hint {
+            line-height: 1;
+        }
+    }
+    .wtable--full {
+        table-layout: fixed;
+        // the same column widths in the equipped and the other weapons table
+        th:nth-child(1) { width: 20%; }
+        th:nth-child(2) { width: 15%; }
+        th:nth-child(3) { width: 6%; }
+        th:nth-child(4) { width: 9%; }
+        th:nth-child(5) { width: 9%; }
+        th:nth-child(6) { width: 8%; }
+        th:nth-child(7) { width: 9%; }
+        th:nth-child(9) { width: 128px; }
+        th,
+        td {
+            padding: 2px 8px;
+            white-space: nowrap;
+        }
+        td.wtable__sp {
+            white-space: normal;
+        }
+        td.empty {
+            text-align: center;
+            white-space: normal;
+        }
+        tbody tr {
+            height: 28px;
+            &:hover {
+                background: rgba(255, 255, 255, 0.03);
+            }
+            &.is-unequipped {
+                opacity: 0.7;
+            }
+        }
+        th:nth-child(n + 2):nth-child(-n + 7),
+        td:nth-child(n + 2):nth-child(-n + 7) {
+            text-align: center;
+        }
+        .wtable__name span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
+}
