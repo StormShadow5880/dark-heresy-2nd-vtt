@@ -234,34 +234,24 @@ export async function chooseSpreadTargets(message) {
     const initialToken = initial.token?.object ?? initial.getActiveTokens?.()[0];
 
     const { DHTargetedActionManager } = await import('./targeted-action-manager.mjs');
-    const candidates = [{ uuid: initial.uuid, name: initial.name, actor: initial }];
-    const tooFar = [];
-    for (const token of game.user.targets) {
-        if (!token.actor || token.actor.uuid === initial.uuid) continue;
-        const distance = initialToken ? DHTargetedActionManager.tokenDistance(initialToken, token) : Infinity;
-        if (withinSpread(distance)) candidates.push({ uuid: token.actor.uuid, name: token.actor.name, actor: token.actor });
-        else tooFar.push(token.actor.name);
-    }
-    if (tooFar.length) ui.notifications.warn(`Further than ${SPREAD_RANGE_M} m from ${initial.name}: ${tooFar.join(', ')}.`);
-    if (candidates.length === 1) ui.notifications.info(`No other target within ${SPREAD_RANGE_M} m of ${initial.name} is targeted: every hit strikes ${initial.name}. Target more tokens first to spread the hits.`);
-
-    const esc = (t) => foundry.utils.escapeHTML(String(t));
-    const rows = flags.hits.slice(1).map((hit, i) => {
-        const options = candidates.map((c) => `<option value="${esc(c.uuid)}">${esc(c.name)}</option>`).join('');
-        return `<div class="form-group"><label>Hit ${i + 2} <small>${esc(hit.location)} · ${hit.totalDamage} ${esc(hit.damageType)}</small></label><select name="hit${i + 1}">${options}</select></div>`;
-    });
-    const picked = await foundry.applications.api.DialogV2.prompt({
-        window: { title: `${flags.attackType}: choose targets` },
-        content: `<p>Hit 1 strikes <strong>${esc(initial.name)}</strong>. Choose the target of each further hit.</p>${rows.join('')}`,
-        ok: {
-            label: 'Assign hits',
-            callback: (event, button) => flags.hits.slice(1).map((h, i) => button.form.elements[`hit${i + 1}`].value),
+    const { pickTokensOnCanvas } = await import('../ui/canvas-pick.mjs');
+    if (!initialToken) return ui.notifications.warn(`${initial.name} needs a token on the scene.`);
+    const extra = flags.hits.length - 1;
+    // the further hits are chosen with the left mouse button on the map: one click per hit (the same token may be clicked again)
+    const tokens = await pickTokensOnCanvas({
+        count: extra,
+        title: `${flags.attackType}: hit 1 strikes ${initial.name}`,
+        label: (i) => `Hit ${i + 2}`,
+        accept: (token) => {
+            if (token.actor.uuid === initial.uuid) return true;
+            const distance = DHTargetedActionManager.tokenDistance(initialToken, token);
+            return withinSpread(distance) ? true : `${token.name} is ${Math.round(distance * 10) / 10} m from ${initial.name}, further than ${SPREAD_RANGE_M} m.`;
         },
-        rejectClose: false,
-        modal: false,
     });
-    if (!picked) return;
+    if (!tokens) return;
     if (resolutionOf(message.id)) return ui.notifications.warn('The targets have been chosen already.');
+    const picked = tokens.map((t) => t.actor.uuid);
+    const candidates = [{ uuid: initial.uuid, actor: initial }, ...tokens.map((t) => ({ uuid: t.actor.uuid, actor: t.actor }))];
 
     const targetIds = [initial.uuid, ...picked];
     const groups = groupHitsByTarget(flags.hits, targetIds);

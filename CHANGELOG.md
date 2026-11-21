@@ -111,7 +111,7 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
   - single hit: a successful test prevents it;
   - several hits (Semi/Full Auto, Swift / Lightning Attack, Barrage, ...): each degree of success prevents one hit, **Psychic Storm two**; the degrees are the *rule* degrees (a plain success is one degree and prevents one hit, see `ruleDos` in `rules/degrees.mjs`), the last hits are removed first, all hits prevented = the attack missed;
   - **Blast** (weapon quality or Psychic Blast): button *Check area* lists every token inside the radius (blast quality level / the power's `special.blast`, else asked), draws the area, targets the tokens and lets you uncheck anyone or mark a way out as blocked; each target answers on its own card, dodging only works if the way to the edge of the area is not longer than the Agility Bonus in metres and not blocked;
-  - **Psychic Barrage / Storm**: the first hit strikes the chosen target, further hits the same target or others within 2 m (button *Choose x targets*), every target answers for its own hits.
+  - **Psychic Barrage / Storm**: the first hit strikes the chosen target, further hits the same target or others within 2 m (button *Choose x targets*: click the targets on the map with the left mouse button, one click per hit, no pre-targeting needed; a bar shows the picks with Undo / Cancel, tokens further than 2 m are refused), every target answers for its own hits.
   - Not automated yet: **Spray** (cone), force fields, parry limits per round.
 
 ### Psychic powers
