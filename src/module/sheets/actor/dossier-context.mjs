@@ -590,3 +590,24 @@ export async function enrichPowerDescriptions(actor, powers) {
         p.descriptionHtml = await enrich(item?.system?.description ?? '', { rollData: { actor, item, pr: actor.psy?.rating ?? 0 } });
     }
 }
+
+
+/**
+ * Small values of the overview: body armour, the lists of the "Quick Info" column and whether any effect exists.
+ * Needs the result of buildTalentsAndTraits().
+ */
+export function buildOverview(actor, dossier, effects = []) {
+    const body = dossier.armour?.find((z) => z.key === 'body');
+    const names = (list, max) => {
+        const sorted = list.map((x) => x.name).sort((a, b) => a.localeCompare(b));
+        return sorted.length > max ? [...sorted.slice(0, max), `+ ${sorted.length - max} more`] : sorted;
+    };
+    return {
+        armour: body ? body.total : '—',
+        influence: actor.characteristics?.influence?.total ?? '—',
+        aptitudeText: (dossier.aptitudes ?? []).map((a) => a.name).join(', ') || '—',
+        talents: names(dossier.talents ?? [], 6),
+        traits: names(dossier.traits ?? [], 6),
+        hasEffects: effects.length > 0 || !!dossier.psychic?.sustainedPowers?.length,
+    };
+}

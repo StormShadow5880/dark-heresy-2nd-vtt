@@ -1,8 +1,9 @@
 <section class="tab dossier-tab" data-tab="overview" data-group="primary">
-    <div class="ov-layout">
-        <article class="panel panel--characteristics">
-            <h2 class="panel__title">Characteristics <span class="panel__hint">and condition</span></h2>
-            <div class="chars">
+    <div class="ov2">
+        <div class="ov2__main">
+            <article class="panel panel--characteristics">
+                <h2 class="panel__title">Characteristics</h2>
+                <div class="chars">
                 {{#each dossier.characteristics as |c|}}
                     <div class="char {{#if c.hasBonus}}char--bonus{{/if}} {{#if c.hasNegative}}char--negative{{/if}} actor-drag" data-item-type="characteristic" data-item-id="{{c.key}}" data-char="{{c.key}}">
                         <button type="button" class="char__edit-toggle" data-action="toggleCharEdit" data-char="{{c.key}}" data-tooltip="Pin details" aria-label="Pin details of {{c.label}}"><i class="fa-solid fa-thumbtack"></i></button>
@@ -28,58 +29,153 @@
                         </div>
                     </div>
                 {{/each}}
-                {{#each dossier.statusTiles as |t|}}
-                    <div class="estat estat--{{t.id}}" data-tooltip="{{t.tooltip}}">
-                        <div class="emblem emblem--{{t.id}}"><b>{{t.value}}</b></div>
-                        <div class="estat__side">
-                            <span class="estat__label">{{t.label}}</span>
-                            <span class="estat__btns">
-                                <button type="button" class="step" data-action="adjustValue" data-path="{{t.path}}" data-delta="-1" data-max="{{t.max}}" aria-label="Decrease {{t.label}}">−</button>
-                                <button type="button" class="step" data-action="adjustValue" data-path="{{t.path}}" data-delta="1" data-max="{{t.max}}" aria-label="Increase {{t.label}}">+</button>
-                            </span>
-                        </div>
-                        {{#if t.maxPath}}
-                            <div class="estat__pop" role="group" aria-label="{{t.label}} maximum">
-                                <label><span>Maximum {{t.label}}</span>
-                                    <input type="number" data-dtype="Number" name="{{t.maxPath}}" value="{{t.max}}" /></label>
-                            </div>
-                        {{/if}}
-                    </div>
-                {{/each}}
-            </div>
-        </article>
-
-        <div class="ov-main">
-            <article class="panel panel--quick">
-                <h2 class="panel__title">Key Skills <span class="panel__hint">Star skills on the Skills tab</span></h2>
-                <ul class="qs">
-                    {{#each dossier.quickSkills as |s|}}
-                        <li class="qs__item" data-tooltip="{{s.label}} · {{s.training}} ({{s.characteristic}})">
-                            <span class="qs__name">{{s.label}} <small>{{s.characteristic}}</small></span>
-                            <span class="qs__pips">{{#each s.pips as |p|}}<i class="pip {{#if p.filled}}on{{/if}}"></i>{{/each}}</span>
-                            <span class="qs__target">{{s.total}}</span>
-                            <button type="button" class="icon-btn roll-skill" data-skill="{{s.skillKey}}" data-specialty="{{s.specKey}}" data-tooltip="Roll {{s.label}} (W100 ≤ {{s.total}})"><i class="fa-solid fa-dice-d20"></i></button>
-                        </li>
-                    {{else}}
-                        <li class="empty">No favourite skills. Use the star on the Skills tab.</li>
-                    {{/each}}
-                </ul>
+                </div>
             </article>
 
-            {{#if dossier.psychic.hasSustained}}
-                <article class="panel panel--sustained-mini">
-                    <h2 class="panel__title">Sustained Powers <span class="panel__hint">current PR {{dossier.psychic.current}} / {{dossier.psychic.rating}}</span></h2>
-                    <ul class="rows rows--compact">
-                        {{#each dossier.psychic.sustainedPowers as |p|}}
-                            <li>
-                                <span class="grow">{{p.name}}{{#if p.effectText}} <small>{{p.effectText}}</small>{{/if}}</span>
-                                <button type="button" class="icon-btn on" data-action="togglePsychicEffect" data-item-id="{{p.id}}" data-tooltip="End this power"><i class="fa-solid fa-hourglass-end"></i></button>
+            <div class="ov2__pair">
+                <article class="panel panel--status">
+                    <h2 class="panel__title">Status</h2>
+                    <ul class="stat-list">
+                        <li class="stat-list__row" data-tooltip="Wounds taken: {{dossier.res.wounds.bar.damage}} of {{dossier.res.wounds.max}}{{#if dossier.res.wounds.bar.critical}}, critical {{dossier.res.wounds.bar.critical}}{{/if}}">
+                            <i class="sicon sicon--wounds fa-solid fa-heart-pulse"></i>
+                            <span class="stat-list__label">Wounds</span>
+                            <span class="stat-list__value">{{dossier.res.wounds.bar.damage}} / {{dossier.res.wounds.max}}</span>
+                            <button type="button" class="step" data-action="adjustDamage" data-delta="-1" aria-label="Heal one point">−</button>
+                            <button type="button" class="step" data-action="adjustDamage" data-delta="1" aria-label="Take one point of damage">+</button>
+                        </li>
+                        {{#each dossier.statusTiles as |t|}}
+                            <li class="stat-list__row" data-tooltip="{{t.tooltip}}">
+                                <i class="sicon sicon--{{t.id}}"></i>
+                                <span class="stat-list__label">{{t.label}}</span>
+                                <span class="stat-list__value">{{t.value}}</span>
+                                <button type="button" class="step" data-action="adjustValue" data-path="{{t.path}}" data-delta="-1" data-max="{{t.max}}" aria-label="Decrease {{t.label}}">−</button>
+                                <button type="button" class="step" data-action="adjustValue" data-path="{{t.path}}" data-delta="1" data-max="{{t.max}}" aria-label="Increase {{t.label}}">+</button>
                             </li>
                         {{/each}}
                     </ul>
                 </article>
-            {{/if}}
 
+                <article class="panel panel--reference">
+                    <h2 class="panel__title">Combat Reference</h2>
+                    <div class="ref">
+                        <ul>
+                            <li><i class="fa-solid fa-person-running"></i><span>Dodge</span><b>{{#if dossier.combat.dodge}}{{dossier.combat.dodge}}{{else}}—{{/if}}</b></li>
+                            <li><i class="fa-solid fa-shield-halved"></i><span>Parry</span><b>{{#if dossier.combat.parry}}{{dossier.combat.parry}}{{else}}—{{/if}}</b></li>
+                            <li><i class="fa-solid fa-vest"></i><span>Armour</span><b data-tooltip="Body: armour + toughness bonus">{{dossier.ov.armour}}</b></li>
+                            <li><i class="fa-solid fa-shoe-prints"></i><span>Move</span><b>{{dossier.combat.movement.half}} m</b></li>
+                        </ul>
+                        <ul>
+                            <li><i class="fa-solid fa-bolt"></i><span>Initiative</span><b>{{#if dossier.combat.initiativeBonus}}+{{/if}}{{dossier.combat.initiativeBonus}}</b></li>
+                            <li><i class="fa-solid fa-angles-right"></i><span>Charge</span><b>{{dossier.combat.movement.charge}} m</b></li>
+                            <li><i class="fa-solid fa-gauge-high"></i><span>Run</span><b>{{dossier.combat.movement.run}} m</b></li>
+                            <li><i class="fa-solid fa-weight-hanging"></i><span>Encumbrance</span><b class="{{#if dossier.gear.encumbrance.encumbered}}warn{{/if}}">{{dossier.gear.encumbrance.value}} / {{dossier.gear.encumbrance.max}}</b></li>
+                        </ul>
+                    </div>
+                </article>
+            </div>
+
+            <div class="ov2__pair">
+                <article class="panel panel--quick">
+                    <h2 class="panel__title">Key Skills <span class="panel__hint">{{dossier.quickSkills.length}} <button type="button" class="icon-btn" data-action="goTab" data-tab="skills" data-tooltip="Choose key skills on the Skills tab"><i class="fa-solid fa-pen"></i></button></span></h2>
+                    <ul class="qs qs--one">
+                        {{#each dossier.quickSkills as |s|}}
+                            <li class="qs__item" data-tooltip="{{s.label}} · {{s.training}} ({{s.characteristic}})">
+                                <span class="qs__name">{{s.label}} <small>{{s.characteristic}}</small></span>
+                                <span class="qs__pips">{{#each s.pips as |p|}}<i class="pip {{#if p.filled}}on{{/if}}"></i>{{/each}}</span>
+                                <span class="qs__target">{{s.total}}</span>
+                                <button type="button" class="icon-btn roll-skill" data-skill="{{s.skillKey}}" data-specialty="{{s.specKey}}" data-tooltip="Roll {{s.label}} (W100 ≤ {{s.total}})"><i class="fa-solid fa-dice-d20"></i></button>
+                            </li>
+                        {{else}}
+                            <li class="empty">No favourite skills. Use the star on the Skills tab.</li>
+                        {{/each}}
+                    </ul>
+                </article>
+
+                <article class="panel panel--eqweapons">
+                    <h2 class="panel__title">Equipped Weapons</h2>
+                    <table class="wtable">
+                        <thead><tr><th>Weapon</th><th>Range</th><th>Damage</th><th>Pen</th><th>Clip</th><th>Special</th><th></th></tr></thead>
+                        <tbody>
+                            {{#each dossier.weapons as |w|}}
+                                {{#if w.equipped}}
+                                    <tr class="item-drag" data-item-id="{{w.id}}" data-item-type="weapon">
+                                        <td class="wtable__name"><img src="{{w.img}}" alt="" /> <span>{{w.name}}</span></td>
+                                        <td>{{w.range}}</td>
+                                        <td>{{w.damage}} <small>{{w.damageType}}</small></td>
+                                        <td>{{w.penetration}}</td>
+                                        <td>{{#if w.usesAmmo}}{{w.clipValue}}/{{w.clipMax}}{{else}}—{{/if}}</td>
+                                        <td class="wtable__sp">{{#each w.specials as |sp|}}{{sp}}{{#unless @last}}, {{/unless}}{{else}}—{{/each}}</td>
+                                        <td class="wtable__act">
+                                            <button type="button" class="icon-btn item-roll" data-item-id="{{w.id}}" data-tooltip="Attack"><i class="fa-solid fa-crosshairs"></i></button>
+                                            <button type="button" class="icon-btn item-damage" data-item-id="{{w.id}}" data-tooltip="Damage"><i class="fa-solid fa-burst"></i></button>
+                                            <button type="button" class="icon-btn item-edit" data-item-id="{{w.id}}" data-tooltip="Edit"><i class="fa-solid fa-pen"></i></button>
+                                        </td>
+                                    </tr>
+                                {{/if}}
+                            {{/each}}
+                            {{#unless dossier.hasEquippedWeapon}}<tr><td colspan="7" class="empty">No weapon equipped.</td></tr>{{/unless}}
+                        </tbody>
+                    </table>
+                </article>
+            </div>
+
+            <article class="panel panel--effects">
+                <h2 class="panel__title">Active Effects &amp; Conditions
+                    <button type="button" class="icon-btn effect-create" data-tooltip="New effect"><i class="fa-solid fa-plus"></i></button>
+                </h2>
+                <ul class="rows rows--compact">
+                    {{#each dossier.psychic.sustainedPowers as |p|}}
+                        <li>
+                            <i class="fa-solid fa-hourglass-half" data-tooltip="Sustained psychic power"></i>
+                            <span class="grow">{{p.name}}{{#if p.effectText}} <small>{{p.effectText}}</small>{{/if}}</span>
+                            <button type="button" class="icon-btn on" data-action="togglePsychicEffect" data-item-id="{{p.id}}" data-tooltip="End this power"><i class="fa-solid fa-hourglass-end"></i></button>
+                        </li>
+                    {{/each}}
+                    {{#each effects as |effect|}}
+                        <li class="{{#if effect.disabled}}is-off{{/if}}">
+                            <img src="{{effect.img}}" alt="" />
+                            <span class="grow">{{effect.name}}</span>
+                            {{#if effect.disabled}}
+                                <button type="button" class="icon-btn effect-enable" data-effect-id="{{effect.id}}" data-tooltip="Enable"><i class="fa-solid fa-toggle-off"></i></button>
+                            {{else}}
+                                <button type="button" class="icon-btn effect-disable on" data-effect-id="{{effect.id}}" data-tooltip="Disable"><i class="fa-solid fa-toggle-on"></i></button>
+                            {{/if}}
+                            <button type="button" class="icon-btn effect-edit" data-effect-id="{{effect.id}}" data-tooltip="Edit"><i class="fa-solid fa-pen"></i></button>
+                        </li>
+                    {{/each}}
+                    {{#unless dossier.ov.hasEffects}}<li class="empty">No active effects or conditions.</li>{{/unless}}
+                </ul>
+            </article>
         </div>
+
+        <aside class="ov2__side">
+            <article class="panel panel--info">
+                <h2 class="panel__title">Quick Info</h2>
+                <div class="qi">
+                    <div class="qi__line"><span>Influence</span><b>{{dossier.ov.influence}}</b></div>
+
+                    <section class="qi__block">
+                        <h3>Aptitudes ({{dossier.aptitudes.length}}) <button type="button" class="icon-btn" data-action="goTab" data-tab="talents" data-tooltip="Show on the Talents tab"><i class="fa-solid fa-pen"></i></button></h3>
+                        <p>{{dossier.ov.aptitudeText}}</p>
+                    </section>
+                    <section class="qi__block">
+                        <h3>Key Talents ({{dossier.talents.length}}) <button type="button" class="icon-btn" data-action="goTab" data-tab="talents" data-tooltip="Open the Talents tab"><i class="fa-solid fa-pen"></i></button></h3>
+                        <ul>{{#each dossier.ov.talents as |t|}}<li>{{t}}</li>{{else}}<li class="empty">None.</li>{{/each}}</ul>
+                    </section>
+                    <section class="qi__block">
+                        <h3>Traits ({{dossier.traits.length}}) <button type="button" class="icon-btn" data-action="goTab" data-tab="talents" data-tooltip="Open the Talents tab"><i class="fa-solid fa-pen"></i></button></h3>
+                        <ul>{{#each dossier.ov.traits as |t|}}<li>{{t}}</li>{{else}}<li class="empty">None.</li>{{/each}}</ul>
+                    </section>
+                    <section class="qi__block">
+                        <h3>Bonuses <button type="button" class="icon-btn" data-action="goTab" data-tab="talents" data-tooltip="Open the Talents tab"><i class="fa-solid fa-pen"></i></button></h3>
+                        <ul class="qi__bonus">
+                            {{#each dossier.abilities as |ab|}}
+                                <li><b>{{ab.source}}:</b> {{ab.name}}{{#if ab.benefit}}<small>{{ab.benefit}}</small>{{/if}}</li>
+                            {{else}}<li class="empty">Select home world, background, role and divination in the header.</li>{{/each}}
+                        </ul>
+                    </section>
+                </div>
+            </article>
+        </aside>
     </div>
 </section>

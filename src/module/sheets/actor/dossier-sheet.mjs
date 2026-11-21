@@ -8,6 +8,7 @@ import {
     buildDevelopment,
     buildGear,
     buildProgression,
+    buildOverview,
     buildEquippedArmour,
     buildPsychic,
     buildQuickSkills,
@@ -59,6 +60,7 @@ export class AcolyteDossierSheet extends AcolyteSheet {
             togglePsychicEffect: AcolyteDossierSheet.#onTogglePsychicEffect,
             togglePowerDetail: AcolyteDossierSheet.#onTogglePowerDetail,
             toggleSkillDetail: AcolyteDossierSheet.#onToggleSkillDetail,
+            goTab: AcolyteDossierSheet.#onGoTab,
             setCritical: AcolyteDossierSheet.#onSetCritical,
         },
     };
@@ -128,6 +130,7 @@ export class AcolyteDossierSheet extends AcolyteSheet {
         };
         Object.assign(context.dossier, await buildTalentsAndTraits(actor));
         await enrichPowerDescriptions(actor, context.dossier.psychic.powers);
+        context.dossier.ov = buildOverview(actor, context.dossier, context.effects ?? []);
         context.dossier.tabs = [
             { id: 'overview', label: 'Overview', icon: 'fa-solid fa-id-card' },
             { id: 'skills', label: 'Skills', icon: 'fa-solid fa-list-check' },
@@ -224,6 +227,11 @@ export class AcolyteDossierSheet extends AcolyteSheet {
         const level = Number(target.dataset.level);
         const current = Number(foundry.utils.getProperty(this.actor, path) ?? 0);
         await this.actor.update({ [path]: current === level ? level - 1 : level });
+    }
+
+    /** Pencil buttons of the overview: open another tab */
+    static #onGoTab(event, target) {
+        this.element.querySelector(`.dh-navigation a[data-tab="${target.dataset.tab}"]`)?.click();
     }
 
     _setSkillOpen(row, open) {
