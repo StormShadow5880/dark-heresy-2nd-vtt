@@ -4,6 +4,8 @@
  * rest and treatment still have to be confirmed (docs/world-clock.md).
  */
 import { SYSTEM_ID } from '../system-id.mjs';
+import { CLOCK_MODES, HOUR, currentWatch, hoursText } from '../rules/rest.mjs';
+import { clockStatus, command, currentRest, decide, publicRest, setClockMode } from '../actions/time-runner.mjs';
 import { DEFAULT_CLOCK, JUMPS, clockParts, normalizeClock, parseTime, timersInFuture } from '../rules/world-clock.mjs';
 
 const ID = 'dh-clock';
@@ -55,7 +57,10 @@ export function renderClock() {
         // setting not registered yet
     }
     const existing = document.getElementById(ID);
-    if (!visible) return existing?.remove();
+    if (!visible) {
+        document.getElementById(`${ID}-sub`)?.remove();
+        return existing?.remove();
+    }
     const parts = clockParts(game.time.worldTime, clockConfig());
     const el = clockElement();
     const gm = game.user.isGM;
@@ -71,6 +76,66 @@ export function renderClock() {
                    <button type="button" data-config="1" class="dh-clock__gear" title="Date, time and mission start"><i class="fa-solid fa-gear"></i></button></span>`
                 : ''
         }`;
+    renderSub();
+}
+
+/** Second slim row: automatic clock (buttons for the GM) and the rest */
+function renderSub() {
+    let el = document.getElementById(`${ID}-sub`);
+    const gm = game.user.isGM;
+    const status = clockStatus();
+    const rest = gm ? currentRest() : publicRest();
+    const restOn = rest && rest.status && !['done', 'cancelled'].includes(rest.status) && (gm ? true : rest.active);
+    if (!gm && !restOn && !status.running) return el?.remove();
+    if (!el) {
+        el = document.createElement('div');
+        el.id = `${ID}-sub`;
+        el.className = 'dh-ui dh-clock-sub';
+        document.body.append(el);
+        el.addEventListener('click', onSubClick);
+    }
+    let html = '';
+    if (restOn) {
+        const planned = rest.plannedSeconds;
+        const start = rest.startWorldTime;
+        const elapsed = Math.min(planned, Math.max(0, game.time.worldTime - start));
+        const labels = { running: 'Resting', paused: 'Rest paused', encounter: gm ? 'Encounter: decide' : 'Rest paused', interrupted: gm ? 'Rest interrupted' : 'Rest paused', recovery: gm ? 'Check: decide' : 'Rest paused' };
+        const plan = gm ? rest.plan : rest;
+        const w = currentWatch({ watches: (plan.watches ?? []).map((x) => ({ from: x.from, to: x.to, actors: x.actors ?? x.names ?? [] })) }, elapsed);
+        const watchNames = gm ? w.actors.map((id) => rest.characters[id]?.name ?? id) : w.actors;
+        const pct = planned ? Math.round((elapsed / planned) * 100) : 0;
+        html += `<span class="dh-clock-sub__state is-rest" role="status"><i class="fa-solid fa-campground"></i> <b>${labels[rest.status] ?? 'Rest'}</b>${plan.location ? ` · ${esc(plan.location)}` : ''}
+            · ${hoursText(elapsed / HOUR)} / ${hoursText(planned / HOUR)}${(plan.watches ?? []).length ? ` · Watch: ${watchNames.length ? esc(watchNames.join(', ')) : 'none'}` : ''}</span>
+            <span class="dh-clock-sub__bar" aria-hidden="true"><i style="width:${pct}%"></i></span>`;
+        if (gm) {
+            const needs = ['encounter', 'interrupted', 'recovery'].includes(rest.status);
+            html += `<span class="dh-clock-sub__buttons">
+                ${needs ? '<button type="button" data-rest="decide" class="is-alert">Decide …</button>' : ''}
+                ${rest.status === 'paused' ? '<button type="button" data-rest="resume">Resume</button>' : rest.status === 'running' ? '<button type="button" data-rest="pause">Pause</button>' : ''}
+                ${rest.status === 'running' ? '<button type="button" data-rest="skip" title="Fast forward: no watch change, check or encounter is skipped">Skip</button>' : ''}
+                <button type="button" data-rest="cancel" title="The world time stays where it is">Cancel</button></span>`;
+        }
+    } else {
+        const dot = status.running ? 'is-on' : '';
+        const text = status.mode === 'pause' ? 'Clock paused' : status.halt ? `${status.label}: halted (${status.halt})` : `${status.label}: running`;
+        html += `<span class="dh-clock-sub__state ${dot}" role="status"><i class="dh-clock-sub__dot"></i> <b>${esc(text)}</b></span>`;
+        if (gm) {
+            html += `<span class="dh-clock-sub__buttons">${Object.entries(CLOCK_MODES)
+                .map(([mode, m]) => `<button type="button" data-mode="${mode}" aria-pressed="${status.mode === mode}" class="${status.mode === mode ? 'is-active' : ''}">${esc(m.label)}</button>`)
+                .join('')}<button type="button" data-rest="start">Rest …</button></span>`;
+        }
+    }
+    el.innerHTML = html;
+}
+
+async function onSubClick(event) {
+    const b = event.target.closest('button');
+    if (!b || !game.user.isGM) return;
+    if (b.dataset.mode) return setClockMode(b.dataset.mode);
+    const act = b.dataset.rest;
+    if (act === 'start') return (await import('./rest-dialog.mjs')).openRestDialog();
+    if (act === 'decide') return decide();
+    if (act) await command(act);
 }
 
 async function onClick(event) {
@@ -138,6 +203,7 @@ function refreshSheets() {
 
 export function initWorldClock() {
     renderClock();
+    window.addEventListener('dh-clock-changed', () => renderClock());
     Hooks.on('updateWorldTime', (worldTime, delta) => {
         renderClock();
         refreshSheets();

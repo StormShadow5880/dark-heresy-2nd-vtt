@@ -165,3 +165,114 @@
         }
     }
 }
+
+// second row: automatic clock and rest (ui/world-clock.mjs renderSub)
+.dh-clock-sub {
+    position: fixed;
+    top: 42px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 34;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    max-width: calc(100vw - 24px);
+    padding: 0.15rem 0.6rem;
+    color: var(--ds-ink, #e6d7b4);
+    font-size: 0.8rem;
+    background: rgba(40, 14, 18, 0.92);
+    border: 1px solid rgba(182, 154, 98, 0.6);
+    border-radius: 3px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+
+    &__state b {
+        font-weight: 600;
+    }
+
+    &__dot {
+        display: inline-block;
+        width: 0.6rem;
+        height: 0.6rem;
+        border-radius: 50%;
+        background: var(--ds-muted, #92918c);
+    }
+
+    &__state.is-on &__dot {
+        background: var(--ds-ok, #6f9a5c);
+        box-shadow: 0 0 6px var(--ds-ok, #6f9a5c);
+    }
+
+    &__bar {
+        display: inline-block;
+        width: 120px;
+        height: 6px;
+        background: rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(182, 154, 98, 0.5);
+
+        i {
+            display: block;
+            height: 100%;
+            background: var(--ds-gold, #b69a62);
+        }
+    }
+
+    &__buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.3rem;
+
+        button {
+            all: unset;
+            box-sizing: border-box;
+            cursor: pointer;
+            padding: 0.1rem 0.5rem;
+            font-size: 0.75rem;
+            color: var(--ds-ink, #e6d7b4);
+            border: 1px solid var(--ds-gold, #b69a62);
+            border-radius: 2px;
+            background: rgba(0, 0, 0, 0.25);
+
+            &:hover,
+            &:focus-visible {
+                background: rgba(182, 154, 98, 0.25);
+            }
+
+            &.is-active {
+                background: var(--ds-gold, #b69a62);
+                color: #1a1410;
+                font-weight: 600;
+            }
+
+            &.is-alert {
+                border-color: var(--ds-warn, #c9923a);
+                color: var(--ds-warn, #c9923a);
+            }
+        }
+    }
+}
+
+// rest dialog
+.dh-rest {
+    fieldset {
+        margin-bottom: 0.5rem;
+        border: 1px solid var(--ds-line, #504638);
+    }
+
+    &__watch {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.4rem;
+        margin: 0.2rem 0;
+
+        input[type='number'] {
+            width: 4.5rem;
+        }
+    }
+
+    &__problems {
+        color: var(--ds-warn, #c9923a);
+    }
+}

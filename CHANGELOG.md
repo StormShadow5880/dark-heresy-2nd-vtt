@@ -6,6 +6,10 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
 
 ## [1.9.0] – Unreleased
 
+### Running clock and rest
+
+- Automatic game clock (Pause, 1:1, 1:3) that stops while the game is paused, in combat and during a rest, and a rest planner ("Rest …") with a visible time lapse, watches, optional random encounters and sleep checks (all configurable GM rules), skip/pause/cancel, GM-only encounter decisions and a summary that heals nothing by itself. See [docs/rest-and-clock.md](docs/rest-and-clock.md).
+
 ### Psychic
 
 - The power dialog warns when the chosen Psy Rating is above the current rating (pushing) and enforces the maximum of the kind of psyker (Bound +2, Unbound +4, Daemonic +3). See [docs/psychic-push.md](docs/psychic-push.md).

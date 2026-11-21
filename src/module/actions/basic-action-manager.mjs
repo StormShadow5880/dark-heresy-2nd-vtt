@@ -1,4 +1,5 @@
 import { bindHealingMessage } from './healing-manager.mjs';
+import { bindRestMessage } from './time-runner.mjs';
 import { bindDefenceMessage, refreshAnsweredRequest } from './combat-resolution-manager.mjs';
 import { refundAmmo } from '../rules/ammo.mjs';
 import { uuid } from '../rolls/roll-helpers.mjs';
@@ -25,6 +26,7 @@ export class BasicActionManager {
                 html.querySelectorAll(selector).forEach((el) => el.addEventListener('click', async (ev) => await handler(ev)));
             bindDefenceMessage(message, html);
             bindHealingMessage(message, html);
+            bindRestMessage(message, html);
             bind('.roll-control__hide-control', (ev) => this._toggleExpandChatMessage(ev));
             bind('.roll-control__refund', (ev) => this._refundResources(ev));
             bind('.roll-control__fate-reroll', (ev) => this._fateReroll(ev));

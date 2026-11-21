@@ -45,6 +45,7 @@ import { aptitudesLocked, isCreatorGranted } from './rules/aptitude-lock.mjs';
 import { applyRulebookStyles, ensureImportMacro, importRulebookPages } from './tools/rulebook-import.mjs';
 import { registerCombatSocket } from './actions/combat-resolution-manager.mjs';
 import { initWorldClock } from './ui/world-clock.mjs';
+import { initTimeRunner, registerTimeSocket } from './actions/time-runner.mjs';
 import { registerHealingSocket, registerHealingLockSocket } from './actions/healing-manager.mjs';
 import { CharacterCreator } from './creator/wizard.mjs';
 import { preloadDossierImages } from './ui/preload-images.mjs';
@@ -157,6 +158,8 @@ Enable Debug with: game.dh.debug = true
         registerCombatSocket();
         registerHealingSocket();
         registerHealingLockSocket();
+        registerTimeSocket();
+        initTimeRunner();
         initWorldClock();
         applyRulebookStyles();
         ensureImportMacro().catch((e) => console.warn('Dark Heresy 2e | macro could not be created', e));
