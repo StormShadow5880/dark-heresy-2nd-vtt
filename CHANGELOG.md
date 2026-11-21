@@ -91,6 +91,7 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
   rulebook description once it is entered in `src/module/rules/skill-descriptions.mjs` - the system data has none yet).
 - Combat tab: one slim line (28 px) per equipped weapon with icon buttons (details in the tooltip), armour as six small tiles plus the worn armour as list entries.
 - Overview rebuilt after the supplied layout: characteristics row, Status (wounds, fatigue, fate, corruption, insanity with −/+) next to Combat Reference, Key Skills next to Equipped Weapons (table), Active Effects & Conditions (including sustained powers), and a Quick Info column (influence, aptitudes, key talents, traits, bonuses; pencil buttons open the matching tab).
+- Portrait in the sheet header: plain square picture without the ornamental shield, larger.
 - *Personal File* moved from the Overview to the Biography tab.
 
 - Fixed the window header buttons (configure, controls, close) of the character sheet that showed empty boxes: a font rule for all buttons also hit them and replaced the Font Awesome icon font.
