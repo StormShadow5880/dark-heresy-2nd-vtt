@@ -248,3 +248,16 @@ test('spent XP sums: no NaN with missing psy cost, text values or items without 
     );
     assert.deepEqual(sums, { spentCharacteristics: 350, spentSkills: 300, spentTalents: 300, spentPsychicPowers: 400, calculatedTotal: 1350 });
 });
+
+test('aptitudes are fixed after creation: only a GM may edit a character that was not made with the wizard', async () => {
+    const { aptitudesLocked, isCreatorGranted } = await import('../src/module/rules/aptitude-lock.mjs');
+    const actor = (creator) => ({ getFlag: (scope, key) => (key === 'creator' ? creator : undefined) });
+    game.user.isGM = false;
+    assert.equal(aptitudesLocked(actor(undefined)), true);
+    game.user.isGM = true;
+    assert.equal(aptitudesLocked(actor(undefined)), false); // old character, GM
+    assert.equal(aptitudesLocked(actor({ version: 1 })), true); // made with the wizard: fixed, even for the GM
+    game.user.isGM = false;
+    assert.equal(isCreatorGranted({ flags: { 'dark-heresy-2nd': { creatorGranted: true } } }), true);
+    assert.equal(isCreatorGranted({}), false);
+});

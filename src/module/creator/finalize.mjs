@@ -88,7 +88,10 @@ export async function buildCharacterData(draft, env, resolve) {
 
     for (const apt of state.aptitudes) {
         const found = await resolve('aptitude', apt.name);
-        add(found ? { ...clean(found), name: apt.name } : { name: apt.name, type: 'aptitude', system: {} });
+        const data = found ? { ...clean(found), name: apt.name } : { name: apt.name, type: 'aptitude', system: {} };
+        // fixed after creation: the lock (rules/aptitude-lock.mjs) lets only these items through
+        data.flags = { ...(data.flags ?? {}), [SYSTEM_ID]: { creatorGranted: true } };
+        add(data);
     }
     for (const t of state.talents) {
         const baseName = t.name.replace(/\s*\(.*\)\s*$/, '');

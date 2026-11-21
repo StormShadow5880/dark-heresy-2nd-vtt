@@ -54,13 +54,13 @@
 
             <article class="panel">
                 <h2 class="panel__title">Aptitudes
-                    <button type="button" class="icon-btn item-create" data-type="aptitude" data-tooltip="New aptitude"><i class="fa-solid fa-plus"></i></button>
+                    {{#unless aptitudesLocked}}<button type="button" class="icon-btn item-create" data-type="aptitude" data-tooltip="New aptitude"><i class="fa-solid fa-plus"></i></button>{{else}}<span class="panel__hint" data-tooltip="Aptitudes are fixed after character creation"><i class="fa-solid fa-lock"></i> fixed</span>{{/unless}}
                 </h2>
                 <div class="chips chips--static">
                     {{#each dossier.aptitudes as |a|}}
-                        <span class="chip item-drag" data-item-id="{{a.id}}">
-                            <span class="item-edit" data-item-id="{{a.id}}" role="button" tabindex="0">{{a.name}}</span>
-                            <button type="button" class="chip__x item-delete" data-item-id="{{a.id}}" aria-label="Remove {{a.name}}">×</button>
+                        <span class="chip" data-item-id="{{a.id}}">
+                            <span>{{a.name}}</span>
+                            {{#unless @root.aptitudesLocked}}<button type="button" class="chip__x item-delete" data-item-id="{{a.id}}" aria-label="Remove {{a.name}}">×</button>{{/unless}}
                         </span>
                     {{else}}
                         <span class="empty">No aptitudes.</span>
@@ -70,11 +70,17 @@
 
             <article class="panel">
                 <h2 class="panel__title">Origin Bonuses</h2>
-                <ul class="rows">
+                <ul class="rows rows--detail">
                     {{#each dossier.abilities as |ab|}}
                         <li>
-                            <span class="grow">{{ab.name}} <small>{{ab.source}}</small></span>
-                            <button type="button" class="icon-btn bonus-vocalize" data-bonus-name="{{ab.name}}" data-tooltip="Show in chat"><i class="fa-solid fa-comment"></i></button>
+                            <details>
+                                <summary>
+                                    <span class="grow">{{ab.name}}</span>
+                                    <span class="pill">{{ab.source}}</span>
+                                    <button type="button" class="icon-btn bonus-vocalize" data-bonus-name="{{ab.name}}" data-tooltip="Show in chat"><i class="fa-solid fa-comment"></i></button>
+                                </summary>
+                                <div class="detail prose">{{#if ab.benefit}}{{ab.benefit}}{{else}}No description.{{/if}}</div>
+                            </details>
                         </li>
                     {{else}}
                         <li class="empty">Select home world, background, role and divination in the header.</li>

@@ -85,6 +85,13 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
 - Not included yet: automatic prices for psychic powers; machine-checking of talent prerequisites (they are free
   text in the data and are shown for confirmation).
 
+- **Aptitudes are fixed after character creation**: no add / remove buttons on the sheets, and a hook refuses to add or delete aptitude items by hand
+  (only items from the wizard pass). A GM may still edit the aptitudes of an old character that was not made with the wizard.
+- Origin Bonuses unfold on click like talents; the skills of the Skills tab unfold on click (characteristic, aptitudes, next advance with price, and the
+  rulebook description once it is entered in `src/module/rules/skill-descriptions.mjs` - the system data has none yet).
+- Combat tab: one slim line (28 px) per equipped weapon with icon buttons (details in the tooltip), armour as six small tiles plus the worn armour as list entries.
+- *Personal File* moved from the Overview to the Biography tab.
+
 ### Psychic powers
 - Power list: the hourglass is only an indicator for a running power (not clickable). A running power cannot be
   manifested again (Manifest greyed out); ending it is done under Sustained Powers.

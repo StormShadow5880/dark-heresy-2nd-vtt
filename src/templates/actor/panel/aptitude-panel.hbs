@@ -4,9 +4,9 @@
         <div class="table-row--head">
             <div class="table-cell--span2">Name</div>
             <div class="table-cell--last">
-                <label class="dh-control-button item-create" data-type="aptitude">
+                {{#unless aptitudesLocked}}<label class="dh-control-button item-create" data-type="aptitude">
                     <span class="dh-control-button__span material-icons">{{defaultVal icon "add_circle"}}</span>
-                </label>
+                </label>{{/unless}}
             </div>
         </div>
         {{#each actor.items as |item|}}
@@ -20,11 +20,13 @@
                     <div class="table-cell">
                         <span class="table-cell--description">{{item.name}}</span>
                     </div>
+                    {{#unless @root.aptitudesLocked}}
                     <div class="table-cell">
                         <label class="dh-control-button item-delete" data-item-id="{{item.id}}">
                             <span class="dh-control-button__span material-icons">{{defaultVal icon "delete"}}</span>
                         </label>
                     </div>
+                    {{/unless}}
                 </div>
             {{/if}}
         {{/each}}

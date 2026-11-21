@@ -80,19 +80,6 @@
                 </article>
             {{/if}}
 
-            <article class="note">
-                <i class="note__pin" aria-hidden="true"></i>
-                <h2 class="note__title">Personal File</h2>
-                <div class="note__grid">
-                    <label><span>Gender</span><input type="text" name="system.bio.gender" value="{{actor.system.bio.gender}}" /></label>
-                    <label><span>Age</span><input type="text" name="system.bio.age" value="{{actor.system.bio.age}}" /></label>
-                    <label><span>Build</span><input type="text" name="system.bio.build" value="{{actor.system.bio.build}}" /></label>
-                    <label><span>Complexion</span><input type="text" name="system.bio.complexion" value="{{actor.system.bio.complexion}}" /></label>
-                    <label><span>Hair</span><input type="text" name="system.bio.hair" value="{{actor.system.bio.hair}}" /></label>
-                    <label><span>Size</span>
-                        <select name="system.size" data-dtype="Number">{{selectOptions dossier.sizeOptions selected=actor.system.size}}</select></label>
-                </div>
-            </article>
         </div>
     </div>
 </section>

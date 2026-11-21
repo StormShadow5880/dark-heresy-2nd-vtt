@@ -4,7 +4,8 @@
  * rules are not re-implemented in the templates.
  */
 import { SYSTEM_ID } from '../../system-id.mjs';
-import { buildQuotes, describeQuote } from '../../rules/advancement.mjs';
+import { SKILL_DESCRIPTIONS } from '../../rules/skill-descriptions.mjs';
+import { buildQuotes, describeQuote, skillQuote } from '../../rules/advancement.mjs';
 import { woundBar } from '../../rules/wounds.mjs';
 import { canSustain, describeEffects, effectLine, hasEffect } from '../../rules/psychic-effects.mjs';
 
@@ -173,6 +174,19 @@ export function buildResources(actor) {
 /**
  * Flat list of all basic skills and all "taken" specialities.
  */
+/** Facts for the fold-out of a skill: aptitudes, next advance with its price, description if the data has one */
+function skillDetail(actor, skillKey, specKey) {
+    const q = skillQuote(actor, skillKey, specKey);
+    return {
+        specialist: !!actor.skills[skillKey]?.isSpecialist,
+        aptitudes: q.required.join(' + '),
+        matches: q.matches,
+        next: q.maxed ? 'Maximum' : q.advanceable ? `${q.fromName} → ${q.toName}` : '',
+        cost: q.maxed || !q.advanceable ? null : q.cost,
+        description: SKILL_DESCRIPTIONS[skillKey] ?? '',
+    };
+}
+
 export function buildSkills(actor) {
     const favorites = getFavoriteSkills(actor);
     const charIndex = (short) => CHARACTERISTIC_ORDER.findIndex((k) => actor.characteristics[k]?.short === short);
@@ -199,6 +213,7 @@ export function buildSkills(actor) {
             charPath: specKey ? null : `${basePath}.characteristic`,
             characteristicOptions: skill.characteristics ?? [],
             cost: skill.cost,
+            detail: skillDetail(actor, skillKey, specKey),
         };
     };
 
@@ -289,6 +304,22 @@ export function buildArmour(actor) {
             total: zone.total,
         };
     });
+}
+
+/** Worn armour as list entries: name and the armour points per body part */
+export function buildEquippedArmour(actor) {
+    return actor.items
+        .filter((item) => item.type === 'armour' && item.equipped && !item.isNestedItem?.())
+        .map((item) => {
+            const ap = item.system.armourPoints ?? {};
+            const parts = ARMOUR_ZONES.map(([key, label]) => ({ label, value: toNumber(ap[key]) })).filter((p) => p.value > 0);
+            return {
+                id: item.id,
+                name: item.name,
+                img: item.img,
+                summary: parts.map((p) => `${p.label} ${p.value}`).join(' · ') || 'no armour points',
+            };
+        });
 }
 
 export function buildGear(actor) {

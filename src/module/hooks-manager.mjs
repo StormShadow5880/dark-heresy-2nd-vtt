@@ -41,6 +41,7 @@ import * as documents from './documents/_module.mjs'
 
 import { SYSTEM_ID } from './system-id.mjs';
 import { onPsychicEffectRemoved, onPsychicPowerDeleted, refreshPsychicEffects } from './actions/psychic-effect-manager.mjs';
+import { aptitudesLocked, isCreatorGranted } from './rules/aptitude-lock.mjs';
 import { CharacterCreator } from './creator/wizard.mjs';
 import { preloadDossierImages } from './ui/preload-images.mjs';
 import { registerWoundsSyncHooks, syncAllWounds } from './actions/wounds-sync.mjs';
@@ -55,6 +56,8 @@ export class HooksManager {
         Hooks.on('hotbarDrop', HooksManager.hotbarDrop);
         Hooks.on('deleteActiveEffect', HooksManager.deleteActiveEffect);
         Hooks.on('deleteItem', HooksManager.deleteItem);
+        Hooks.on('preCreateItem', HooksManager.preCreateItem);
+        Hooks.on('preDeleteItem', HooksManager.preDeleteItem);
         Hooks.on('renderActorDirectory', HooksManager.renderActorDirectory);
         Hooks.on('updateActor', HooksManager.updateActor);
         registerWoundsSyncHooks();
@@ -174,6 +177,20 @@ Enable Debug with: game.dh.debug = true
         button.addEventListener('click', () => CharacterCreator.open());
         const header = root.querySelector('.directory-header .header-actions') ?? root.querySelector('.directory-header') ?? root.querySelector('header');
         header?.append(button);
+    }
+
+    /** Aptitudes are fixed after character creation (see rules/aptitude-lock.mjs) */
+    static preCreateItem(item, data) {
+        if (item.type !== 'aptitude' || !item.parent?.getFlag || isCreatorGranted(data)) return;
+        if (!aptitudesLocked(item.parent)) return;
+        ui.notifications.warn('Aptitudes are fixed after character creation and can not be added by hand.');
+        return false;
+    }
+
+    static preDeleteItem(item) {
+        if (item.type !== 'aptitude' || !item.parent?.getFlag || !aptitudesLocked(item.parent)) return;
+        ui.notifications.warn('Aptitudes are fixed after character creation and can not be removed by hand.');
+        return false;
     }
 
     static async deleteItem(item, options, userId) {

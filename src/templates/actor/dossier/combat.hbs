@@ -3,37 +3,31 @@
         <h2 class="panel__title">Equipped Weapons
             <button type="button" class="icon-btn item-create" data-type="weapon" data-tooltip="New weapon"><i class="fa-solid fa-plus"></i></button>
         </h2>
-        <div class="weapon-cards">
+        <ul class="wlist">
             {{#each dossier.weapons as |w|}}
                 {{#if w.equipped}}
-                    <div class="weapon item-drag" data-item-id="{{w.id}}" data-item-type="weapon">
-                        <div class="weapon__head">
-                            <span class="weapon__name">{{w.name}}</span>
-                            <span class="weapon__class">{{w.class}}{{#if w.type}} · {{w.type}}{{/if}}</span>
-                            <button type="button" class="icon-btn item-edit" data-item-id="{{w.id}}" data-tooltip="Edit"><i class="fa-solid fa-pen"></i></button>
-                            <button type="button" class="icon-btn on" data-action="toggleEquipped" data-item-id="{{w.id}}" data-tooltip="Unequip" aria-pressed="true"><i class="fa-solid fa-hand-fist"></i></button>
-                        </div>
-                        <dl class="weapon__stats">
-                            <div><dt>Damage</dt><dd>{{w.damage}} <small>{{w.damageType}}</small></dd></div>
-                            <div><dt>Pen</dt><dd>{{w.penetration}}</dd></div>
-                            <div><dt>Range</dt><dd>{{w.range}}</dd></div>
-                            <div><dt>RoF</dt><dd>{{w.rateOfFire}}</dd></div>
-                            <div><dt>Clip</dt><dd>{{#if w.usesAmmo}}{{w.clipValue}}/{{w.clipMax}}{{else}}—{{/if}}</dd></div>
-                            {{#if w.usesAmmo}}<div><dt>Reload</dt><dd>{{w.reload}}</dd></div>{{/if}}
-                        </dl>
-                        {{#if w.specials.length}}<div class="weapon__specials">{{#each w.specials as |sp|}}<span class="pill">{{sp}}</span>{{/each}}</div>{{/if}}
-                        <div class="weapon__actions">
-                            <button type="button" class="btn btn--primary item-roll" data-item-id="{{w.id}}"><i class="fa-solid fa-crosshairs"></i> Attack</button>
-                            <button type="button" class="btn item-damage" data-item-id="{{w.id}}"><i class="fa-solid fa-burst"></i> Damage</button>
-                            {{#if w.usesAmmo}}<button type="button" class="btn" data-action="reloadWeapon" data-item-id="{{w.id}}"><i class="fa-solid fa-rotate"></i> Reload</button>{{/if}}
-                        </div>
-                    </div>
+                    <li class="wrow item-drag" data-item-id="{{w.id}}" data-item-type="weapon" data-tooltip="{{w.name}} · {{w.class}}{{#if w.type}} · {{w.type}}{{/if}} · {{w.damage}} {{w.damageType}} · pen {{w.penetration}} · range {{w.range}} · RoF {{w.rateOfFire}}{{#if w.usesAmmo}} · clip {{w.clipValue}}/{{w.clipMax}} · reload {{w.reload}}{{/if}}{{#if w.specials.length}} · {{#each w.specials as |sp|}}{{sp}}{{#unless @last}}, {{/unless}}{{/each}}{{/if}}">
+                        <span class="wrow__name">{{w.name}}</span>
+                        <span class="wrow__stats">
+                            <span><small>Dmg</small> {{w.damage}} {{w.damageType}}</span>
+                            <span><small>Pen</small> {{w.penetration}}</span>
+                            <span><small>Rng</small> {{w.range}}</span>
+                            <span><small>RoF</small> {{w.rateOfFire}}</span>
+                            {{#if w.usesAmmo}}<span><small>Clip</small> {{w.clipValue}}/{{w.clipMax}}</span>{{/if}}
+                            {{#if w.specials.length}}<span class="wrow__sp">{{#each w.specials as |sp|}}{{sp}}{{#unless @last}}, {{/unless}}{{/each}}</span>{{/if}}
+                        </span>
+                        <button type="button" class="icon-btn icon-btn--act item-roll" data-item-id="{{w.id}}" data-tooltip="Attack"><i class="fa-solid fa-crosshairs"></i></button>
+                        <button type="button" class="icon-btn icon-btn--act item-damage" data-item-id="{{w.id}}" data-tooltip="Damage"><i class="fa-solid fa-burst"></i></button>
+                        {{#if w.usesAmmo}}<button type="button" class="icon-btn" data-action="reloadWeapon" data-item-id="{{w.id}}" data-tooltip="Reload ({{w.reload}})"><i class="fa-solid fa-rotate"></i></button>{{/if}}
+                        <button type="button" class="icon-btn on" data-action="toggleEquipped" data-item-id="{{w.id}}" data-tooltip="Unequip" aria-pressed="true"><i class="fa-solid fa-hand-fist"></i></button>
+                        <button type="button" class="icon-btn item-edit" data-item-id="{{w.id}}" data-tooltip="Edit"><i class="fa-solid fa-pen"></i></button>
+                    </li>
                 {{/if}}
             {{/each}}
             {{#unless dossier.hasEquippedWeapon}}
-                <p class="empty">No weapon equipped. Equip a weapon from the list below or from the Gear tab.</p>
+                <li class="empty">No weapon equipped. Equip a weapon from the list below or from the Gear tab.</li>
             {{/unless}}
-        </div>
+        </ul>
     </article>
 
     <div class="combat-layout">
@@ -62,15 +56,25 @@
 
         <article class="panel panel--armour">
             <h2 class="panel__title">Armour <span class="panel__hint">Total = armour + toughness bonus + trait</span></h2>
-            <div class="armour-figure">
+            <div class="armour-strip">
                 {{#each dossier.armour as |z|}}
-                    <div class="zone zone--{{z.key}}" data-tooltip="{{z.label}}: armour {{z.armour}} + toughness bonus {{z.toughnessBonus}}{{#if z.traitBonus}} + trait {{z.traitBonus}}{{/if}}">
-                        <span class="zone__label">{{z.label}}</span>
-                        <span class="zone__total">{{z.total}}</span>
-                        <span class="zone__parts">AP {{z.armour}} · TB {{z.toughnessBonus}}{{#if z.traitBonus}} · Tr {{z.traitBonus}}{{/if}}</span>
+                    <div class="azone azone--{{z.key}}" data-tooltip="{{z.label}}: armour {{z.armour}} + toughness bonus {{z.toughnessBonus}}{{#if z.traitBonus}} + trait {{z.traitBonus}}{{/if}}">
+                        <small>{{z.label}}</small><b>{{z.total}}</b>
                     </div>
                 {{/each}}
             </div>
+            <ul class="rows rows--compact">
+                {{#each dossier.equippedArmour as |a|}}
+                    <li class="item-drag" data-item-id="{{a.id}}">
+                        <img src="{{a.img}}" alt="" />
+                        <span class="grow">{{a.name}} <small>{{a.summary}}</small></span>
+                        <button type="button" class="icon-btn on" data-action="toggleEquipped" data-item-id="{{a.id}}" data-tooltip="Take off" aria-pressed="true"><i class="fa-solid fa-shield-halved"></i></button>
+                        <button type="button" class="icon-btn item-edit" data-item-id="{{a.id}}" data-tooltip="Edit"><i class="fa-solid fa-pen"></i></button>
+                    </li>
+                {{else}}
+                    <li class="empty">No armour worn. Equip armour on the Gear tab.</li>
+                {{/each}}
+            </ul>
         </article>
     </div>
 

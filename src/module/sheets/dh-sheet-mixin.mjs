@@ -1,3 +1,4 @@
+import { aptitudesLocked } from '../rules/aptitude-lock.mjs';
 import { markTooltips } from '../ui/tooltips.mjs';
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
@@ -59,6 +60,7 @@ export function DHSheetMixin(Base) {
             context.system = this.document.system;
             context.flags = this.document.flags;
             // Stored values for form fields: document.system already contains Active Effects, saving those would make them permanent
+            context.aptitudesLocked = this.document.documentName === 'Actor' ? aptitudesLocked(this.document) : false;
             context.storedCharacteristics = this.document._source?.system?.characteristics ?? {};
             context.effects = this.document.effects.contents;
             return context;

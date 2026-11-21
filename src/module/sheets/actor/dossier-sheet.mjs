@@ -8,6 +8,7 @@ import {
     buildDevelopment,
     buildGear,
     buildProgression,
+    buildEquippedArmour,
     buildPsychic,
     buildQuickSkills,
     enrichPowerDescriptions,
@@ -57,6 +58,7 @@ export class AcolyteDossierSheet extends AcolyteSheet {
             adjustDamage: AcolyteDossierSheet.#onAdjustDamage,
             togglePsychicEffect: AcolyteDossierSheet.#onTogglePsychicEffect,
             togglePowerDetail: AcolyteDossierSheet.#onTogglePowerDetail,
+            toggleSkillDetail: AcolyteDossierSheet.#onToggleSkillDetail,
             setCritical: AcolyteDossierSheet.#onSetCritical,
         },
     };
@@ -82,6 +84,8 @@ export class AcolyteDossierSheet extends AcolyteSheet {
     _openCharEdits = new Set();
     /** Psychic powers whose details are expanded (kept across re-renders) */
     _openPowers = new Set();
+    /** Skills whose fold-out is open (kept across re-renders) */
+    _openSkills = new Set();
 
     async _prepareContext(options) {
         const context = await super._prepareContext(options);
@@ -108,6 +112,7 @@ export class AcolyteDossierSheet extends AcolyteSheet {
             psychic: buildPsychic(actor),
             development: buildDevelopment(actor),
             progression: buildProgression(actor),
+            equippedArmour: buildEquippedArmour(actor),
             relations: buildRelations(actor),
             favorites: getFavoriteSkills(actor),
             bioFields: ['homeWorld', 'background', 'role', 'elite', 'divination'].map((key) => ({
@@ -150,6 +155,7 @@ export class AcolyteDossierSheet extends AcolyteSheet {
                 this.render();
             }),
         );
+        this.element.querySelectorAll('.skill-row').forEach((row) => this._setSkillOpen(row, this._openSkills.has(row.querySelector('.skill-toggle')?.dataset.skillId)));
         this.element.querySelectorAll('.pw[data-power]').forEach((row) => this._setPowerOpen(row, this._openPowers.has(row.dataset.power)));
         this.element.querySelectorAll('.char').forEach((tile) => tile.classList.toggle('is-editing', this._openCharEdits.has(tile.dataset.char)));
         // Buttons inside <summary> must not toggle the surrounding <details>
@@ -218,6 +224,21 @@ export class AcolyteDossierSheet extends AcolyteSheet {
         const level = Number(target.dataset.level);
         const current = Number(foundry.utils.getProperty(this.actor, path) ?? 0);
         await this.actor.update({ [path]: current === level ? level - 1 : level });
+    }
+
+    _setSkillOpen(row, open) {
+        row.classList.toggle('is-open', open);
+        row.querySelector('.skill-detail')?.toggleAttribute('hidden', !open);
+        row.querySelector('.skill-toggle')?.setAttribute('aria-expanded', String(open));
+    }
+
+    /** Click on a skill name: show / hide its details (no re-render) */
+    static #onToggleSkillDetail(event, target) {
+        const id = target.dataset.skillId;
+        const open = !this._openSkills.has(id);
+        if (open) this._openSkills.add(id);
+        else this._openSkills.delete(id);
+        this._setSkillOpen(target.closest('.skill-row'), open);
     }
 
     _setPowerOpen(row, open) {

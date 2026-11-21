@@ -1358,7 +1358,10 @@
     }
 
 
-    // ------------------------------------------------ Personal file: handwritten note on parchment
+    // ------------------------------------------------ Personal file: handwritten note on parchment (Biography tab, full width)
+    .dossier-tab[data-tab='bio'] .note {
+        grid-column: 1 / -1;
+    }
     .note {
         --ink: #e6d7b4;
         --ink-label: #c9ae78;
@@ -1531,6 +1534,58 @@
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
+            }
+            .skill-toggle {
+                height: auto;
+                padding: 0;
+                background: none;
+                border: 0;
+                color: inherit;
+                text-align: left;
+                cursor: pointer;
+                > i {
+                    width: 12px;
+                    font-size: 0.65rem;
+                    color: var(--ds-gold);
+                    transition: transform 0.12s;
+                }
+                &:hover {
+                    color: #fff;
+                    text-decoration: underline;
+                }
+            }
+            &.is-open .skill-toggle > i {
+                transform: rotate(90deg);
+            }
+            .skill-detail {
+                grid-column: 1 / -1;
+                padding: 2px 8px 6px 38px;
+                &[hidden] {
+                    display: none;
+                }
+            }
+            .skill-facts {
+                margin: 0 0 4px;
+                display: grid;
+                gap: 1px;
+                > div {
+                    display: flex;
+                    gap: 10px;
+                }
+                dt {
+                    min-width: 96px;
+                    font-size: 0.7rem;
+                    text-transform: uppercase;
+                    letter-spacing: 0.06em;
+                    color: var(--ds-muted);
+                }
+                dd {
+                    margin: 0;
+                }
+            }
+            .empty-note {
+                color: var(--ds-muted);
+                font-style: italic;
             }
             &.is-trained {
                 box-shadow: inset 3px 0 0 var(--ds-gold);
@@ -1802,7 +1857,103 @@
         font-size: 1.2rem;
     }
 
-    // ------------------------------------------------ Combat: functional first
+    // ------------------------------------------------ Combat: one slim line per weapon
+    .wlist {
+        list-style: none;
+        margin: 0;
+        padding: 4px 8px 6px;
+        display: grid;
+        gap: 2px;
+    }
+    .wrow {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        height: 28px;
+        padding: 0 4px 0 8px;
+        background: linear-gradient(180deg, #232320, #171716);
+        border: 1px solid var(--ds-line);
+        border-left: 3px solid var(--ds-oxblood);
+        &__name {
+            flex: none;
+            max-width: 26%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-family: var(--ds-font-title);
+            font-size: 1rem;
+            color: #f3ead2;
+        }
+        &__stats {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            gap: 12px;
+            overflow: hidden;
+            white-space: nowrap;
+            font-size: 0.8rem;
+            color: #fff;
+            small {
+                margin-right: 3px;
+                font-size: 0.6rem;
+                text-transform: uppercase;
+                letter-spacing: 0.08em;
+                color: var(--ds-muted);
+            }
+        }
+        &__sp {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--ds-muted);
+            font-size: 0.74rem;
+        }
+        .icon-btn {
+            width: 24px;
+            height: 22px;
+            flex: none;
+            &--act {
+                color: var(--ds-gold);
+            }
+        }
+    }
+    // Armour: six small tiles and the worn armour as list entries
+    .armour-strip {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 3px;
+        padding: 6px 8px 4px;
+    }
+    .panel--armour .rows .grow {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .azone {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 26px;
+        padding: 0 8px;
+        background: rgba(10, 10, 9, 0.7);
+        border: 1px solid var(--ds-line);
+        small {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--ds-muted);
+        }
+        b {
+            font-family: var(--ds-font-title);
+            font-size: 1.1rem;
+            color: #fff;
+        }
+        &--body {
+            border-top: 2px solid var(--ds-gold);
+        }
+    }
+
+    // ------------------------------------------------ Combat (older card styles, no longer used by the combat tab)
     .weapon-cards {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
