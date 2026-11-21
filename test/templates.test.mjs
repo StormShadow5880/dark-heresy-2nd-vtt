@@ -166,3 +166,35 @@ test('attack automation chat cards render their data', () => {
     assert.match(evaded, /Parry succeeded/);
     assert.match(evaded, /no damage/);
 });
+
+test('barrage / storm chat cards', () => {
+    const request = hbs.compile(fs.readFileSync(path.join(ROOT, 'chat/spread-request-chat.hbs'), 'utf8'))({
+        attackType: 'Psychic Barrage', powerName: 'Mind Lash', attackerName: 'Voss', targetName: 'Cultist', hitCount: 3, extraHits: 2, manyExtra: true, range: 2,
+    });
+    assert.match(request, /Choose 2 targets/);
+    assert.match(request, /within 2 metres/);
+    assert.match(request, /dh-spread__choose/);
+    const result = hbs.compile(fs.readFileSync(path.join(ROOT, 'chat/spread-result-chat.hbs'), 'utf8'))({
+        attackType: 'Psychic Storm', powerName: 'X',
+        groups: [{ targetName: 'A', count: 1, many: false }, { targetName: 'B', count: 2, many: true, targetUuid: 'Actor.b', hits: [{ location: 'Body', totalDamage: 7, damageType: 'Energy' }] }],
+    });
+    assert.match(result, /<b>A<\/b>: 1 hit – answers in the chat/);
+    assert.match(result, /<b>B<\/b>: 2 hits/);
+    assert.match(result, /roll-control__assign-damage/);
+});
+
+test('blast chat cards', () => {
+    const request = hbs.compile(fs.readFileSync(path.join(ROOT, 'chat/blast-request-chat.hbs'), 'utf8'))({ powerName: 'Flame', attackerName: 'Voss', targetName: 'Cultist', radius: 4 });
+    assert.match(request, /\(4 m\)/);
+    assert.match(request, /dh-blast__choose/);
+    const result = hbs.compile(fs.readFileSync(path.join(ROOT, 'chat/blast-result-chat.hbs'), 'utf8'))({
+        powerName: 'Flame', radius: 4, count: 2, many: true, targets: [{ name: 'A', distance: 0 }, { name: 'B', distance: 3 }], hit: { totalDamage: 12, damageType: 'Energy', totalPenetration: 2 },
+    });
+    assert.match(result, /2 targets in 4 m/);
+    assert.match(result, /<b>B<\/b> · 3 m from the centre/);
+    assert.match(result, /dh-blast__apply/);
+    const damage = hbs.compile(fs.readFileSync(path.join(ROOT, 'chat/blast-damage-chat.hbs'), 'utf8'))({
+        powerName: 'Flame', targets: [{ name: 'A', damage: 5, critical: 1, wounds: 3, maxWounds: 12, hit: { rawDamage: 12, damageType: 'Energy', usableArmour: 2, toughnessBonus: 3 } }],
+    });
+    assert.match(damage, /12 Energy − armour 2 − TB 3 = <b>5<\/b> wounds/);
+});

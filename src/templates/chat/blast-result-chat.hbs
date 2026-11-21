@@ -1,0 +1,11 @@
+<div class="dh-ui dh-card dh-card--ornate dh-blast-result">
+    <div class="dh-card__eyebrow">Psychic Blast · {{powerName}}</div>
+    <h2 class="dh-card__name">{{count}} target{{#if many}}s{{/if}} in {{radius}} m</h2>
+    <div class="dh-rule"></div>
+    {{#each targets as |t|}}<p class="dh-detail-line"><b>{{t.name}}</b> · {{t.distance}} m from the centre</p>{{/each}}
+    <p class="dh-note">Each target takes {{hit.totalDamage}} {{hit.damageType}} (penetration {{hit.totalPenetration}}), armour and toughness bonus are subtracted per target. Dodging a blast is not automated yet.</p>
+    <footer class="dh-card__foot dh-card__foot--center dh-blast__applybox">
+        <button type="button" class="dh-btn dh-btn--primary dh-blast__apply"><i class="fa-solid fa-burst"></i><span>Apply damage to all</span></button>
+    </footer>
+    <p class="dh-detail-line dh-blast__applytext"></p>
+</div>

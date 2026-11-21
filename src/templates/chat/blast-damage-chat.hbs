@@ -1,0 +1,9 @@
+<div class="dh-ui dh-card dh-card--ornate dh-card--fail">
+    <div class="dh-card__eyebrow">Psychic Blast · {{powerName}}</div>
+    <h2 class="dh-card__name">Damage</h2>
+    <div class="dh-rule"></div>
+    {{#each targets as |t|}}
+        <p class="dh-detail-line"><b>{{t.name}}</b>: {{t.hit.rawDamage}} {{t.hit.damageType}} − armour {{t.hit.usableArmour}} − TB {{t.hit.toughnessBonus}} = <b>{{t.damage}}</b> wounds{{#if t.critical}} <span class="warn">(+{{t.critical}} critical)</span>{{/if}} · {{t.wounds}} / {{t.maxWounds}}</p>
+        {{#if t.criticalEffect}}<p class="dh-note dh-note--alert">{{t.criticalEffect}}</p>{{/if}}
+    {{/each}}
+</div>

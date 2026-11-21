@@ -96,8 +96,12 @@ export async function applyHits(actor, hits) {
  *  - weapon attacks
  *  - Psychic Bolt: "can be dodged as if it were any other ranged attack. A successful Dodge test is sufficient to avoid a normal
  *    Psychic Bolt" (core rulebook, Psychic Powers)
- * Psychic Barrage / Storm / Blast follow the rules for dodging auto-fire and area effect attacks (rulebook page 220), which are not
- * in the system data yet: they are not automated and stay with the manual hit buttons.
+ *  - Psychic Barrage and Storm: the first hit strikes the chosen target, further hits may strike it or other targets within two
+ *    metres (`spread`). A target that receives ONE hit answers it like a bolt (dodge); several hits on one target follow the
+ *    auto-fire dodging rules (rulebook page 220), not in the system data yet: those stay with the manual hit buttons.
+ *  - Psychic Blast: aimed at one target, everyone within the blast radius around it is hit (`blast`). The radius is the power's
+ *    `special.blast` (e.g. "@pr"); the affected tokens are listed and can be checked before the damage is applied. Dodging a blast
+ *    follows the area effect rules (page 220), not in the system data yet.
  * @param attackItem a weapon or psychic power item
  * @returns {{automated: boolean, ranged: boolean, melee: boolean, reason?: string}}
  */
@@ -106,10 +110,42 @@ export function automatedAttack(attackItem) {
     if (attackItem.type === 'weapon') return { automated: true, melee: !!attackItem.isMelee, ranged: !attackItem.isMelee };
     if (attackItem.type === 'psychicPower') {
         const type = String(attackItem.system?.attackType ?? '').toLowerCase();
-        const bolt = type === 'psychic bolt' || type === 'psychic-bolt';
-        return bolt
-            ? { automated: true, melee: false, ranged: true }
-            : { automated: false, melee: false, ranged: true, reason: `${attackItem.system?.attackType || 'This power'}: the rules for dodging it are not automated yet.` };
+        if (type === 'psychic bolt' || type === 'psychic-bolt') return { automated: true, melee: false, ranged: true };
+        // Barrage and Storm: further hits may strike other targets near the first one (see SPREAD_RANGE)
+        if (type === 'psychic barrage' || type === 'psychic storm') return { automated: true, melee: false, ranged: true, spread: true };
+        // Blast: aimed at one target, everyone in the radius around it is hit (the area is checked in the chat)
+        if (type === 'psychic blast') return { automated: true, melee: false, ranged: true, blast: true };
+        return { automated: false, melee: false, ranged: true, reason: `${attackItem.system?.attackType || 'This power'}: the rules for dodging it are not automated yet.` };
     }
     return { automated: false, ranged: false, melee: false };
+}
+
+/** Reach of the further hits of a Psychic Barrage / Storm around the first target, in metres */
+export const SPREAD_RANGE_M = 2;
+
+export const withinSpread = (distance) => Number.isFinite(distance) && distance <= SPREAD_RANGE_M;
+
+/**
+ * Hit number i (0-based) strikes targetIds[i]. The first hit always strikes the first (initial) target.
+ * @returns {{targetId: string, hits: object[]}[]} one entry per target in order of its first hit
+ */
+export function groupHitsByTarget(hits, targetIds) {
+    if (targetIds.length !== hits.length) throw new Error('Every hit needs a target.');
+    const groups = [];
+    hits.forEach((hit, i) => {
+        let group = groups.find((g) => g.targetId === targetIds[i]);
+        if (!group) {
+            group = { targetId: targetIds[i], hits: [] };
+            groups.push(group);
+        }
+        group.hits.push(hit);
+    });
+    return groups;
+}
+
+/** Tokens within the blast radius: [{id, distance}] -> those with distance <= radius, nearest first */
+export function inBlastRadius(tokens, radius) {
+    return tokens
+        .filter((t) => Number.isFinite(t.distance) && t.distance <= radius)
+        .sort((a, b) => a.distance - b.distance);
 }

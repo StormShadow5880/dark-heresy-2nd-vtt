@@ -1,0 +1,20 @@
+<div class="dh-ui dh-card dh-card--ornate">
+    <div class="dh-card__eyebrow">{{attackType}} · {{powerName}}</div>
+    <h2 class="dh-card__name">Targets chosen</h2>
+    <div class="dh-rule"></div>
+    {{#each groups as |g|}}
+        <p class="dh-detail-line"><b>{{g.targetName}}</b>: {{g.count}} hit{{#if g.many}}s{{/if}}{{#unless g.many}} – answers in the chat{{/unless}}</p>
+        {{#if g.many}}
+            <p class="dh-note">Several hits on one target: dodging them is not automated yet, apply them by hand.</p>
+            {{#each g.hits as |hit|}}
+                <div class="dh-card__foot dh-card__foot--center">
+                    <button type="button" class="dh-btn roll-control__assign-damage"
+                            data-location="{{hit.location}}" data-total-damage="{{hit.totalDamage}}" data-total-penetration="{{hit.totalPenetration}}"
+                            data-total-fatigue="{{hit.totalFatigue}}" data-damage-type="{{hit.damageType}}" data-target-uuid="{{g.targetUuid}}">
+                        <i class="fa-solid fa-crosshairs"></i><span>{{hit.location}}: {{hit.totalDamage}} {{hit.damageType}}</span>
+                    </button>
+                </div>
+            {{/each}}
+        {{/if}}
+    {{/each}}
+</div>

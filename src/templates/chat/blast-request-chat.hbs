@@ -1,0 +1,11 @@
+<div class="dh-ui dh-card dh-card--ornate dh-blast">
+    <div class="dh-card__eyebrow">Psychic Blast</div>
+    <h2 class="dh-card__name">{{powerName}}</h2>
+    <div class="dh-card__sub">{{attackerName}} → {{targetName}}</div>
+    <div class="dh-rule"></div>
+    <p class="dh-note">The blast is centred on {{targetName}}. Everyone within the radius{{#if radius}} ({{radius}} m){{/if}} is hit. Check who is inside before the damage is applied.</p>
+    <footer class="dh-card__foot dh-card__foot--center dh-blast__buttons">
+        <button type="button" class="dh-btn dh-btn--primary dh-blast__choose"><i class="fa-solid fa-bullseye"></i><span>Check area</span></button>
+    </footer>
+    <p class="dh-detail-line dh-blast__text"></p>
+</div>

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { defenceChoices, serializeHit, applyHits } from '../src/module/rules/combat-resolution.mjs';
+import { SPREAD_RANGE_M, defenceChoices, serializeHit, applyHits, groupHitsByTarget, withinSpread, inBlastRadius } from '../src/module/rules/combat-resolution.mjs';
 
 const actor = (over = {}) => {
     const a = {
@@ -87,10 +87,31 @@ test('automated attacks: weapons and Psychic Bolt, the other psychic attacks wai
     const bolt = automatedAttack({ type: 'psychicPower', system: { attackType: 'Psychic Bolt' } });
     assert.deepEqual(bolt, { automated: true, melee: false, ranged: true });
     assert.deepEqual(defenceChoices(actor(), { melee: bolt.melee }).map((c) => c.id), ['dodge', 'none']);
-    for (const type of ['Psychic Barrage', 'Psychic Storm', 'Psychic Blast']) {
-        const r = automatedAttack({ type: 'psychicPower', system: { attackType: type } });
-        assert.equal(r.automated, false);
-        assert.match(r.reason, /not automated yet/);
+    // Barrage and Storm: further hits may strike other targets near the first one
+    for (const type of ['Psychic Barrage', 'Psychic Storm']) {
+        assert.deepEqual(automatedAttack({ type: 'psychicPower', system: { attackType: type } }), { automated: true, melee: false, ranged: true, spread: true });
     }
+    assert.deepEqual(automatedAttack({ type: 'psychicPower', system: { attackType: 'Psychic Blast' } }), { automated: true, melee: false, ranged: true, blast: true });
+    assert.equal(automatedAttack({ type: 'psychicPower', system: { attackType: 'Something else' } }).automated, false);
     assert.equal(automatedAttack(null).automated, false);
+});
+
+test('barrage / storm: the first hit strikes the first target, further hits go to the chosen targets within 2 m', () => {
+    assert.equal(SPREAD_RANGE_M, 2);
+    assert.equal(withinSpread(0), true);
+    assert.equal(withinSpread(2), true);
+    assert.equal(withinSpread(2.1), false);
+    assert.equal(withinSpread(NaN), false);
+    const hits = [{ n: 1 }, { n: 2 }, { n: 3 }, { n: 4 }];
+    const groups = groupHitsByTarget(hits, ['A', 'B', 'A', 'C']);
+    assert.deepEqual(groups.map((g) => [g.targetId, g.hits.map((h) => h.n)]), [['A', [1, 3]], ['B', [2]], ['C', [4]]]);
+    assert.deepEqual(groupHitsByTarget(hits, ['A', 'A', 'A', 'A']).length, 1);
+    assert.throws(() => groupHitsByTarget(hits, ['A', 'B']), /Every hit needs a target/);
+});
+
+test('blast: everyone within the radius is listed, nearest first', () => {
+    const tokens = [{ id: 'far', distance: 7.5 }, { id: 'centre', distance: 0 }, { id: 'edge', distance: 5 }, { id: 'near', distance: 2 }, { id: 'bad', distance: NaN }];
+    assert.deepEqual(inBlastRadius(tokens, 5).map((t) => t.id), ['centre', 'near', 'edge']);
+    assert.deepEqual(inBlastRadius(tokens, 1).map((t) => t.id), ['centre']);
+    assert.deepEqual(inBlastRadius([], 5), []);
 });
