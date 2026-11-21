@@ -20,9 +20,19 @@
         <div class="dh-badge dh-badge--damage" data-tooltip="Wounds taken"><span class="dh-badge__num">{{result.damage}}</span></div>
         <div class="dh-verdict dh-verdict--fail">{{#if result.damage}}wounds{{else}}no wounds{{/if}}</div>
         {{#each result.hits as |h|}}
-            <p class="dh-detail-line">
-                <b>{{h.location}}</b>: {{h.rawDamage}} {{h.damageType}} − armour {{h.usableArmour}} − TB {{h.toughnessBonus}} = {{h.wounds}}{{#if h.critical}} <span class="warn">(+{{h.critical}} critical)</span>{{/if}}{{#if h.fatigue}} · fatigue +{{h.fatigue}}{{/if}}
-            </p>
+            <section class="dh-calc">
+                <h4 class="dh-calc__title">Hit · {{h.location}} <span>{{h.damageType}}</span></h4>
+                <dl>
+                    <div><dt>Damage</dt><dd>{{#if h.damageFormula}}{{h.damageFormula}} → {{h.damageDice}}{{#each h.damageModifiers as |m|}} {{m.text}} <small>{{m.name}}</small>{{/each}} = <b>{{h.rawDamage}}</b>{{else}}<b>{{h.rawDamage}}</b>{{/if}}</dd></div>
+                    <div><dt>Armour</dt><dd>{{h.armour}} − penetration {{h.penetration}}{{#each h.penetrationModifiers as |m|}} <small>({{m.name}} {{m.text}})</small>{{/each}} = <b>{{h.usableArmour}}</b> <small>(not below 0)</small></dd></div>
+                    <div><dt>Toughness bonus</dt><dd><b>{{h.toughnessBonus}}</b></dd></div>
+                    <div><dt>Absorbed</dt><dd>{{h.usableArmour}} + {{h.toughnessBonus}} = <b>{{h.reduction}}</b></dd></div>
+                    <div class="dh-calc__sum"><dt>Damage taken</dt><dd>{{h.rawDamage}} − {{h.reduction}} = <b>{{h.reducedDamage}}</b>{{#if h.critical}} → {{h.wounds}} wounds + <span class="warn">{{h.critical}} critical</span>{{else}} → <b>{{h.wounds}} wounds</b>{{/if}}</dd></div>
+                    {{#if h.trueGrit}}<div><dt>True Grit</dt><dd>critical damage {{h.criticalBeforeGrit}} reduced by the toughness bonus (not below 1) = {{h.critical}}</dd></div>{{/if}}
+                    <div><dt>Wounds</dt><dd>{{h.woundsBefore}} → <b>{{h.woundsAfter}}</b></dd></div>
+                    {{#if h.fatigue}}<div><dt>Fatigue</dt><dd>+{{h.fatigue}}</dd></div>{{/if}}
+                </dl>
+            </section>
             {{#if h.criticalEffect}}<p class="dh-note dh-note--alert">{{h.criticalEffect}}</p>{{/if}}
             {{#each h.fury as |f|}}<p class="dh-note dh-note--alert"><b>Righteous Fury</b> – {{f}}</p>{{/each}}
         {{/each}}

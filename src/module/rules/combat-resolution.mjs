@@ -35,6 +35,14 @@ export function defenceChoices(actor, { melee = false, noDodge = false } = {}) {
     return choices;
 }
 
+/** { 'strength bonus': 3, aim: -10 } -> [{ name, value, text: '+3' }, ...] (zero values are left out) */
+function signed(map) {
+    return Object.entries(map ?? {})
+        .map(([name, value]) => ({ name, value: Number(value) || 0 }))
+        .filter((m) => m.value !== 0)
+        .map((m) => ({ ...m, text: `${m.value > 0 ? '+' : '−'}${Math.abs(m.value)}` }));
+}
+
 /** A hit as it travels in a chat message flag (plain data) */
 export function serializeHit(hit) {
     return {
@@ -44,6 +52,13 @@ export function serializeHit(hit) {
         totalFatigue: Number(hit.totalFatigue) || 0,
         damageType: hit.damageType ?? 'Impact',
         fury: (hit.righteousFury ?? []).map((r) => r.effect).filter(Boolean),
+        // how the damage came about (shown in the result card)
+        damageFormula: hit.damageRoll?.formula ?? null,
+        damageRolled: Number.isFinite(Number(hit.damage)) ? Number(hit.damage) : null,
+        damageDice: hit.damageRoll?.result ?? null,
+        damageModifiers: signed(hit.modifiers),
+        penetrationBase: Number.isFinite(Number(hit.penetration)) ? Number(hit.penetration) : null,
+        penetrationModifiers: signed(hit.penetrationModifiers),
     };
 }
 
@@ -69,6 +84,17 @@ export async function applyHits(actor, hits) {
         results.push({
             location: hit.location,
             damageType: hit.damageType,
+            damageFormula: hit.damageFormula ?? null,
+            damageDice: hit.damageDice ?? null,
+            damageRolled: hit.damageRolled ?? null,
+            damageModifiers: hit.damageModifiers ?? [],
+            penetrationBase: hit.penetrationBase ?? null,
+            penetrationModifiers: hit.penetrationModifiers ?? [],
+            reducedDamage: data.reducedDamage,
+            criticalBeforeGrit: data.criticalBeforeGrit,
+            trueGrit: data.criticalBeforeGrit > data.criticalDamageTaken,
+            woundsBefore: data.woundsBefore,
+            woundsAfter: data.woundsBefore - data.damageTaken,
             rawDamage: hit.totalDamage,
             penetration: hit.totalPenetration,
             armour: data.armour,

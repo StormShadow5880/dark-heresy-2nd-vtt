@@ -157,10 +157,17 @@ test('attack automation chat cards render their data', () => {
     const result = hbs.compile(fs.readFileSync(path.join(ROOT, 'chat/attack-result-chat.hbs'), 'utf8'))({
         attackerName: 'Voss', targetName: 'Cultist', weaponName: 'Lasgun', evaded: false, maxWounds: 12,
         evasion: { label: 'Dodge', roll: 80, target: 45, success: false },
-        result: { damage: 6, critical: 0, wounds: 6, criticalTotal: 0, hits: [{ location: 'Body', rawDamage: 12, damageType: 'Energy', usableArmour: 3, toughnessBonus: 3, wounds: 6, critical: 0, fatigue: 0 }] },
+        result: { damage: 6, critical: 0, wounds: 6, criticalTotal: 0, hits: [{
+            location: 'Body', rawDamage: 12, damageType: 'Energy', damageFormula: '1d10+3', damageDice: '7 + 3', damageModifiers: [{ name: 'strength bonus', value: 2, text: '+2' }],
+            armour: 4, penetration: 1, penetrationModifiers: [], usableArmour: 3, toughnessBonus: 3, reduction: 6, reducedDamage: 6, woundsBefore: 12, woundsAfter: 6, wounds: 6, critical: 0, fatigue: 0,
+        }] },
     });
     assert.match(result, /Dodge failed/);
-    assert.match(result, /12 Energy − armour 3 − TB 3 = 6/);
+    assert.match(result, /1d10\+3 → 7 \+ 3 \+2 <small>strength bonus<\/small> = <b>12<\/b>/);
+    assert.match(result, /4 − penetration 1 = <b>3<\/b>/);
+    assert.match(result, /3 \+ 3 = <b>6<\/b>/);
+    assert.match(result, /12 − 6 = <b>6<\/b> → <b>6 wounds<\/b>/);
+    assert.match(result, /12 → <b>6<\/b>/);
     assert.match(result, /6 \/ 12/);
     const evaded = hbs.compile(fs.readFileSync(path.join(ROOT, 'chat/attack-result-chat.hbs'), 'utf8'))({ targetName: 'X', evaded: true, evasion: { label: 'Parry', roll: 10, target: 40, success: true, degrees: 4 } });
     assert.match(evaded, /Parry succeeded/);

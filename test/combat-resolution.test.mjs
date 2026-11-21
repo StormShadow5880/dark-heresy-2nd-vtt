@@ -33,7 +33,11 @@ test('defences: dodge always, parry only against melee, "take the hit" always', 
 
 test('hits are serialized to plain data', () => {
     const hit = { location: 'Head', totalDamage: '9', totalPenetration: 2, totalFatigue: 0, damageType: 'Energy', righteousFury: [{ effect: 'x' }, {}] };
-    assert.deepEqual(serializeHit(hit), { location: 'Head', totalDamage: 9, totalPenetration: 2, totalFatigue: 0, damageType: 'Energy', fury: ['x'] });
+    const s = serializeHit(hit);
+    assert.deepEqual({ location: s.location, totalDamage: s.totalDamage, totalPenetration: s.totalPenetration, totalFatigue: s.totalFatigue, damageType: s.damageType, fury: s.fury }, { location: 'Head', totalDamage: 9, totalPenetration: 2, totalFatigue: 0, damageType: 'Energy', fury: ['x'] });
+    // no dice information without a roll: nothing is invented
+    assert.equal(s.damageFormula, null);
+    assert.deepEqual(s.damageModifiers, []);
 });
 
 test('a hit is reduced by armour (minus penetration) and toughness bonus, then taken from the wounds', async () => {
@@ -156,4 +160,39 @@ test('distance problems name both tokens and both distances', async () => {
     assert.equal(distanceProblem({ name: 'Cultist', from: 'Brute', distance: 3.46, allowed: 2 }), 'Cultist is 3.5 m away from Brute, but only 2 m are allowed.');
     assert.equal(distanceProblem({ name: 'Cultist', from: 'Voss', distance: 25, allowed: 10 }), 'Cultist is 25 m away from Voss, but only 10 m are allowed.');
     assert.match(distanceProblem({ name: 'A', from: 'B', distance: NaN, allowed: 2 }), /could not be measured/);
+});
+
+test('the damage calculation of every hit is kept for the result card', async () => {
+    const a = actor();
+    const hit = {
+        location: 'Body', totalDamage: 12, totalPenetration: 1, damageType: 'Energy',
+        damageFormula: '1d10+3', damageDice: '7 + 3', damageRolled: 10, damageModifiers: [{ name: 'strength bonus', value: 2, text: '+2' }], penetrationBase: 1, penetrationModifiers: [],
+    };
+    const r = await applyHits(a, [hit]);
+    const h = r.hits[0];
+    assert.equal(h.damageFormula, '1d10+3');
+    assert.equal(h.armour, 4);
+    assert.equal(h.usableArmour, 3); // 4 - 1
+    assert.equal(h.toughnessBonus, 3);
+    assert.equal(h.reduction, 6);
+    assert.equal(h.reducedDamage, 6); // 12 - 6
+    assert.equal(h.woundsBefore, 12);
+    assert.equal(h.woundsAfter, 6);
+    assert.equal(h.trueGrit, false);
+    // serialization keeps the dice and the modifiers (zero modifiers dropped)
+    const s = serializeHit({ location: 'Head', totalDamage: 9, damageRoll: { formula: '1d10+2', result: '5 + 2' }, damage: 7, modifiers: { 'strength bonus': 2, aim: 0, penalty: -1 }, penetration: 2, penetrationModifiers: {} });
+    assert.equal(s.damageFormula, '1d10+2');
+    assert.equal(s.damageDice, '5 + 2');
+    assert.deepEqual(s.damageModifiers.map((m) => m.text), ['+2', '−1']);
+    assert.equal(s.penetrationBase, 2);
+});
+
+test('True Grit reduces the critical damage and says so', async () => {
+    const a = actor();
+    a.hasTalent = (n) => n === 'True Grit';
+    a.system.wounds.value = 1;
+    const r = await applyHits(a, [{ location: 'Body', totalDamage: 20, totalPenetration: 0, damageType: 'Impact' }]); // 20 - 4 - 3 = 13: 1 wound + 12 critical -> 12 - 3 = 9
+    assert.equal(r.hits[0].criticalBeforeGrit, 12);
+    assert.equal(r.hits[0].critical, 9);
+    assert.equal(r.hits[0].trueGrit, true);
 });

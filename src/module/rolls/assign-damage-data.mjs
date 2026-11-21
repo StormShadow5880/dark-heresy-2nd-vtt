@@ -13,6 +13,9 @@ export class AssignDamageData {
     tb = 0;
     usableArmour = 0;
     reduction = 0;
+    reducedDamage = 0;
+    criticalBeforeGrit = 0;
+    woundsBefore = 0;
 
     hasFatigueDamage = false;
     fatigueTaken = 0;
@@ -60,6 +63,8 @@ export class AssignDamageData {
         this.usableArmour = usableArmour;
         this.reduction = reduction;
         const reducedDamage = totalDamage - reduction;
+        this.reducedDamage = Math.max(0, reducedDamage);
+        this.woundsBefore = this.actor.system.wounds.value;
         // We have damage to process
         if(reducedDamage > 0) {
             // No Wounds Available
@@ -81,6 +86,7 @@ export class AssignDamageData {
             }
         }
 
+        this.criticalBeforeGrit = this.criticalDamageTaken;
         if(this.criticalDamageTaken > 0) {
 
             // Handle True Grit Talent
