@@ -9,7 +9,7 @@
  */
 import { SYSTEM_ID } from '../system-id.mjs';
 import { toFormula } from '../rules/formula.mjs';
-import { SPREAD_RANGE_M, applyHits, automatedAttack, blastDodge, defenceChoices, evasionOutcome, groupHitsByTarget, inBlastRadius, serializeHit, withinSpread } from '../rules/combat-resolution.mjs';
+import { SPREAD_RANGE_M, applyHits, automatedAttack, blastDodge, defenceChoices, distanceProblem, evasionOutcome, groupHitsByTarget, inBlastRadius, serializeHit, withinSpread } from '../rules/combat-resolution.mjs';
 
 const FLAG = 'defence';
 const RESOLVES = 'defenceResolves';
@@ -34,9 +34,9 @@ async function actorFromUuid(uuid) {
 const resolutionOf = (messageId) => game.messages.find((m) => [RESOLVES, SPREAD_RESOLVES, BLAST_RESOLVES].some((key) => m.getFlag(SYSTEM_ID, key) === messageId));
 
 /** One defence request card for the hit(s) that strike one target */
-async function postDefenceRequest({ attacker, target, weaponName, hits, melee, storm = false, area = null }) {
+async function postDefenceRequest({ attacker, target, weaponName, hits, melee, storm = false, area = null, template = null }) {
     const choices = defenceChoices(target, { melee, noDodge: !!area && !area.canDodge });
-    const flags = { attackerUuid: attacker.uuid, targetUuid: target.uuid, weaponName, hits: hits.map(serializeHit), storm, area };
+    const flags = { attackerUuid: attacker.uuid, targetUuid: target.uuid, weaponName, hits: hits.map(serializeHit), storm, area, template };
     const notes = [];
     if (hits.length > 1) notes.push(storm ? 'Each degree of success prevents two hits.' : 'Each degree of success prevents one hit.');
     if (area) {
@@ -97,6 +97,39 @@ export async function requestDefence(actionData) {
     return true;
 }
 
+/**
+ * Draws the impact area of a blast as a circle around the token (a template of the scene, so everybody sees it).
+ * Returns { sceneId, id, authorId } or null if it could not be drawn (no permission, no scene).
+ */
+async function drawBlastTemplate(token, radius) {
+    try {
+        const [created] = await canvas.scene.createEmbeddedDocuments('MeasuredTemplate', [
+            { t: 'circle', x: token.center.x, y: token.center.y, distance: radius, fillColor: '#a02020', borderColor: '#d8b66a', author: game.user.id, flags: { [SYSTEM_ID]: { blast: true } } },
+        ]);
+        return created ? { sceneId: canvas.scene.id, id: created.id, authorId: game.user.id } : null;
+    } catch (error) {
+        console.warn('Dark Heresy 2e | blast template could not be drawn', error);
+        return null;
+    }
+}
+
+async function removeBlastTemplate(template) {
+    if (!template) return;
+    try {
+        await game.scenes.get(template.sceneId)?.deleteEmbeddedDocuments('MeasuredTemplate', [template.id]);
+    } catch {
+        // already gone, or no permission: the creator's client or the GM removes it
+    }
+}
+
+/** When every defence card of a blast is answered, the circle is removed (by the client that drew it, or the GM) */
+function cleanupBlastTemplate(request) {
+    const template = request?.getFlag?.(SYSTEM_ID, FLAG)?.template;
+    if (!template || (template.authorId !== game.user.id && !game.user.isGM)) return;
+    const open = game.messages.some((m) => m.getFlag(SYSTEM_ID, FLAG)?.template?.id === template.id && !resolutionOf(m.id));
+    if (!open) removeBlastTemplate(template);
+}
+
 /** The blast radius of a power in metres, or null if the power has no data for it */
 async function blastRadius(attackItem, pr) {
     const formula = attackItem.system?.special?.blast;
@@ -111,7 +144,10 @@ async function blastRadius(attackItem, pr) {
 
 /** Blast (power or weapon): the card with the button that checks who is inside the area */
 async function requestBlast({ rd, hits, radius, label }) {
+    const centreToken = rd.targetActor.token?.object ?? rd.targetActor.getActiveTokens?.()[0];
+    const template = radius && centreToken ? await drawBlastTemplate(centreToken, radius) : null;
     const flags = {
+        template,
         attackerUuid: rd.sourceActor.uuid,
         centreUuid: rd.targetActor.uuid,
         powerName: rd.name,
@@ -137,6 +173,7 @@ async function requestSpread({ rd, hits, attackItem }) {
         targetUuid: rd.targetActor.uuid,
         powerName: rd.name,
         attackType: attackItem.system.attackType,
+        maxRange: Number(rd.maxRange) || 0,
         hits: hits.map(serializeHit),
     };
     const extra = hits.length - 1;
@@ -236,6 +273,7 @@ export async function chooseSpreadTargets(message) {
     const { DHTargetedActionManager } = await import('./targeted-action-manager.mjs');
     const { pickTokensOnCanvas } = await import('../ui/canvas-pick.mjs');
     if (!initialToken) return ui.notifications.warn(`${initial.name} needs a token on the scene.`);
+    const attackerToken = attacker?.token?.object ?? attacker?.getActiveTokens?.()[0];
     const extra = flags.hits.length - 1;
     // the further hits are chosen with the left mouse button on the map: one click per hit (the same token may be clicked again)
     const tokens = await pickTokensOnCanvas({
@@ -243,9 +281,14 @@ export async function chooseSpreadTargets(message) {
         title: `${flags.attackType}: hit 1 strikes ${initial.name}`,
         label: (i) => `Hit ${i + 2}`,
         accept: (token) => {
+            // every target must be within the range of the power ...
+            if (flags.maxRange > 0 && attackerToken && token !== attackerToken) {
+                const problem = distanceProblem({ name: token.name, from: attackerToken.name, distance: DHTargetedActionManager.tokenDistance(attackerToken, token), allowed: flags.maxRange });
+                if (problem) return `${problem} (range of ${flags.powerName})`;
+            }
+            // ... and, from the first hit on, within two metres of the first target
             if (token.actor.uuid === initial.uuid) return true;
-            const distance = DHTargetedActionManager.tokenDistance(initialToken, token);
-            return withinSpread(distance) ? true : `${token.name} is ${Math.round(distance * 10) / 10} m from ${initial.name}, further than ${SPREAD_RANGE_M} m.`;
+            return distanceProblem({ name: token.name, from: initial.name, distance: DHTargetedActionManager.tokenDistance(initialToken, token), allowed: SPREAD_RANGE_M }) ?? true;
         },
     });
     if (!tokens) return;
@@ -329,7 +372,10 @@ export function refreshAnsweredRequest(message) {
     const requestId = [RESOLVES, SPREAD_RESOLVES, BLAST_RESOLVES].map((key) => message.getFlag?.(SYSTEM_ID, key)).find(Boolean);
     if (!requestId) return;
     const request = game.messages.get(requestId);
-    if (request) ui.chat?.updateMessage?.(request);
+    if (request) {
+        ui.chat?.updateMessage?.(request);
+        cleanupBlastTemplate(request);
+    }
 }
 
 
@@ -398,18 +444,9 @@ export async function checkBlastArea(message) {
         radius,
     );
 
-    // draw the area so everybody can see what is inside (removed again afterwards)
-    let templateId = null;
-    try {
-        const grid = canvas.grid;
-        const [created] = await canvas.scene.createEmbeddedDocuments('MeasuredTemplate', [
-            { t: 'circle', x: centreToken.center.x, y: centreToken.center.y, distance: radius, fillColor: '#a02020', borderColor: '#d8b66a', author: game.user.id, flags: { [SYSTEM_ID]: { blast: true } } },
-        ]);
-        templateId = created?.id ?? null;
-        void grid;
-    } catch (error) {
-        console.warn('Dark Heresy 2e | blast template could not be drawn', error);
-    }
+    // the impact area is drawn as a circle around the first target (already when the blast hit, otherwise now);
+    // it stays until every target has answered, see cleanupBlastTemplate
+    const template = flags.template ?? (await drawBlastTemplate(centreToken, radius));
     // the affected tokens are targeted, so they are visible on the canvas
     game.user.targets.forEach((t) => t.setTarget(false, { releaseOthers: false, groupSelection: true }));
     inside.forEach((i) => i.token.setTarget(true, { releaseOthers: false, groupSelection: true }));
@@ -422,7 +459,7 @@ export async function checkBlastArea(message) {
         })
         .join('');
     let picked = null;
-    try {
+    {
         picked = await foundry.applications.api.DialogV2.prompt({
             window: { title: `Blast: ${radius} m around ${centre.name}` },
             content: `<p>${inside.length} token(s) inside the ${radius} m area (centre to centre). Uncheck anyone who is not hit (cover, line of sight, ...). Tick <em>blocked</em> if an obstacle stops a target from leaving the area (then it cannot dodge).</p>${rows}`,
@@ -436,10 +473,13 @@ export async function checkBlastArea(message) {
             rejectClose: false,
             modal: false,
         });
-    } finally {
-        if (templateId) canvas.scene.deleteEmbeddedDocuments('MeasuredTemplate', [templateId]).catch(() => {});
     }
-    if (!picked || !picked.hit.length) return;
+    game.user.targets.forEach((t) => t.setTarget(false, { releaseOthers: false, groupSelection: true }));
+    if (!picked || !picked.hit.length) {
+        // nobody is hit: the circle goes away, cancelling keeps the circle of the request (the area can be checked again)
+        if (picked && !picked.hit.length) await removeBlastTemplate(template);
+        return;
+    }
     if (resolutionOf(message.id)) return ui.notifications.warn('The area has been checked already.');
 
     const targets = inside.filter((i) => picked.hit.includes(i.id)).map((i) => ({ uuid: i.id, name: i.name, distance: Math.round(i.distance * 10) / 10, blocked: picked.blocked.includes(i.id), token: i.token }));
@@ -461,6 +501,6 @@ export async function checkBlastArea(message) {
     for (const t of targets) {
         const actor = t.token.actor;
         const area = blastDodge({ distanceFromCentre: t.distance, radius, agilityBonus: actor.characteristics?.agility?.bonus, blocked: t.blocked });
-        await postDefenceRequest({ attacker, target: actor, weaponName: flags.powerName, hits: [flags.hit], melee: false, area });
+        await postDefenceRequest({ attacker, target: actor, weaponName: flags.powerName, hits: [flags.hit], melee: false, area, template });
     }
 }

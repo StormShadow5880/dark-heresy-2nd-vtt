@@ -1,3 +1,4 @@
+import { distanceProblem } from '../rules/combat-resolution.mjs';
 import { autoCombatEnabled } from '../actions/combat-resolution-manager.mjs';
 import { DHPromptApplication } from './dh-prompt-base.mjs';
 
@@ -52,6 +53,14 @@ export class PsychicPowerDialog extends DHPromptApplication {
         if (this.data.hasDamage && !this.data.targetActor && autoCombatEnabled()) {
             ui.notifications.warn('Target the token you attack first (select it and press T, or right click > Target). Without a target no attack roll is made.');
             return;
+        }
+        // the range of a psychic power is a hard limit
+        if (this.data.hasDamage && this.data.targetActor && this.data.maxRange > 0 && autoCombatEnabled()) {
+            const problem = distanceProblem({ name: this.data.targetActor.name, from: this.data.sourceActor.name, distance: Number(this.data.distance), allowed: this.data.maxRange });
+            if (problem) {
+                ui.notifications.warn(`${problem} (range of ${this.data.power.name})`);
+                return;
+            }
         }
         await this.data.finalize();
         await this.psychicAttackData.performActionAndSendToChat();

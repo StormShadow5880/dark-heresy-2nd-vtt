@@ -190,3 +190,19 @@ export function blastDodge({ distanceFromCentre, radius, agilityBonus, blocked =
     const bonus = Math.max(0, Number(agilityBonus) || 0);
     return { toEdge, agilityBonus: bonus, blocked: !!blocked, canDodge: !blocked && toEdge <= bonus };
 }
+
+const metres = (n) => Math.round(n * 10) / 10;
+
+/**
+ * Checks a distance against what is allowed. Returns null if it is fine, otherwise the message for the user, e.g.
+ * "Cultist is 3.5 m away from Brute, but only 2 m are allowed."
+ * @param name {string} the token that is checked
+ * @param from {string} the token or point it is measured from
+ * @param distance {number} metres (NaN: could not be measured)
+ * @param allowed {number} metres
+ */
+export function distanceProblem({ name, from, distance, allowed }) {
+    if (!Number.isFinite(distance)) return `The distance between ${name} and ${from} could not be measured.`;
+    if (distance <= allowed) return null;
+    return `${name} is ${metres(distance)} m away from ${from}, but only ${metres(allowed)} m are allowed.`;
+}

@@ -149,3 +149,11 @@ test('blast / spray: dodging needs a way to the edge no longer than the Agility 
     const a = { skills: { dodge: { current: 40 }, parry: { current: 30 } } };
     assert.deepEqual(defenceChoices(a, { melee: false, noDodge: true }).map((c) => c.id), ['none']);
 });
+
+test('distance problems name both tokens and both distances', async () => {
+    const { distanceProblem } = await import('../src/module/rules/combat-resolution.mjs');
+    assert.equal(distanceProblem({ name: 'Cultist', from: 'Brute', distance: 2, allowed: 2 }), null);
+    assert.equal(distanceProblem({ name: 'Cultist', from: 'Brute', distance: 3.46, allowed: 2 }), 'Cultist is 3.5 m away from Brute, but only 2 m are allowed.');
+    assert.equal(distanceProblem({ name: 'Cultist', from: 'Voss', distance: 25, allowed: 10 }), 'Cultist is 25 m away from Voss, but only 10 m are allowed.');
+    assert.match(distanceProblem({ name: 'A', from: 'B', distance: NaN, allowed: 2 }), /could not be measured/);
+});
