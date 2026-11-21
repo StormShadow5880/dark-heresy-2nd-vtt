@@ -45,6 +45,9 @@ function asset(effectName, slot) {
     return key;
 }
 
+/** Why nothing played: one line in the browser console (F12), so a silent attack can be explained */
+const skip = (why) => console.info(`Dark Heresy 2e | no animation: ${why}`);
+
 const tokenOfActor = (actor) => actor?.token?.object ?? actor?.getActiveTokens?.()[0] ?? null;
 
 async function safely(label, fn) {
@@ -69,13 +72,14 @@ export function effectOfRoll(rd) {
  */
 export async function playShot(rd) {
     const name = effectOfRoll(rd);
-    if (!name || EFFECTS[name].kind !== 'projectile' || !vfxAvailable()) return;
+    if (!name || EFFECTS[name].kind !== 'projectile') return skip(`no effect for this attack (weapon type "${rd?.weapon?.system?.type}", power type "${rd?.power?.system?.attackType}")`);
+    if (!vfxAvailable()) return skip('effects off, or Sequencer / JB2A Free not active');
     const from = tokenOfActor(rd.sourceActor);
     const to = tokenOfActor(rd.targetActor);
-    if (!from || !to || from === to) return;
+    if (!from || !to || from === to) return skip(`token missing (attacker: ${!!from}, target: ${!!to})`);
     await safely(`${name} shot`, async () => {
         const shot = asset(name, 'shot');
-        if (!shot) return;
+        if (!shot) return skip(`no JB2A asset for ${name}.shot`);
         const seq = new globalThis.Sequence();
         const muzzle = asset(name, 'muzzle');
         if (muzzle) seq.effect().file(muzzle).atLocation(from).rotateTowards(to).scaleToObject(1.5);
