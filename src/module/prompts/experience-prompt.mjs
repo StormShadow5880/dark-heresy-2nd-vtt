@@ -2,11 +2,24 @@ import { actionDialog, DIALOG_CLASSES } from './dialog-helpers.mjs';
 import { markTooltips } from '../ui/tooltips.mjs';
 import { SYSTEM_ID } from '../system-id.mjs';
 import { awardExperience, purchaseAdvancement, purchaseTargets, spendExperience } from '../rules/experience.mjs';
-import { availableXp, characteristicQuote, checkPurchase, isMultipleTalent, ownedTalentNames, skillQuote, talentQuote } from '../rules/advancement.mjs';
+import { availableXp, characteristicQuote, checkPurchase, isMultipleTalent, knownTalentSet, ownedTalentNames, skillQuote, talentQuote } from '../rules/advancement.mjs';
 
 const esc = (s) => foundry.utils.escapeHTML(String(s ?? ''));
 
 const { DialogV2 } = foundry.applications.api;
+
+/** The prerequisites of a talent, requirement by requirement: ✓ met, ✗ not met, ? to be checked by hand */
+function prerequisiteHtml(quote) {
+    const pc = quote.prerequisiteCheck;
+    if (!pc || pc.empty) return `<span class="warn">${esc(quote.prerequisites)}</span>`;
+    const mark = { met: '✓', unmet: '✗', manual: '?' };
+    return pc.clauses
+        .map((c) => {
+            const detail = c.alternatives.map((a) => (a.detail ? `${a.text}: ${a.detail}` : a.text)).join(' / ');
+            return `<div class="prereq prereq--${c.status}" title="${esc(detail)}"><b>${mark[c.status]}</b> ${esc(c.text)}${c.status !== 'met' ? ` <small>(${esc(detail)})</small>` : ''}</div>`;
+        })
+        .join('');
+}
 
 /** Talents of the system compendium with the fields the price needs */
 async function loadTalentIndex() {
@@ -47,7 +60,8 @@ export async function prepareSpendExperience(actor, preselect = null) {
             <div class="form-group" id="adv-target-row"><label>Advance</label><select id="adv-target"></select></div>
             <div class="form-group" id="adv-choice-row" hidden><label>Choice</label><input type="text" id="adv-choice" placeholder="e.g. Las, Bolt, ..." /></div>
             <div id="adv-summary" class="adv-summary"></div>
-            <div class="form-group" id="adv-prereq-row" hidden><label>Prerequisites checked</label><input type="checkbox" id="adv-prereq" /></div>
+            <div class="form-group" id="adv-prereq-row" hidden><label>I have checked the prerequisites marked "?"</label><input type="checkbox" id="adv-prereq" /></div>
+            ${game.user.isGM ? `<div class="form-group" id="adv-override-row" hidden><label>GM override: buy although a prerequisite is not met</label><input type="checkbox" id="adv-override" /></div>` : ''}
             <div id="adv-manual" hidden>
                 <div class="form-group"><label>Entry</label>
                     <select id="xp-target"><option value="psy">Psy Rating</option><option value="talent">Talent</option><option value="other">Other</option></select></div>
@@ -94,7 +108,15 @@ export async function prepareSpendExperience(actor, preselect = null) {
             });
         } else if (cat === 'talent') {
             const taken = ownedTalentNames(actor);
-            options = talents.map((t) => ({ value: t.id, kind: 'talent', label: `${t.name} (tier ${t.tier})${taken.has(t.name.toLowerCase()) && !isMultipleTalent(t.name) ? ' – learned' : ''}` }));
+            const known = knownTalentSet();
+            // ✓ prerequisites met, ✗ not met, ? has to be checked by you; with the price
+            const mark = { met: '✓', unmet: '✗', manual: '?' };
+            options = talents.map((t) => {
+                const learned = taken.has(t.name.toLowerCase()) && !isMultipleTalent(t.name);
+                const q = talentQuote(actor, t, isMultipleTalent(t.name) ? 'x' : '', undefined, { knownTalents: known });
+                const status = q.prerequisiteCheck && !q.prerequisiteCheck.empty ? mark[q.prerequisiteCheck.status] : '✓';
+                return { value: t.id, kind: 'talent', label: `${learned ? '–' : status} ${t.name} (tier ${t.tier}${q.cost ? `, ${q.cost} EP` : ''})${learned ? ' – learned' : ''}` };
+            });
         }
         $('#adv-target').innerHTML = options.map((o) => `<option value="${esc(o.value)}" data-kind="${o.kind}">${esc(o.label)}</option>`).join('');
         if (preselect && cat === startCategory && options.some((o) => o.value === preselect.key)) $('#adv-target').value = preselect.key;
@@ -134,8 +156,10 @@ export async function prepareSpendExperience(actor, preselect = null) {
             return;
         }
         $('#adv-choice-row').hidden = !quote.multiple;
-        $('#adv-prereq-row').hidden = !quote.prerequisites;
-        const check = checkPurchase(actor, quote, { prerequisitesConfirmed: $('#adv-prereq').checked });
+        const pc = quote.prerequisiteCheck;
+        $('#adv-prereq-row').hidden = !(quote.prerequisites && (pc ? pc.manual.length > 0 : true));
+        if ($('#adv-override-row')) $('#adv-override-row').hidden = !(pc && pc.status === 'unmet');
+        const check = checkPurchase(actor, quote, { prerequisitesConfirmed: $('#adv-prereq').checked, gmOverride: !!$('#adv-override')?.checked });
         const available = availableXp(actor);
         const rows = [
             ['Advance', esc(quote.label)],
@@ -147,7 +171,7 @@ export async function prepareSpendExperience(actor, preselect = null) {
             ['Available', `${available} EP`],
             ['After purchase', quote.cost != null && !quote.maxed ? `${available - quote.cost} EP` : '—'],
         ];
-        if (quote.prerequisites) rows.splice(4, 0, ['Prerequisites', `<span class="warn">${esc(quote.prerequisites)}</span>`]);
+        if (quote.prerequisites) rows.splice(4, 0, ['Prerequisites', prerequisiteHtml(quote)]);
         $('#adv-summary').innerHTML =
             `<dl class="adv-summary__rows">${rows.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>` +
             (check.errors.length ? `<p class="adv-summary__error">${esc(check.errors[0])}</p>` : '');
@@ -178,6 +202,7 @@ export async function prepareSpendExperience(actor, preselect = null) {
             ...purchase,
             choice: root.querySelector('#adv-choice').value.trim(),
             prerequisitesConfirmed: root.querySelector('#adv-prereq').checked,
+            gmOverride: !!root.querySelector('#adv-override')?.checked,
             note,
         });
     }

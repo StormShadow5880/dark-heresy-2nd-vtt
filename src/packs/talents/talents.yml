@@ -2,7 +2,7 @@ data:
     aptitudes: Weapon Skill, Ballistic Skill
     benefit: The penalty for  attacks with both weapons in the same turn drops to -10.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Agility 30'
     source: PG 123 CB
     tier: '1'
 img: systems/dark-heresy-2nd/icons/items/swords/swords_01_b.png
@@ -14,7 +14,7 @@ data:
     benefit: Ignores all penalties for fighting with a melee weapon while suffering
         from obscured vision
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Perception 30'
     source: PG 123 CB
     tier: '1'
 img: systems/dark-heresy-2nd/icons/talents/blue/b_02.png
@@ -41,7 +41,7 @@ data:
     benefit: Reduces the effective distance of all falls by a number of metres equal
         to his Agility bonus. Also adds +20 to his Acrobatics skill tests when using Jump
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Agility 30'
     source: PG 124 CB
     tier: '1'
 img: systems/dark-heresy-2nd/icons/psykana/wind-grasp-magenta-1.jpg
@@ -53,7 +53,7 @@ data:
     benefit: Once per day, he can re-roll a test made to gather information from a group
         of people.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Fellowship 30'
     source: PG 124 CB
     tier: '1'
 img: systems/dark-heresy-2nd/icons/talents/blue/b_18.png
@@ -65,7 +65,7 @@ data:
     benefit: Test Willpower to avoid Fatigue from Blood Loss with a Challenging (+0)
         Willpower test.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Willpower 40'
     source: PG 125 CB
     tier: '1'
 img: systems/dark-heresy-2nd/icons/talents/blue/b_18.png
@@ -77,7 +77,7 @@ data:
     benefit: As a Full Action, may make an Opposed Weapon Skill test and force opponent
         to drop weapon. If 3 or more DoS, can steal weapon.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Agility 30'
     source: PG 125 CB
     tier: '1'
 img: systems/dark-heresy-2nd/icons/items/armor/gloves_s08.png
@@ -112,7 +112,7 @@ data:
     benefit: Can summon larger metallic objects up to 2 kilograms per point of his Willpower
         bonus, and can summon such objects up to 40 metres.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Ferric Lure Implants, Mechanicus Implants'
     source: PG 127 CB
     tier: '1'
 img: systems/dark-heresy-2nd/icons/talents/blue/b_02.png
@@ -164,7 +164,7 @@ data:
     aptitudes: Toughness, Defence
     benefit: Test Challenging (+0)  Toughness Test to overcome Stunning.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Toughness 40'
     source: PG 128 CB
     tier: '1'
 img: systems/dark-heresy-2nd/icons/talents/blue/b_18.png
@@ -175,7 +175,7 @@ data:
     aptitudes: Willpower, Defence
     benefit: Ignore mundane horrors.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Willpower 40'
     source: PG 128 CB
     tier: '1'
 img: systems/dark-heresy-2nd/icons/talents/blue/b_18.png
@@ -186,7 +186,7 @@ data:
     aptitudes: Perception, Social
     benefit: Can retry Awareness test once with 10 modifier.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Intelligence 35'
     source: PG 129 CB
     tier: '1'
 img: systems/dark-heresy-2nd/icons/talents/blue/b_18.png
@@ -197,7 +197,7 @@ data:
     aptitudes: Agility, General
     benefit: Stand as a Free Action.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Agility 30'
     source: PG 129 CB
     tier: '1'
 img: systems/dark-heresy-2nd/icons/talents/blue/b_18.png
@@ -232,7 +232,7 @@ data:
     aptitudes: Perception, Offence
     benefit: Can add DoS from the attack to reduce armour value of cover.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Perception 30'
     source: PG 130 CB
     tier: '1'
 img: systems/dark-heresy-2nd/icons/talents/blue/b_18.png
@@ -245,7 +245,7 @@ data:
         tests increases to +10 times X. Additionally, when the character acquires his
         talent, also increases his Influence by 1.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Fellowship 30'
     source: PG 130 CB
     tier: '1'
 img: systems/dark-heresy-2nd/icons/psykana/evil-eye-eerie-2.jpg
@@ -326,7 +326,7 @@ data:
     aptitudes: Intelligence, Tech
     benefit: Un-jam gun as Half Action.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Intelligence 30'
     source: PG 132 CB
     tier: '1'
 img: systems/dark-heresy-2nd/icons/talents/blue/b_21.png
@@ -337,7 +337,7 @@ data:
     aptitudes: Perception, Psyker
     benefit: Allows Psyniscience test as Free Action.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Perception 30, Psy rating, Psyniscience'
     source: PG 133 CB
     tier: '1'
 img: systems/dark-heresy-2nd/icons/psykana/evil-eye-eerie-3.jpg
@@ -361,7 +361,7 @@ data:
         weapons damage and penetration by an amount equal to the characters Intelligence
         bonus until the end of the round once per encounter.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Intelligence 40, Tech Use +10'
     source: PG 133 CB
     tier: '1'
 img: systems/dark-heresy-2nd/icons/talents/blue/b_18.png
@@ -397,7 +397,7 @@ data:
     aptitudes: Intelligence, Tech
     benefit: The character gains an extra amount of Armour points equal to his Intelligence bonus, which he can distribute to any locations that his armour would normally cover, as long as he has at least an hour each day to clean and repair it or make minor modifications. This bonus applies only to armour when the Acolyte is wearing it, as it combines his training with his skill at armoury.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Intelligence 35, Tech-Use, Trade (Armourer)'
     source: PG 123 CB
     tier: '2'
 img: systems/dark-heresy-2nd/icons/talents/blue/b_07.png
@@ -409,7 +409,7 @@ data:
     benefit: Can Parry while Frenzied, and can re-roll a failed test to snap out of
         Frenzy or resist entering Frenzy if they choose.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Frenzy'
     source: PG 123 CB
     tier: '2'
 img: systems/dark-heresy-2nd/icons/psykana/evil-eye-red-1.jpg
@@ -421,7 +421,7 @@ data:
     benefit: Remove bracing requirement from Heavy weapons, and +20 to his Athletics
         skill test when using Heft.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Strength 45'
     source: PG 123 CB
     tier: '2'
 img: systems/dark-heresy-2nd/icons/talents/blue/b_18.png
@@ -445,7 +445,7 @@ data:
     aptitudes: Weapon Skill, Defence
     benefit: Opponents get no bonus for outnumbering the character.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Weapon Skill 30'
     source: PG 124 CB
     tier: '2'
 img: systems/dark-heresy-2nd/icons/items/armor/helmet_s10.png
@@ -457,7 +457,7 @@ data:
     benefit: Can use Per or Int instead of Ag for Initiative rolls, and rolls two dice
         (picking higher) for the result.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Awareness +10, Intelligence 35 or Perception 35'
     source: PG 124 CB
     tier: '2'
 img: systems/dark-heresy-2nd/icons/psykana/evil-eye-eerie-1.jpg
@@ -468,7 +468,7 @@ data:
     aptitudes: Fellowship, Leadership
     benefit: Use Fellowship instead of Influence for Requisition tests.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Cover-Up, Intelligence 35'
     source: PG 124 CB
     tier: '2'
 img: systems/dark-heresy-2nd/icons/talents/blue/b_18.png
@@ -480,7 +480,7 @@ data:
     benefit: Has a+10 bonus to all Interrogate tests, additional +5 for others who also
         have Coordinated Interrogation
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Clues from the Crowds, Strength 40 or Willpower 40'
     source: PG 124 CB
     tier: '2'
 img: systems/dark-heresy-2nd/icons/talents/blue/b_18.png
@@ -491,7 +491,7 @@ data:
     aptitudes: Weapon Skill, Defence
     benefit: May make a Standard Attack after successful Parry with -20 to Weapon Skill.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Weapon Skill 40'
     source: PG 125 CB
     tier: '2'
 img: systems/dark-heresy-2nd/icons/talents/blue/b_18.png
@@ -502,7 +502,7 @@ data:
     aptitudes: Intelligence, Knowledge
     benefit: Can reduce Influence by 1 to gain 1d5 Subtlety.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Intelligence 35'
     source: PG 125 CB
     tier: '2'
 img: systems/dark-heresy-2nd/icons/talents/blue/b_18.png
@@ -538,7 +538,7 @@ data:
     aptitudes: Willpower, Defence
     benefit: Can use Willpower to Evade against psychic attacks.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Willpower 35'
     source: PG 125 CB
     tier: '2'
 img: systems/dark-heresy-2nd/icons/psykana/haste-royal-2.jpg
@@ -550,7 +550,7 @@ data:
     benefit: Successful All Out Attack grants, may make a second All Out Attack once
         per turn.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Weapon Skill 35'
     source: PG 125 CB
     tier: '2'
 img: systems/dark-heresy-2nd/icons/talents/blue/b_18.png
@@ -562,7 +562,7 @@ data:
     benefit: A second ranged attack against the same target, grants a+20 bonus if scored
         1 or more DoS.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Two-Weapon Wielder'
     source: PG 125 CB
     tier: '2'
 img: systems/dark-heresy-2nd/icons/items/pistols/pistols_13.png
@@ -584,7 +584,7 @@ data:
     aptitudes: Fellowship, Social
     benefit: Can use Fellowship instead of Agility when Shadowing.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Clues from the Crowds, Fellowship 35'
     source: PG 127 CB
     tier: '2'
 img: systems/dark-heresy-2nd/icons/talents/green/g_11.png
@@ -609,7 +609,7 @@ data:
     aptitudes: Agility, Defence
     benefit: 20 to hit character when he Charges or Runs.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Agility 40'
     source: PG 128 CB
     tier: '2'
 img: systems/dark-heresy-2nd/icons/talents/blue/b_18.png
@@ -633,7 +633,7 @@ data:
     aptitudes: Toughness, Defence
     benefit: Character always heals as if Lightly Damaged.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Toughness 40'
     source: PG 128 CB
     tier: '2'
 img: systems/dark-heresy-2nd/icons/talents/blue/b_18.png
@@ -657,7 +657,7 @@ data:
     benefit: As a Full Action, can both move up to his Full Move rate and make a single
         shot attack with a ranged weapon per weapon.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Agility 40, Ballistic Skill 40'
     source: PG 128 CB
     tier: '2'
 img: systems/dark-heresy-2nd/icons/talents/blue/b_18.png
@@ -682,7 +682,7 @@ data:
     aptitudes: Ballistic Skill, Finesse
     benefit: Fire at multiple targets more than 10 metres apart when firing two weapons.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Ballistic Skill 40'
     source: PG 128 CB
     tier: '2'
 img: systems/dark-heresy-2nd/icons/talents/blue/b_18.png
@@ -694,7 +694,7 @@ data:
     benefit: Attacker imposes penalty on all evasion attempts made against this attack
         equal to 10 times the total degrees of success scored on the attack test.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Ballistic Skill 40 or Weapon Skill 40, Perception 35'
     source: PG 128 CB
     tier: '2'
 img: systems/dark-heresy-2nd/icons/talents/blue/b_18.png
@@ -731,7 +731,7 @@ data:
     aptitudes: Weapon Skill, Offence
     benefit: Spend Fate point to make melee attacks unavoidable.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Weapon Skill 50'
     source: PG 129 CB
     tier: '2'
 img: systems/dark-heresy-2nd/icons/talents/blue/b_18.png
@@ -756,7 +756,7 @@ data:
         with Pen 0 and the Shocking quality. Must pass a Toughness test or suffer 1 level
         of Fatigue after attack.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Luminen Capacitors, Mechanicus Implants'
     source: PG 129 CB
     tier: '2'
 img: systems/dark-heresy-2nd/icons/psykana/lighting-eerie-2.jpg
@@ -770,7 +770,7 @@ data:
         damage from falling if the coils are active. Each use drains half the power stored
         in the coils (can use the coils twice before recharging them).
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Maglev Coils, Mechanicus Implants'
     source: PG 129 CB
     tier: '2'
 img: systems/dark-heresy-2nd/icons/talents/blue/b_18.png
@@ -781,7 +781,7 @@ data:
     aptitudes: Ballistic Skill, Finesse
     benefit: No penalties for firing at long or extreme range.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Ballistic Skill 35'
     source: PG 130 CB
     tier: '2'
 img: systems/dark-heresy-2nd/icons/items/rifles/rifle_03.png
@@ -792,7 +792,7 @@ data:
     aptitudes: Intelligence, Tech
     benefit: Gain ability to use certain Mechadendrites. Weapon or Utility.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Mechanicus Implants'
     source: PG 130 CB
     tier: '2'
 img: systems/dark-heresy-2nd/icons/talents/blue/b_18.png
@@ -828,7 +828,7 @@ data:
     aptitudes: Ballistic Skill/Weapon Skill, Finesse
     benefit: No penalty to making Called Shot in either Ranged or Melee Combat.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Ballistic Skill 40 or Weapon Skill 40'
     source: PG 130 CB
     tier: '2'
 img: systems/dark-heresy-2nd/icons/talents/blue/b_18.png
@@ -840,7 +840,7 @@ data:
     benefit: Spend 10 minutes and make a Tech-Use test to heal 1d5 damage. Rolls 96
         or higher, loses the ability for one week.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Autosanguine Implants, Mechanicus Implants'
     source: PG 131 CB
     tier: '2'
 img: systems/dark-heresy-2nd/icons/talents/blue/b_18.png
@@ -876,7 +876,7 @@ data:
     aptitudes: Willpower, Defence
     benefit: May reroll failed WP tests to resist psychic powers.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Resistance (Psychic Powers), Willpower 30'
     source: PG 131 CB
     tier: '2'
 img: systems/dark-heresy-2nd/icons/talents/red/r_27.png
@@ -887,7 +887,7 @@ data:
     aptitudes: Weapon Skill, Finesse
     benefit: May make multiple melee attacks.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Weapon Skill 30'
     source: PG 131 CB
     tier: '2'
 img: systems/dark-heresy-2nd/icons/talents/blue/b_18.png
@@ -924,7 +924,7 @@ data:
     benefit: When fighting unarmed, attacks hit as Deadly Natural Weapons and user can
         re-roll damage.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Agility 35, Ambidextrous, Weapon Skill 35'
     source: PG 132 CB
     tier: '2'
 img: systems/dark-heresy-2nd/icons/talents/blue/b_18.png
@@ -936,7 +936,7 @@ data:
     benefit: 'Spend Fate point to add 1d5 to psy rating however he adds +30 to rolls
         on Table 62: Psychic Phenomena'
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Psy rating, Strong Minded, Willpower 50'
     source: PG 132 CB
     tier: '2'
 img: systems/dark-heresy-2nd/icons/talents/blue/b_18.png
@@ -950,7 +950,7 @@ data:
         targeting each other foe also engaged in melee combat with the character beyond
         the rst (to a maximum number of attacks up to his Weapon Skill bonus).
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Weapon Skill 40'
     source: PG 133 CB
     tier: '2'
 img: systems/dark-heresy-2nd/icons/talents/blue/b_18.png
@@ -987,7 +987,7 @@ data:
         Pinning test. If this reduces the result to zero or less, he counts as having
         passed the Fear test with 1 degree of success.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Jaded, Resistance (Fear), Willpower 45'
     source: PG 123 CB
     tier: '3'
 img: systems/dark-heresy-2nd/icons/talents/violet/p_06.png
@@ -1011,7 +1011,7 @@ data:
         move at half rate as a Free Action. Only once per round, and opponent does not
         receive a free attack.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Acrobatics, Agility 40'
     source: PG 123 CB
     tier: '3'
 img: systems/dark-heresy-2nd/icons/talents/blue/gr_10.PNG
@@ -1023,7 +1023,7 @@ data:
     benefit: Adds 5 x his psy rating to any Opposed test when defending against psychic
         powers.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Psy rating, Strong Minded, Willpower 40'
     source: PG 123 CB
     tier: '3'
 img: systems/dark-heresy-2nd/icons/psykana/protect-blue-2.jpg
@@ -1035,7 +1035,7 @@ data:
     benefit: When attacking with any bladed weapon, can re-roll one missed attack per
         round.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Weapon Skill 30, Weapon Training (any melee)'
     source: PG 123 CB
     tier: '3'
 img: systems/dark-heresy-2nd/icons/items/swords/swords_06_b.PNG
@@ -1046,7 +1046,7 @@ data:
     aptitudes: Weapon Skill, Offence
     benefit: Add half WS bonus (Round up) to damage inflicted in melee.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Weapon Skill 40'
     source: PG 125 CB
     tier: '3'
 img: systems/dark-heresy-2nd/icons/items/maces/mace_09_b.png
@@ -1083,7 +1083,7 @@ data:
     aptitudes: Perception, Finesse
     benefit: 'The Acolyte can place his hits where they inflict maximum harm, such as gaps or joints in armour. When this talent is taken, the character selects the Specialisation that matches the prerequisite used in purchase (Melee with Weapon Skill, Ranged with Ballistic Skill). When the character’s attack in that combat type inflicts Critical damage, he adds his Perception bonus to the damage result.'
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Ballistic Skill 45 or Weapon Skill 45'
     source: PG 125 CB
     tier: '3'
 img: systems/dark-heresy-2nd/icons/items/rifles/rifle_06.png
@@ -1095,7 +1095,7 @@ data:
     benefit: Reduce Subtlety loss by 1d5 when conducting an Interrogation. If this results
         in a negative number increase the warbands Subtlety by 1.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Coordinated Interrogation, Fellowship 50'
     source: PG 125 CB
     tier: '3'
 img: systems/dark-heresy-2nd/icons/talents/blue/b_18.png
@@ -1118,7 +1118,7 @@ data:
     benefit: Spend 1 Fate point to add the number of  DoS scored on the attack test
         to damage and Penetration.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Ballistic Skill 50'
     source: PG 127 CB
     tier: '3'
 img: systems/dark-heresy-2nd/icons/psykana/evil-eye-red-3.jpg
@@ -1129,7 +1129,7 @@ data:
     aptitudes: Willpower, Psyker
     benefit: Roll twice for Psychic Phenomena and choose result.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Willpower 35'
     source: PG 127 CB
     tier: '3'
 img: systems/dark-heresy-2nd/icons/talents/green/g_23.PNG
@@ -1140,7 +1140,7 @@ data:
     aptitudes: Perception, Knowledge
     benefit: Spend 1 Fate point to reveal a clue.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Contact Network, Coordinated Interrogation, Intelligence 40'
     source: PG 127 CB
     tier: '3'
 img: systems/dark-heresy-2nd/icons/talents/blue/b_18.png
@@ -1151,7 +1151,7 @@ data:
     aptitudes: Fellowship, Leadership
     benefit: Affect NPCs within 100xFelB metres with Social skills.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Fellowship 40, Willpower 40'
     source: PG 127 CB
     tier: '3'
 img: systems/dark-heresy-2nd/icons/talents/blue/b_18.png
@@ -1164,7 +1164,7 @@ data:
         half his Strength bonus (rounded up) to the weapons penetration. The attack also
         counts as having the Concussive (2) weapon quality.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Crushing Blow'
     source: PG 128 CB
     tier: '3'
 img: systems/dark-heresy-2nd/icons/items/maces/mace_02_b.png
@@ -1201,7 +1201,7 @@ data:
     aptitudes: Intelligence, Knowledge
     benefit: counts as having all Common Lore and Scholastic Lore skills at rank 1 (Known).
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Intelligence 40, Lore (any one)'
     source: PG 128 CB
     tier: '3'
 img: systems/dark-heresy-2nd/icons/talents/blue/b_18.png
@@ -1249,7 +1249,7 @@ data:
     aptitudes: Weapon Skill, Finesse
     benefit: Character may make many melee attacks with single roll.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Swift Attack'
     source: PG 129 CB
     tier: '3'
 img: systems/dark-heresy-2nd/icons/psykana/enchant-sky-2.jpg
@@ -1262,7 +1262,7 @@ data:
         and deals 1d10 plus twice his Willpower bonus in Energy damage. Must pass a Toughness
         test or suffer 1 level of Fatigue after attack.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Luminen Shock, Luminen Capacitors, Mechanicus Implants'
     source: PG 129 CB
     tier: '3'
 img: systems/dark-heresy-2nd/icons/psykana/lighting-eerie-3.jpg
@@ -1275,7 +1275,7 @@ data:
         test is Challenging (+0) or better, score a number of degrees of success equal
         to the characteristic bonus.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Rank 4 in selected skill'
     source: PG 130 CB
     tier: '3'
 img: systems/dark-heresy-2nd/icons/talents/blue/b_18.png
@@ -1286,7 +1286,7 @@ data:
     aptitudes: Ballistic Skill, Offence
     benefit: Add half BS (rounding up) bonus to ranged damage rolls.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Ballistic Skill 40'
     source: PG 130 CB
     tier: '3'
 img: systems/dark-heresy-2nd/icons/talents/blue/b_18.png
@@ -1298,7 +1298,7 @@ data:
     benefit: Ignore penalties from Critical damage by spending Fate point. Once the
         encounter ends, the effects trigger as normal.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Willpower 50, Toughness 50'
     source: PG 130 CB
     tier: '3'
 img: systems/dark-heresy-2nd/icons/talents/blue/b_18.png
@@ -1309,7 +1309,7 @@ data:
     aptitudes: Agility, Offence
     benefit: Double speed when charging.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Weapon Skill 40, Agility 50'
     source: PG 130 CB
     tier: '3'
 img: systems/dark-heresy-2nd/icons/talents/blue/b_18.png
@@ -1370,7 +1370,7 @@ data:
     aptitudes: Agility, Defence
     benefit: Can make additional Dodge or Parry attempt per round.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Agility 40, Dodge or Parry'
     source: PG 131 CB
     tier: '3'
 img: systems/dark-heresy-2nd/icons/talents/blue/b_18.png
@@ -1382,7 +1382,7 @@ data:
     benefit: Gain +20 to Medicae tests, bonuses to first aid tests and only suffers
         a 10 penalty for those suffering Critical damage.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Rank 2 in the Medicae skill'
     source: PG 131 CB
     tier: '3'
 img: systems/dark-heresy-2nd/icons/talents/blue/b_18.png
@@ -1394,7 +1394,7 @@ data:
     benefit: May shoot into melee without penalty. Also an Aim action beforehand, prevents
         any chance of hitting friendly targets as well.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Ballistic Skill 50'
     source: PG 132 CB
     tier: '3'
 img: systems/dark-heresy-2nd/icons/talents/blue/b_18.png
@@ -1405,7 +1405,7 @@ data:
     aptitudes: Strength, Offence
     benefit: Break enemies with armoured charge.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Strength 50'
     source: PG 132 CB
     tier: '3'
 img: systems/dark-heresy-2nd/icons/psykana/lighting-acid-2.jpg
@@ -1416,7 +1416,7 @@ data:
     aptitudes: Toughness, Defence
     benefit: Reduce Critical damage taken.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Toughness 40'
     source: PG 132 CB
     tier: '3'
 img: systems/dark-heresy-2nd/icons/talents/blue/b_18.png
@@ -1427,7 +1427,7 @@ data:
     aptitudes: Finesse, Offence
     benefit: No penalties when fighting with two single handed weapons.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Agility 45, Ambidextrous, Ballistic Skill 40 or Weapon Skill 40, Two-Weapon Wielder (Melee, Ranged)'
     source: PG 132 CB
     tier: '3'
 img: systems/dark-heresy-2nd/icons/talents/blue/b_18.png
@@ -1441,7 +1441,7 @@ data:
         make any Focus Power tests or sustain other psychic powers until the beginning
         of his next turn.
     cost: 0
-    prerequisites: ''
+    prerequisites: 'Psy rating, Strong Minded, Willpower 50'
     source: PG 133 CB
     tier: '3'
 img: systems/dark-heresy-2nd/icons/talents/blue/b_18.png

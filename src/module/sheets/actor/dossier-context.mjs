@@ -550,6 +550,8 @@ export function buildProgression(actor) {
         maxed: q.maxed,
         advanceable: q.advanceable && !q.maxed,
         cost: q.cost,
+        valueFrom: q.valueFrom ?? null,
+        valueTo: q.valueTo ?? null,
         matches: q.matches,
         required: q.required.join(' + '),
         detail: describeQuote(q),

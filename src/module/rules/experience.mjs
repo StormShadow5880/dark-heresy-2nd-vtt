@@ -7,7 +7,7 @@
  */
 import { SYSTEM_ID } from '../system-id.mjs';
 import { CHARACTERISTIC_ORDER } from '../sheets/actor/dossier-context.mjs';
-import { availableXp, characteristicQuote, checkPurchase, num, skillQuote, talentQuote } from './advancement.mjs';
+import { availableXp, characteristicQuote, checkPurchase, num, powerQuote, skillQuote, talentQuote } from './advancement.mjs';
 
 export const MAX_CHARACTERISTIC_ADVANCE = 5;
 export const MAX_SKILL_ADVANCE = 4;
@@ -171,7 +171,7 @@ const purchasesRunning = new Set();
  *                    prerequisitesConfirmed?: boolean, note?: string}}
  * @returns {Promise<{ok: boolean, errors: string[], quote?: object}>}
  */
-export async function purchaseAdvancement(actor, { kind, key, talent = null, choice = '', prerequisitesConfirmed = false, note = '', silent = false }) {
+export async function purchaseAdvancement(actor, { kind, key, talent = null, power = null, choice = '', prerequisitesConfirmed = false, gmOverride = false, note = '', silent = false }) {
     const lock = `${actor.id ?? actor.name}`;
     if (purchasesRunning.has(lock)) return { ok: false, errors: ['Another purchase is still being processed.'] };
     purchasesRunning.add(lock);
@@ -183,9 +183,11 @@ export async function purchaseAdvancement(actor, { kind, key, talent = null, cho
             const [skillKey, specKey] = key.split('.');
             quote = skillQuote(actor, skillKey, specKey);
         } else if (kind === 'talent' && talent) quote = talentQuote(actor, talent, choice);
+        else if (kind === 'power' && power) quote = powerQuote(actor, power);
         else return fail(['Unknown advancement.']);
 
-        const check = checkPurchase(actor, quote, { prerequisitesConfirmed });
+        // only a GM can override an unmet prerequisite
+        const check = checkPurchase(actor, quote, { prerequisitesConfirmed, gmOverride: gmOverride && !!game.user?.isGM });
         if (!check.ok) return fail(check.errors, quote);
 
         const cost = quote.cost;
@@ -195,8 +197,8 @@ export async function purchaseAdvancement(actor, { kind, key, talent = null, cho
             timestamp: Date.now(),
             user: game.user.name,
             type: 'spend',
-            category: kind === 'char' ? 'Characteristic' : kind === 'talent' ? 'Talent' : 'Skill',
-            label: kind === 'talent' ? `${quote.label} (tier ${quote.tier})` : `${quote.label} advance (${quote.fromName} → ${quote.toName})`,
+            category: kind === 'char' ? 'Characteristic' : kind === 'talent' ? 'Talent' : kind === 'power' ? 'Psychic Power' : 'Skill',
+            label: kind === 'talent' ? `${quote.label} (tier ${quote.tier})` : kind === 'power' ? quote.label : `${quote.label} advance (${quote.fromName} → ${quote.toName})`,
             cost,
             note,
             matches: quote.matches,
@@ -222,6 +224,10 @@ export async function purchaseAdvancement(actor, { kind, key, talent = null, cho
 
         let created = null;
         try {
+            if (kind === 'power') {
+                const data = { ...(power.data ?? {}), system: { ...(power.data?.system ?? {}), cost } };
+                [created] = await actor.createEmbeddedDocuments('Item', [data]);
+            }
             if (kind === 'talent') {
                 const data = {
                     name: quote.label,

@@ -239,3 +239,29 @@
         }
     }
 }
+
+// prerequisites in the spend-EP dialog: one line per requirement
+.dh-ui .prereq {
+    display: block;
+    margin: 0 0 2px;
+    b {
+        display: inline-block;
+        width: 1.2em;
+        text-align: center;
+    }
+    &--met b {
+        color: var(--ds-ok, #6f9a5c);
+    }
+    &--unmet {
+        color: var(--ds-fail, #b8514b);
+    }
+    &--unmet b {
+        color: var(--ds-fail, #b8514b);
+    }
+    &--manual b {
+        color: var(--ds-warn, #c9923a);
+    }
+    small {
+        color: var(--ds-muted, #92918c);
+    }
+}

@@ -3170,3 +3170,16 @@
         }
     }
 }
+
+// Advancement rows: the value now and after the advance under the level names
+.application.dossier {
+    .adv__step {
+        display: flex;
+        flex-direction: column;
+        .adv__value {
+            color: var(--ds-gold);
+            font-size: 0.72rem;
+            letter-spacing: 0.04em;
+        }
+    }
+}

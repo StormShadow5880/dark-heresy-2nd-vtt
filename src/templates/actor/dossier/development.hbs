@@ -38,7 +38,7 @@
                     {{#each dossier.progression.characteristics as |c|}}
                         <li class="adv {{#if maxed}}is-max{{/if}}" data-tooltip="{{detail}}">
                             <span class="adv__name"><b>{{label}}</b><small>{{required}}</small></span>
-                            <span class="adv__step">{{from}} → {{#if maxed}}<em>Maximum</em>{{else}}{{to}}{{/if}}</span>
+                            <span class="adv__step">{{from}} → {{#if maxed}}<em>Maximum</em>{{else}}{{to}}{{/if}}{{#if valueFrom}}{{#unless maxed}}<small class="adv__value" data-tooltip="Value now → after this advance">{{valueFrom}} → {{valueTo}}</small>{{/unless}}{{/if}}</span>
                             <span class="adv__match" data-tooltip="Matching aptitudes">{{#unless maxed}}{{matches}}/2{{/unless}}</span>
                             <span class="adv__cost">{{#if maxed}}—{{else}}{{cost}}{{/if}}</span>
                             <button type="button" class="icon-btn" data-action="buyAdvance" data-kind="{{kind}}" data-key="{{key}}" {{#unless advanceable}}disabled{{/unless}} data-tooltip="{{#if maxed}}Maximum reached{{else}}Spend EP on this advance{{/if}}"><i class="fa-solid fa-coins"></i></button>
@@ -50,7 +50,7 @@
                     {{#each dossier.progression.skills as |s|}}
                         <li class="adv {{#if maxed}}is-max{{/if}}" data-tooltip="{{detail}}">
                             <span class="adv__name"><b>{{label}}</b><small>{{required}}</small></span>
-                            <span class="adv__step">{{from}} → {{#if maxed}}<em>Maximum</em>{{else}}{{to}}{{/if}}</span>
+                            <span class="adv__step">{{from}} → {{#if maxed}}<em>Maximum</em>{{else}}{{to}}{{/if}}{{#if valueFrom}}{{#unless maxed}}<small class="adv__value" data-tooltip="Value now → after this advance">{{valueFrom}} → {{valueTo}}</small>{{/unless}}{{/if}}</span>
                             <span class="adv__match" data-tooltip="Matching aptitudes">{{#unless maxed}}{{matches}}/2{{/unless}}</span>
                             <span class="adv__cost">{{#if maxed}}—{{else}}{{cost}}{{/if}}</span>
                             <button type="button" class="icon-btn" data-action="buyAdvance" data-kind="{{kind}}" data-key="{{key}}" {{#unless advanceable}}disabled{{/unless}} data-tooltip="{{#if maxed}}Maximum reached{{else}}Spend EP on this advance{{/if}}"><i class="fa-solid fa-coins"></i></button>

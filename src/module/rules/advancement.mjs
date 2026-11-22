@@ -19,6 +19,7 @@ import {
     SKILL_LEVELS,
     TALENT_COSTS,
 } from './advancement-data.mjs';
+import { evaluatePrerequisites, normalizeName, viewOf } from './prerequisites.mjs';
 
 export const MAX_CHARACTERISTIC_LEVEL = CHARACTERISTIC_LEVELS.length - 1;
 export const MAX_SKILL_LEVEL = SKILL_LEVELS.length - 1;
@@ -105,6 +106,9 @@ export function characteristicQuote(actor, key, owned = ownedAptitudes(actor)) {
     quote.toName = CHARACTERISTIC_LEVELS[level + 1];
     quote.cost = lookupCost(CHARACTERISTIC_COSTS, quote.matches, level + 1);
     quote.gain = '+5';
+    // the value of the characteristic now and after this advance
+    quote.valueFrom = Number.isFinite(Number(c.total)) ? Number(c.total) : null;
+    quote.valueTo = quote.valueFrom === null ? null : quote.valueFrom + 5;
     return quote;
 }
 
@@ -128,6 +132,11 @@ export function skillQuote(actor, key, specKey = null, owned = ownedAptitudes(ac
     if (level >= MAX_SKILL_LEVEL) return { ...quote, maxed: true, toName: 'Maximum' };
     quote.toName = SKILL_LEVELS[level + 1];
     quote.cost = lookupCost(SKILL_COSTS, quote.matches, level + 1);
+    // the target number of the skill now and after this advance (untrained −20, known 0, trained +10, +20, +30)
+    const training = [-20, 0, 10, 20, 30];
+    const current = Number(target.current);
+    quote.valueFrom = Number.isFinite(current) ? current : null;
+    quote.valueTo = quote.valueFrom === null ? null : quote.valueFrom + (training[level + 1] ?? 0) - (training[level] ?? 0);
     return quote;
 }
 
@@ -148,7 +157,17 @@ export function isMultipleTalent(name) {
  * @param talent {{name: string, aptitudes: string, tier: number|string, prerequisites?: string}}
  * @param choice {string} the choice of a multiple talent, e.g. "Las" for Weapon Training
  */
-export function talentQuote(actor, talent, choice = '', owned = ownedAptitudes(actor)) {
+/** Normalised names of all talents of the compendium (the prerequisites tell talents from other items by it) */
+export function knownTalentSet() {
+    try {
+        const index = globalThis.game?.packs?.get('dark-heresy-2nd.talents')?.index;
+        return new Set([...(index ?? [])].map((e) => normalizeName(e.name)));
+    } catch {
+        return new Set();
+    }
+}
+
+export function talentQuote(actor, talent, choice = '', owned = ownedAptitudes(actor), { knownTalents = null } = {}) {
     const multiple = isMultipleTalent(talent.name);
     const name = multiple && choice ? `${talent.name} (${choice})` : talent.name;
     const quote = { ...base('talent', talent.name, name), multiple, prerequisites: String(talent.prerequisites ?? '').trim() };
@@ -162,6 +181,8 @@ export function talentQuote(actor, talent, choice = '', owned = ownedAptitudes(a
         return { ...quote, advanceable: false, maxed: true, error: `${name} is already learned.` };
     }
     quote.cost = lookupCost(TALENT_COSTS, quote.matches, tier);
+    // the prerequisites of the talent against this character: every requirement that can be read is checked, the rest is "manual"
+    quote.prerequisiteCheck = quote.prerequisites ? evaluatePrerequisites(quote.prerequisites, viewOf(actor, knownTalents ?? knownTalentSet())) : null;
     return quote;
 }
 
@@ -173,15 +194,36 @@ export function availableXp(actor) {
  * Can this quote be bought right now?
  * @returns {{ok: boolean, errors: string[], remaining: number}}
  */
-export function checkPurchase(actor, quote, { prerequisitesConfirmed = false } = {}) {
+export function checkPurchase(actor, quote, { prerequisitesConfirmed = false, gmOverride = false } = {}) {
     const errors = [];
     const available = availableXp(actor);
     if (quote.error) errors.push(quote.error);
     else if (quote.maxed) errors.push(`${quote.label} is already at the maximum.`);
     else if (!Number.isFinite(quote.cost) || quote.cost <= 0) errors.push('No cost could be determined.');
     if (!errors.length && quote.cost > available) errors.push(`Not enough EP: ${quote.cost} needed, ${available} available.`);
-    if (!errors.length && quote.prerequisites && !prerequisitesConfirmed) errors.push(`Check the prerequisites first: ${quote.prerequisites}`);
+    if (!errors.length && quote.prerequisites) {
+        const check = quote.prerequisiteCheck;
+        if (check && !check.empty) {
+            // a requirement that is definitely not met blocks the purchase (only a GM can override it); one that cannot be read has to be confirmed
+            if (check.status === 'unmet' && !gmOverride) errors.push(`Prerequisites not met: ${check.unmet.join('; ')}.`);
+            else if (check.manual.length && !prerequisitesConfirmed) errors.push(`Check these prerequisites yourself and confirm them: ${check.manual.join('; ')}.`);
+        } else if (!check && !prerequisitesConfirmed) errors.push(`Check the prerequisites first: ${quote.prerequisites}`);
+    }
     return { ok: errors.length === 0, errors, remaining: available - (quote.cost ?? 0) };
+}
+
+/** A psychic power of the compendium: the price is the one in its data (a power without a price cannot be bought automatically) */
+export function powerQuote(actor, power) {
+    const cost = Math.floor(num(power.cost));
+    const owned = (actor.items ?? []).some((i) => i.type === 'psychicPower' && normalizeName(i.name) === normalizeName(power.name));
+    const quote = { ...base('power', power.name, power.name), discipline: power.discipline ?? '', fromName: 'Not learned', toName: 'Learned', cost: cost > 0 ? cost : null };
+    if (owned) return { ...quote, advanceable: false, maxed: true, error: `${power.name} is already learned.` };
+    if (!(cost > 0)) return { ...quote, advanceable: false, error: `${power.name} has no price in its data: enter it as a manual entry.` };
+    // a power needs a psyker: this is reported for the player and the GM to confirm, it is not an invented block
+    const psy = num(actor.system?.psy?.rating);
+    quote.prerequisites = psy >= 1 ? '' : 'Psy rating';
+    quote.prerequisiteCheck = psy >= 1 ? null : { empty: false, status: 'manual', clauses: [], unmet: [], manual: [`Psy Rating ${psy}: confirm that the character may learn psychic powers`] };
+    return quote;
 }
 
 /** One line for tooltips and the dialog, e.g. "Required: Ballistic Skill + Finesse · Matching 1/2 · 250 EP" */
