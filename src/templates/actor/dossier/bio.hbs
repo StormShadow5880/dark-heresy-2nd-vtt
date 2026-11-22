@@ -29,7 +29,8 @@
         </article>
         <article class="panel panel--relations">
             <h2 class="panel__title">Patron &amp; Relationships
-                <button type="button" class="icon-btn" data-action="addFaction" data-tooltip="New faction"><i class="fa-solid fa-flag"></i></button>
+                {{#if dossier.isGM}}<button type="button" class="icon-btn" data-action="manageFactions" data-tooltip="Manage the list of factions"><i class="fa-solid fa-landmark"></i></button>{{/if}}
+                <button type="button" class="icon-btn" data-action="addFaction" data-tooltip="Add a faction relation"><i class="fa-solid fa-flag"></i></button>
                 <button type="button" class="icon-btn" data-action="addContact" data-faction="" data-tooltip="New contact"><i class="fa-solid fa-plus"></i></button>
             </h2>
             <div class="rel-patron" data-patron-drop>
@@ -63,7 +64,10 @@
                 {{#each dossier.network.groups as |g|}}
                     <section class="rel-faction" data-faction="{{g.id}}">
                         <div class="rel-row rel-row--faction">
-                            <input type="text" class="rel-name" data-faction-field="name" data-faction-id="{{g.id}}" value="{{g.name}}" aria-label="Faction" />
+                            <select class="rel-name" data-faction-field="factionId" data-faction-id="{{g.id}}" aria-label="Faction">
+                                {{#if g.unlisted}}<option value="" selected>{{#if g.name}}{{g.name}} (not in the list){{else}}– choose a faction –{{/if}}</option>{{/if}}
+                                {{#each g.options as |o|}}<option value="{{o.id}}" {{#if o.selected}}selected{{/if}}>{{o.name}}</option>{{/each}}
+                            </select>
                             <input type="number" step="1" class="rel-level" data-faction-field="level" data-faction-id="{{g.id}}" value="{{g.level}}" aria-label="Faction level" title="Your relation to this faction" />
                             <span class="rel-calc">faction</span>
                             <span class="rel-mod {{#if (gt g.modifier 0)}}is-pos{{else if (lt g.modifier 0)}}is-neg{{/if}}">{{#if (gt g.modifier 0)}}+{{/if}}{{g.modifier}}</span>

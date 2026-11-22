@@ -70,6 +70,7 @@ export class AcolyteDossierSheet extends AcolyteSheet {
             firstAidSelf: AcolyteDossierSheet.#onFirstAidSelf,
             fateHeal: AcolyteDossierSheet.#onFateHeal,
             addFaction: AcolyteDossierSheet.#onAddFaction,
+            manageFactions: AcolyteDossierSheet.#onManageFactions,
             removeFaction: AcolyteDossierSheet.#onRemoveFaction,
             addContact: AcolyteDossierSheet.#onAddContact,
             relationRoll: AcolyteDossierSheet.#onRelationRoll,
@@ -351,6 +352,11 @@ export class AcolyteDossierSheet extends AcolyteSheet {
 
     static async #onAddFaction() {
         if (this.isEditable) await addFaction(this.actor);
+    }
+
+    static async #onManageFactions() {
+        const { openFactionManager } = await import('../../relations/factions.mjs');
+        await openFactionManager();
     }
 
     static async #onRemoveFaction(event, target) {

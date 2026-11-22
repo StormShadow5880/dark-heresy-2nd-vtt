@@ -5,16 +5,18 @@
 import { SYSTEM_ID } from '../system-id.mjs';
 import { AFFILIATIONS } from '../rules/relations.mjs';
 import { newId } from '../rules/relations-data.mjs';
+import { factionRegistry, openFactionManager } from '../relations/factions.mjs';
+import { findById } from '../rules/factions.mjs';
 import { actorPatronId, assignPatron, createPatron, deletePatron, fullPatron, patronDocs, savePatron, publicPatron } from '../relations/store.mjs';
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 
 const TEXT_FIELDS = [
-    { key: 'role', label: 'Role', rows: 2 },
-    { key: 'motivation', label: 'Motivation', rows: 3 },
-    { key: 'demeanor', label: 'Demeanor', rows: 3 },
-    { key: 'description', label: 'Description', rows: 5 },
-    { key: 'notes', label: 'Notes', rows: 4 },
+    { key: 'role', label: 'Role', rows: 3, icon: 'fa-medal' },
+    { key: 'motivation', label: 'Motivation', rows: 3, icon: 'fa-compass' },
+    { key: 'demeanor', label: 'Demeanor', rows: 4, icon: 'fa-masks-theater' },
+    { key: 'description', label: 'Description', rows: 4, icon: 'fa-scroll' },
+    { key: 'notes', label: 'Notes', rows: 3, icon: 'fa-book-open' },
 ];
 
 /**
@@ -24,16 +26,16 @@ const TEXT_FIELDS = [
 export class PatronSheet extends HandlebarsApplicationMixin(foundry.applications.sheets.ActorSheetV2) {
     static DEFAULT_OPTIONS = {
         classes: ['dh-ui', 'dh-patron'],
-        position: { width: 620, height: 720 },
+        position: { width: 940, height: 900 },
         window: { resizable: true, icon: 'fa-solid fa-user-tie' },
         // our fields are saved with the Save button, not by the form
         form: { submitOnChange: false, closeOnSubmit: false, handler: async () => {} },
         actions: {
-            addBoon: PatronSheet.#add('boons', () => ({ id: newId('b'), text: '' })),
-            addLiability: PatronSheet.#add('liabilities', () => ({ id: newId('l'), text: '', secret: false })),
-            addRelation: PatronSheet.#add('relations', () => ({ id: newId('r'), faction: '', level: 0, secret: false })),
+            addBoon: PatronSheet.#add('boons', () => ({ id: newId('b'), name: '', text: '' })),
+            addLiability: PatronSheet.#add('liabilities', () => ({ id: newId('l'), name: '', text: '', secret: false })),
+            addRelation: PatronSheet.#add('relations', () => ({ id: newId('r'), faction: '', level: 0, note: '', secret: false })),
             removeRow: PatronSheet.#remove,
-            save: PatronSheet.#save,
+            manageFactions: () => openFactionManager(),
             pickImage: PatronSheet.#pickImage,
         },
     };
@@ -43,8 +45,46 @@ export class PatronSheet extends HandlebarsApplicationMixin(foundry.applications
     draft = null;
     assigned = null;
 
+    #timer = null;
+
     get patronId() {
         return this.document.id;
+    }
+
+    get title() {
+        return `Patron: ${this.draft?.name ?? this.document.name}`;
+    }
+
+    /** Every change is saved by itself shortly after the last edit (and when the window closes): there is no Save button to forget */
+    queueSave() {
+        if (!game.user.isGM) return;
+        clearTimeout(this.#timer);
+        this.#timer = setTimeout(() => this.autosave(), 500);
+    }
+
+    async autosave() {
+        clearTimeout(this.#timer);
+        this.#timer = null;
+        if (!game.user.isGM || !this.draft) return;
+        try {
+            const doc = this.document;
+            const before = new Set(publicPatron(doc)?.assigned ?? []);
+            // render:false: a redraw while typing would take the focus away from the next field
+            await savePatron(this.patronId, { ...this.draft, assigned: [...before] }, { render: false });
+            for (const id of this.assigned) if (!before.has(id)) await assignPatron(game.actors.get(id), this.patronId);
+            for (const id of before) if (!this.assigned.has(id)) await assignPatron(game.actors.get(id), null);
+            if (this.window?.title) this.window.title.textContent = this.title;
+            const note = this.element?.querySelector('.dh-patron__saved');
+            if (note) note.textContent = 'Saved.';
+        } catch (error) {
+            console.error('Dark Heresy 2e | the patron could not be saved', error);
+            ui.notifications.error(`The patron could not be saved: ${error.message}`);
+        }
+    }
+
+    async close(options) {
+        if (this.#timer) await this.autosave();
+        return super.close(options);
     }
 
     async _prepareContext(options) {
@@ -60,33 +100,52 @@ export class PatronSheet extends HandlebarsApplicationMixin(foundry.applications
                   .filter((a) => a.type === 'acolyte')
                   .map((a) => ({ id: a.id, name: a.name, assigned: this.assigned.has(a.id), other: actorPatronId(a) && actorPatronId(a) !== this.patronId ? game.actors.get(actorPatronId(a))?.name : '' }))
             : [];
-        return { ...base, patron: this.draft, editable: isGM, isGM, textFields: TEXT_FIELDS, affiliations: AFFILIATIONS, characters };
+        return { ...base, patron: this.draft, editable: isGM, isGM, textFields: TEXT_FIELDS, affiliations: AFFILIATIONS, characters, factionOptions: factionRegistry() };
     }
 
     _onRender(context, options) {
         super._onRender?.(context, options);
         const root = this.element;
-        root.querySelectorAll('[data-field]').forEach((el) => el.addEventListener('change', () => (this.draft[el.dataset.field] = el.value)));
+        root.querySelectorAll('[data-field]').forEach((el) =>
+            el.addEventListener('change', () => {
+                this.draft[el.dataset.field] = el.value;
+                this.queueSave();
+            }),
+        );
+        root.querySelectorAll('[data-nav]').forEach((b) => b.addEventListener('click', () => root.querySelector(`#${b.dataset.nav}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })));
         root.querySelectorAll('[data-list]').forEach((el) =>
             el.addEventListener('change', () => {
                 const row = this.draft[el.dataset.list][Number(el.dataset.index)];
                 if (!row) return;
                 const key = el.dataset.key;
-                row[key] = el.type === 'checkbox' ? el.checked : key === 'level' ? Math.trunc(Number(el.value)) || 0 : el.value;
+                if (key === 'factionId') {
+                    // chosen from the list of the world: the row keeps the id and the name at the time of choosing
+                    const chosen = findById(factionRegistry(), el.value);
+                    row.factionId = chosen?.id ?? null;
+                    if (chosen) row.faction = chosen.name;
+                } else row[key] = el.type === 'checkbox' ? el.checked : key === 'level' ? Math.trunc(Number(el.value)) || 0 : el.value;
+                this.queueSave();
+                if (key === 'level') this.render(); // the colour of the level box follows
             }),
         );
-        root.querySelectorAll('[data-assign]').forEach((el) => el.addEventListener('change', () => (el.checked ? this.assigned.add(el.dataset.assign) : this.assigned.delete(el.dataset.assign))));
+        root.querySelectorAll('[data-assign]').forEach((el) => el.addEventListener('change', () => {
+                el.checked ? this.assigned.add(el.dataset.assign) : this.assigned.delete(el.dataset.assign);
+                this.queueSave();
+            }),
+        );
     }
 
     static #add(list, make) {
         return function () {
             this.draft[list].push(make());
+            this.queueSave();
             this.render();
         };
     }
 
     static #remove(event, target) {
         this.draft[target.dataset.list].splice(Number(target.dataset.index), 1);
+        this.queueSave();
         this.render();
     }
 
@@ -97,21 +156,10 @@ export class PatronSheet extends HandlebarsApplicationMixin(foundry.applications
             current: this.draft.img,
             callback: (path) => {
                 this.draft.img = path;
+                this.queueSave();
                 this.render();
             },
         }).render(true);
-    }
-
-    static async #save() {
-        if (!game.user.isGM) return;
-        const doc = this.document;
-        const before = new Set(publicPatron(doc)?.assigned ?? []);
-        await savePatron(this.patronId, { ...this.draft, assigned: [...before] });
-        for (const id of this.assigned) if (!before.has(id)) await assignPatron(game.actors.get(id), this.patronId);
-        for (const id of before) if (!this.assigned.has(id)) await assignPatron(game.actors.get(id), null);
-        ui.notifications.info(`${this.draft.name} saved.`);
-        this.draft = null;
-        this.render();
     }
 }
 

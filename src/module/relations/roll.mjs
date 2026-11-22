@@ -14,6 +14,8 @@ import { SOCIAL_SKILLS, describeRelation, evaluateSelection, isSocialSkill, need
 import { contactOf, shouldProcess } from '../rules/relations-data.mjs';
 import { actorPatronDoc, actorRelations, fullPatron } from './store.mjs';
 import { relationCap } from './sheet-actions.mjs';
+import { factionName, linkRows } from '../rules/factions.mjs';
+import { factionRegistry } from './factions.mjs';
 
 const SOCKET = `system.${SYSTEM_ID}`;
 const seen = new Set();
@@ -32,6 +34,8 @@ export const confirmAllRelations = () => {
 /** What this client knows: personal factions and contacts, the patron as far as this user may see it */
 export async function relationContext(actor) {
     const rel = actorRelations(actor);
+    const registry = factionRegistry();
+    const factions = linkRows(rel.factions, registry).map((f) => ({ ...f, name: factionName(registry, f) }));
     const contacts = actor.items.filter((i) => i.type === 'peer').map(contactOf);
     const doc = actorPatronDoc(actor);
     let patron = null;
@@ -39,7 +43,7 @@ export async function relationContext(actor) {
         const full = await fullPatron(doc);
         if (full) patron = { id: doc.id, name: full.name, affiliation: full.affiliation ?? 'unknown', relations: (full.relations ?? []).map((r) => ({ id: r.id, faction: r.faction, level: r.secret && !game.user.isGM ? undefined : r.level, secret: !!r.secret })) };
     }
-    return { factions: rel.factions, contacts, patron };
+    return { factions, contacts, patron };
 }
 
 const hasAnything = (ctx) => ctx.factions.length > 0 || ctx.contacts.length > 0 || !!ctx.patron;

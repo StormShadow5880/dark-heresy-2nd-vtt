@@ -26,15 +26,15 @@ export const emptyPatron = () => ({
     demeanor: '',
     description: '',
     notes: '', // public notes: the GM's private notes are stored in the confidential store
-    boons: [], // { id, text }
-    liabilities: [], // { id, text, secret }
-    relations: [], // { id, faction, level, secret }: the patron's relation to a faction
+    boons: [], // { id, name, text }
+    liabilities: [], // { id, name, text, secret }
+    relations: [], // { id, factionId, faction (name snapshot), level, note, secret }: the patron's relation to a faction
     affiliation: 'unknown', // unknown | known | hidden: is the characters' membership known (GM controlled, see rules/relations.mjs)
     assigned: [], // actor ids
 });
 
 /** The confidential counterpart of a patron */
-export const emptySecret = () => ({ notes: '', liabilities: [], relationLevels: {} });
+export const emptySecret = () => ({ notes: '', liabilities: [], relationLevels: {}, relationNotes: {} });
 
 /**
  * Splits a complete patron (as the GM edits it) into the part for the public document and the confidential part.
@@ -47,15 +47,17 @@ export function splitPatron(full) {
     secret.notes = String(full.gmNotes ?? '');
     pub.liabilities = [];
     for (const l of full.liabilities ?? []) {
-        if (l.secret) secret.liabilities.push({ id: l.id, text: l.text });
-        else pub.liabilities.push({ id: l.id, text: l.text, secret: false });
+        if (l.secret) secret.liabilities.push({ id: l.id, name: l.name ?? '', text: l.text ?? '' });
+        else pub.liabilities.push({ id: l.id, name: l.name ?? '', text: l.text ?? '', secret: false });
     }
     pub.relations = [];
     for (const r of full.relations ?? []) {
         if (r.secret) {
+            // the level AND the note of a secret relation are confidential
             secret.relationLevels[r.id] = level(r.level);
-            pub.relations.push({ id: r.id, faction: r.faction, secret: true });
-        } else pub.relations.push({ id: r.id, faction: r.faction, level: level(r.level), secret: false });
+            secret.relationNotes[r.id] = String(r.note ?? '');
+            pub.relations.push({ id: r.id, factionId: r.factionId ?? null, faction: r.faction, secret: true });
+        } else pub.relations.push({ id: r.id, factionId: r.factionId ?? null, faction: r.faction, level: level(r.level), note: String(r.note ?? ''), secret: false });
     }
     delete pub.gmNotes;
     return { pub, secret };
@@ -69,7 +71,7 @@ export function mergePatron(pub, secret) {
         ...pub,
         gmNotes: s.notes,
         liabilities: [...(pub.liabilities ?? []).map((l) => ({ ...l, secret: false })), ...s.liabilities.map((l) => ({ ...l, secret: true }))],
-        relations: (pub.relations ?? []).map((r) => (r.secret ? { ...r, level: level(s.relationLevels[r.id]) } : r)),
+        relations: (pub.relations ?? []).map((r) => (r.secret ? { ...r, level: level(s.relationLevels[r.id]), note: String(s.relationNotes?.[r.id] ?? '') } : r)),
     };
 }
 
@@ -106,7 +108,7 @@ export const emptyRelations = () => ({ version: 1, factions: [] }); // factions:
 
 export function normalizeRelations(raw) {
     const r = { ...emptyRelations(), ...(raw ?? {}) };
-    r.factions = (r.factions ?? []).map((f) => ({ id: f.id ?? newId('f'), name: String(f.name ?? ''), level: level(f.level) }));
+    r.factions = (r.factions ?? []).map((f) => ({ id: f.id ?? newId('f'), factionId: f.factionId ?? null, name: String(f.name ?? ''), level: level(f.level) }));
     return r;
 }
 

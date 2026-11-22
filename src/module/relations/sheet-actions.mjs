@@ -7,6 +7,8 @@ import { level } from '../rules/relations.mjs';
 import { contactOf, newId } from '../rules/relations-data.mjs';
 import { actorRelations, readSecrets, saveActorRelations, setContactGmNotes } from './store.mjs';
 import { buildNetwork } from '../rules/relations.mjs';
+import { factionName, findById, linkRows, optionsFor } from '../rules/factions.mjs';
+import { factionRegistry } from './factions.mjs';
 
 export function relationCap() {
     try {
@@ -20,18 +22,26 @@ export function relationCap() {
 /** View model of the Relationships panel */
 export async function buildNetworkView(actor) {
     const rel = actorRelations(actor);
+    const registry = factionRegistry();
+    // rows of earlier versions (free text) are linked to the list when the name matches; the names come from the list
+    const linked = linkRows(rel.factions, registry);
+    const factions = linked.map((f) => ({ ...f, name: factionName(registry, f) }));
     const contacts = actor.items.filter((i) => i.type === 'peer').map(contactOf);
-    const net = buildNetwork(rel.factions, contacts, relationCap());
+    const net = buildNetwork(factions, contacts, relationCap());
+    for (const g of net.groups) {
+        g.options = optionsFor(registry, linked, g.factionId).map((o) => ({ id: o.id, name: o.name, selected: o.id === g.factionId }));
+        g.unlisted = !g.factionId || !findById(registry, g.factionId); // a free-text or removed faction: shown as it is
+    }
     if (game.user.isGM) {
         const secrets = (await readSecrets()).contacts[actor.id] ?? {};
         for (const c of [...net.groups.flatMap((g) => g.contacts), ...net.loose]) c.gmNotes = secrets[c.id] ?? '';
     }
-    return { ...net, hasFactions: net.groups.length > 0, cap: relationCap(), factionOptions: rel.factions };
+    return { ...net, hasFactions: net.groups.length > 0, cap: relationCap(), factionOptions: factions.map((f) => ({ id: f.id, name: f.name })) };
 }
 
 export async function addFaction(actor) {
     const rel = actorRelations(actor);
-    rel.factions.push({ id: newId('f'), name: 'New faction', level: 0 });
+    rel.factions.push({ id: newId('f'), factionId: null, name: '', level: 0 });
     await saveActorRelations(actor, rel);
 }
 
@@ -49,8 +59,13 @@ export async function setFactionField(actor, factionId, field, value) {
     const rel = actorRelations(actor);
     const f = rel.factions.find((x) => x.id === factionId);
     if (!f) return;
-    f[field] = field === 'level' ? level(value) : String(value);
-    await saveActorRelations(actor, rel, { render: field === 'level' });
+    if (field === 'factionId') {
+        // chosen from the list of the world: the row keeps the id and the name at the time of choosing
+        const chosen = findById(factionRegistry(), value);
+        f.factionId = chosen?.id ?? null;
+        f.name = chosen?.name ?? f.name;
+    } else f[field] = field === 'level' ? level(value) : String(value);
+    await saveActorRelations(actor, rel, { render: field === 'level' || field === 'factionId' });
 }
 
 export async function addContact(actor, factionId = null) {

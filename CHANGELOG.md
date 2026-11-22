@@ -8,6 +8,8 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
 
 ### Patrons and relationships
 
+- One faction list for the world (standard factions + custom ones added by the GM); characters and patrons choose their relations from it. The patron sheet follows the dossier design, boons/liabilities have a title and a description, relations a note, and every change is saved automatically.
+
 - Patrons are actors of their own type (drag one onto the patron field of a character: the stats come from the patron, nothing is copied); existing journal patrons are converted automatically.
 - Patron dossiers (GM-managed, one patron for several characters, secret liabilities and relation values kept in a GM-only store), Patron & Relationships panel in the Biography (factions with contacts, calculation and modifier), contact "Test" button and a relationship section in social roll dialogs (house rule: 1 level = ±10 on the target), GM-resolved rolls for secret values. New settings for an optional limit and GM confirmation. See [docs/patrons.md](docs/patrons.md).
 

@@ -208,6 +208,14 @@ Enable Debug with: game.dh.debug = true
             patrons.addEventListener('click', async () => (await import('./sheets/patron-dossier.mjs')).openPatronDirectory());
             (root.querySelector('.directory-header .header-actions') ?? root.querySelector('.directory-header') ?? root.querySelector('header'))?.append(patrons);
         }
+        if (game.user.isGM && !root.querySelector('.dh-factions-btn')) {
+            const factions = document.createElement('button');
+            factions.type = 'button';
+            factions.className = 'dh-factions-btn';
+            factions.innerHTML = '<i class="fa-solid fa-landmark"></i> Factions';
+            factions.addEventListener('click', async () => (await import('./relations/factions.mjs')).openFactionManager());
+            (root.querySelector('.directory-header .header-actions') ?? root.querySelector('.directory-header') ?? root.querySelector('header'))?.append(factions);
+        }
         if (root.querySelector('.dh-create-acolyte')) return;
         if (!game.user.hasPermission('ACTOR_CREATE')) return;
         const button = document.createElement('button');

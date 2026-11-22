@@ -11,6 +11,8 @@
  * (Earlier versions kept patrons in JournalEntry documents: migrateJournalPatrons() converts them.)
  */
 import { SYSTEM_ID } from '../system-id.mjs';
+import { factionRegistry } from './factions.mjs';
+import { factionName } from '../rules/factions.mjs';
 import { emptyPatron, emptySecret, mergePatron, newId, normalizeRelations, patronOwnership, playerView, splitPatron } from '../rules/relations-data.mjs';
 
 const SECRETS = 'secretsJson';
@@ -35,7 +37,10 @@ export function publicPatron(doc) {
     const sys = typeof doc.system?.toObject === 'function' ? doc.system.toObject() : doc.system ?? {};
     const pub = {};
     for (const key of PATRON_KEYS) if (sys[key] !== undefined) pub[key] = foundry.utils?.deepClone ? foundry.utils.deepClone(sys[key]) : JSON.parse(JSON.stringify(sys[key]));
-    return { ...emptyPatron(), ...pub, name: doc.name, img: doc.img ?? emptyPatron().img };
+    const registry = factionRegistry();
+    // the faction names come from the list (a rename reaches everybody), the row keeps its snapshot otherwise
+    const relations = (pub.relations ?? emptyPatron().relations).map((r) => ({ ...r, faction: factionName(registry, r) }));
+    return { ...emptyPatron(), ...pub, relations, name: doc.name, img: doc.img ?? emptyPatron().img };
 }
 
 /** The complete patron for the GM: public data and confidential store */
@@ -55,13 +60,13 @@ export async function createPatron() {
 }
 
 /** Saves a complete patron: the public part into the patron actor, the confidential part into the store (GM only) */
-export async function savePatron(id, full) {
+export async function savePatron(id, full, { render = true } = {}) {
     if (!game.user.isGM) return;
     const doc = game.actors.get(id);
     if (!doc) return;
     const { pub, secret } = splitPatron({ ...full, assigned: full.assigned ?? publicPatron(doc)?.assigned ?? [] });
     const { name, img, ...system } = pub;
-    await doc.update({ name, img, system });
+    await doc.update({ name, img, system }, { render });
     const secrets = await readSecrets();
     secrets.patrons[id] = secret;
     await writeSecrets(secrets);

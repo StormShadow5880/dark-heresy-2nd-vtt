@@ -135,8 +135,8 @@ test('network: factions with contacts, contacts without a faction, the total per
 const patron = () => ({
     ...emptyPatron(),
     name: 'Inquisitor Voss',
-    liabilities: [{ id: 'l1', text: 'Publicly known debt', secret: false }, { id: 'l2', text: 'SECRET: heretical past', secret: true }],
-    relations: [{ id: 'r1', faction: 'Mechanicus', level: 2, secret: false }, { id: 'r2', faction: 'Ecclesiarchy', level: -3, secret: true }],
+    liabilities: [{ id: 'l1', name: 'Debt', text: 'Publicly known debt', secret: false }, { id: 'l2', name: 'SECRET TITLE', text: 'SECRET: heretical past', secret: true }],
+    relations: [{ id: 'r1', faction: 'Mechanicus', level: 2, note: 'public note on r1', secret: false }, { id: 'r2', faction: 'Ecclesiarchy', level: -3, note: 'SECRET RELATION NOTE', secret: true }],
     gmNotes: 'SECRET GM NOTE',
     notes: 'public note',
 });
@@ -145,9 +145,10 @@ test('secrets: the public document contains no confidential text or value', () =
     const { pub, secret } = splitPatron(patron());
     const json = JSON.stringify(pub);
     assert.doesNotMatch(json, /SECRET/);
-    assert.doesNotMatch(json, /heretical/);
+    assert.doesNotMatch(json, /heretical|SECRET TITLE|SECRET RELATION NOTE/);
+    assert.match(json, /public note on r1/);
     assert.doesNotMatch(json, /-3|−3/);
-    assert.deepEqual(pub.relations.find((r) => r.id === 'r2'), { id: 'r2', faction: 'Ecclesiarchy', secret: true });
+    assert.deepEqual(pub.relations.find((r) => r.id === 'r2'), { id: 'r2', factionId: null, faction: 'Ecclesiarchy', secret: true });
     assert.equal(pub.liabilities.length, 1);
     assert.equal(secret.notes, 'SECRET GM NOTE');
     assert.equal(secret.liabilities[0].text, 'SECRET: heretical past');
@@ -172,6 +173,8 @@ test('the GM gets everything back: split and merge are lossless', () => {
     assert.equal(back.relations.find((r) => r.id === 'r2').level, -3);
     assert.equal(back.liabilities.length, 2);
     assert.equal(back.liabilities.find((l) => l.secret).text, 'SECRET: heretical past');
+    assert.equal(back.liabilities.find((l) => l.secret).name, 'SECRET TITLE');
+    assert.equal(back.relations.find((r) => r.id === 'r2').note, 'SECRET RELATION NOTE');
     assert.equal(patronRelation(back, 'mechanicus').level, 2);
     assert.equal(patronRelation(pub, 'Ecclesiarchy').level, undefined); // the public data has no value
 });
