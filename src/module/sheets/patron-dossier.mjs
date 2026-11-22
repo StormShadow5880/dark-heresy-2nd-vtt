@@ -119,7 +119,12 @@ export class PatronSheet extends HandlebarsApplicationMixin(foundry.applications
 export function openPatron(patronId) {
     const doc = game.actors.get(patronId);
     if (!doc) return ui.notifications.warn('This patron is not available to you.');
-    doc.sheet.render({ force: true });
+    try {
+        doc.sheet.render({ force: true });
+    } catch (error) {
+        console.error('Dark Heresy 2e | the patron sheet could not be opened', error);
+        ui.notifications.error(`The patron sheet could not be opened: ${error.message}`);
+    }
 }
 
 /** GM list of all patrons: open, create, delete (patrons are also in the Actors directory: type Patron) */
@@ -127,30 +132,41 @@ export async function openPatronDirectory() {
     if (!game.user.isGM) return;
     const DialogV2 = foundry.applications.api.DialogV2;
     const docs = patronDocs();
-    const rows = docs.map((d) => `<li><b>${foundry.utils.escapeHTML(d.name)}</b> <small>${(publicPatron(d)?.assigned ?? []).length} character(s)</small>
-        <button type="button" data-open="${d.id}">Open</button><button type="button" data-delete="${d.id}" aria-label="Delete">×</button></li>`).join('');
+    const rows = docs
+        .map(
+            (d) => `<li><b>${foundry.utils.escapeHTML(d.name)}</b> <small>${(publicPatron(d)?.assigned ?? []).length} character(s)</small>
+        <button type="button" data-open="${d.id}">Open</button><button type="button" data-delete="${d.id}" aria-label="Delete">×</button></li>`,
+        )
+        .join('');
     await DialogV2.wait({
         classes: ['dh-ui', 'dh-dialog'],
         window: { title: 'Patrons' },
-        content: `<ul class="dh-patron__dir">${rows || '<li class="empty">No patrons yet.</li>'}</ul>`,
+        content: `<ul class="dh-patron__dir">${rows || '<li class="empty">No patrons yet.</li>'}</ul>
+            <p><button type="button" data-new="1">New patron</button></p>`,
         render: (event, dialog) =>
             dialog.element.addEventListener('click', async (ev) => {
-                const b = ev.target.closest('button[data-open], button[data-delete]');
+                const b = ev.target.closest('button[data-open], button[data-delete], button[data-new]');
                 if (!b) return;
-                if (b.dataset.open) openPatron(b.dataset.open);
-                else if (await DialogV2.confirm({ window: { title: 'Delete the patron' }, content: '<p>Delete this patron and its confidential data? The characters lose their patron.</p>', rejectClose: false, modal: false })) {
-                    await deletePatron(b.dataset.delete);
-                    dialog.close();
-                    openPatronDirectory();
+                try {
+                    if (b.dataset.new) {
+                        // created here and not in the callback of a dialog button: errors are shown instead of swallowed
+                        const doc = await createPatron();
+                        if (!doc) return ui.notifications.error('The patron could not be created.');
+                        dialog.close();
+                        openPatron(doc.id);
+                    } else if (b.dataset.open) openPatron(b.dataset.open);
+                    else if (await DialogV2.confirm({ window: { title: 'Delete the patron' }, content: '<p>Delete this patron and its confidential data? The characters lose their patron.</p>', rejectClose: false, modal: false })) {
+                        await deletePatron(b.dataset.delete);
+                        dialog.close();
+                        openPatronDirectory();
+                    }
+                } catch (error) {
+                    console.error('Dark Heresy 2e | patron action failed', error);
+                    ui.notifications.error(`Patron: ${error.message}`);
                 }
             }),
-        buttons: [
-            { action: 'new', label: 'New patron', default: true, callback: async () => (await createPatron()) },
-            { action: 'close', label: 'Close' },
-        ],
+        buttons: [{ action: 'close', label: 'Close', default: true }],
         rejectClose: false,
         modal: false,
-    }).then(async (r) => {
-        if (r && r.id) openPatron(r.id);
     });
 }
