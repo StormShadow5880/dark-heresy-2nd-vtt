@@ -89,6 +89,14 @@ export class DarkHeresySettings {
             type: Number,
             range: { min: 0, max: 1, step: 0.05 },
         });
+        game.settings.register(SYSTEM_ID, 'sustain-prompt', {
+            name: 'Ask about sustained powers at the start of the turn',
+            hint: 'In combat the psyker is asked at the start of his turn which sustained powers he keeps. The cost (Free, Half or Full Action) is taken from the actions of the turn; powers that are not kept end.',
+            scope: 'world',
+            config: true,
+            default: true,
+            type: Boolean,
+        });
         game.settings.register(SYSTEM_ID, 'relations-cap-mode', {
             name: 'Relationship modifier: limit',
             hint: 'House rule: one relationship level = ±10 on the target of a fitting social test. Here the GM can limit the relationship modifier (positive and negative). This is separate from the DH2 limit of ±60 for all modifiers of a roll, which always applies.',

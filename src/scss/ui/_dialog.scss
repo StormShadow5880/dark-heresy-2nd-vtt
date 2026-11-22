@@ -522,3 +522,45 @@
     clip: rect(0 0 0 0);
     white-space: nowrap;
 }
+
+// sustained powers at the start of the turn
+.dh-sustain {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    &__list {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    &__row {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+        gap: 10px;
+        padding: 6px 10px;
+        border: 1px solid var(--ds-line, rgba(255, 255, 255, 0.2));
+        cursor: pointer;
+
+        &:has(input:checked) {
+            border-color: var(--ds-gold, #c9a14a);
+        }
+
+        &.is-disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+    }
+
+    &__cost {
+        color: var(--ds-muted, #aaa);
+        font-size: 0.9em;
+    }
+
+    &__budget {
+        margin: 0;
+        font-weight: 700;
+    }
+}

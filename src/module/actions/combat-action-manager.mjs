@@ -1,24 +1,28 @@
 import { handleBleeding, handleOnFire } from '../rules/active-effects.mjs';
+import { onTurnStart } from '../ui/sustain-dialog.mjs';
 
 export class CombatActionManager {
     combatTurnHook;
     combatRoundHook;
+    combatStartHook;
 
     initializeHooks() {
         // Initialize Combat Hooks
         this.combatTurnHook = Hooks.on('combatTurn', async (combat, data) => await this.updateCombat(combat, data));
         this.combatRoundHook = Hooks.on('combatRound', async (combat, data) => await this.updateCombat(combat, data));
+        this.combatStartHook = Hooks.on('combatStart', async (combat) => await onTurnStart(combat));
     }
 
     disableHooks() {
         game.dh.log('Disabling Hooks', {'cth': this.combatTurnHook, 'crh': this.combatRoundHook})
         Hooks.off('combatTurn', this.combatTurnHook);
         Hooks.off('combatRound', this.combatRoundHook);
+        Hooks.off('combatStart', this.combatStartHook);
     }
 
     async updateCombat(combat, data) {
-        console.log(combat);
-        console.log(data);
+        // the psyker decides which sustained powers he keeps (only the responsible client opens the dialog)
+        onTurnStart(combat).catch((err) => console.error('Dark Heresy | sustained powers', err));
         // Only Run on the first GM -- so it will only run once
         if(game.userId === this.getFirstGM()) {
             game.dh.log('updateCombat - this should only be running on first GM');

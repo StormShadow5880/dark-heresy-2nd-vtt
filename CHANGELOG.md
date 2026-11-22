@@ -6,6 +6,10 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
 
 ## [1.9.0] – Unreleased
 
+### Psychic: sustained powers at the start of the turn
+
+- In combat the psyker is asked at the start of his turn which sustained powers he keeps. Free actions cost nothing, the others are taken from the actions of the turn (1 Full Action); powers that are not ticked end. See `docs/sustained-powers.md`.
+
 ### Item sheets: codex design
 
 - Talent, trait, gear, weapon, psychic power and generic item sheets use the new parchment design (dark red header, emblem, tier/level plaque, gold divider). All fields and data paths are unchanged. See `docs/codex-sheets.md`.
