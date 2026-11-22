@@ -199,6 +199,122 @@ $cx-body: 'IM Fell DW Pica', 'Palatino Linotype', Georgia, 'Times New Roman', se
         }
     }
 
+
+    // ---- facts (small fields under the header of gear, weapon and psychic power sheets) -----------------------------
+    &__facts {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(13em, 1fr));
+        gap: 1.2cqw 2cqw;
+        margin-top: 2.4cqw;
+        padding: 1.4cqw 0;
+        border-top: 1px solid rgba(141, 107, 52, 0.6);
+        border-bottom: 1px solid rgba(141, 107, 52, 0.6);
+    }
+
+    &__fact {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5cqw;
+        min-width: 0;
+        margin: 0;
+
+        > span {
+            color: $cx-ink-soft;
+            font-family: $cx-title;
+            font-size: clamp(10px, 1.6cqw, 18px);
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+        }
+
+        &--check {
+            flex-direction: row;
+            align-items: center;
+            gap: 1cqw;
+
+            input {
+                width: 1.4em;
+                height: 1.4em;
+                margin: 0;
+                accent-color: $cx-red;
+            }
+        }
+    }
+
+    select.dh-codex__field {
+        padding-block: 0.3cqw;
+    }
+
+    // ---- tabs and the legacy panels of the tab pages -------------------------------------------------------------------
+    &__tabs {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 1cqw;
+        margin: 1.6cqw 0 0;
+        padding: 0;
+        background: none;
+        border: 0;
+
+        label {
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .dh-navigation__item-left {
+            margin-right: auto;
+        }
+
+        a {
+            display: inline-block;
+            padding: 0.5cqw 1.8cqw;
+            border: 1px solid rgba(110, 82, 40, 0.65);
+            background: rgba(255, 252, 240, 0.35);
+            color: $cx-ink-soft;
+            font-family: $cx-title;
+            font-size: clamp(10px, 1.7cqw, 19px);
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            text-decoration: none;
+
+            &.active {
+                background: $cx-red;
+                border-color: $cx-red;
+                color: $cx-cream;
+            }
+        }
+    }
+
+    // the tab pages keep their old panels, they only sit on the parchment now
+    &__body.dh-wrapper {
+        margin-top: 1.6cqw;
+        background: none;
+
+        .dh-panel {
+            border: 1px solid rgba(110, 82, 40, 0.65);
+            border-image: none;
+            background: rgba(255, 252, 240, 0.3);
+            box-shadow: none;
+        }
+
+        .dh-panel__header {
+            color: $cx-red;
+            font-family: $cx-title;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            border-bottom: 1px solid rgba(141, 107, 52, 0.6);
+        }
+
+        .dh-field__input,
+        .dh-header__input,
+        .dh-header__textarea,
+        .dh-header__select {
+            background: rgba(255, 252, 240, 0.5);
+            box-shadow: none;
+        }
+    }
+
     // ---- body -------------------------------------------------------------------------------------------------------
     &__body {
         margin-top: 2.4cqw;

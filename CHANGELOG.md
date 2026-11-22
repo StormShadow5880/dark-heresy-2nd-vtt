@@ -8,7 +8,7 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
 
 ### Item sheets: codex design
 
-- Talent, trait and generic item sheets use the new parchment design (dark red header, emblem, tier/level plaque, gold divider). All fields and data paths are unchanged. See `docs/codex-sheets.md`.
+- Talent, trait, gear, weapon, psychic power and generic item sheets use the new parchment design (dark red header, emblem, tier/level plaque, gold divider). All fields and data paths are unchanged. See `docs/codex-sheets.md`.
 
 ### Psychic powers: readable formulas
 
