@@ -6,6 +6,10 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
 
 ## [1.9.0] – Unreleased
 
+### Patrons and relationships
+
+- Patron dossiers (GM-managed, one patron for several characters, secret liabilities and relation values kept in a GM-only store), Patron & Relationships panel in the Biography (factions with contacts, calculation and modifier), contact "Test" button and a relationship section in social roll dialogs (house rule: 1 level = ±10 on the target), GM-resolved rolls for secret values. New settings for an optional limit and GM confirmation. See [docs/patrons.md](docs/patrons.md).
+
 ### Running clock and rest
 
 - Automatic game clock (Pause, 1:1, 1:3) that stops while the game is paused, in combat and during a rest, and a rest planner ("Rest …") with a visible time lapse, watches, optional random encounters and sleep checks (all configurable GM rules), skip/pause/cancel, GM-only encounter decisions and a summary that heals nothing by itself. See [docs/rest-and-clock.md](docs/rest-and-clock.md).

@@ -108,7 +108,9 @@
         }
     }
 
-    &__level {
+    &__level,
+    input.dh-patron__level {
+        flex: 0 0 4rem;
         width: 4rem;
     }
 
@@ -191,8 +193,17 @@
         align-items: center;
     }
 
-    .rel-level {
+    // the sheet sets number inputs to the full width: the value fields stay narrow, the name fields take the rest
+    input.rel-level,
+    .application.dossier & input.rel-level {
+        flex: 0 0 3.6rem;
         width: 3.6rem;
+    }
+
+    input.grow {
+        flex: 1 1 auto;
+        min-width: 0;
+        width: auto;
     }
 
     .rel-calc {
