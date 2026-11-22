@@ -61,3 +61,6 @@ At a stop (encounter, pause) the display may snap back by up to one tick of the 
 ## Encounter table
 `docs/tables/rest-encounters.json` is a ready-made Foundry RollTable (d100, 50 generic entries that grow worse with the roll (harmless 01–24, minor trouble 25–50, serious 51–74, dangerous 75–90, grave 91–100; many are not fights), original text). Import: Roll Tables sidebar → ⚙ (or right-click a folder) → *Import Data*, or create a table and use *Import* from the JSON. Then pick it in the rest dialog.
 The table result (name and description) is shown only to the GM. Edit, add or reweight the entries freely.
+
+## Where the GM tools are
+Patrons, Factions and "24 h rest" are tools in the **scene controls** (token tools, left side, GM only). The Actors directory shows only "Create Character" (full width) for everybody who may create actors; "Create Actor" and "Create Folder" are hidden for players (this only hides the buttons: Foundry's own permission "Create New Actors" still decides what the server allows).

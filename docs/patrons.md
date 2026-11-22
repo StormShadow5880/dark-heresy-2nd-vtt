@@ -23,17 +23,17 @@ One applicable relationship level = **±10 on the target number** of a fitting s
 
 ## Factions (one list for the world)
 The system brings the standard factions: Adeptus Mechanicus, Adeptus Arbites, Administratum, Ecclesiarchy (Ministorum), Imperial Navy, Inquisition, Rogue Trader Dynasties.
-The GM adds the organisations of the campaign **once** (Actors directory → "Factions", or the landmark button in the Biography panel or the patron sheet); they are then chosen from the same list by every character and patron
+The GM adds the organisations of the campaign **once** (scene controls → token tools → "Factions", or the landmark button in the Biography panel or the patron sheet); they are then chosen from the same list by every character and patron
 (stored in the world setting `factions-custom`, defaults in `rules/factions.mjs`). A character or patron **chooses** a faction in each relation row (a faction can be used once per row set); the level is stored with the character or the patron.
 Renaming a custom faction reaches everybody; deleting one keeps the name in the rows that used it (shown as "not in the list"). Rows of the earlier free-text version are linked to the list when the name matches, otherwise they stay as they are.
 Not in this version: factions as documents with their own dossier, descriptions or sub-factions.
 
 ## Patron actor (like in Imperium Maledictum)
-A patron is an **actor of its own type "Patron"** (Actors directory → Create Actor → Patron, or the "Patrons" button). It has its own sheet (the dossier below). **Drag a patron from the Actors directory onto the patron field**
+A patron is an **actor of its own type "Patron"** (Actors directory → Create Actor → Patron, or the "Patrons" tool in the scene controls). It has its own sheet (the dossier below). **Drag a patron from the Actors directory onto the patron field**
 in the Biography tab of a character (GM only): the character then reads **all stats from the patron** (relations to factions, boons, liabilities, membership status); nothing is copied, so a change of the patron reaches every assigned character at once.
 The old drop-down of the GM still works. Players cannot assign a patron.
 
-## Patron dossier (sheet of the patron actor; GM also: Actors directory → "Patrons")
+## Patron dossier (sheet of the patron actor; GM also: scene controls → token tools → "Patrons")
 Layout like the character dossier (portrait, name, dynasty and faction; Dossier / Boons / Liabilities / Factions; role, motivation, demeanor, description, notes; boons and liabilities with title and description; relations with a faction choice, level box, note).
 **Changes are saved automatically** shortly after the last edit and when the window closes (no Save button; the sheet shows "Saved.").
 Name, image, dynasty, faction, role, motivation, demeanor, description, notes, boons, liabilities (each can be *secret*), relations to factions (level, each can be *secret*),

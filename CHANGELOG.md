@@ -6,6 +6,10 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
 
 ## [1.9.0] – Unreleased
 
+### Actors directory
+
+- "Create Acolyte" is now **Create Character** in its own full-width row. "Create Actor" / "Create Folder" are hidden for players. Patrons, Factions and 24 h rest moved from the directory to the scene controls (GM only).
+
 ### Patrons and relationships
 
 - One faction list for the world (standard factions + custom ones added by the GM); characters and patrons choose their relations from it. The patron sheet follows the dossier design, boons/liabilities have a title and a description, relations a note, and every change is saved automatically.

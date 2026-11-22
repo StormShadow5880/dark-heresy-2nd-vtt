@@ -68,6 +68,7 @@ export class HooksManager {
         Hooks.on('preCreateItem', HooksManager.preCreateItem);
         Hooks.on('preDeleteItem', HooksManager.preDeleteItem);
         Hooks.on('renderActorDirectory', HooksManager.renderActorDirectory);
+        Hooks.on('getSceneControlButtons', HooksManager.gmTools);
         Hooks.on('updateActor', HooksManager.updateActor);
         registerWoundsSyncHooks();
 
@@ -189,42 +190,41 @@ Enable Debug with: game.dh.debug = true
     }
 
     /** Button "Create Acolyte" in the actor directory (opens the character creation wizard) */
+    /**
+     * Actors directory: players get no "Create Actor" / "Create Folder" (the GM tools are in the scene controls, see gmTools()); the character
+     * generator is one full-width row under the buttons: "Create Character".
+     */
     static renderActorDirectory(app, html) {
         const root = html instanceof HTMLElement ? html : html[0];
         if (!root) return;
-        if (game.user.isGM && !root.querySelector('.dh-finish-rest')) {
-            const rest = document.createElement('button');
-            rest.type = 'button';
-            rest.className = 'dh-finish-rest';
-            rest.innerHTML = '<i class="fa-solid fa-bed"></i> 24 h rest';
-            rest.addEventListener('click', async () => (await import('./actions/healing-manager.mjs')).finishRest());
-            (root.querySelector('.directory-header .header-actions') ?? root.querySelector('.directory-header') ?? root.querySelector('header'))?.append(rest);
+        if (!game.user.isGM) {
+            root.querySelectorAll('[data-action="createEntry"], [data-action="createFolder"], .create-entry, .create-folder').forEach((el) => el.remove());
         }
-        if (game.user.isGM && !root.querySelector('.dh-patrons')) {
-            const patrons = document.createElement('button');
-            patrons.type = 'button';
-            patrons.className = 'dh-patrons';
-            patrons.innerHTML = '<i class="fa-solid fa-user-tie"></i> Patrons';
-            patrons.addEventListener('click', async () => (await import('./sheets/patron-dossier.mjs')).openPatronDirectory());
-            (root.querySelector('.directory-header .header-actions') ?? root.querySelector('.directory-header') ?? root.querySelector('header'))?.append(patrons);
-        }
-        if (game.user.isGM && !root.querySelector('.dh-factions-btn')) {
-            const factions = document.createElement('button');
-            factions.type = 'button';
-            factions.className = 'dh-factions-btn';
-            factions.innerHTML = '<i class="fa-solid fa-landmark"></i> Factions';
-            factions.addEventListener('click', async () => (await import('./relations/factions.mjs')).openFactionManager());
-            (root.querySelector('.directory-header .header-actions') ?? root.querySelector('.directory-header') ?? root.querySelector('header'))?.append(factions);
-        }
-        if (root.querySelector('.dh-create-acolyte')) return;
+        if (root.querySelector('.dh-create-row')) return;
         if (!game.user.hasPermission('ACTOR_CREATE')) return;
+        const row = document.createElement('div');
+        row.className = 'dh-create-row';
         const button = document.createElement('button');
         button.type = 'button';
         button.className = 'dh-create-acolyte';
-        button.innerHTML = '<i class="fa-solid fa-user-plus"></i> Create Acolyte';
+        button.innerHTML = '<i class="fa-solid fa-user-plus"></i> Create Character';
         button.addEventListener('click', () => CharacterCreator.open());
-        const header = root.querySelector('.directory-header .header-actions') ?? root.querySelector('.directory-header') ?? root.querySelector('header');
-        header?.append(button);
+        row.append(button);
+        const actions = root.querySelector('.directory-header .header-actions');
+        if (actions) actions.insertAdjacentElement('afterend', row);
+        else (root.querySelector('.directory-header') ?? root.querySelector('header'))?.append(row);
+    }
+
+    /** GM tools in the scene controls (token tools, left side): Patrons, Factions, 24 h rest. Not shown to players. */
+    static gmTools(controls) {
+        const tools = controls.tokens?.tools;
+        if (!tools || !game.user.isGM) return;
+        const add = (name, title, icon, run) => {
+            tools[name] = { name, title, icon, order: Object.keys(tools).length, visible: true, button: true, onChange: async () => run() };
+        };
+        add('dhPatrons', 'Patrons', 'fa-solid fa-user-tie', async () => (await import('./sheets/patron-dossier.mjs')).openPatronDirectory());
+        add('dhFactions', 'Factions', 'fa-solid fa-landmark', async () => (await import('./relations/factions.mjs')).openFactionManager());
+        add('dhRest24', '24 h rest', 'fa-solid fa-bed', async () => (await import('./actions/healing-manager.mjs')).finishRest());
     }
 
     /** Aptitudes are fixed after character creation (see rules/aptitude-lock.mjs) */

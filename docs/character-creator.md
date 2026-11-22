@@ -1,6 +1,6 @@
 # Character Creation Wizard (Dark Heresy 2E, core rulebook)
 
-Opens from the **Create Acolyte** button in the Actors directory (or `game.dh.openCreator()`). It builds a draft,
+Opens from the **Create Character** button in the Actors directory (a full-width row under the buttons) (or `game.dh.openCreator()`). It builds a draft,
 and finalizing creates one `acolyte` actor with all embedded items in a single `Actor.create` call.
 
 ## Architecture
