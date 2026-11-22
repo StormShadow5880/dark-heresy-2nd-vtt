@@ -625,6 +625,20 @@
 .panel--relations {
     grid-column: 1 / -1;
 
+    // the panel has no body wrapper: everything under the title gets the same side padding
+    > :not(.panel__title) {
+        margin-left: 0.7rem;
+        margin-right: 0.7rem;
+    }
+
+    > .rel-patron {
+        margin-top: 0.5rem;
+    }
+
+    > .rel-table {
+        margin-bottom: 0.6rem;
+    }
+
     .rel-patron {
         display: flex;
         gap: 0.5rem;
@@ -646,6 +660,18 @@
         &.is-over {
             border-color: var(--ds-gold, #b69a62);
             background: rgba(182, 154, 98, 0.1);
+        }
+
+        // name and button keep their size, the choice takes the rest
+        .grow {
+            flex: 0 0 auto;
+            white-space: nowrap;
+        }
+
+        select {
+            flex: 1 1 12rem;
+            min-width: 0;
+            width: auto;
         }
     }
 
@@ -669,13 +695,18 @@
                 justify-content: space-between;
                 gap: 0.5rem;
                 border-top: 1px solid var(--ds-line, #504638);
-                padding: 0.1rem 0;
+                padding: 0.2rem 0.4rem;
+
+                b {
+                    white-space: nowrap;
+                }
             }
         }
     }
 
     .rel-hint {
-        margin: 0.1rem 0 0.4rem;
+        margin-top: 0.1rem;
+        margin-bottom: 0.4rem;
         font-size: var(--ds-fs-s, 0.78rem);
         color: var(--ds-muted, #92918c);
     }
