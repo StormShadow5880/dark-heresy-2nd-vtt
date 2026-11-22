@@ -225,7 +225,9 @@ export async function purchaseAdvancement(actor, { kind, key, talent = null, pow
         let created = null;
         try {
             if (kind === 'power') {
-                const data = { ...(power.data ?? {}), system: { ...(power.data?.system ?? {}), cost } };
+                // the power of the compendium as a new item of the character (without the identity of the compendium entry)
+                const { _id, folder, sort, ownership, _stats, ...rest } = power.data ?? {};
+                const data = { ...rest, system: { ...(rest.system ?? {}), cost } };
                 [created] = await actor.createEmbeddedDocuments('Item', [data]);
             }
             if (kind === 'talent') {

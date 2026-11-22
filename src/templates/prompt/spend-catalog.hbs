@@ -1,0 +1,51 @@
+<div class="dh-catalog">
+    <header class="dh-catalog__head">
+        <div class="dh-catalog__ep"><span>Available</span><strong>{{available}} EP</strong></div>
+        {{#unless isOther}}
+            <input type="search" class="dh-catalog__search" data-search placeholder="Search the list …" value="{{search}}" aria-label="Search the list" />
+            <label class="dh-catalog__only"><input type="checkbox" data-only {{#if onlyBuyable}}checked{{/if}} /> Only what I can buy</label>
+        {{/unless}}
+    </header>
+
+    <div class="dh-catalog__tabs" role="tablist" aria-label="Catalogue">
+        {{#each tabs as |t|}}
+            <button type="button" role="tab" class="dh-catalog__tab {{#if t.active}}is-active{{/if}}" data-tab="{{t.id}}" aria-selected="{{t.active}}">{{t.label}}{{#if t.count}} <small>{{t.count}}</small>{{/if}}</button>
+        {{/each}}
+    </div>
+
+    <div class="dh-catalog__body" role="tabpanel">
+        {{#if isOther}}
+            <form class="dh-catalog__manual">
+                <p class="notes">For everything that has no price in the catalogue: the Psy Rating, a talent or entry of your own. The cost is entered by hand.</p>
+                <label>Entry <select name="target"><option value="psy">Psy Rating</option><option value="talent">Talent</option><option value="other">Other</option></select></label>
+                <label>Name <input type="text" name="label" /></label>
+                <label>Cost (EP) <input type="number" name="cost" min="1" step="1" /></label>
+                {{#if isGM}}<label class="dh-catalog__check"><input type="checkbox" name="override" /> GM override: spend even if the EP are not enough</label>{{/if}}
+                <label>Note <input type="text" name="note" /></label>
+                <button type="button" class="dh-catalog__buy" data-manual>Spend</button>
+            </form>
+        {{else}}
+            <table class="dh-catalog__table">
+                <thead>
+                    <tr><th scope="col">Name</th><th scope="col">{{levelHeader}}</th>{{#if showValue}}<th scope="col">Value</th>{{/if}}{{#if showApt}}<th scope="col" title="Matching aptitudes">Apt.</th>{{/if}}{{#if showPrereq}}<th scope="col">Prerequisites</th>{{/if}}<th scope="col" class="num">EP</th><th scope="col"><span class="sr-only">Buy</span></th></tr>
+                </thead>
+                <tbody>
+                    {{#each rows as |r|}}
+                        <tr class="{{#unless r.canBuy}}is-locked{{/unless}} {{#if r.highlight}}is-highlight{{/if}}" data-id="{{r.id}}" {{#if r.reason}}title="{{r.reason}}"{{/if}}>
+                            <th scope="row"><span class="dh-catalog__name">{{r.name}}</span>{{#if r.sub}}<small>{{r.sub}}</small>{{/if}}</th>
+                            <td>{{r.level}}</td>
+                            {{#if ../showValue}}<td>{{r.value}}</td>{{/if}}
+                            {{#if ../showApt}}<td>{{#if r.maxed}}{{else}}{{r.matches}}/2{{/if}}</td>{{/if}}
+                            {{#if ../showPrereq}}<td class="dh-catalog__status is-{{r.status}}">{{#if (eq r.status "met")}}<b aria-hidden="true">✓</b> met{{else if (eq r.status "unmet")}}<b aria-hidden="true">✗</b> not met{{else if (eq r.status "manual")}}<b aria-hidden="true">?</b> check{{else}}<span class="muted">—</span>{{/if}}</td>{{/if}}
+                            <td class="num">{{#if r.cost}}{{r.cost}}{{else}}—{{/if}}</td>
+                            <td class="act"><button type="button" class="dh-catalog__buy" data-buy="{{r.id}}" {{#unless r.canBuy}}disabled{{/unless}} aria-label="Buy {{r.name}}"><i class="fa-solid fa-coins" aria-hidden="true"></i> Buy</button></td>
+                        </tr>
+                    {{else}}
+                        <tr><td colspan="7" class="empty">Nothing found.</td></tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        {{/if}}
+    </div>
+    <p class="dh-catalog__legend">✓ prerequisites met · ✗ not met (only the GM can override) · ? has to be checked by you · a greyed button shows its reason when you point at the row</p>
+</div>

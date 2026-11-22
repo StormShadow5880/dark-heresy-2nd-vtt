@@ -180,3 +180,31 @@ test('purchase: not enough EP, a learned talent and a double click change nothin
     assert.equal(actor.system.experience.used, 600);
     assert.equal((await purchaseAdvancement(actor, { kind: 'talent', key: 'Frenzy', talent: byName.Frenzy, silent: true })).ok, false);
 });
+
+const aura = { id: 'p1', name: 'Aura of Fear', discipline: 'Minor', cost: 100, data: { _id: 'p1', name: 'Aura of Fear', type: 'psychicPower', img: 'x.webp', system: { cost: 100, discipline: 'Minor' } } };
+
+test('psychic powers: bought at the price of the data, the item is created without the compendium identity, a duplicate is refused', async () => {
+    const actor = actorWith({ total: 500 });
+    actor.system.psy.rating = 2;
+    const r = await purchaseAdvancement(actor, { kind: 'power', key: 'Aura of Fear', power: aura, silent: true });
+    assert.equal(r.ok, true, r.errors?.join());
+    assert.equal(actor.system.experience.used, 100);
+    const item = actor.items.find((i) => i.name === 'Aura of Fear');
+    assert.equal(item.type, 'psychicPower');
+    assert.equal(item.system.cost, 100);
+    assert.equal(item._id, undefined);
+    assert.equal(actor.flags.xpLog.at(-1).category, 'Psychic Power');
+    assert.equal((await purchaseAdvancement(actor, { kind: 'power', key: 'Aura of Fear', power: aura, silent: true })).ok, false);
+});
+
+test('psychic powers: without a Psy Rating the purchase has to be confirmed; without a price it cannot be bought', async () => {
+    const actor = actorWith({ total: 500 });
+    actor.system.psy.rating = 0;
+    const no = await purchaseAdvancement(actor, { kind: 'power', key: 'Aura of Fear', power: aura, silent: true });
+    assert.equal(no.ok, false);
+    assert.match(no.errors[0], /Psy Rating 0/);
+    assert.equal((await purchaseAdvancement(actor, { kind: 'power', key: 'Aura of Fear', power: aura, prerequisitesConfirmed: true, silent: true })).ok, true);
+    const free = await purchaseAdvancement(actorWith(), { kind: 'power', key: 'X', power: { ...aura, name: 'X', cost: 0 }, silent: true });
+    assert.equal(free.ok, false);
+    assert.match(free.errors[0], /no price/);
+});
