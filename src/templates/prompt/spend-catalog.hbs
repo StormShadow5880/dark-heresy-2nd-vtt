@@ -32,7 +32,7 @@
                 <tbody>
                     {{#each rows as |r|}}
                         <tr class="{{#unless r.canBuy}}is-locked{{/unless}} {{#if r.highlight}}is-highlight{{/if}}" data-id="{{r.id}}" {{#if r.reason}}title="{{r.reason}}"{{/if}}>
-                            <th scope="row"><span class="dh-catalog__name">{{r.name}}</span>{{#if r.sub}}<small>{{r.sub}}</small>{{/if}}</th>
+                            <th scope="row">{{#if r.entryId}}<a class="dh-catalog__name is-link" data-open-item="{{r.entryId}}" data-kind="{{r.kind}}" role="button" tabindex="0" title="Open the item card">{{r.name}}</a>{{else}}<span class="dh-catalog__name">{{r.name}}</span>{{/if}}{{#if r.sub}}<small>{{r.sub}}</small>{{/if}}</th>
                             <td>{{r.level}}</td>
                             {{#if ../showValue}}<td>{{r.value}}</td>{{/if}}
                             {{#if ../showApt}}<td>{{#if r.maxed}}{{else}}{{r.matches}}/2{{/if}}</td>{{/if}}

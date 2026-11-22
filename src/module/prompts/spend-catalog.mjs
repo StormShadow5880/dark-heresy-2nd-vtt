@@ -102,6 +102,14 @@ export class SpendCatalog extends HandlebarsApplicationMixin(ApplicationV2) {
         };
     }
 
+    /** Opens the item card of a talent or psychic power from the compendium. */
+    async _openItem(kind, id) {
+        const pack = game.packs.get(`${SYSTEM_ID}.${kind === 'power' ? 'psychic-powers' : 'talents'}`);
+        const doc = await pack?.getDocument(id);
+        if (doc) doc.sheet.render(true);
+        else ui.notifications.warn('The item card could not be found.');
+    }
+
     async _onRender() {
         const el = this.element;
         el.querySelectorAll('[data-tab]').forEach((b) =>
@@ -121,6 +129,16 @@ export class SpendCatalog extends HandlebarsApplicationMixin(ApplicationV2) {
         el.querySelector('[data-only]')?.addEventListener('change', (ev) => {
             this.onlyBuyable = ev.target.checked;
             this.render();
+        });
+        el.querySelectorAll('[data-open-item]').forEach((a) => {
+            const open = () => this._openItem(a.dataset.kind, a.dataset.openItem);
+            a.addEventListener('click', open);
+            a.addEventListener('keydown', (ev) => {
+                if (ev.key === 'Enter' || ev.key === ' ') {
+                    ev.preventDefault();
+                    open();
+                }
+            });
         });
         el.querySelectorAll('[data-buy]').forEach((b) => b.addEventListener('click', () => this._confirm(b.dataset.buy)));
         el.querySelector('[data-manual]')?.addEventListener('click', () => this._manual(el.querySelector('.dh-catalog__manual')));

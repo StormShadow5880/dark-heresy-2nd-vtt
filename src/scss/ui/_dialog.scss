@@ -268,6 +268,17 @@
 
 // "Spend EP" catalogue (prompts/spend-catalog.mjs)
 .dh-catalog {
+    &__name.is-link {
+        cursor: pointer;
+        text-decoration: underline dotted;
+        text-underline-offset: 3px;
+
+        &:hover,
+        &:focus-visible {
+            text-decoration: underline solid;
+        }
+    }
+
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
