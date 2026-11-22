@@ -49,6 +49,20 @@ export class ActorContainerSheet extends DHSheetMixin(foundry.applications.sheet
         html.find('.add-skill').click(async (ev) => await this._addSpecialistSkill(ev));
     }
 
+    /** A patron dragged from the Actors directory onto a character becomes its patron; the stats are then read from the patron (they are not copied) */
+    async _onDropPatron(data) {
+        const dropped = await fromUuid(data.uuid);
+        if (dropped?.type !== 'patron' || this.actor.type !== 'acolyte') return false;
+        if (!game.user.isGM) {
+            ui.notifications.warn('Only the GM can assign a patron.');
+            return false;
+        }
+        const { assignPatron } = await import('../../relations/store.mjs');
+        await assignPatron(this.actor, dropped.id);
+        ui.notifications.info(`${dropped.name} is now the patron of ${this.actor.name}.`);
+        return true;
+    }
+
     async _onDrop(event) {
         event.preventDefault();
         event.stopPropagation();
@@ -64,6 +78,8 @@ export class ActorContainerSheet extends DHSheetMixin(foundry.applications.sheet
                     return false;
                 }
                 return await this._onDropItem(data);
+            } else if (data.type === 'Actor') {
+                return await this._onDropPatron(data);
             } else if (data.type === 'ActiveEffect') {
                 const effect = await ActiveEffect.implementation.fromDropData(data);
                 if (effect && effect.parent?.uuid !== this.actor.uuid) {

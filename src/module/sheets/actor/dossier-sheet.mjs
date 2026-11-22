@@ -31,6 +31,7 @@ import { activatePsychicPower, deactivatePsychicEffect, isPsychicPowerActive } f
 import { prepareAwardExperience, prepareSpendExperience } from '../../prompts/experience-prompt.mjs';
 import { confirmDialog } from '../../prompts/dialog-helpers.mjs';
 import { timerRows } from '../../rules/healing.mjs';
+import { levelToModifier } from '../../rules/relations.mjs';
 import { addContact, addFaction, buildNetworkView, removeFaction, setContactField, setFactionField } from '../../relations/sheet-actions.mjs';
 import { actorPatronDoc, assignPatron, patronDocs, publicPatron } from '../../relations/store.mjs';
 
@@ -146,7 +147,20 @@ export class AcolyteDossierSheet extends AcolyteSheet {
         context.dossier.network = await buildNetworkView(actor);
         const patronDoc = actorPatronDoc(actor);
         const patron = patronDoc ? publicPatron(patronDoc) : null;
-        context.dossier.patron = patron ? { id: patronDoc.id, name: patronDoc.name, img: patron.img, faction: patron.faction } : null;
+        context.dossier.patron = patron
+            ? {
+                  id: patronDoc.id,
+                  name: patronDoc.name,
+                  img: patron.img,
+                  faction: patron.faction,
+                  dynasty: patron.dynasty,
+                  affiliation: patron.affiliation,
+                  boons: patron.boons,
+                  liabilities: patron.liabilities,
+                  // the stats come from the patron, nothing is copied to the character
+                  relations: patron.relations.map((r) => ({ faction: r.faction, secret: !!r.secret, level: r.level, modifier: r.secret ? null : levelToModifier(r.level) })),
+              }
+            : null;
         context.dossier.patronOptions = game.user.isGM ? patronDocs().map((d) => ({ id: d.id, name: d.name, selected: d.id === patronDoc?.id })) : [];
         context.dossier.ov = buildOverview(actor, context.dossier, context.effects ?? []);
         context.dossier.tabs = [
@@ -185,6 +199,11 @@ export class AcolyteDossierSheet extends AcolyteSheet {
             this.element.querySelectorAll('[data-contact]').forEach((el) => el.addEventListener('change', () => setContactField(this.actor, el.dataset.contact, el.dataset.field, el.value)));
             this.element.querySelectorAll('[data-faction-field]').forEach((el) => el.addEventListener('change', () => setFactionField(this.actor, el.dataset.factionId, el.dataset.factionField, el.value)));
         }
+        this.element.querySelectorAll('[data-patron-drop]').forEach((zone) => {
+            zone.addEventListener('dragenter', () => zone.classList.add('is-over'));
+            zone.addEventListener('dragleave', () => zone.classList.remove('is-over'));
+            zone.addEventListener('drop', () => zone.classList.remove('is-over'));
+        });
         this.element.querySelectorAll('[data-patron-assign]').forEach((el) => el.addEventListener('change', () => assignPatron(this.actor, el.value || null)));
         this.element.querySelectorAll('summary button').forEach((b) => b.addEventListener('click', (ev) => ev.preventDefault()));
     }

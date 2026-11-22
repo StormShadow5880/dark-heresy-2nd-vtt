@@ -1,17 +1,18 @@
 /**
  * Storage of patrons and relationships (Foundry side). Rules and data shapes: rules/relations.mjs, rules/relations-data.mjs.
  *
- *   public patron      JournalEntry, flags.dark-heresy-2nd.patronJson; ownership: nobody by default, OBSERVER for the owners of assigned characters
+ *   patron             Actor of type "patron": the PUBLIC data in `system`; ownership: nobody by default, OBSERVER for the owners of the
+ *                      characters it is assigned to (so the players can open the patron sheet)
  *   confidential store ONE JournalEntry, ownership default NONE (GM only), flags.dark-heresy-2nd.secretsJson:
- *                      { patrons: { [patronId]: secret }, contacts: { [actorId]: { [itemId]: gmNotes } } }
+ *                      { patrons: { [patronActorId]: secret }, contacts: { [actorId]: { [itemId]: gmNotes } } }
  *   character          actor flag relations (personal factions), actor flag patronId, item flag relation (contact data)
  *
- * Only a GM client writes the patron documents and reads the confidential store. Players read the public patron document they may observe.
+ * Only a GM client writes the patron and reads the confidential store. Players read the public patron actor they may observe.
+ * (Earlier versions kept patrons in JournalEntry documents: migrateJournalPatrons() converts them.)
  */
 import { SYSTEM_ID } from '../system-id.mjs';
 import { emptyPatron, emptySecret, mergePatron, newId, normalizeRelations, patronOwnership, playerView, splitPatron } from '../rules/relations-data.mjs';
 
-const PATRON = 'patronJson';
 const SECRETS = 'secretsJson';
 const STORE_MARK = 'secretStore';
 const parse = (text, fallback) => {
@@ -24,15 +25,20 @@ const parse = (text, fallback) => {
 
 /* ------------------------------ patrons ------------------------------ */
 
-export const patronDocs = () => game.journal?.filter((j) => j.getFlag(SYSTEM_ID, PATRON) !== undefined) ?? [];
+const PATRON_KEYS = Object.keys(emptyPatron());
 
-/** Public data of a patron document (what a player gets) */
+export const patronDocs = () => game.actors?.filter((a) => a.type === 'patron') ?? [];
+
+/** Public data of a patron actor (what a player gets) */
 export function publicPatron(doc) {
-    const pub = parse(doc?.getFlag(SYSTEM_ID, PATRON), null);
-    return pub ? { ...emptyPatron(), ...pub, name: doc.name } : null;
+    if (!doc || doc.type !== 'patron') return null;
+    const sys = typeof doc.system?.toObject === 'function' ? doc.system.toObject() : doc.system ?? {};
+    const pub = {};
+    for (const key of PATRON_KEYS) if (sys[key] !== undefined) pub[key] = foundry.utils?.deepClone ? foundry.utils.deepClone(sys[key]) : JSON.parse(JSON.stringify(sys[key]));
+    return { ...emptyPatron(), ...pub, name: doc.name, img: doc.img ?? emptyPatron().img };
 }
 
-/** The complete patron for the GM: public document and confidential store */
+/** The complete patron for the GM: public data and confidential store */
 export async function fullPatron(doc) {
     const pub = publicPatron(doc);
     if (!pub) return null;
@@ -44,21 +50,18 @@ export async function fullPatron(doc) {
 export async function createPatron() {
     if (!game.user.isGM) return null;
     const pub = emptyPatron();
-    const doc = await JournalEntry.create({
-        name: pub.name,
-        ownership: { default: CONST.DOCUMENT_OWNERSHIP_LEVELS.NONE },
-        flags: { [SYSTEM_ID]: { [PATRON]: JSON.stringify(pub) } },
-    });
-    return doc;
+    const { name, img, ...system } = pub;
+    return Actor.create({ name, img, type: 'patron', system });
 }
 
-/** Saves a complete patron: the public part into the patron document, the confidential part into the store (GM only) */
+/** Saves a complete patron: the public part into the patron actor, the confidential part into the store (GM only) */
 export async function savePatron(id, full) {
     if (!game.user.isGM) return;
-    const doc = game.journal.get(id);
+    const doc = game.actors.get(id);
     if (!doc) return;
     const { pub, secret } = splitPatron({ ...full, assigned: full.assigned ?? publicPatron(doc)?.assigned ?? [] });
-    await doc.update({ name: pub.name, [`flags.${SYSTEM_ID}.${PATRON}`]: JSON.stringify(pub) });
+    const { name, img, ...system } = pub;
+    await doc.update({ name, img, system });
     const secrets = await readSecrets();
     secrets.patrons[id] = secret;
     await writeSecrets(secrets);
@@ -66,7 +69,7 @@ export async function savePatron(id, full) {
 
 export async function deletePatron(id) {
     if (!game.user.isGM) return;
-    const doc = game.journal.get(id);
+    const doc = game.actors.get(id);
     const pub = publicPatron(doc);
     for (const actorId of pub?.assigned ?? []) await game.actors.get(actorId)?.unsetFlag(SYSTEM_ID, 'patronId');
     const secrets = await readSecrets();
@@ -79,7 +82,7 @@ export const actorPatronId = (actor) => actor?.getFlag(SYSTEM_ID, 'patronId') ??
 
 export function actorPatronDoc(actor) {
     const id = actorPatronId(actor);
-    return id ? game.journal.get(id) ?? null : null;
+    return id ? game.actors.get(id) ?? null : null;
 }
 
 /** Users (not GMs) who own an actor */
@@ -100,21 +103,19 @@ export async function assignPatron(actor, patronId) {
     const previous = actorPatronId(actor);
     if (previous && previous !== patronId) await removeFromAssigned(previous, actor.id);
     if (!patronId) return actor.unsetFlag(SYSTEM_ID, 'patronId');
-    const doc = game.journal.get(patronId);
+    const doc = game.actors.get(patronId);
     const pub = publicPatron(doc);
     if (!pub) return;
-    pub.assigned = [...new Set([...(pub.assigned ?? []), actor.id])];
-    await doc.setFlag(SYSTEM_ID, PATRON, JSON.stringify(pub));
+    await doc.update({ 'system.assigned': [...new Set([...(pub.assigned ?? []), actor.id])] });
     await actor.setFlag(SYSTEM_ID, 'patronId', patronId);
     await syncPatronOwnership(doc);
 }
 
 async function removeFromAssigned(patronId, actorId) {
-    const doc = game.journal.get(patronId);
+    const doc = game.actors.get(patronId);
     const pub = publicPatron(doc);
     if (!pub) return;
-    pub.assigned = (pub.assigned ?? []).filter((id) => id !== actorId);
-    await doc.setFlag(SYSTEM_ID, PATRON, JSON.stringify(pub));
+    await doc.update({ 'system.assigned': (pub.assigned ?? []).filter((id) => id !== actorId) });
     await syncPatronOwnership(doc);
 }
 
@@ -163,7 +164,7 @@ export async function setContactGmNotes(actorId, itemId, text) {
 
 /** The patron's relation to a faction as the GM client sees it (for the secret roll path) */
 export async function patronFactionLevel(patronId, factionName) {
-    const doc = game.journal.get(patronId);
+    const doc = game.actors.get(patronId);
     const full = await fullPatron(doc);
     const wanted = String(factionName ?? '').trim().toLowerCase();
     return (full?.relations ?? []).find((r) => String(r.faction).trim().toLowerCase() === wanted) ?? null;
@@ -179,3 +180,31 @@ export async function saveActorRelations(actor, relations, { render = true } = {
 }
 
 export { newId, emptySecret };
+
+/**
+ * Earlier versions kept a patron in a JournalEntry (flags.patronJson). Converts them to patron actors: same data, the confidential part
+ * moves to the new id, the characters point to the new patron. The old journal is deleted only after the new actor exists.
+ */
+export async function migrateJournalPatrons() {
+    if (!game.user.isGM) return 0;
+    const old = game.journal?.filter((j) => j.getFlag(SYSTEM_ID, 'patronJson') !== undefined) ?? [];
+    let migrated = 0;
+    for (const doc of old) {
+        const pub = parse(doc.getFlag(SYSTEM_ID, 'patronJson'), null);
+        if (!pub) continue;
+        const { name, img, ...system } = { ...emptyPatron(), ...pub, name: doc.name };
+        const created = await Actor.create({ name, img, type: 'patron', system });
+        if (!created) continue;
+        const secrets = await readSecrets();
+        if (secrets.patrons[doc.id]) {
+            secrets.patrons[created.id] = secrets.patrons[doc.id];
+            delete secrets.patrons[doc.id];
+            await writeSecrets(secrets);
+        }
+        for (const actorId of pub.assigned ?? []) await game.actors.get(actorId)?.setFlag(SYSTEM_ID, 'patronId', created.id);
+        await syncPatronOwnership(created);
+        await doc.delete();
+        migrated++;
+    }
+    return migrated;
+}

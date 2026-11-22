@@ -44,8 +44,10 @@ import { onPsychicEffectRemoved, onPsychicPowerDeleted, refreshPsychicEffects } 
 import { aptitudesLocked, isCreatorGranted } from './rules/aptitude-lock.mjs';
 import { applyRulebookStyles, ensureImportMacro, importRulebookPages } from './tools/rulebook-import.mjs';
 import { registerCombatSocket } from './actions/combat-resolution-manager.mjs';
+import { PatronSheet } from './sheets/patron-dossier.mjs';
 import { initWorldClock } from './ui/world-clock.mjs';
 import { registerRelationSocket } from './relations/roll.mjs';
+import { migrateJournalPatrons } from './relations/store.mjs';
 import { initTimeRunner, registerTimeSocket } from './actions/time-runner.mjs';
 import { registerHealingSocket, registerHealingLockSocket } from './actions/healing-manager.mjs';
 import { CharacterCreator } from './creator/wizard.mjs';
@@ -112,8 +114,10 @@ Enable Debug with: game.dh.debug = true
             acolyte: documents.DarkHeresyAcolyte,
             npc: documents.DarkHeresyNPC,
             vehicle: documents.DarkHeresyVehicle,
+            patron: documents.DarkHeresyPatron,
 
         };
+        CONFIG.Actor.typeLabels = { ...(CONFIG.Actor.typeLabels ?? {}), patron: 'Patron' };
         CONFIG.Item.documentClass = DarkHeresyItem;
 
         // Register sheet application classes
@@ -129,6 +133,7 @@ Enable Debug with: game.dh.debug = true
         Actors.registerSheet(SYSTEM_ID, AcolyteDossierSheet, {types: ['acolyte'], makeDefault: true, label: 'Dark Heresy Dossier'});
         Actors.registerSheet(SYSTEM_ID, AcolyteSheet, {types: ['acolyte'], makeDefault: false, label: 'Dark Heresy Classic'});
         Actors.registerSheet(SYSTEM_ID, NpcSheet, {types: ['npc'], makeDefault: true });
+        Actors.registerSheet(SYSTEM_ID, PatronSheet, {types: ['patron'], makeDefault: true, label: 'Patron Dossier'});
         Actors.registerSheet(SYSTEM_ID, VehicleSheet, {types: ['vehicle'], makeDefault: true });
 
         Items.registerSheet(SYSTEM_ID, DarkHeresyItemSheet, { makeDefault: true });
@@ -161,6 +166,7 @@ Enable Debug with: game.dh.debug = true
         registerHealingLockSocket();
         registerTimeSocket();
         registerRelationSocket();
+        if (game.users.activeGM?.id === game.user.id) migrateJournalPatrons().then((n) => n && ui.notifications.info(`${n} patron(s) converted to patron actors.`)).catch((e) => console.warn('Dark Heresy 2e | patron migration failed', e));
         initTimeRunner();
         initWorldClock();
         applyRulebookStyles();

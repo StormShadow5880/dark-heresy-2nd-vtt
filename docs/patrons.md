@@ -21,7 +21,12 @@ One applicable relationship level = **±10 on the target number** of a fitting s
 - *Relationship modifier: limit*: **no additional limit (default)** or a limit; *maximum* (default 20, only used with the limit): ±20 is only a test value, nothing is built in. Separate from the DH2 limits.
 - *GM confirms every relationship test of the players* (default off).
 
-## Patron dossier (GM: Actors directory → "Patrons")
+## Patron actor (like in Imperium Maledictum)
+A patron is an **actor of its own type "Patron"** (Actors directory → Create Actor → Patron, or the "Patrons" button). It has its own sheet (the dossier below). **Drag a patron from the Actors directory onto the patron field**
+in the Biography tab of a character (GM only): the character then reads **all stats from the patron** (relations to factions, boons, liabilities, membership status); nothing is copied, so a change of the patron reaches every assigned character at once.
+The old drop-down of the GM still works. Players cannot assign a patron.
+
+## Patron dossier (sheet of the patron actor; GM also: Actors directory → "Patrons")
 Name, image, dynasty, faction, role, motivation, demeanor, description, notes, boons, liabilities (each can be *secret*), relations to factions (level, each can be *secret*),
 membership status (unknown / known / hidden), the assigned characters. One patron can have many characters; the data exists once, the characters only point to it (actor flag `patronId`).
 The GM creates, edits, assigns and removes. A player sees the dossier of his character's patron (Biography → "Open dossier") with the public data only.
@@ -40,11 +45,11 @@ Contacts were items of type `peer`. They stay exactly as they are: without relat
 
 ## Secrets and rights (technical)
 Foundry has no field-level permissions, so hidden values are **not stored where a player can read them**:
-- public patron document (JournalEntry, `patronJson`): ownership *nobody* by default, *observer* only for the owners of assigned characters; contains no secret liability, no GM notes and no value of a secret relation (only its name, marked secret);
+- public patron data (the `system` of the patron actor): ownership *nobody* by default, *observer* only for the owners of assigned characters (set by the GM client when assigning); contains no secret liability, no GM notes and no value of a secret relation (only its name, marked secret);
 - confidential store (one JournalEntry, default ownership NONE, `secretsJson`): secret liabilities, GM notes, the levels of secret relations, GM notes of contacts. Only GM clients read and write it;
 - actor and item flags hold only the non-secret personal relations (the player owns them);
 - a roll with a secret patron value goes by socket to the **active GM client only** (`shouldProcess`: active GM, each request id once); that client rolls once. The public chat card shows success/failure and degrees but **no roll, target or modifier**; the details are a whisper to the GMs.
-Assumption not verified here: Foundry does not send documents with ownership NONE to players. Check once with a player client: `game.journal.contents.map(j => j.name)` must not list "Dark Heresy: patrons and relations (GM only)" and unassigned patrons.
+Assumption not verified here: Foundry does not send documents with ownership NONE to players. Check once with a player client: `game.journal.contents.map(j => j.name)` must not list "Dark Heresy: patrons and relations (GM only)", and `game.actors.filter(a => a.type === 'patron')` must list only the patrons of the player's characters.
 
 ## Limits
 - Success and degrees of a secret roll are visible, as they must be; a player could estimate the modifier from many results.
@@ -56,3 +61,6 @@ Assumption not verified here: Foundry does not send documents with ownership NON
 1. GM: create a patron, assign two characters; each player sees only his own patron. 2. Player: open the dossier, secret liabilities/relations are not there (also not in the console: `game.journal`).
 3. Biography: add a faction (−1) and a contact (+2): total +1 → +10. 4. Charm roll with the relationship: modifier +10 on the card. 5. Roll in the patron's name with a secret relation: public card without numbers, GM whisper with them.
 6. Membership "unknown": the roll goes to the GM. 7. Technology/dodge roll: no relationship section. 8. Set the limit to 20 and use +3: +20.
+
+## Migration from the journal version
+The first version kept patrons in JournalEntry documents. On the first start of the GM client these are converted to patron actors (same data; the confidential part moves to the new id; the characters point to the new patron; the old journal is deleted only after the new actor exists). A notice shows how many were converted. It runs on the active GM client only and finds nothing to do afterwards.

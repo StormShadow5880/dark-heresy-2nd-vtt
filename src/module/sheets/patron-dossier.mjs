@@ -7,7 +7,7 @@ import { AFFILIATIONS } from '../rules/relations.mjs';
 import { newId } from '../rules/relations-data.mjs';
 import { actorPatronId, assignPatron, createPatron, deletePatron, fullPatron, patronDocs, savePatron, publicPatron } from '../relations/store.mjs';
 
-const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
+const { HandlebarsApplicationMixin } = foundry.applications.api;
 
 const TEXT_FIELDS = [
     { key: 'role', label: 'Role', rows: 2 },
@@ -17,36 +17,39 @@ const TEXT_FIELDS = [
     { key: 'notes', label: 'Notes', rows: 4 },
 ];
 
-export class PatronDossier extends HandlebarsApplicationMixin(ApplicationV2) {
+/**
+ * Sheet of the patron actor. The GM edits everything; a player who owns an assigned character sees the public data only. What the player's
+ * client receives is already reduced (store.mjs, rules/relations-data.mjs): hidden values are not in the client data.
+ */
+export class PatronSheet extends HandlebarsApplicationMixin(foundry.applications.sheets.ActorSheetV2) {
     static DEFAULT_OPTIONS = {
         classes: ['dh-ui', 'dh-patron'],
         position: { width: 620, height: 720 },
         window: { resizable: true, icon: 'fa-solid fa-user-tie' },
+        // our fields are saved with the Save button, not by the form
+        form: { submitOnChange: false, closeOnSubmit: false, handler: async () => {} },
         actions: {
-            addBoon: PatronDossier.#add('boons', () => ({ id: newId('b'), text: '' })),
-            addLiability: PatronDossier.#add('liabilities', () => ({ id: newId('l'), text: '', secret: false })),
-            addRelation: PatronDossier.#add('relations', () => ({ id: newId('r'), faction: '', level: 0, secret: false })),
-            removeRow: PatronDossier.#remove,
-            save: PatronDossier.#save,
-            pickImage: PatronDossier.#pickImage,
+            addBoon: PatronSheet.#add('boons', () => ({ id: newId('b'), text: '' })),
+            addLiability: PatronSheet.#add('liabilities', () => ({ id: newId('l'), text: '', secret: false })),
+            addRelation: PatronSheet.#add('relations', () => ({ id: newId('r'), faction: '', level: 0, secret: false })),
+            removeRow: PatronSheet.#remove,
+            save: PatronSheet.#save,
+            pickImage: PatronSheet.#pickImage,
         },
     };
 
     static PARTS = { body: { template: 'systems/dark-heresy-2nd/templates/patron/dossier.hbs', scrollable: ['.dh-patron__body'] } };
 
-    constructor(patronId, options = {}) {
-        super({ ...options, id: `dh-patron-${patronId}` });
-        this.patronId = patronId;
-        this.draft = null;
-        this.assigned = null;
+    draft = null;
+    assigned = null;
+
+    get patronId() {
+        return this.document.id;
     }
 
-    get title() {
-        return this.draft?.name ?? 'Patron';
-    }
-
-    async _prepareContext() {
-        const doc = game.journal.get(this.patronId);
+    async _prepareContext(options) {
+        const base = await super._prepareContext(options);
+        const doc = this.document;
         const isGM = game.user.isGM;
         if (!this.draft) {
             this.draft = foundry.utils.deepClone(await fullPatron(doc));
@@ -55,12 +58,13 @@ export class PatronDossier extends HandlebarsApplicationMixin(ApplicationV2) {
         const characters = isGM
             ? game.actors
                   .filter((a) => a.type === 'acolyte')
-                  .map((a) => ({ id: a.id, name: a.name, assigned: this.assigned.has(a.id), other: actorPatronId(a) && actorPatronId(a) !== this.patronId ? game.journal.get(actorPatronId(a))?.name : '' }))
+                  .map((a) => ({ id: a.id, name: a.name, assigned: this.assigned.has(a.id), other: actorPatronId(a) && actorPatronId(a) !== this.patronId ? game.actors.get(actorPatronId(a))?.name : '' }))
             : [];
-        return { patron: this.draft, editable: isGM, isGM, textFields: TEXT_FIELDS, affiliations: AFFILIATIONS, characters };
+        return { ...base, patron: this.draft, editable: isGM, isGM, textFields: TEXT_FIELDS, affiliations: AFFILIATIONS, characters };
     }
 
-    _onRender() {
+    _onRender(context, options) {
+        super._onRender?.(context, options);
         const root = this.element;
         root.querySelectorAll('[data-field]').forEach((el) => el.addEventListener('change', () => (this.draft[el.dataset.field] = el.value)));
         root.querySelectorAll('[data-list]').forEach((el) =>
@@ -100,7 +104,7 @@ export class PatronDossier extends HandlebarsApplicationMixin(ApplicationV2) {
 
     static async #save() {
         if (!game.user.isGM) return;
-        const doc = game.journal.get(this.patronId);
+        const doc = this.document;
         const before = new Set(publicPatron(doc)?.assigned ?? []);
         await savePatron(this.patronId, { ...this.draft, assigned: [...before] });
         for (const id of this.assigned) if (!before.has(id)) await assignPatron(game.actors.get(id), this.patronId);
@@ -111,14 +115,14 @@ export class PatronDossier extends HandlebarsApplicationMixin(ApplicationV2) {
     }
 }
 
-/** Opens the dossier of a patron (a player only gets the patrons of his characters, the document permission decides) */
+/** Opens the sheet of a patron (a player only gets the patrons of his characters: the permission of the actor decides) */
 export function openPatron(patronId) {
-    const doc = game.journal.get(patronId);
+    const doc = game.actors.get(patronId);
     if (!doc) return ui.notifications.warn('This patron is not available to you.');
-    new PatronDossier(patronId).render({ force: true });
+    doc.sheet.render({ force: true });
 }
 
-/** GM list of all patrons: open, create, delete */
+/** GM list of all patrons: open, create, delete (patrons are also in the Actors directory: type Patron) */
 export async function openPatronDirectory() {
     if (!game.user.isGM) return;
     const DialogV2 = foundry.applications.api.DialogV2;

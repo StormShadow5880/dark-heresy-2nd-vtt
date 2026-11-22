@@ -32,17 +32,29 @@
                 <button type="button" class="icon-btn" data-action="addFaction" data-tooltip="New faction"><i class="fa-solid fa-flag"></i></button>
                 <button type="button" class="icon-btn" data-action="addContact" data-faction="" data-tooltip="New contact"><i class="fa-solid fa-plus"></i></button>
             </h2>
-            <div class="rel-patron">
+            <div class="rel-patron" data-patron-drop>
                 {{#if dossier.patron}}
                     <img src="{{dossier.patron.img}}" alt="" />
                     <span class="grow"><b>{{dossier.patron.name}}</b>{{#if dossier.patron.faction}} <small>{{dossier.patron.faction}}</small>{{/if}}</span>
                     <button type="button" class="rel-btn" data-action="openPatron" data-id="{{dossier.patron.id}}">Open dossier</button>
-                {{else}}<span class="grow empty">No patron.</span>{{/if}}
+                {{else}}<span class="grow empty">No patron.{{#if dossier.isGM}} Drag a patron from the Actors directory here.{{/if}}</span>{{/if}}
                 {{#if dossier.isGM}}
                     <select data-patron-assign aria-label="Patron of this character"><option value="">– no patron –</option>
                         {{#each dossier.patronOptions as |p|}}<option value="{{p.id}}" {{#if p.selected}}selected{{/if}}>{{p.name}}</option>{{/each}}</select>
                 {{/if}}
             </div>
+            {{#if dossier.patron}}
+                <div class="rel-patron-stats">
+                    <h4>Relations of the patron <small>(used for tests in the patron's name)</small></h4>
+                    <ul class="rel-patron-stats__list">
+                        {{#each dossier.patron.relations as |r|}}
+                            <li><span>{{r.faction}}</span><b>{{#if r.secret}}unknown{{else}}{{signed r.level}} <small>→ {{#if (gt r.modifier 0)}}+{{/if}}{{r.modifier}}</small>{{/if}}</b></li>
+                        {{else}}<li class="empty">None.</li>{{/each}}
+                    </ul>
+                    {{#if dossier.patron.boons.length}}<h4>Boons</h4><ul class="rel-patron-stats__list">{{#each dossier.patron.boons as |b|}}<li><span>{{b.text}}</span></li>{{/each}}</ul>{{/if}}
+                    {{#if dossier.patron.liabilities.length}}<h4>Liabilities</h4><ul class="rel-patron-stats__list">{{#each dossier.patron.liabilities as |l|}}<li><span>{{l.text}}</span></li>{{/each}}</ul>{{/if}}
+                </div>
+            {{/if}}
             <p class="rel-hint">House rule: one relationship level = ±10 on the target of a fitting social test. Faction level + contact value = personal level. In the patron's name the patron's value replaces it.</p>
             {{#each dossier.network.groups as |g|}}
                 <section class="rel-faction" data-faction="{{g.id}}">

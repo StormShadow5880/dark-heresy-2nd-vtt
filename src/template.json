@@ -1,6 +1,6 @@
 {
     "Actor": {
-        "types": ["acolyte", "npc", "vehicle"],
+        "types": ["acolyte", "npc", "vehicle", "patron"],
         "templates": {
             "base": {
                 "wounds": {
@@ -963,6 +963,21 @@
         },
         "vehicle": {
             "templates": ["base", "vehicle", "npc"]
+        },
+        "patron": {
+            "version": 1,
+            "dynasty": "",
+            "faction": "",
+            "role": "",
+            "motivation": "",
+            "demeanor": "",
+            "description": "",
+            "notes": "",
+            "boons": [],
+            "liabilities": [],
+            "relations": [],
+            "affiliation": "unknown",
+            "assigned": []
         }
     },
     "Item": {
