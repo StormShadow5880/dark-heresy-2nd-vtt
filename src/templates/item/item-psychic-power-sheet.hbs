@@ -1,8 +1,8 @@
 <div class="dh-codex dh-codex--psychic">
-    {{> systems/dark-heresy-2nd/templates/item/partial/codex-head.hbs plaqueLabel="XP" plaqueField="system.cost" plaqueValue=item.system.cost}}
+    {{> systems/dark-heresy-2nd/templates/item/partial/codex-head.hbs plaqueText=true plaqueHint="Discipline" plaqueField="system.discipline" plaqueValue=item.system.discipline}}
 
     <div class="dh-codex__facts">
-        <label class="dh-codex__fact"><span>Discipline</span><input class="dh-codex__field" name="system.discipline" type="text" value="{{item.system.discipline}}" /></label>
+        <label class="dh-codex__fact"><span>XP Cost</span><input class="dh-codex__field" name="system.cost" type="number" data-dtype="Number" value="{{item.system.cost}}" /></label>
         <label class="dh-codex__fact"><span>Prerequisites</span><input class="dh-codex__field" name="system.prerequisites" type="text" value="{{item.system.prerequisites}}" /></label>
         <label class="dh-codex__fact"><span>Range</span><input class="dh-codex__field" name="system.range" type="text" value="{{item.system.range}}" /></label>
         <label class="dh-codex__fact"><span>Action</span><select class="dh-codex__field" name="system.action">{{selectOptions (arrayToObject dh.combat.action_speeds) selected=item.system.action}}</select></label>

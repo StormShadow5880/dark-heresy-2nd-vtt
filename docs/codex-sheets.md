@@ -10,7 +10,7 @@ Light "archive page" design for item sheets: parchment, dark red header with emb
 | Trait | `item-trait-sheet.hbs` | plaque **Level**, section Description |
 | Gear, consumable, drug, tool | `item-gear-sheet.hbs` | facts row (weight, in backpack, availability, craftsmanship), Description |
 | Weapon | `item-weapon-sheet.hbs` | facts row, tabs Active Effects / Stats / Description (old panels inside, recoloured) |
-| Psychic power | `item-psychic-power-sheet.hbs` | plaque **XP**, facts row (discipline, prerequisites, range, action, sustained, subtype), tabs Action / Effects / Description |
+| Psychic power | `item-psychic-power-sheet.hbs` | plaque with the **discipline** (text field), facts row (XP cost, prerequisites, range, action, sustained, subtype), tabs Action / Effects / Description |
 | All other items without their own sheet (aptitude, mutation, malignancy, …) | `item-sheet.hbs` | no plaque, section Description |
 
 Not changed yet (they have tabs, tables or many fields of their own): armour, cybernetic, force field, ammunition, peer/enemy, critical injury, attack special, weapon modification, journal entry, storage location. The header partial, the facts row (`__facts` / `__fact`) and the tab styling can be reused for them. Tab pages of weapon and psychic power keep their old panels (inside `.dh-codex__body.dh-wrapper`), only recoloured.

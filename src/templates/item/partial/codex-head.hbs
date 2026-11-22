@@ -1,7 +1,8 @@
 {{!--
   Header of the "codex" item sheets (parchment page, dark red header, emblem). The pictures are decoration only: name, image,
   badge and source are real form fields.
-  Parameters: plaqueLabel, plaqueField, plaqueValue (optional badge, e.g. "Tier" / "system.tier").
+  Parameters: plaqueLabel, plaqueField, plaqueValue (optional badge, e.g. "Tier" / "system.tier");
+  plaqueText=true makes the badge a text field (psychic power: discipline), plaqueHint is its placeholder.
 --}}
 <header class="dh-codex__head">
     <div class="dh-codex__icon">
@@ -11,9 +12,13 @@
         <textarea class="dh-codex__name" name="name" rows="1" aria-label="Name" placeholder="Name" spellcheck="false">{{item.name}}</textarea>
         <div class="dh-codex__meta">
             {{#if plaqueField}}
-                <label class="dh-codex__plaque">
-                    <span>{{plaqueLabel}}</span>
-                    <input name="{{plaqueField}}" type="number" data-dtype="Number" value="{{plaqueValue}}" aria-label="{{plaqueLabel}}" />
+                <label class="dh-codex__plaque{{#if plaqueText}} dh-codex__plaque--text{{/if}}">
+                    {{#if plaqueLabel}}<span>{{plaqueLabel}}</span>{{/if}}
+                    {{#if plaqueText}}
+                        <input name="{{plaqueField}}" type="text" value="{{plaqueValue}}" aria-label="{{#if plaqueLabel}}{{plaqueLabel}}{{else}}{{plaqueField}}{{/if}}" placeholder="{{plaqueHint}}" />
+                    {{else}}
+                        <input name="{{plaqueField}}" type="number" data-dtype="Number" value="{{plaqueValue}}" aria-label="{{plaqueLabel}}" />
+                    {{/if}}
                 </label>
             {{/if}}
             <input class="dh-codex__source" name="system.source" type="text" value="{{item.system.source}}" aria-label="Source" title="{{item.system.source}}" placeholder="Source" />

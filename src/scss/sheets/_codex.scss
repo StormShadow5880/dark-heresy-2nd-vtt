@@ -210,6 +210,21 @@ $cx-body: 'IM Fell DW Pica', 'Palatino Linotype', Georgia, 'Times New Roman', se
         }
     }
 
+    &__plaque--text {
+        min-width: 15cqw;
+        padding: 0 3cqw;
+
+        input {
+            width: auto;
+            min-width: 7em;
+            max-width: 24cqw;
+            field-sizing: content;
+            text-align: center;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+    }
+
     &__source {
         flex: 1 1 auto;
         min-width: 0;
