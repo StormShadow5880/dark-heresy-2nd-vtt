@@ -31,6 +31,7 @@ import { activatePsychicPower, deactivatePsychicEffect, isPsychicPowerActive } f
 import { prepareAwardExperience, prepareSpendExperience } from '../../prompts/experience-prompt.mjs';
 import { confirmDialog } from '../../prompts/dialog-helpers.mjs';
 import { timerRows } from '../../rules/healing.mjs';
+import { isFreeAreaClick } from '../../rules/item-description.mjs';
 import { levelToModifier } from '../../rules/relations.mjs';
 import { addContact, addFaction, buildNetworkView, removeFaction, setContactField, setFactionField } from '../../relations/sheet-actions.mjs';
 import { actorPatronDoc, assignPatron, patronDocs, publicPatron } from '../../relations/store.mjs';
@@ -64,6 +65,7 @@ export class AcolyteDossierSheet extends AcolyteSheet {
             togglePsychicEffect: AcolyteDossierSheet.#onTogglePsychicEffect,
             togglePowerDetail: AcolyteDossierSheet.#onTogglePowerDetail,
             toggleSkillDetail: AcolyteDossierSheet.#onToggleSkillDetail,
+            toggleGearDetail: AcolyteDossierSheet.#onToggleGearDetail,
             goTab: AcolyteDossierSheet.#onGoTab,
             setCritical: AcolyteDossierSheet.#onSetCritical,
             firstAid: AcolyteDossierSheet.#onFirstAid,
@@ -101,6 +103,9 @@ export class AcolyteDossierSheet extends AcolyteSheet {
     _openPowers = new Set();
     /** Skills whose fold-out is open (kept across re-renders) */
     _openSkills = new Set();
+    /** Gear rows whose description is open, and the prepared descriptions (kept across re-renders) */
+    _openGear = new Set();
+    _gearHtml = new Map();
 
     async _prepareContext(options) {
         const context = await super._prepareContext(options);
@@ -192,6 +197,13 @@ export class AcolyteDossierSheet extends AcolyteSheet {
             }),
         );
         this.element.querySelectorAll('.skill-row').forEach((row) => this._setSkillOpen(row, this._openSkills.has(row.querySelector('.skill-toggle')?.dataset.skillId)));
+        this.element.querySelectorAll('.gear-row.has-detail').forEach((row) => {
+            // a click on the free area of the row folds the description; the name, the image and every button have their own function
+            row.addEventListener('click', (ev) => {
+                if (isFreeAreaClick(ev.target)) this._toggleGear(row);
+            });
+            if (this._openGear.has(row.dataset.itemId)) this._setGearOpen(row, true);
+        });
         this.element.querySelectorAll('.pw[data-power]').forEach((row) => this._setPowerOpen(row, this._openPowers.has(row.dataset.power)));
         this.element.querySelectorAll('.char').forEach((tile) => tile.classList.toggle('is-editing', this._openCharEdits.has(tile.dataset.char)));
         // Buttons inside <summary> must not toggle the surrounding <details>
@@ -291,6 +303,42 @@ export class AcolyteDossierSheet extends AcolyteSheet {
         if (open) this._openSkills.add(id);
         else this._openSkills.delete(id);
         this._setSkillOpen(target.closest('.skill-row'), open);
+    }
+
+    _toggleGear(row) {
+        const id = row.dataset.itemId;
+        const open = !this._openGear.has(id);
+        if (open) this._openGear.add(id);
+        else this._openGear.delete(id);
+        this._setGearOpen(row, open);
+    }
+
+    /** Folds the description of a gear row (no re-render). The text is prepared by Foundry's enricher on the first opening: links and formatting stay, the HTML is made safe. */
+    async _setGearOpen(row, open) {
+        row.classList.toggle('is-open', open);
+        row.querySelector('.gear-detail')?.setAttribute('aria-hidden', String(!open));
+        const toggle = row.querySelector('.gear-toggle');
+        toggle?.setAttribute('aria-expanded', String(open));
+        if (open) await this._fillGearDetail(row);
+    }
+
+    async _fillGearDetail(row) {
+        const body = row.querySelector('.gear-detail__body');
+        const item = this.actor.items.get(row.dataset.itemId);
+        if (!body || !item || body.dataset.filled) return;
+        const raw = item.system?.description ?? '';
+        let cached = this._gearHtml.get(item.id);
+        if (!cached || cached.raw !== raw) {
+            const html = await foundry.applications.ux.TextEditor.implementation.enrichHTML(raw, { rollData: { actor: this.actor, item, pr: this.actor.psy?.rating ?? 0 } });
+            cached = { raw, html };
+            this._gearHtml.set(item.id, cached);
+        }
+        body.innerHTML = cached.html;
+        body.dataset.filled = '1';
+    }
+
+    static #onToggleGearDetail(event, target) {
+        this._toggleGear(target.closest('.gear-row'));
     }
 
     _setPowerOpen(row, open) {

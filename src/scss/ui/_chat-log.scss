@@ -91,9 +91,10 @@ body.dh-dark-chat {
         &::placeholder {
             color: var(--dh-chat-muted);
         }
+        // the field where you write: a calm, slightly lighter border while typing (no yellow frame)
         &:focus {
-            border-color: var(--dh-chat-gold);
-            box-shadow: 0 0 0 1px var(--dh-chat-gold);
+            border-color: #6f6759;
+            box-shadow: none;
             outline: none;
         }
     }

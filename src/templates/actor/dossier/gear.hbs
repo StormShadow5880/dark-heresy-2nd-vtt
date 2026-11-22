@@ -21,16 +21,24 @@
                 </h3>
                 <ul class="rows">
                     {{#each group.items as |item|}}
-                        <li class="item-drag {{#if item.canEquip}}{{#unless item.equipped}}is-unequipped{{/unless}}{{/if}}" data-item-id="{{item.id}}">
-                            <img src="{{item.img}}" alt="" />
-                            <span class="grow">{{item.name}} <small>{{item.type}}{{#if item.inBackpack}} · in backpack{{/if}}</small></span>
-                            <span class="weight" data-tooltip="Weight">{{item.weight}} kg</span>
-                            {{#if item.canEquip}}
-                                <button type="button" class="icon-btn {{#if item.equipped}}on{{/if}}" data-action="toggleEquipped" data-item-id="{{item.id}}" data-tooltip="{{#if item.equipped}}Unequip{{else}}Equip{{/if}}" aria-pressed="{{item.equipped}}"><i class="fa-solid fa-check"></i></button>
+                        <li class="gear-row item-drag {{#if item.canEquip}}{{#unless item.equipped}}is-unequipped{{/unless}}{{/if}} {{#if item.hasDescription}}has-detail{{/if}}" data-item-id="{{item.id}}">
+                            <div class="gear-row__line">
+                                {{#if item.hasDescription}}
+                                    <button type="button" class="gear-toggle" data-action="toggleGearDetail" data-item-id="{{item.id}}" aria-expanded="false" aria-controls="gear-detail-{{item.id}}" aria-label="Show the description of {{item.name}}" data-tooltip="Description"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
+                                {{else}}<span class="gear-toggle gear-toggle--none" aria-hidden="true"></span>{{/if}}
+                                <button type="button" class="gear-img item-edit" data-item-id="{{item.id}}" aria-label="Open {{item.name}}"><img src="{{item.img}}" alt="" /></button>
+                                <button type="button" class="gear-name item-edit grow" data-item-id="{{item.id}}" data-tooltip="Open the item">{{item.name}} <small>{{item.type}}{{#if item.inBackpack}} · in backpack{{/if}}</small></button>
+                                <span class="weight" data-tooltip="Weight">{{item.weight}} kg</span>
+                                {{#if item.canEquip}}
+                                    <button type="button" class="icon-btn {{#if item.equipped}}on{{/if}}" data-action="toggleEquipped" data-item-id="{{item.id}}" data-tooltip="{{#if item.equipped}}Unequip{{else}}Equip{{/if}}" aria-pressed="{{item.equipped}}"><i class="fa-solid fa-check"></i></button>
+                                {{/if}}
+                                <button type="button" class="icon-btn item-vocalize" data-item-id="{{item.id}}" data-tooltip="Show in chat"><i class="fa-solid fa-comment"></i></button>
+                                <button type="button" class="icon-btn item-edit" data-item-id="{{item.id}}" data-tooltip="Edit"><i class="fa-solid fa-pen"></i></button>
+                                <button type="button" class="icon-btn item-delete" data-item-id="{{item.id}}" data-tooltip="Delete"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                            {{#if item.hasDescription}}
+                                <div class="gear-detail" id="gear-detail-{{item.id}}" role="region" aria-label="Description of {{item.name}}" aria-hidden="true"><div class="fold__inner"><div class="gear-detail__body"></div></div></div>
                             {{/if}}
-                            <button type="button" class="icon-btn item-vocalize" data-item-id="{{item.id}}" data-tooltip="Show in chat"><i class="fa-solid fa-comment"></i></button>
-                            <button type="button" class="icon-btn item-edit" data-item-id="{{item.id}}" data-tooltip="Edit"><i class="fa-solid fa-pen"></i></button>
-                            <button type="button" class="icon-btn item-delete" data-item-id="{{item.id}}" data-tooltip="Delete"><i class="fa-solid fa-trash"></i></button>
                         </li>
                     {{/each}}
                 </ul>

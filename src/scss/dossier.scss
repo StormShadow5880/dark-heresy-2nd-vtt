@@ -2946,7 +2946,8 @@
 
     // power and skill details: height 0 -> auto through a grid row, plus fade
     .pw__detail,
-    .skill-detail {
+    .skill-detail,
+    .gear-detail {
         display: grid;
         grid-template-rows: 0fr;
         opacity: 0;
@@ -2958,7 +2959,8 @@
         }
     }
     .pw.is-open > .pw__detail,
-    .skill-row.is-open > .skill-detail {
+    .skill-row.is-open > .skill-detail,
+    .gear-row.is-open > .gear-detail {
         grid-template-rows: 1fr;
         opacity: 1;
         visibility: visible;
@@ -2986,6 +2988,7 @@
     @media (prefers-reduced-motion: reduce) {
         .pw__detail,
         .skill-detail,
+        .gear-detail,
         details::details-content {
             transition: none !important;
         }
@@ -3050,6 +3053,120 @@
         .wtable__name span {
             overflow: hidden;
             text-overflow: ellipsis;
+        }
+    }
+}
+
+// ------------------------------------------------ Gear rows with a fold-out description
+.application.dossier {
+    .rows > li.gear-row {
+        display: block;
+        padding: 0;
+        &.has-detail {
+            cursor: pointer;
+        }
+    }
+    .gear-row__line {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 5px 12px;
+        min-height: 36px;
+    }
+    // arrow: shows that a description exists and whether it is open; rows without one keep the same width
+    .gear-toggle {
+        flex: none;
+        width: 18px;
+        height: 22px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: none;
+        border: 0;
+        color: var(--ds-gold);
+        cursor: pointer;
+        > i {
+            font-size: 0.65rem;
+            transition: transform 0.12s;
+        }
+        &--none {
+            cursor: default;
+        }
+        &:hover {
+            color: #fff;
+        }
+        &:focus-visible {
+            outline: 2px solid var(--ds-gold-soft, #c9ae78);
+            outline-offset: 1px;
+        }
+    }
+    .gear-row.is-open .gear-toggle > i {
+        transform: rotate(90deg);
+    }
+    // name and image open the item window: buttons that look like text and picture
+    .gear-img,
+    .gear-name {
+        height: auto;
+        padding: 0;
+        background: none;
+        border: 0;
+        color: inherit;
+        font: inherit;
+        text-align: left;
+        cursor: pointer;
+    }
+    .gear-img {
+        flex: none;
+        display: flex;
+        img {
+            width: 26px;
+            height: 26px;
+        }
+    }
+    .gear-name {
+        display: block;
+        justify-content: flex-start;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        &:hover {
+            color: #fff;
+            text-decoration: underline;
+        }
+    }
+    .gear-img:focus-visible,
+    .gear-name:focus-visible {
+        outline: 2px solid var(--ds-gold-soft, #c9ae78);
+        outline-offset: 2px;
+    }
+    .gear-row.is-open > .gear-detail > .fold__inner {
+        padding: 2px 12px 8px 64px;
+    }
+    .gear-detail__body {
+        color: var(--ds-parchment);
+        font-size: 0.92rem;
+        line-height: 1.45;
+        overflow-wrap: anywhere;
+        p {
+            margin: 0 0 0.4em;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+    }
+    @container dossier (max-width: 640px) {
+        .gear-row__line {
+            flex-wrap: wrap;
+            row-gap: 4px;
+        }
+        .gear-name {
+            flex-basis: 40%;
+            white-space: normal;
+        }
+        .gear-row.is-open > .gear-detail > .fold__inner {
+            padding-left: 30px;
         }
     }
 }

@@ -3,6 +3,7 @@
  * Everything here only READS existing actor data (computed in documents/acolyte.mjs);
  * rules are not re-implemented in the templates.
  */
+import { hasDescription } from '../../rules/item-description.mjs';
 import { SYSTEM_ID } from '../../system-id.mjs';
 import { SKILL_DESCRIPTIONS } from '../../rules/skill-descriptions.mjs';
 import { buildQuotes, describeQuote, skillQuote } from '../../rules/advancement.mjs';
@@ -337,6 +338,7 @@ export function buildGear(actor) {
                 canEquip: ['weapon', 'armour', 'forceField', 'cybernetic'].includes(item.type) || 'equipped' in item.system,
                 inBackpack: item.isInBackpack,
                 craftsmanship: item.system.craftsmanship,
+                hasDescription: hasDescription(item.system?.description),
             }))
             .sort((a, b) => a.name.localeCompare(b.name)),
     }));

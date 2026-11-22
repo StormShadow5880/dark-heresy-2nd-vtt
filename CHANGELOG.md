@@ -6,6 +6,10 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
 
 ## [1.9.0] – Unreleased
 
+### Gear
+
+- Item rows in the Gear tab fold their description open (click on the free area of the row or the arrow); name and image open the item window. See [docs/gear-descriptions.md](docs/gear-descriptions.md).
+
 ### Actors directory
 
 - "Create Acolyte" is now **Create Character** in its own full-width row. "Create Actor" / "Create Folder" are hidden for players. Patrons, Factions and 24 h rest moved from the directory to the scene controls (GM only).
