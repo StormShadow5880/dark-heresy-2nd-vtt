@@ -1020,6 +1020,33 @@
         gap: 0 16px;
         align-items: start;
     }
+    // Combat tab, second row: Defence & Movement | Armour | Healing side by side, equally tall; two columns, then one, on narrower sheets
+    .combat-layout--three {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        align-items: stretch;
+        gap: 0 14px;
+        margin-bottom: 14px;
+        .panel {
+            margin-bottom: 0;
+        }
+        // Defence & Movement is the compact one
+        .defence {
+            gap: 6px;
+            padding: 8px;
+            &__btn {
+                padding: 4px 2px;
+            }
+            &__value {
+                font-size: 1.35rem;
+            }
+        }
+    }
+    @container dossier (max-width: 860px) {
+        .combat-layout--three {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px 16px;
+        }
+    }
     .two-col {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1698,6 +1725,8 @@
                 background: none;
                 border: 0;
                 color: inherit;
+                width: 100%;
+                justify-content: flex-start; // Foundry centres the content of buttons: the skill names are flush left
                 text-align: left;
                 cursor: pointer;
                 > i {
