@@ -26,3 +26,7 @@ Not changed yet (they have tabs, tables or many fields of their own): armour, cy
 - The pictures only decorate. Name, image, tier/level, source, aptitudes, prerequisites, cost and text stay real form fields with the old data paths (`name`, `img`, `system.*`).
 - Long values wrap (name, aptitudes, prerequisites and the text area grow with their content). Enter in the name field does not add a line break.
 - Rules and data are untouched.
+
+## Psychic power variant
+
+`dh-codex--psychic` sets the pictures and colours (CSS variables `--cx-*`): violet warp header, eye emblem, violet parchment (`arkanes-pergament`), violet ribbons and tabs. Files: `warp-header`, `psyker-emblem`, `plakette-psy`, `icon-rahmen-psy`, `auge-trennlinie` (cut and compressed from the psychic asset pack; `auge-trennlinie` is prepared but not used yet because the layout has no divider). A further variant (e.g. for another item group) only needs its own set of variables.
