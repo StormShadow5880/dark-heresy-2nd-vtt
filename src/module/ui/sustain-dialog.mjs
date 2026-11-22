@@ -1,4 +1,5 @@
 import { SYSTEM_ID } from '../system-id.mjs';
+import { spendAction } from '../combat/action-account.mjs';
 import { canSustain } from '../rules/psychic-effects.mjs';
 import { isPsychicPowerActive, deactivatePsychicEffect } from '../actions/psychic-effect-manager.mjs';
 import { TURN_BUDGET, budgetLabel, needsSustainPrompt, planSustain, sustainEntries, turnKey } from '../rules/sustain-turn.mjs';
@@ -87,6 +88,7 @@ async function promptSustained(actor, combatant, entries, key) {
     const plan = planSustain(entries, result);
     if (!plan.ok) return ui.notifications.warn(plan.error);
     for (const e of plan.dropped) await deactivatePsychicEffect(actor, e.id);
+    if (plan.spent > 0) await spendAction(actor, { name: 'Sustaining powers', cost: plan.spent });
     await combatant.setFlag(SYSTEM_ID, 'sustainTurn', { key, spent: plan.spent, remaining: plan.remaining, kept: plan.kept.map((e) => e.id) });
 
     const list = (arr) => arr.map((e) => `${esc(e.name)} <em>(${esc(e.label)})</em>`).join(', ') || '—';

@@ -6,6 +6,10 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
 
 ## [1.9.0] – Unreleased
 
+### Combat: action account
+
+- Each turn a character has 1 Full Action (= 2 Half Actions). Weapon attacks, psychic powers and sustained powers are taken from it; if something does not fit, the player is asked. The Combat tab shows the account and lets you take other actions by hand. See `docs/action-account.md`.
+
 ### Psychic: sustained powers at the start of the turn
 
 - In combat the psyker is asked at the start of his turn which sustained powers he keeps. Free actions cost nothing, the others are taken from the actions of the turn (1 Full Action); powers that are not ticked end. See `docs/sustained-powers.md`.

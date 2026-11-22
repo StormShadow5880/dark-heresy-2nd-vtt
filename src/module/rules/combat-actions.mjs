@@ -66,7 +66,7 @@ export function updateAvailableCombatActions(rollData) {
     }
 }
 
-function allCombatActions() {
+export function allCombatActions() {
     return [
         {
             name: 'Standard Attack',

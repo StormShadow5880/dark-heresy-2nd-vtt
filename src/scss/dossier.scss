@@ -3190,3 +3190,60 @@
     white-space: nowrap;
     border-bottom: 1px dotted currentColor;
 }
+
+// action account of the turn (combat tab, combat tracker)
+.action-account {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 16px;
+    padding: 8px 12px;
+
+    &__text {
+        flex: 1 1 14em;
+
+        &.is-over {
+            color: #e0645a;
+        }
+
+        &.is-idle {
+            opacity: 0.7;
+        }
+    }
+
+    &__btns {
+        display: flex;
+        gap: 6px;
+    }
+
+    &__pips {
+        display: flex;
+        gap: 6px;
+    }
+}
+
+.pip {
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--ds-gold, #c9a14a);
+    border-radius: 50%;
+    display: inline-block;
+    box-sizing: border-box;
+
+    &.is-on {
+        background: var(--ds-gold, #c9a14a);
+    }
+}
+
+.dh-account-pips {
+    display: inline-flex;
+    gap: 3px;
+    margin-left: 6px;
+    vertical-align: middle;
+
+    .pip {
+        width: 9px;
+        height: 9px;
+        border-width: 1px;
+    }
+}

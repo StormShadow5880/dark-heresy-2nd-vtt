@@ -9,5 +9,5 @@ In combat the psyker is asked at the start of his turn which sustained powers he
 - **Decide later** changes nothing and does not mark the turn as answered.
 - **Special:** powers whose cost is "Special" cannot be calculated; they cost nothing here and are marked "check the power".
 
-The system has no other action tracking; the remaining actions are shown in the dialog and the chat message only.
+The cost is taken from the action account of the turn, see `action-account.md`.
 Code: `rules/sustain-turn.mjs` (pure), `ui/sustain-dialog.mjs`, hook in `actions/combat-action-manager.mjs`.

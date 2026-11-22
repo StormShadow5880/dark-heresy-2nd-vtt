@@ -1,0 +1,11 @@
+{{#if acct.active}}
+    <div class="action-account__pips" role="img" aria-label="{{acct.text}}">{{#each acct.pips}}<i class="pip {{#if on}}is-on{{/if}}"></i>{{/each}}</div>
+    <div class="action-account__text {{#if acct.over}}is-over{{/if}}"><strong>Actions this turn:</strong> {{acct.text}}{{#if acct.log.length}} <small>· {{#each acct.log}}{{name}} ({{label}}){{#unless @last}}, {{/unless}}{{/each}}</small>{{/if}}</div>
+    <div class="action-account__btns">
+        <button type="button" class="icon-btn" data-action="takeAction" data-tooltip="Take an action (movement, aim, reload …)"><i class="fa-solid fa-person-running"></i> Take an action</button>
+        {{#if acct.canRefund}}<button type="button" class="icon-btn" data-action="refundAction" data-tooltip="Give the last action back"><i class="fa-solid fa-rotate-left"></i></button>{{/if}}
+        <button type="button" class="icon-btn" data-action="resetAccount" data-tooltip="Full account again"><i class="fa-solid fa-arrows-rotate"></i></button>
+    </div>
+{{else}}
+    <div class="action-account__text is-idle">Actions: it is not the turn of this character.</div>
+{{/if}}

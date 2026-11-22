@@ -1,4 +1,5 @@
 import { distanceProblem } from '../rules/combat-resolution.mjs';
+import { guardPower } from '../combat/action-account.mjs';
 import { autoCombatEnabled } from '../actions/combat-resolution-manager.mjs';
 import { DHPromptApplication } from './dh-prompt-base.mjs';
 
@@ -68,6 +69,7 @@ export class PsychicPowerDialog extends DHPromptApplication {
             }
         }
         await this.data.finalize();
+        if (!(await guardPower(this.data.sourceActor, this.data.power))) return;
         await this.psychicAttackData.performActionAndSendToChat();
         await this.close();
     }

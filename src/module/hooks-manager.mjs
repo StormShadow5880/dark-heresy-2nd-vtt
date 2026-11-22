@@ -31,6 +31,7 @@ import { DarkHeresyGearSheet } from './sheets/item/gear-sheet.mjs';
 import { DarkHeresySettings } from './dark-heresy-settings.mjs';
 import { DHTargetedActionManager } from './actions/targeted-action-manager.mjs';
 import { DHBasicActionManager } from './actions/basic-action-manager.mjs';
+import { decorateTracker, refreshAccountViews } from './combat/action-account.mjs';
 import { DHCombatActionManager } from './actions/combat-action-manager.mjs';
 import { DarkHeresyCyberneticSheet } from './sheets/item/cybernetic-sheet.mjs';
 import { DarkHeresyForceFieldSheet } from './sheets/item/force-field-sheet.mjs';
@@ -68,6 +69,9 @@ export class HooksManager {
         Hooks.on('preCreateItem', HooksManager.preCreateItem);
         Hooks.on('preDeleteItem', HooksManager.preDeleteItem);
         Hooks.on('renderActorDirectory', HooksManager.renderActorDirectory);
+        // the action account of a turn follows the combat (sheets and combat tracker)
+        for (const hook of ['updateCombatant', 'updateCombat', 'deleteCombat']) Hooks.on(hook, () => refreshAccountViews());
+        Hooks.on('renderCombatTracker', (app, html) => decorateTracker(html instanceof HTMLElement ? html : html?.[0] ?? document));
         Hooks.on('getSceneControlButtons', HooksManager.gmTools);
         Hooks.on('updateActor', HooksManager.updateActor);
         registerWoundsSyncHooks();

@@ -1,3 +1,4 @@
+import { guardCombatAction } from '../combat/action-account.mjs';
 import { DHPromptApplication } from './dh-prompt-base.mjs';
 
 export class WeaponAttackDialog extends DHPromptApplication {
@@ -53,6 +54,8 @@ export class WeaponAttackDialog extends DHPromptApplication {
         }
 
         await this.data.finalize();
+        // the attack is taken from the action account of the turn (not for a re-roll with a Fate Point)
+        if (!(await guardCombatAction(this.data.sourceActor, this.data.action))) return;
         await this.weaponAttackData.performActionAndSendToChat();
         await this.close();
     }

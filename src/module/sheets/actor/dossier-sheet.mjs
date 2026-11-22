@@ -1,6 +1,7 @@
 import { AcolyteSheet } from './acolyte-sheet.mjs';
 import { prettifyDescription } from '../../rules/psy-text.mjs';
 import { SYSTEM_ID } from '../../system-id.mjs';
+import { chooseAndSpend, refundAction, resetAccount, viewFor as accountViewFor } from '../../combat/action-account.mjs';
 import {
     buildArmour,
     buildCharacteristics,
@@ -54,6 +55,9 @@ export class AcolyteDossierSheet extends AcolyteSheet {
             toggleFavorite: AcolyteDossierSheet.#onToggleFavorite,
             toggleEquipped: AcolyteDossierSheet.#onToggleEquipped,
             reloadWeapon: AcolyteDossierSheet.#onReloadWeapon,
+            takeAction: AcolyteDossierSheet.#onTakeAction,
+            refundAction: AcolyteDossierSheet.#onRefundAction,
+            resetAccount: AcolyteDossierSheet.#onResetAccount,
             adjustValue: AcolyteDossierSheet.#onAdjustValue,
             spendExperience: AcolyteDossierSheet.#onSpendExperience,
             awardExperience: AcolyteDossierSheet.#onAwardExperience,
@@ -117,6 +121,7 @@ export class AcolyteDossierSheet extends AcolyteSheet {
         context.dossier = {
             characteristics: buildCharacteristics(actor),
             resources: resources,
+            account: accountViewFor(actor),
             statusTiles: buildStatusTiles(actor),
             res: Object.fromEntries(resources.map((r) => [r.id, r])),
             skills,
@@ -383,6 +388,18 @@ export class AcolyteDossierSheet extends AcolyteSheet {
     }
 
     /** Clicking a critical pip sets that level, clicking the highest filled one lowers it by one */
+    static async #onTakeAction() {
+        await chooseAndSpend(this.actor);
+    }
+
+    static async #onRefundAction() {
+        await refundAction(this.actor);
+    }
+
+    static async #onResetAccount() {
+        await resetAccount(this.actor);
+    }
+
     static async #onFirstAid() {
         const { startFirstAid } = await import('../../actions/healing-manager.mjs');
         await startFirstAid(this.actor);
