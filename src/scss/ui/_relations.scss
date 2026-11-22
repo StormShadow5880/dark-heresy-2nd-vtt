@@ -1,0 +1,282 @@
+// Patrons and relationships: the patron dossier, the relationship panel of the Biography tab and the section of the roll dialog.
+
+.dh-patron {
+    &__body {
+        display: flex;
+        flex-direction: column;
+        gap: 0.7rem;
+        padding: 0.8rem;
+        color: var(--ds-parchment, #d9d0bd);
+        font-family: var(--ds-font, sans-serif);
+    }
+
+    &__head {
+        display: flex;
+        gap: 0.8rem;
+        align-items: center;
+    }
+
+    &__img {
+        width: 96px;
+        height: 96px;
+        object-fit: cover;
+        border: 2px solid var(--ds-gold, #b69a62);
+        background: #000;
+    }
+
+    &__titles {
+        flex: 1;
+        min-width: 0;
+    }
+
+    &__titles h2 {
+        margin: 0;
+        font-family: var(--ds-font-title, Georgia, serif);
+        color: var(--ds-ink, #e6d7b4);
+    }
+
+    &__sub {
+        margin: 0;
+        color: var(--ds-muted, #92918c);
+    }
+
+    &__name {
+        width: 100%;
+        font-size: 1.3rem;
+        font-family: var(--ds-font-title, Georgia, serif);
+    }
+
+    &__row {
+        display: flex;
+        gap: 0.5rem;
+
+        label {
+            flex: 1;
+        }
+    }
+
+    &__grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+
+        @media (max-width: 560px) {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    &__field {
+        display: flex;
+        flex-direction: column;
+        gap: 0.15rem;
+
+        span {
+            font-size: var(--ds-fs-s, 0.78rem);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--ds-gold, #b69a62);
+        }
+
+        p {
+            margin: 0;
+            white-space: pre-wrap;
+        }
+    }
+
+    &__list h3,
+    &__gm h3 {
+        margin: 0 0 0.2rem;
+        font-family: var(--ds-font-title, Georgia, serif);
+        color: var(--ds-gold, #b69a62);
+        border-bottom: 1px solid var(--ds-line, #504638);
+    }
+
+    &__list ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    &__list li {
+        display: flex;
+        gap: 0.4rem;
+        align-items: center;
+        padding: 0.15rem 0;
+
+        input[type='text'] {
+            flex: 1;
+        }
+    }
+
+    &__level {
+        width: 4rem;
+    }
+
+    &__lv {
+        margin-left: auto;
+        font-weight: 700;
+    }
+
+    &__secret {
+        white-space: nowrap;
+        color: var(--ds-warn, #c9923a);
+        font-size: var(--ds-fs-s, 0.78rem);
+    }
+
+    &__gm {
+        padding: 0.5rem;
+        border: 1px dashed var(--ds-warn, #c9923a);
+        background: rgba(201, 146, 58, 0.06);
+    }
+
+    &__assign label {
+        display: block;
+    }
+
+    &__foot {
+        text-align: right;
+    }
+
+    &__dir {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+
+        li {
+            display: flex;
+            gap: 0.4rem;
+            align-items: center;
+            padding: 0.15rem 0;
+        }
+
+        b {
+            flex: 1;
+        }
+    }
+}
+
+// relationship panel on the sheet
+.panel--relations {
+    .rel-patron {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+        margin-bottom: 0.3rem;
+
+        img {
+            width: 32px;
+            height: 32px;
+            object-fit: cover;
+            border: 1px solid var(--ds-gold, #b69a62);
+        }
+    }
+
+    .rel-hint {
+        margin: 0.1rem 0 0.4rem;
+        font-size: var(--ds-fs-s, 0.78rem);
+        color: var(--ds-muted, #92918c);
+    }
+
+    .rel-faction {
+        margin: 0.3rem 0;
+        padding: 0.25rem 0.35rem;
+        border: 1px solid var(--ds-line, #504638);
+        border-left: 3px solid var(--ds-gold, #b69a62);
+    }
+
+    .rel-faction__head,
+    .rel-contact__row {
+        display: flex;
+        gap: 0.35rem;
+        align-items: center;
+    }
+
+    .rel-level {
+        width: 3.6rem;
+    }
+
+    .rel-calc {
+        color: var(--ds-muted, #92918c);
+        white-space: nowrap;
+        font-size: var(--ds-fs-s, 0.78rem);
+    }
+
+    .rel-mod {
+        min-width: 2.4rem;
+        text-align: center;
+        font-weight: 700;
+        color: var(--ds-muted, #92918c);
+
+        &.is-pos {
+            color: var(--ds-ok, #6f9a5c);
+        }
+
+        &.is-neg {
+            color: var(--ds-fail, #b8514b);
+        }
+    }
+
+    .rel-btn {
+        padding: 0 0.5rem;
+        cursor: pointer;
+        font-size: var(--ds-fs-s, 0.78rem);
+        text-transform: uppercase;
+    }
+
+    .rel-contact {
+        list-style: none;
+        padding: 0.15rem 0;
+    }
+
+    .rel-contact__details {
+        margin: 0.15rem 0 0 0.5rem;
+
+        summary {
+            cursor: pointer;
+            color: var(--ds-muted, #92918c);
+            font-size: var(--ds-fs-s, 0.78rem);
+        }
+
+        label {
+            display: flex;
+            flex-direction: column;
+            font-size: var(--ds-fs-s, 0.78rem);
+        }
+
+        .rel-gm span {
+            color: var(--ds-warn, #c9923a);
+        }
+    }
+
+    .rel-loose {
+        margin: 0;
+        font-size: var(--ds-fs-s, 0.78rem);
+        text-transform: uppercase;
+        color: var(--ds-gold, #b69a62);
+    }
+}
+
+// section of the roll dialog
+.dh-rel {
+    &__modes {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.3rem 0.8rem;
+        margin: 0.3rem 0;
+    }
+
+    label {
+        display: flex;
+        flex-direction: column;
+        gap: 0.1rem;
+    }
+
+    &__mode {
+        flex-direction: row !important;
+        gap: 0.3rem !important;
+    }
+
+    &__preview {
+        margin-top: 0.3rem;
+    }
+}

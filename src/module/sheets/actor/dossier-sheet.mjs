@@ -31,6 +31,8 @@ import { activatePsychicPower, deactivatePsychicEffect, isPsychicPowerActive } f
 import { prepareAwardExperience, prepareSpendExperience } from '../../prompts/experience-prompt.mjs';
 import { confirmDialog } from '../../prompts/dialog-helpers.mjs';
 import { timerRows } from '../../rules/healing.mjs';
+import { addContact, addFaction, buildNetworkView, removeFaction, setContactField, setFactionField } from '../../relations/sheet-actions.mjs';
+import { actorPatronDoc, assignPatron, patronDocs, publicPatron } from '../../relations/store.mjs';
 
 const T = 'systems/dark-heresy-2nd/templates/actor/dossier';
 
@@ -66,6 +68,11 @@ export class AcolyteDossierSheet extends AcolyteSheet {
             firstAid: AcolyteDossierSheet.#onFirstAid,
             firstAidSelf: AcolyteDossierSheet.#onFirstAidSelf,
             fateHeal: AcolyteDossierSheet.#onFateHeal,
+            addFaction: AcolyteDossierSheet.#onAddFaction,
+            removeFaction: AcolyteDossierSheet.#onRemoveFaction,
+            addContact: AcolyteDossierSheet.#onAddContact,
+            relationRoll: AcolyteDossierSheet.#onRelationRoll,
+            openPatron: AcolyteDossierSheet.#onOpenPatron,
         },
     };
 
@@ -135,6 +142,12 @@ export class AcolyteDossierSheet extends AcolyteSheet {
         };
         Object.assign(context.dossier, await buildTalentsAndTraits(actor));
         await enrichPowerDescriptions(actor, context.dossier.psychic.powers);
+        // patron and relationships (Biography)
+        context.dossier.network = await buildNetworkView(actor);
+        const patronDoc = actorPatronDoc(actor);
+        const patron = patronDoc ? publicPatron(patronDoc) : null;
+        context.dossier.patron = patron ? { id: patronDoc.id, name: patronDoc.name, img: patron.img, faction: patron.faction } : null;
+        context.dossier.patronOptions = game.user.isGM ? patronDocs().map((d) => ({ id: d.id, name: d.name, selected: d.id === patronDoc?.id })) : [];
         context.dossier.ov = buildOverview(actor, context.dossier, context.effects ?? []);
         context.dossier.tabs = [
             { id: 'overview', label: 'Overview', icon: 'fa-solid fa-id-card' },
@@ -167,6 +180,12 @@ export class AcolyteDossierSheet extends AcolyteSheet {
         this.element.querySelectorAll('.pw[data-power]').forEach((row) => this._setPowerOpen(row, this._openPowers.has(row.dataset.power)));
         this.element.querySelectorAll('.char').forEach((tile) => tile.classList.toggle('is-editing', this._openCharEdits.has(tile.dataset.char)));
         // Buttons inside <summary> must not toggle the surrounding <details>
+        // relationships: text and number fields save on change (no redraw while typing, see sheet-actions.mjs)
+        if (this.isEditable) {
+            this.element.querySelectorAll('[data-contact]').forEach((el) => el.addEventListener('change', () => setContactField(this.actor, el.dataset.contact, el.dataset.field, el.value)));
+            this.element.querySelectorAll('[data-faction-field]').forEach((el) => el.addEventListener('change', () => setFactionField(this.actor, el.dataset.factionId, el.dataset.factionField, el.value)));
+        }
+        this.element.querySelectorAll('[data-patron-assign]').forEach((el) => el.addEventListener('change', () => assignPatron(this.actor, el.value || null)));
         this.element.querySelectorAll('summary button').forEach((b) => b.addEventListener('click', (ev) => ev.preventDefault()));
     }
 
@@ -309,6 +328,28 @@ export class AcolyteDossierSheet extends AcolyteSheet {
         if (!this.isEditable) return;
         const { startFateHeal } = await import('../../actions/healing-manager.mjs');
         await startFateHeal(this.actor);
+    }
+
+    static async #onAddFaction() {
+        if (this.isEditable) await addFaction(this.actor);
+    }
+
+    static async #onRemoveFaction(event, target) {
+        if (this.isEditable) await removeFaction(this.actor, target.dataset.faction);
+    }
+
+    static async #onAddContact(event, target) {
+        if (this.isEditable) await addContact(this.actor, target.dataset.faction || null);
+    }
+
+    static async #onRelationRoll(event, target) {
+        const { relationRollPrompt } = await import('../../relations/roll.mjs');
+        await relationRollPrompt(this.actor, { itemId: target.dataset.itemId ?? null, factionId: target.dataset.faction ?? null });
+    }
+
+    static async #onOpenPatron(event, target) {
+        const { openPatron } = await import('../patron-dossier.mjs');
+        openPatron(target.dataset.id);
     }
 
     static async #onSetCritical(event, target) {

@@ -1,0 +1,18 @@
+<li class="rel-contact" data-id="{{id}}">
+    <div class="rel-contact__row">
+        <input type="text" class="grow" data-contact="{{id}}" data-field="name" value="{{name}}" aria-label="Contact name" />
+        <input type="number" step="1" class="rel-level" data-contact="{{id}}" data-field="level" value="{{level}}" aria-label="Contact value" title="Value towards this person" />
+        <span class="rel-calc" title="Faction level + contact value = personal relationship level">{{formula}}</span>
+        <span class="rel-mod {{#if (gt modifier 0)}}is-pos{{else if (lt modifier 0)}}is-neg{{/if}}" title="Target modifier of a fitting social test (house rule: 1 level = 10){{#if capped}}, limited by the GM setting{{/if}}">{{#if (gt modifier 0)}}+{{/if}}{{modifier}}</span>
+        <button type="button" class="rel-btn" data-action="relationRoll" data-item-id="{{id}}" data-tooltip="Social test with this contact">Test</button>
+        <button type="button" class="icon-btn item-delete" data-item-id="{{id}}" aria-label="Delete the contact"><i class="fa-solid fa-trash"></i></button>
+    </div>
+    <details class="rel-contact__details">
+        <summary>Details</summary>
+        <label><span>Description</span><textarea rows="2" data-contact="{{id}}" data-field="description">{{description}}</textarea></label>
+        <label><span>Background of the relationship</span><textarea rows="2" data-contact="{{id}}" data-field="background">{{background}}</textarea></label>
+        <label><span>Notes</span><textarea rows="2" data-contact="{{id}}" data-field="notes">{{notes}}</textarea></label>
+        {{#if @root.dossier.isGM}}<label class="rel-gm"><span>GM notes (never sent to the players)</span><textarea rows="2" data-contact="{{id}}" data-field="gmNotes">{{gmNotes}}</textarea></label>{{/if}}
+        {{#if @root.dossier.network.hasFactions}}<label><span>Faction</span><select data-contact="{{id}}" data-field="factionId"><option value="">– none –</option>{{#each @root.dossier.network.factionOptions as |f|}}<option value="{{f.id}}" {{#if (eq f.id ../factionId)}}selected{{/if}}>{{f.name}}</option>{{/each}}</select></label>{{/if}}
+    </details>
+</li>

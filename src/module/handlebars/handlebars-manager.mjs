@@ -15,6 +15,7 @@ export class HandlebarManager {
             'systems/dark-heresy-2nd/templates/chat/partials/damage-calc.hbs',
             'systems/dark-heresy-2nd/templates/chat/attack-card-chat.hbs',
             'systems/dark-heresy-2nd/templates/chat/healing-card-chat.hbs',
+            'systems/dark-heresy-2nd/templates/actor/dossier/contact-row.hbs',
             // Actor partials.
             'systems/dark-heresy-2nd/templates/actor/panel/active-effects-panel.hbs',
             'systems/dark-heresy-2nd/templates/actor/panel/aptitude-panel.hbs',

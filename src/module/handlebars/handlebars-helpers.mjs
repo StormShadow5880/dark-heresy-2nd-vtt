@@ -128,6 +128,12 @@ export function registerHandlebarsHelpers() {
         return value ? 'success' : '';
     });
 
+    // +2 / −1 / 0 for relationship levels
+    Handlebars.registerHelper('signed', function(value) {
+        const n = Math.trunc(Number(value)) || 0;
+        return n > 0 ? `+${n}` : n < 0 ? `−${Math.abs(n)}` : '0';
+    });
+
     Handlebars.registerHelper('inc', function(value) {
         return Number.parseInt(value) + 1;
     });

@@ -125,7 +125,7 @@ export class DarkHeresyAcolyte extends DarkHeresyBaseActor {
         });
     }
 
-    async rollSkill(skillName, specialityName) {
+    async rollSkill(skillName, specialityName, options = {}) {
         let skill = this.skills[skillName];
         let label = skill.label;
         if (specialityName) {
@@ -133,6 +133,8 @@ export class DarkHeresyAcolyte extends DarkHeresyBaseActor {
             label = `${label}: ${skill.label}`;
         }
         const simpleSkillData = new SimpleSkillData();
+        simpleSkillData.skillKey = skillName; // the relationship section of the dialog needs to know which skill this is
+        simpleSkillData.relationPreset = options.relationPreset;
         const rollData = simpleSkillData.rollData;
         rollData.actor = this;
         rollData.nameOverride = label;

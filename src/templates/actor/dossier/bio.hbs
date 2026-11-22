@@ -27,17 +27,44 @@
                 <textarea class="notes" name="system.bio.notes" rows="14" aria-label="Notes">{{actor.system.bio.notes}}</textarea>
             </div>
         </article>
-        <article class="panel">
-            <h2 class="panel__title">Contacts
-                <button type="button" class="icon-btn item-create" data-type="peer" data-tooltip="New contact"><i class="fa-solid fa-plus"></i></button>
+        <article class="panel panel--relations">
+            <h2 class="panel__title">Patron &amp; Relationships
+                <button type="button" class="icon-btn" data-action="addFaction" data-tooltip="New faction"><i class="fa-solid fa-flag"></i></button>
+                <button type="button" class="icon-btn" data-action="addContact" data-faction="" data-tooltip="New contact"><i class="fa-solid fa-plus"></i></button>
             </h2>
-            <ul class="rows">
-                {{#each dossier.relations.peers as |p|}}
-                    <li class="item-drag" data-item-id="{{p.id}}"><img src="{{p.img}}" alt="" /><span class="grow">{{p.name}}</span>
-                        <button type="button" class="icon-btn item-edit" data-item-id="{{p.id}}"><i class="fa-solid fa-pen"></i></button>
-                        <button type="button" class="icon-btn item-delete" data-item-id="{{p.id}}"><i class="fa-solid fa-trash"></i></button></li>
-                {{else}}<li class="empty">No contacts.</li>{{/each}}
-            </ul>
+            <div class="rel-patron">
+                {{#if dossier.patron}}
+                    <img src="{{dossier.patron.img}}" alt="" />
+                    <span class="grow"><b>{{dossier.patron.name}}</b>{{#if dossier.patron.faction}} <small>{{dossier.patron.faction}}</small>{{/if}}</span>
+                    <button type="button" class="rel-btn" data-action="openPatron" data-id="{{dossier.patron.id}}">Open dossier</button>
+                {{else}}<span class="grow empty">No patron.</span>{{/if}}
+                {{#if dossier.isGM}}
+                    <select data-patron-assign aria-label="Patron of this character"><option value="">– no patron –</option>
+                        {{#each dossier.patronOptions as |p|}}<option value="{{p.id}}" {{#if p.selected}}selected{{/if}}>{{p.name}}</option>{{/each}}</select>
+                {{/if}}
+            </div>
+            <p class="rel-hint">House rule: one relationship level = ±10 on the target of a fitting social test. Faction level + contact value = personal level. In the patron's name the patron's value replaces it.</p>
+            {{#each dossier.network.groups as |g|}}
+                <section class="rel-faction" data-faction="{{g.id}}">
+                    <div class="rel-faction__head">
+                        <input type="text" class="grow" data-faction-field="name" data-faction-id="{{g.id}}" value="{{g.name}}" aria-label="Faction" />
+                        <input type="number" step="1" class="rel-level" data-faction-field="level" data-faction-id="{{g.id}}" value="{{g.level}}" aria-label="Faction level" title="Your relation to this faction" />
+                        <span class="rel-mod {{#if (gt g.modifier 0)}}is-pos{{else if (lt g.modifier 0)}}is-neg{{/if}}">{{#if (gt g.modifier 0)}}+{{/if}}{{g.modifier}}</span>
+                        <button type="button" class="rel-btn" data-action="addContact" data-faction="{{g.id}}" data-tooltip="New contact in this faction">+ Contact</button>
+                        <button type="button" class="rel-btn" data-action="relationRoll" data-faction="{{g.id}}" data-tooltip="Social test with the faction">Test</button>
+                        <button type="button" class="icon-btn" data-action="removeFaction" data-faction="{{g.id}}" aria-label="Remove the faction"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                    <ul class="rows">
+                        {{#each g.contacts as |c|}}{{> systems/dark-heresy-2nd/templates/actor/dossier/contact-row.hbs c}}{{else}}<li class="empty">No contacts.</li>{{/each}}
+                    </ul>
+                </section>
+            {{/each}}
+            <section class="rel-faction rel-faction--loose">
+                <h3 class="rel-loose">Contacts without a faction</h3>
+                <ul class="rows">
+                    {{#each dossier.network.loose as |c|}}{{> systems/dark-heresy-2nd/templates/actor/dossier/contact-row.hbs c}}{{else}}<li class="empty">No contacts.</li>{{/each}}
+                </ul>
+            </section>
         </article>
         <article class="panel">
             <h2 class="panel__title">Enemies

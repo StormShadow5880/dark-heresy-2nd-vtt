@@ -1,0 +1,76 @@
+<div class="dh-patron__body">
+    <header class="dh-patron__head">
+        <img class="dh-patron__img" src="{{patron.img}}" alt="" {{#if editable}}data-action="pickImage" title="Change the image"{{/if}} />
+        <div class="dh-patron__titles">
+            {{#if editable}}
+                <input type="text" class="dh-patron__name" data-field="name" value="{{patron.name}}" aria-label="Name" />
+                <div class="dh-patron__row">
+                    <label><span>Dynasty</span><input type="text" data-field="dynasty" value="{{patron.dynasty}}" /></label>
+                    <label><span>Faction</span><input type="text" data-field="faction" value="{{patron.faction}}" /></label>
+                </div>
+            {{else}}
+                <h2>{{patron.name}}</h2>
+                <p class="dh-patron__sub">{{#if patron.dynasty}}{{patron.dynasty}}{{/if}}{{#if patron.faction}} · {{patron.faction}}{{/if}}</p>
+            {{/if}}
+        </div>
+    </header>
+
+    <section class="dh-patron__grid">
+        {{#each textFields as |f|}}
+            <label class="dh-patron__field"><span>{{f.label}}</span>
+                {{#if ../editable}}<textarea data-field="{{f.key}}" rows="{{f.rows}}">{{lookup ../patron f.key}}</textarea>
+                {{else}}<p>{{lookup ../patron f.key}}</p>{{/if}}
+            </label>
+        {{/each}}
+    </section>
+
+    <section class="dh-patron__list">
+        <h3>Boons {{#if editable}}<button type="button" data-action="addBoon" class="dh-patron__add" aria-label="Add a boon">+</button>{{/if}}</h3>
+        <ul>
+            {{#each patron.boons as |b i|}}
+                <li>{{#if ../editable}}<input type="text" data-list="boons" data-index="{{i}}" data-key="text" value="{{b.text}}" /><button type="button" data-action="removeRow" data-list="boons" data-index="{{i}}" aria-label="Remove">×</button>
+                    {{else}}{{b.text}}{{/if}}</li>
+            {{else}}<li class="empty">None.</li>{{/each}}
+        </ul>
+    </section>
+
+    <section class="dh-patron__list">
+        <h3>Liabilities {{#if editable}}<button type="button" data-action="addLiability" class="dh-patron__add" aria-label="Add a liability">+</button>{{/if}}</h3>
+        <ul>
+            {{#each patron.liabilities as |l i|}}
+                <li>{{#if ../editable}}<input type="text" data-list="liabilities" data-index="{{i}}" data-key="text" value="{{l.text}}" />
+                    <label class="dh-patron__secret" title="Only the GM can see this"><input type="checkbox" data-list="liabilities" data-index="{{i}}" data-key="secret" {{#if l.secret}}checked{{/if}} /> secret</label>
+                    <button type="button" data-action="removeRow" data-list="liabilities" data-index="{{i}}" aria-label="Remove">×</button>
+                    {{else}}{{l.text}}{{/if}}</li>
+            {{else}}<li class="empty">None known.</li>{{/each}}
+        </ul>
+    </section>
+
+    <section class="dh-patron__list">
+        <h3>Relations to factions {{#if editable}}<button type="button" data-action="addRelation" class="dh-patron__add" aria-label="Add a faction relation">+</button>{{/if}}</h3>
+        <ul>
+            {{#each patron.relations as |r i|}}
+                <li>{{#if ../editable}}
+                        <input type="text" data-list="relations" data-index="{{i}}" data-key="faction" value="{{r.faction}}" aria-label="Faction" />
+                        <input type="number" step="1" class="dh-patron__level" data-list="relations" data-index="{{i}}" data-key="level" value="{{r.level}}" aria-label="Level" />
+                        <label class="dh-patron__secret" title="The players only see 'unknown'"><input type="checkbox" data-list="relations" data-index="{{i}}" data-key="secret" {{#if r.secret}}checked{{/if}} /> secret</label>
+                        <button type="button" data-action="removeRow" data-list="relations" data-index="{{i}}" aria-label="Remove">×</button>
+                    {{else}}<b>{{r.faction}}</b> <span class="dh-patron__lv">{{#if r.secret}}unknown{{else}}{{signed r.level}}{{/if}}</span>{{/if}}</li>
+            {{else}}<li class="empty">None.</li>{{/each}}
+        </ul>
+        {{#if editable}}<p class="notes">A level of ±1 means ±10 on the target of a fitting social test made in the patron's name (house rule).</p>{{/if}}
+    </section>
+
+    {{#if isGM}}
+        <section class="dh-patron__gm">
+            <h3>GM only</h3>
+            <label class="dh-patron__field"><span>Confidential notes (never sent to the players)</span><textarea data-field="gmNotes" rows="4">{{patron.gmNotes}}</textarea></label>
+            <label class="dh-patron__field"><span>Is the membership known?</span>
+                <select data-field="affiliation">{{#each affiliations as |label key|}}<option value="{{key}}" {{#if (eq key ../patron.affiliation)}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+            <fieldset class="dh-patron__assign"><legend>Characters of this patron</legend>
+                {{#each characters as |c|}}<label><input type="checkbox" data-assign="{{c.id}}" {{#if c.assigned}}checked{{/if}} /> {{c.name}}{{#if c.other}} <small>(now: {{c.other}})</small>{{/if}}</label>{{else}}<p class="empty">No characters.</p>{{/each}}
+            </fieldset>
+        </section>
+        <footer class="dh-patron__foot"><button type="button" data-action="save" class="dh-patron__save">Save the patron</button></footer>
+    {{/if}}
+</div>

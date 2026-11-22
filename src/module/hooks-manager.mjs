@@ -45,6 +45,7 @@ import { aptitudesLocked, isCreatorGranted } from './rules/aptitude-lock.mjs';
 import { applyRulebookStyles, ensureImportMacro, importRulebookPages } from './tools/rulebook-import.mjs';
 import { registerCombatSocket } from './actions/combat-resolution-manager.mjs';
 import { initWorldClock } from './ui/world-clock.mjs';
+import { registerRelationSocket } from './relations/roll.mjs';
 import { initTimeRunner, registerTimeSocket } from './actions/time-runner.mjs';
 import { registerHealingSocket, registerHealingLockSocket } from './actions/healing-manager.mjs';
 import { CharacterCreator } from './creator/wizard.mjs';
@@ -159,6 +160,7 @@ Enable Debug with: game.dh.debug = true
         registerHealingSocket();
         registerHealingLockSocket();
         registerTimeSocket();
+        registerRelationSocket();
         initTimeRunner();
         initWorldClock();
         applyRulebookStyles();
@@ -191,6 +193,14 @@ Enable Debug with: game.dh.debug = true
             rest.innerHTML = '<i class="fa-solid fa-bed"></i> 24 h rest';
             rest.addEventListener('click', async () => (await import('./actions/healing-manager.mjs')).finishRest());
             (root.querySelector('.directory-header .header-actions') ?? root.querySelector('.directory-header') ?? root.querySelector('header'))?.append(rest);
+        }
+        if (game.user.isGM && !root.querySelector('.dh-patrons')) {
+            const patrons = document.createElement('button');
+            patrons.type = 'button';
+            patrons.className = 'dh-patrons';
+            patrons.innerHTML = '<i class="fa-solid fa-user-tie"></i> Patrons';
+            patrons.addEventListener('click', async () => (await import('./sheets/patron-dossier.mjs')).openPatronDirectory());
+            (root.querySelector('.directory-header .header-actions') ?? root.querySelector('.directory-header') ?? root.querySelector('header'))?.append(patrons);
         }
         if (root.querySelector('.dh-create-acolyte')) return;
         if (!game.user.hasPermission('ACTOR_CREATE')) return;

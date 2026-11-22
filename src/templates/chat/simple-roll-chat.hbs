@@ -19,6 +19,9 @@
                 {{#each activeModifiers}}<span class="dh-mod"><b>{{@key}}</b> {{this}}</span>{{/each}}
             </div>
         {{/if}}
+        {{#if relation}}
+            <div class="dh-mods dh-mods--center">{{#each relation.lines}}<span class="dh-mod"><b>{{label}}</b> {{value}}</span>{{/each}}</div>
+        {{/if}}
         <div class="dh-rule"></div>
         <div class="dh-card__foot-line">{{#if success}}The Emperor protects{{else}}Only in death does duty end{{/if}}</div>
         <div class="dice-rolls" style="display:none">

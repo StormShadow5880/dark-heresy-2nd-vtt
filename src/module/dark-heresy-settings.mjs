@@ -87,6 +87,32 @@ export class DarkHeresySettings {
             type: Number,
             range: { min: 0, max: 1, step: 0.05 },
         });
+        game.settings.register(SYSTEM_ID, 'relations-cap-mode', {
+            name: 'Relationship modifier: limit',
+            hint: 'House rule: one relationship level = ±10 on the target of a fitting social test. Here the GM can limit the relationship modifier (positive and negative). This is separate from the DH2 limit of ±60 for all modifiers of a roll, which always applies.',
+            scope: 'world',
+            config: true,
+            default: 'none',
+            type: String,
+            choices: { none: 'No additional limit', cap: 'Limit to the value below' },
+        });
+        game.settings.register(SYSTEM_ID, 'relations-cap-value', {
+            name: 'Relationship modifier: maximum (only with a limit)',
+            hint: 'For example 20 means at most +20 and at least −20 from relationships. No value is built in: it only applies if the limit above is switched on.',
+            scope: 'world',
+            config: true,
+            default: 20,
+            type: Number,
+            range: { min: 10, max: 60, step: 10 },
+        });
+        game.settings.register(SYSTEM_ID, 'relations-gm-confirm', {
+            name: 'GM confirms every relationship test of the players',
+            hint: 'If on, a social test of a player that uses a relationship is first shown to the GM, who can confirm or correct whether it is relevant. Secret patron values and an unclear patron membership always go through the GM.',
+            scope: 'world',
+            config: true,
+            default: false,
+            type: Boolean,
+        });
         game.settings.register(SYSTEM_ID, DarkHeresySettings.SETTINGS.healingFirstAidLock, {
             name: 'First Aid: what starts the 24 hour limit',
             hint: 'A patient can be treated with First Aid once per 24 hours. Default: only a successful treatment starts the limit. Alternative: every attempt does.',
