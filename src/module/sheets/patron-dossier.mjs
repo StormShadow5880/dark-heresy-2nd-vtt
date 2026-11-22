@@ -40,7 +40,8 @@ export class PatronSheet extends HandlebarsApplicationMixin(foundry.applications
         },
     };
 
-    static PARTS = { body: { template: 'systems/dark-heresy-2nd/templates/patron/dossier.hbs', scrollable: ['.dh-patron__body'] } };
+    // '' = the part itself is the scrolling area
+    static PARTS = { body: { template: 'systems/dark-heresy-2nd/templates/patron/dossier.hbs', scrollable: [''] } };
 
     draft = null;
     assigned = null;
@@ -103,9 +104,24 @@ export class PatronSheet extends HandlebarsApplicationMixin(foundry.applications
         return { ...base, patron: this.draft, editable: isGM, isGM, textFields: TEXT_FIELDS, affiliations: AFFILIATIONS, characters, factionOptions: factionRegistry() };
     }
 
+    /** Belt and braces: the scroll position is also kept by hand, adding or removing a row must never throw the sheet back to the top */
+    async _preRender(context, options) {
+        await super._preRender?.(context, options);
+        const body = this.element?.querySelector?.('.dh-patron__body');
+        this._scrollTop = body ? body.scrollTop : null;
+    }
+
     _onRender(context, options) {
         super._onRender?.(context, options);
         const root = this.element;
+        if (this._scrollTop) {
+            const body = root.querySelector('.dh-patron__body');
+            const top = this._scrollTop;
+            if (body) {
+                body.scrollTop = top;
+                requestAnimationFrame(() => (body.scrollTop = top));
+            }
+        }
         root.querySelectorAll('[data-field]').forEach((el) =>
             el.addEventListener('change', () => {
                 this.draft[el.dataset.field] = el.value;

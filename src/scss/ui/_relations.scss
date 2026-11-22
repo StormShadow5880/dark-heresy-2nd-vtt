@@ -7,12 +7,18 @@
     --pt-ink: var(--ds-ink, #e6d7b4);
     --pt-line: rgba(182, 154, 98, 0.55);
 
+    // the body is the scrolling area (the window itself does not scroll): Foundry keeps its scroll position when the sheet is drawn again
     .window-content {
         padding: 0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
         background: radial-gradient(ellipse at 30% 0%, #5c1a20 0%, #3a1015 45%, #240a0d 100%);
     }
 
     &__body {
+        flex: 1 1 auto;
+        min-height: 0;
         display: flex;
         flex-direction: column;
         gap: 0.9rem;
