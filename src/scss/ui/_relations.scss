@@ -158,7 +158,10 @@
 }
 
 // relationship panel on the sheet
+// the panel takes the whole width of the two-column layout of the Biography tab
 .panel--relations {
+    grid-column: 1 / -1;
+
     .rel-patron {
         display: flex;
         gap: 0.5rem;

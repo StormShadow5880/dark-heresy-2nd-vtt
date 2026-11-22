@@ -66,9 +66,17 @@ export function DHSheetMixin(Base) {
             return context;
         }
 
+        /** Remembers where the active tab was scrolled to: a redraw (adding a row, changing a value) must not throw the user back to the top */
+        async _preRender(context, options) {
+            await super._preRender(context, options);
+            const active = this.element?.querySelector?.('.tab.active');
+            this._savedScroll = active ? { tab: active.dataset.tab, top: active.scrollTop } : null;
+        }
+
         async _onRender(context, options) {
             await super._onRender(context, options);
             this._activateTabs();
+            this._restoreScroll();
             if (!this.isEditable) {
                 this.element.querySelectorAll('input, select, textarea').forEach((el) => (el.disabled = true));
             }
@@ -81,6 +89,19 @@ export function DHSheetMixin(Base) {
          * @param html {jQuery}
          */
         _activateListeners(html) {}
+
+        /** The new tab element is only visible after _activateTabs(): the scroll position can be set now */
+        _restoreScroll() {
+            const saved = this._savedScroll;
+            if (!saved?.top) return;
+            const active = this.element.querySelector('.tab.active');
+            if (!active || active.dataset.tab !== saved.tab) return;
+            active.scrollTop = saved.top;
+            // layout of images and fonts may still change the height: once more after the next frame
+            requestAnimationFrame(() => {
+                if (active.isConnected) active.scrollTop = saved.top;
+            });
+        }
 
         _activateTabs() {
             const navLinks = [...this.element.querySelectorAll('.dh-navigation a[data-tab]')];
