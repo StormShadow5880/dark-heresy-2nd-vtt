@@ -347,3 +347,52 @@ $tl: '../images/timeline';
         color: var(--ds-warn, #c9923a);
     }
 }
+
+// Healing panel on the Combat tab: the buttons in a row (they wrap on narrow sheets), with the same look as the other sheet buttons
+.panel--healing {
+    .healing-actions {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(10.5rem, 1fr));
+        gap: 0.5rem;
+        padding: 0.6rem 0.7rem 0.4rem;
+    }
+
+    .healing-actions .dh-btn {
+        all: unset;
+        box-sizing: border-box;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        min-height: 2.1rem;
+        padding: 0 0.7rem;
+        font-family: var(--ds-font-title, Georgia, serif);
+        font-size: 0.85rem;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        text-align: center;
+        color: var(--ds-ink, #e6d7b4);
+        background: linear-gradient(180deg, #5a1b21, #35100f);
+        border: 1px solid var(--ds-gold, #b69a62);
+        border-radius: 3px;
+
+        i {
+            color: var(--ds-gold, #b69a62);
+        }
+
+        &:hover,
+        &:focus-visible {
+            filter: brightness(1.3);
+        }
+
+        &:focus-visible {
+            outline: 2px solid #f1e4c4;
+            outline-offset: 1px;
+        }
+    }
+
+    .healing-timers {
+        margin: 0.2rem 0.7rem 0.6rem;
+    }
+}
