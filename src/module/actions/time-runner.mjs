@@ -78,6 +78,16 @@ async function confirmNoConflict(what) {
 /* ------------------------------ state storage ------------------------------ */
 
 let cache = null; // the state of the rest as this client knows it
+let loaded = false; // loaded once: "no rest" is cached too (reading the store every 250 ms would parse the journal again and again)
+
+/** The state of the rest, read from the store once and then kept up to date by saveState() and the journal hooks */
+const ensureCache = () => {
+    if (!loaded) {
+        cache = loadState();
+        loaded = true;
+    }
+    return cache;
+};
 let doc = null;
 
 function findDoc() {
@@ -104,15 +114,22 @@ export function loadState() {
 
 async function saveState(state) {
     cache = state;
+    loaded = true;
     const d = doc ?? (await ensureDoc());
     if (d) await d.setFlag(SYSTEM_ID, 'restJson', JSON.stringify(state));
 }
 
 const isActive = (s) => !!s && ['running', 'paused', 'encounter', 'interrupted', 'recovery'].includes(s.status);
-export const currentRest = () => (game.user.isGM ? (cache ??= loadState()) : null);
+export const currentRest = () => (game.user.isGM ? ensureCache() : null);
 export const restActive = () => isActive(game.user.isGM ? currentRest() : publicRest());
 
+let publishedKey = null;
+
 async function publish(state) {
+    // the public part only changes with the status, the plan or the roster: not every 250 ms
+    const key = state ? `${state.status}|${state.startWorldTime}|${state.plannedSeconds}|${state.plan?.secondsPerHour}|${state.plan?.watches?.length}|${state.plan?.location}` : '';
+    if (key === publishedKey) return;
+    publishedKey = key;
     const active = isActive(state);
     const secretToPublic = { encounter: 'paused', interrupted: 'paused', recovery: 'paused' };
     const watches = state?.plan?.watches?.map((w) => ({ from: w.from, to: w.to, names: w.actors.map((id) => state.characters[id]?.name ?? '?') })) ?? [];
@@ -177,7 +194,7 @@ async function tick() {
     if (!isActiveGM() || busy) return;
     busy = true;
     try {
-        cache ??= loadState();
+        ensureCache();
         if (cache && isActive(cache)) await restTick(dt);
         else await clockTick(dt);
     } catch (error) {
@@ -336,13 +353,18 @@ export function registerTimeSocket() {
         if (data?.type !== 'rest-command' || !isActiveGM()) return;
         apply(data.cmd, data.args ?? {});
     });
-    Hooks.on('updateJournalEntry', (entry) => {
-        if (entry.getFlag?.(SYSTEM_ID, 'restStore') && game.user.isGM && !isActiveGM()) cache = loadState();
-    });
+    // another GM client changed the store (or created it): this one reads it again (the active GM is the writer and keeps its own state)
+    for (const hook of ['createJournalEntry', 'updateJournalEntry', 'deleteJournalEntry']) {
+        Hooks.on(hook, (entry) => {
+            if (!game.user.isGM || isActiveGM() || !entry?.getFlag?.(SYSTEM_ID, 'restStore')) return;
+            cache = hook === 'deleteJournalEntry' ? null : loadState();
+            loaded = true;
+        });
+    }
 }
 
 async function apply(cmd, args) {
-    cache ??= loadState();
+    ensureCache();
     const s = cache;
     if (cmd === 'start') {
         if (isActive(s)) return ui.notifications.warn('A rest is already in progress.');
@@ -393,6 +415,7 @@ export function clockStatus() {
 export function initTimeRunner() {
     if (game.user.isGM) {
         cache = loadState();
+        loaded = true;
         if (cache && isActive(cache) && isActiveGM()) {
             // after a reload: the stored state is checked and continued under control
             recoverRest(cache);
@@ -401,7 +424,8 @@ export function initTimeRunner() {
         }
     }
     last = Date.now();
-    setInterval(tick, TICK_MS);
+    // only a GM client ever advances the time: players need no timer at all
+    if (game.user.isGM) setInterval(tick, TICK_MS);
     for (const hook of ['pauseGame', 'updateCombat', 'deleteCombat', 'createCombat']) Hooks.on(hook, () => window.dispatchEvent(new CustomEvent('dh-clock-changed')));
 }
 

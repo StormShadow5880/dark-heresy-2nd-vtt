@@ -112,7 +112,17 @@ export function currentWatch(plan, offset, asleep = []) {
  * Everything that has to happen during the rest, in order: watch starts (with the sleep checks of the watchers) and encounter checks.
  * Event ids are stable, so a plan whose duration changes keeps the ids of the events already processed.
  */
+const scheduleCache = new WeakMap(); // plan object -> schedule (the runner asks for it several times per tick; a changed plan is a new object)
+
 export function buildSchedule(plan) {
+    const cached = scheduleCache.get(plan);
+    if (cached) return cached;
+    const built = computeSchedule(plan);
+    scheduleCache.set(plan, built);
+    return built;
+}
+
+function computeSchedule(plan) {
     const end = plannedSeconds(plan);
     const events = [];
     plan.watches.forEach((w, index) => {

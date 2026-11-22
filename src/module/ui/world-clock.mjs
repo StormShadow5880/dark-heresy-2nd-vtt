@@ -79,6 +79,38 @@ function clockElement() {
 }
 
 /** Draws the bar from the current world time */
+/** Names of the characters on watch at `elapsed` seconds of the rest (GM: from the full state, players: from the public part) */
+function watchNamesAt(rest, gm, elapsed) {
+    const plan = gm ? rest.plan : rest;
+    const w = currentWatch({ watches: (plan?.watches ?? []).map((x) => ({ from: x.from, to: x.to, actors: x.actors ?? x.names ?? [] })) }, elapsed);
+    return gm ? w.actors.map((id) => rest.characters[id]?.name ?? id) : w.actors;
+}
+
+/**
+ * Everything that changes the STRUCTURE of the bar (which buttons and texts exist). While it stays the same, a change of the world time
+ * only repaints the texts: rebuilding the HTML of both rows several times per second during a rest would cost layout and repaints.
+ */
+let lastStructure = null;
+function structureKey(parts) {
+    const gm = game.user.isGM;
+    const status = clockStatus();
+    const rest = gm ? currentRest() : publicRest();
+    const restOn = rest && rest.status && !['done', 'cancelled'].includes(rest.status) && (gm ? true : rest.active);
+    let rest_ = '';
+    if (restOn) {
+        const elapsed = Math.min(rest.plannedSeconds, Math.max(0, displayTime() - rest.startWorldTime));
+        rest_ = `${rest.status}|${(gm ? rest.plan?.location : rest.location) ?? ''}|${watchNamesAt(rest, gm, elapsed).join(',')}`;
+    }
+    return [gm, !!parts.mission, status.mode, status.running, status.halt, rest_].join('#');
+}
+
+/** World time changed: repaint the texts, rebuild the bar only if its structure changed */
+export function updateClock() {
+    const key = structureKey(clockParts(displayTime(), clockConfig()));
+    if (key !== lastStructure || !document.getElementById(ID)) renderClock();
+    else paintClock();
+}
+
 export function renderClock() {
     let visible = true;
     try {
@@ -92,6 +124,7 @@ export function renderClock() {
         return existing?.remove();
     }
     const parts = clockParts(displayTime(), clockConfig());
+    lastStructure = structureKey(parts);
     const el = clockElement();
     const gm = game.user.isGM;
     el.innerHTML = `
@@ -134,8 +167,7 @@ function renderSub() {
         const elapsed = Math.min(planned, Math.max(0, displayTime() - start));
         const labels = { running: 'Resting', paused: 'Rest paused', encounter: gm ? 'Encounter: decide' : 'Rest paused', interrupted: gm ? 'Rest interrupted' : 'Rest paused', recovery: gm ? 'Check: decide' : 'Rest paused' };
         const plan = gm ? rest.plan : rest;
-        const w = currentWatch({ watches: (plan.watches ?? []).map((x) => ({ from: x.from, to: x.to, actors: x.actors ?? x.names ?? [] })) }, elapsed);
-        const watchNames = gm ? w.actors.map((id) => rest.characters[id]?.name ?? id) : w.actors;
+        const watchNames = watchNamesAt(rest, gm, elapsed);
         const pct = planned ? Math.round((elapsed / planned) * 100) : 0;
         html += `<span class="dh-clock-sub__state is-rest" role="status"><i class="fa-solid fa-campground"></i> <b>${labels[rest.status] ?? 'Rest'}</b>${plan.location ? ` · ${esc(plan.location)}` : ''}
             · <span class="dh-clock-sub__elapsed">${hoursText(elapsed / HOUR)}</span> / ${hoursText(planned / HOUR)}${(plan.watches ?? []).length ? ` · Watch: ${watchNames.length ? esc(watchNames.join(', ')) : 'none'}` : ''}</span>
@@ -235,7 +267,12 @@ function warnRewind() {
  * click handlers a second time (every handler is bound on the whole sheet element after each render), which made buttons such as
  * "new entry" fire several times.
  */
-function refreshSheets() {
+let lastSheetRefresh = 0;
+function refreshSheets(delta = 0) {
+    // the timers show minutes: once every 5 s is enough, a big jump (manual time jump, rest) refreshes at once
+    const now = performance.now();
+    if (Math.abs(Number(delta)) < 60 && now - lastSheetRefresh < 5000) return;
+    lastSheetRefresh = now;
     for (const app of foundry.applications.instances.values()) {
         if (!(app.actor && app.options?.classes?.includes('dossier') && app.rendered)) continue;
         const list = app.element.querySelector('.healing-timers');
@@ -244,9 +281,10 @@ function refreshSheets() {
             if (rows.length && app.element.querySelector('.panel--healing')) app.render(); // a timer appeared: one full render
             continue;
         }
-        list.innerHTML = rows
+        const html = rows
             .map((t) => `<li class="healing-timers__row is-${t.state}"><span>${esc(t.label)} <small>(${t.hours} h)</small></span><b>${esc(t.ready ? t.text || 'ready' : t.text)}</b></li>`)
             .join('');
+        if (list.innerHTML !== html) list.innerHTML = html;
     }
 }
 
@@ -280,16 +318,17 @@ function paintClock() {
 export function initWorldClock() {
     markSync();
     renderClock();
-    window.addEventListener('dh-clock-changed', () => renderClock());
-    // while a rest runs the bar is redrawn ~7 times per second with the predicted time (minute by minute)
+    window.addEventListener('dh-clock-changed', () => updateClock());
+    // while a rest runs the texts are repainted ~5 times per second with the predicted time (minute by minute); nothing in a hidden tab
     setInterval(() => {
+        if (document.hidden) return;
         const rest = game.user.isGM ? currentRest() : publicRest();
         if (rest?.status === 'running' && !game.paused) paintClock();
-    }, 150);
+    }, 200);
     Hooks.on('updateWorldTime', (worldTime, delta) => {
         markSync();
-        renderClock();
-        refreshSheets();
+        updateClock();
+        refreshSheets(delta);
         if (Number(delta) < 0) warnRewind();
     });
 }

@@ -32,7 +32,10 @@ $tl: '../images/timeline';
         url('#{$tl}/frame-center.webp') center / auto 100% no-repeat,
         url('#{$tl}/frame-tile.webp') center / auto 100% repeat-x,
         linear-gradient(180deg, #4a1519, #2a0d10);
+    // the frame has a pointed outline: a shadow filter follows it; the bar is its own layer, so the repaint of its texts stays inside
     filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.6));
+    contain: layout style;
+    will-change: contents;
     pointer-events: auto;
 
     // the dark text field sits on the frame: make the text field itself a calm dark red
@@ -156,7 +159,7 @@ $tl: '../images/timeline';
 
     &.is-alert {
         color: #ffcf8a;
-        animation: dh-clock-alert 1.4s ease-in-out infinite;
+        animation: dh-clock-alert 1.4s ease-in-out 6; // a few pulses, then it rests (an endless filter animation repaints every frame)
     }
 
     &:disabled,
@@ -169,7 +172,7 @@ $tl: '../images/timeline';
 
 @keyframes dh-clock-alert {
     50% {
-        filter: brightness(1.5);
+        box-shadow: 0 0 8px 2px rgba(255, 207, 138, 0.8);
     }
 }
 
@@ -274,7 +277,8 @@ $tl: '../images/timeline';
     background: linear-gradient(180deg, #2c0f13, #1c0809);
     border: 6px solid transparent;
     border-image: url('#{$tl}/button-plaque.webp') 70 fill / 6px stretch;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+    contain: layout style;
 
     &__state b {
         font-weight: 600;

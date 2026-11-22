@@ -585,12 +585,14 @@ export function buildStatusTiles(actor) {
 /** Enriched description of every power (inline rolls like [[@pr/2]] use the psy rating of the actor) */
 export async function enrichPowerDescriptions(actor, powers) {
     const enrich = foundry.applications.ux.TextEditor.implementation.enrichHTML;
-    for (const p of powers) {
-        const item = actor.items.get(p.id);
-        p.descriptionHtml = await enrich(item?.system?.description ?? '', { rollData: { actor, item, pr: actor.psy?.rating ?? 0 } });
-    }
+    // all powers at once: the sheet waits for the slowest one, not for the sum of them (a sheet with many powers redraws on every change)
+    await Promise.all(
+        powers.map(async (p) => {
+            const item = actor.items.get(p.id);
+            p.descriptionHtml = await enrich(item?.system?.description ?? '', { rollData: { actor, item, pr: actor.psy?.rating ?? 0 } });
+        }),
+    );
 }
-
 
 /**
  * Small values of the overview: body armour, the lists of the "Quick Info" column and whether any effect exists.
