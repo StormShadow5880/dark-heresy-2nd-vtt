@@ -82,7 +82,7 @@ export function bindSection(element, ctx, { skillKey, skillLabel, base }) {
         const v = $('#relGm')?.value;
         return v === 'known' ? { affiliation: 'known' } : v === 'notknown' ? { apply: false } : undefined;
     };
-    const evaluate = () => evaluateSelection(ctx, read(), { skill: skillKey, cap: relationCap(), gm: gmDecision() });
+    const evaluate = (override) => evaluateSelection(ctx, read(), { skill: skillKey, cap: relationCap(), gm: override ?? gmDecision() });
     const update = () => {
         const sel = read();
         $('.dh-rel__personal').hidden = sel.mode !== 'personal';
@@ -142,16 +142,16 @@ export async function handleSelection({ actor, simpleSkillData, section, skillKe
     }
     const goesToGm = needsGmResolution(resolved, { confirmAll: confirmAllRelations() });
     if (game.user.isGM) {
-        // the GM decided in the dialog (membership select): no second confirmation
+        // a GM who rolls with the patron mode has decided to use it, unless "not known here" was chosen in the dialog: no second question
+        const d = section.gmDecision() ?? {};
+        const forced = d.apply === false ? d : { ...d, apply: true };
         if (resolved.secret) {
-            await runRelationRoll(actor, { skillKey, skillLabel, sel, difficulty, modifier, gm: section.gmDecision(), asGm: true });
+            await runRelationRoll(actor, { skillKey, skillLabel, sel, difficulty, modifier, gm: forced });
             return 'handled';
         }
-        if (resolved.needsGm && !resolved.applies) {
-            ui.notifications.info('The patron is not treated as known for this test: no relationship modifier was applied.');
-            return 'none';
-        }
-        applyToRollData(simpleSkillData.rollData, resolved, skillLabel);
+        const decided = section.evaluate(forced);
+        if (!decided.applies) return 'none';
+        applyToRollData(simpleSkillData.rollData, decided, skillLabel);
         return 'apply';
     }
     if (goesToGm) {
@@ -193,7 +193,9 @@ async function processRequest(data) {
     if (!actor || !user || !(user.isGM || actor.testUserPermission(user, 'OWNER'))) return ui.notifications.warn(`${user?.name ?? 'A user'} may not roll for this character.`);
     if (!isSocialSkill(data.skillKey) || !actor.system.skills?.[data.skillKey]) return;
     const ctx = await gmContext(actor);
-    const preview = evaluateSelection(ctx, data.sel, { skill: data.skillKey, cap: relationCap() });
+    // the GM sees the true values, also those that are secret for the player
+    const preview = evaluateSelection(revealed(ctx), data.sel, { skill: data.skillKey, cap: relationCap() });
+    preview.wasSecret = data.sel.mode === 'patron' && !!ctx.patron?.relations?.find((r) => r.id === data.sel.patronRelationId)?.secret;
     const decision = await confirmDialog(actor, data, preview);
     if (!decision) return ui.notifications.info('The GM did not roll the test.');
     await runRelationRoll(actor, { ...data, gm: decision });
@@ -204,10 +206,13 @@ async function gmContext(actor) {
     return relationContext(actor);
 }
 
+/** The same data with the secret flags removed, for calculations on the GM client only */
+const revealed = (ctx) => ({ ...ctx, patron: ctx.patron && { ...ctx.patron, relations: ctx.patron.relations.map((r) => ({ ...r, secret: false })) } });
+
 async function confirmDialog(actor, data, preview) {
     const DialogV2 = foundry.applications.api.DialogV2;
-    const lines = describeRelation({ ...preview, secret: false }, { skillLabel: data.skillLabel, base: actor.system.skills[data.skillKey].current, factionName: preview.factionName, contactName: preview.contactName });
-    const secretNote = preview.secret ? '<p><b>The value is secret for the player.</b> You see it here, the player does not.</p>' : '';
+    const lines = describeRelation({ ...preview, applies: true, secret: false }, { skillLabel: data.skillLabel, base: actor.system.skills[data.skillKey].current, factionName: preview.factionName, contactName: preview.contactName });
+    const secretNote = preview.wasSecret ? '<p><b>The value is secret for the player.</b> You see it here, the player does not.</p>' : '';
     const result = await DialogV2.wait({
         classes: ['dh-ui', 'dh-dialog'],
         window: { title: 'Relationship test' },
@@ -239,8 +244,7 @@ async function runRelationRoll(actor, { skillKey, skillLabel, sel, difficulty, m
     const ctx = await gmContext(actor);
     const wasSecret = sel.mode === 'patron' && !!ctx.patron?.relations?.find((r) => r.id === sel.patronRelationId)?.secret;
     // the GM computes with the true value: reveal the level for this calculation only
-    const trueCtx = { ...ctx, patron: ctx.patron && { ...ctx.patron, relations: ctx.patron.relations.map((r) => ({ ...r, secret: false })) } };
-    const resolved = evaluateSelection(trueCtx, sel, { skill: skillKey, cap: relationCap(), gm: { ...gm, affiliation: sel.mode === 'patron' ? gm?.affiliation ?? (gm?.apply === true ? 'known' : undefined) : gm?.affiliation } });
+    const resolved = evaluateSelection(revealed(ctx), sel, { skill: skillKey, cap: relationCap(), gm: { ...gm, affiliation: sel.mode === 'patron' ? gm?.affiliation ?? (gm?.apply === true ? 'known' : undefined) : gm?.affiliation } });
     const skill = actor.system.skills[skillKey];
     const data = new SimpleSkillData();
     const rd = data.rollData;
@@ -256,7 +260,7 @@ async function runRelationRoll(actor, { skillKey, skillLabel, sel, difficulty, m
     }
     await rd.calculateTotalModifiers();
     await data.calculateSuccessOrFailure();
-    if (!wasSecret) return sendActionDataToChat(data);
+    if (!wasSecret || !resolved.applies) return sendActionDataToChat(data); // nothing hidden was used: the normal card
 
     // secret value: the public card knows only the outcome, everything else goes to the GMs
     const outcome = { characterName: actor.name, skillLabel, success: rd.success, degrees: rd.success ? rd.dos : rd.dof };
