@@ -38,8 +38,8 @@ export async function openFactionManager() {
         factionRegistry()
             .map((f) =>
                 f.custom
-                    ? `<li data-id="${esc(f.id)}"><input type="text" value="${esc(f.name)}" data-rename aria-label="Name" /><button type="button" data-delete aria-label="Delete the faction">×</button></li>`
-                    : `<li class="is-default"><span>${esc(f.name)}</span><small>standard</small></li>`,
+                    ? `<li data-id="${esc(f.id)}"><input type="text" value="${esc(f.name)}" data-rename aria-label="Name" /><button type="button" data-delete class="dh-factions__del" aria-label="Delete the faction" title="Delete the faction">×</button></li>`
+                    : `<li class="is-default"><span class="dh-factions__name">${esc(f.name)}</span><small class="dh-factions__tag">standard</small></li>`,
             )
             .join('');
     await DialogV2.wait({
@@ -48,7 +48,7 @@ export async function openFactionManager() {
         position: { width: 440 },
         content: `<p class="notes">Characters and patrons choose their relations from this list. Add the organisations of your campaign once; they can then be chosen everywhere.</p>
             <ul class="dh-factions">${rows()}</ul>
-            <div class="form-group"><input type="text" data-new placeholder="New faction, e.g. House Volscen" /><button type="button" data-add>Add</button></div>
+            <div class="dh-factions__add"><input type="text" data-new placeholder="New faction, e.g. House Volscen" aria-label="New faction" /><button type="button" data-add>Add</button></div>
             <p class="notes dh-factions__msg" role="status"></p>`,
         render: (event, dialog) => {
             const el = dialog.element;

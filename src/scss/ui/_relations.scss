@@ -738,3 +738,77 @@
         margin-top: 0.3rem;
     }
 }
+
+// the faction list dialog (relations/factions.mjs)
+.dh-factions {
+    list-style: none;
+    margin: 0.3rem 0 0.6rem;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+
+    li {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.3rem 0.6rem;
+        background: rgba(0, 0, 0, 0.28);
+        border: 1px solid rgba(182, 154, 98, 0.45);
+        border-radius: 3px;
+        list-style: none;
+    }
+
+    &__name {
+        flex: 1;
+        min-width: 0;
+        font-weight: 600;
+    }
+
+    &__tag {
+        flex: none;
+        padding: 0 0.45rem;
+        font-size: 0.68rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--ds-muted, #92918c);
+        border: 1px solid rgba(146, 145, 140, 0.5);
+        border-radius: 2px;
+    }
+
+    li input[type='text'] {
+        flex: 1;
+        min-width: 0;
+    }
+
+    &__del {
+        flex: none;
+        width: 1.9rem;
+        height: 1.9rem;
+        padding: 0;
+        line-height: 1;
+        cursor: pointer;
+    }
+
+    &__add {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+
+        input {
+            flex: 1;
+            min-width: 0;
+        }
+
+        button {
+            flex: none;
+            width: auto;
+            padding: 0 1.2rem;
+        }
+    }
+
+    &__msg {
+        min-height: 1.2em;
+        color: var(--ds-warn, #c9923a);
+    }
+}
