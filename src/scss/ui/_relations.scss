@@ -217,41 +217,85 @@
         color: var(--ds-muted, #92918c);
     }
 
+    // table: every row has the same columns, so names, values, calculation, modifier and buttons line up
+    --rel-cols: minmax(0, 1fr) 4rem 7.5rem 3.4rem 10rem 4.6rem;
+
+    .rel-row {
+        display: grid;
+        grid-template-columns: var(--rel-cols);
+        align-items: center;
+        gap: 0 0.5rem;
+        min-height: 2.1rem;
+
+        > * {
+            min-width: 0;
+        }
+
+        &--head {
+            min-height: 0;
+            padding-bottom: 0.15rem;
+            font-size: var(--ds-fs-s, 0.78rem);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--ds-muted, #92918c);
+
+            span:nth-child(n + 2) {
+                text-align: center;
+            }
+        }
+
+        &--faction {
+            font-weight: 600;
+        }
+    }
+
     .rel-faction {
         margin: 0.3rem 0;
         padding: 0.25rem 0.35rem;
         border: 1px solid var(--ds-line, #504638);
         border-left: 3px solid var(--ds-gold, #b69a62);
+        background: rgba(0, 0, 0, 0.12);
     }
 
-    .rel-faction__head,
-    .rel-contact__row {
-        display: flex;
-        gap: 0.35rem;
-        align-items: center;
+    .rel-faction .rows {
+        margin: 0;
+        padding: 0;
     }
 
-    // the sheet sets number inputs to the full width: the value fields stay narrow, the name fields take the rest
+    .rel-contact {
+        list-style: none;
+        position: relative;
+        padding: 0.1rem 0;
+        border-top: 1px solid rgba(80, 70, 56, 0.6);
+    }
+
+    .rel-name,
+    input.rel-name {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .rel-name--indent,
+    input.rel-name--indent {
+        width: calc(100% - 1.2rem);
+        margin-left: 1.2rem;
+    }
+
     input.rel-level,
     .application.dossier & input.rel-level {
-        flex: 0 0 3.6rem;
-        width: 3.6rem;
-    }
-
-    input.grow {
-        flex: 1 1 auto;
-        min-width: 0;
-        width: auto;
+        width: 100%;
+        text-align: center;
     }
 
     .rel-calc {
+        text-align: center;
         color: var(--ds-muted, #92918c);
         white-space: nowrap;
         font-size: var(--ds-fs-s, 0.78rem);
+        font-weight: 400;
     }
 
     .rel-mod {
-        min-width: 2.4rem;
         text-align: center;
         font-weight: 700;
         color: var(--ds-muted, #92918c);
@@ -265,31 +309,43 @@
         }
     }
 
+    .rel-actions {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 0.3rem;
+    }
+
     .rel-btn {
         padding: 0 0.5rem;
+        height: 1.7rem;
+        line-height: 1;
+        white-space: nowrap;
         cursor: pointer;
         font-size: var(--ds-fs-s, 0.78rem);
         text-transform: uppercase;
     }
 
-    .rel-contact {
-        list-style: none;
-        padding: 0.15rem 0;
-    }
-
+    // the "Details" toggle sits in the last column of the row; the fold-out opens below the row
     .rel-contact__details {
-        margin: 0.15rem 0 0 0.5rem;
+        margin: 0.15rem 0 0.2rem 1.2rem;
 
         summary {
+            position: absolute;
+            top: 0.45rem;
+            right: 0;
+            width: 4.6rem;
             cursor: pointer;
             color: var(--ds-muted, #92918c);
             font-size: var(--ds-fs-s, 0.78rem);
+            text-align: right;
         }
 
         label {
             display: flex;
             flex-direction: column;
             font-size: var(--ds-fs-s, 0.78rem);
+            margin-top: 0.15rem;
         }
 
         .rel-gm span {
