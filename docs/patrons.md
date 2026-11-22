@@ -34,7 +34,7 @@ in the Biography tab of a character (GM only): the character then reads **all st
 The old drop-down of the GM still works. Players cannot assign a patron.
 
 ## Patron dossier (sheet of the patron actor; GM also: scene controls → token tools → "Patrons")
-Layout like the character dossier (portrait, name, dynasty and faction; Dossier / Boons / Liabilities / Factions; role, motivation, demeanor, description, notes; boons and liabilities with title and description; relations with a faction choice, level box, note).
+Layout after the supplied design (`patron-dossier.html/.css` of the design template): identity row (portrait with edit button, name, dynasty, **faction chosen from the list**), tabs Dossier / Relations / GM (anchors; the GM tab only for the GM), the overview on the left and boons, liabilities, relations to factions and the GM area on the right; boons and liabilities have a title and a description, relations a faction choice, level box, note and *secret*; the design's breakpoints for narrow windows. The labels are English like the rest of the system (the design template is German: translations would be added through Foundry's language files).
 **Changes are saved automatically** shortly after the last edit and when the window closes (no Save button; the sheet shows "Saved.").
 Name, image, dynasty, faction, role, motivation, demeanor, description, notes, boons, liabilities (each can be *secret*), relations to factions (level, each can be *secret*),
 membership status (unknown / known / hidden), the assigned characters. One patron can have many characters; the data exists once, the characters only point to it (actor flag `patronId`).

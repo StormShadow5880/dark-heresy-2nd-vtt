@@ -23,6 +23,12 @@ const TEXT_FIELDS = [
  * Sheet of the patron actor. The GM edits everything; a player who owns an assigned character sees the public data only. What the player's
  * client receives is already reduced (store.mjs, rules/relations-data.mjs): hidden values are not in the client data.
  */
+/** Is the patron's own faction (a name) in the list of the world? An empty one counts as listed */
+function factionListed(name) {
+    const n = String(name ?? '').trim().toLowerCase();
+    return !n || factionRegistry().some((f) => f.name.toLowerCase() === n);
+}
+
 export class PatronSheet extends HandlebarsApplicationMixin(foundry.applications.sheets.ActorSheetV2) {
     static DEFAULT_OPTIONS = {
         classes: ['dh-ui', 'dh-patron'],
@@ -101,7 +107,7 @@ export class PatronSheet extends HandlebarsApplicationMixin(foundry.applications
                   .filter((a) => a.type === 'acolyte')
                   .map((a) => ({ id: a.id, name: a.name, assigned: this.assigned.has(a.id), other: actorPatronId(a) && actorPatronId(a) !== this.patronId ? game.actors.get(actorPatronId(a))?.name : '' }))
             : [];
-        return { ...base, patron: this.draft, editable: isGM, isGM, textFields: TEXT_FIELDS, affiliations: AFFILIATIONS, characters, factionOptions: factionRegistry() };
+        return { ...base, patron: this.draft, editable: isGM, isGM, textFields: TEXT_FIELDS, affiliations: AFFILIATIONS, characters, factionOptions: factionRegistry(), factionListed: factionListed(this.draft.faction) };
     }
 
     /** Belt and braces: the scroll position is also kept by hand, adding or removing a row must never throw the sheet back to the top */
@@ -128,7 +134,12 @@ export class PatronSheet extends HandlebarsApplicationMixin(foundry.applications
                 this.queueSave();
             }),
         );
-        root.querySelectorAll('[data-nav]').forEach((b) => b.addEventListener('click', () => root.querySelector(`#${b.dataset.nav}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })));
+        root.querySelectorAll('[data-nav]').forEach((b) =>
+            b.addEventListener('click', () => {
+                root.querySelector(`#${b.dataset.nav}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                root.querySelectorAll('[data-nav]').forEach((x) => x.classList.toggle('is-active', x === b));
+            }),
+        );
         root.querySelectorAll('[data-list]').forEach((el) =>
             el.addEventListener('change', () => {
                 const row = this.draft[el.dataset.list][Number(el.dataset.index)];
