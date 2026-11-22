@@ -1,4 +1,5 @@
 import { AcolyteSheet } from './acolyte-sheet.mjs';
+import { prettifyDescription } from '../../rules/psy-text.mjs';
 import { SYSTEM_ID } from '../../system-id.mjs';
 import {
     buildArmour,
@@ -329,7 +330,7 @@ export class AcolyteDossierSheet extends AcolyteSheet {
         const raw = item.system?.description ?? '';
         let cached = this._gearHtml.get(item.id);
         if (!cached || cached.raw !== raw) {
-            const html = await foundry.applications.ux.TextEditor.implementation.enrichHTML(raw, { rollData: { actor: this.actor, item, pr: this.actor.psy?.rating ?? 0 } });
+            const html = await foundry.applications.ux.TextEditor.implementation.enrichHTML(prettifyDescription(raw, this.actor.psy?.rating ?? 0), { rollData: { actor: this.actor, item, pr: this.actor.psy?.rating ?? 0 } });
             cached = { raw, html };
             this._gearHtml.set(item.id, cached);
         }

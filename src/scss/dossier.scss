@@ -3183,3 +3183,10 @@
         }
     }
 }
+
+// psy-rating formulas in descriptions ("2 × PR" or the calculated value)
+.dh-pr {
+    font-weight: 700;
+    white-space: nowrap;
+    border-bottom: 1px dotted currentColor;
+}

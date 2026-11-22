@@ -1,3 +1,4 @@
+import { prettifyDescription } from '../rules/psy-text.mjs';
 import { homeworlds } from '../rules/homeworlds.mjs';
 import { backgrounds } from '../rules/backgrounds.mjs';
 import { divinations } from '../rules/divinations.mjs';
@@ -186,7 +187,7 @@ export class DarkHeresyAcolyte extends DarkHeresyBaseActor {
                     actor: this.name,
                     name: item.name,
                     type: item.type?.toUpperCase(),
-                    description: await foundry.applications.ux.TextEditor.implementation.enrichHTML(item.system.benefit ?? item.system.description, {
+                    description: await foundry.applications.ux.TextEditor.implementation.enrichHTML(prettifyDescription(item.system.benefit ?? item.system.description, this.psy.rating), {
                         rollData: {
                             actor: this,
                             item: item,

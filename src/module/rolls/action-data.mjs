@@ -1,4 +1,5 @@
 import { playShot } from '../vfx/vfx.mjs';
+import { prettifyDescription } from '../rules/psy-text.mjs';
 import { requestHealingPower } from '../actions/healing-manager.mjs';
 import { requestDefence } from '../actions/combat-resolution-manager.mjs';
 import { PsychicRollData, RollData, WeaponRollData } from './roll-data.mjs';
@@ -411,7 +412,7 @@ export class PsychicActionData extends ActionData {
 
     async descriptionText() {
         if(this.rollData.power) {
-            this.psychicEffect = await foundry.applications.ux.TextEditor.implementation.enrichHTML(this.rollData.power.system.description, {rollData: this.rollData});
+            this.psychicEffect = await foundry.applications.ux.TextEditor.implementation.enrichHTML(prettifyDescription(this.rollData.power.system.description, this.rollData.pr ?? this.rollData.actor?.psy?.rating ?? 0), {rollData: this.rollData});
         }
     }
 }

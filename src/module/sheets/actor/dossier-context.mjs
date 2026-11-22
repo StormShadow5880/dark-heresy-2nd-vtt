@@ -3,6 +3,7 @@
  * Everything here only READS existing actor data (computed in documents/acolyte.mjs);
  * rules are not re-implemented in the templates.
  */
+import { prettifyDescription, prettyRange } from '../../rules/psy-text.mjs';
 import { hasDescription } from '../../rules/item-description.mjs';
 import { SYSTEM_ID } from '../../system-id.mjs';
 import { SKILL_DESCRIPTIONS } from '../../rules/skill-descriptions.mjs';
@@ -357,7 +358,7 @@ export function buildGear(actor) {
 
 export async function buildTalentsAndTraits(actor) {
     const enrich = (text, item) =>
-        foundry.applications.ux.TextEditor.implementation.enrichHTML(text ?? '', {
+        foundry.applications.ux.TextEditor.implementation.enrichHTML(prettifyDescription(text ?? '', actor.psy?.rating ?? 0), {
             rollData: { actor, item, pr: actor.psy?.rating },
         });
 
@@ -422,7 +423,7 @@ export function buildPsychic(actor) {
             action: item.system.action,
             subtype: item.system.subtype,
             sustained: item.system.sustained,
-            range: item.system.range,
+            range: prettyRange(item.system.range, item.actor?.psy?.rating),
             prerequisite: item.system.prerequisite,
             damage: item.system.damage,
             penetration: item.system.penetration,
@@ -593,7 +594,7 @@ export async function enrichPowerDescriptions(actor, powers) {
     await Promise.all(
         powers.map(async (p) => {
             const item = actor.items.get(p.id);
-            p.descriptionHtml = await enrich(item?.system?.description ?? '', { rollData: { actor, item, pr: actor.psy?.rating ?? 0 } });
+            p.descriptionHtml = await enrich(prettifyDescription(item?.system?.description ?? '', actor.psy?.rating ?? 0), { rollData: { actor, item, pr: actor.psy?.rating ?? 0 } });
         }),
     );
 }

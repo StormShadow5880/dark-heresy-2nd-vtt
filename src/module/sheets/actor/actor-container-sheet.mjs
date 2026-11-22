@@ -1,4 +1,5 @@
 import { toggleUIExpanded } from '../../rules/config.mjs';
+import { prettifyDescription } from '../../rules/psy-text.mjs';
 import { DHBasicActionManager } from '../../actions/basic-action-manager.mjs';
 import { prepareCreateSpecialistSkillPrompt } from '../../prompts/simple-prompt.mjs';
 import { DHSheetMixin } from '../dh-sheet-mixin.mjs';
@@ -173,7 +174,7 @@ export class ActorContainerSheet extends DHSheetMixin(foundry.applications.sheet
             actor: this.actor.name,
             name: item.name,
             type: item.type?.toUpperCase(),
-            description: await foundry.applications.ux.TextEditor.implementation.enrichHTML(item.system.benefit ?? item.system.description, {rollData: {actor: this.actor, item: this, pr: this.actor.psy.rating}}),
+            description: await foundry.applications.ux.TextEditor.implementation.enrichHTML(prettifyDescription(item.system.benefit ?? item.system.description, this.actor.psy.rating), {rollData: {actor: this.actor, item: this, pr: this.actor.psy.rating}}),
         });
     }
 

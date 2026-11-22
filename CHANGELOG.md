@@ -6,6 +6,10 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
 
 ## [1.9.0] – Unreleased
 
+### Psychic powers: readable formulas
+
+- Formulas like `2*@pr` or `[[@pr/2]]` are shown as "2 × PR" / the calculated value with the psy rating of the character (descriptions, range, chat). Dice formulas stay rollable; the compendium data is unchanged.
+
 ### Talents and Spend EP
 
 - The prerequisites of the core talents are in the compendium and are **checked when buying** (characteristics, skills and ranks, other talents with their choice, alternatives, Psy Rating, Lore): a requirement that is not met blocks the purchase (only the GM can override), one that cannot be read has to be confirmed. "Spend EP" is now a catalogue of characteristics, skills, talents and psychic powers with price, value, aptitudes and prerequisites; the advancement overview shows the value now → after the advance. See [docs/talent-prerequisites.md](docs/talent-prerequisites.md).
