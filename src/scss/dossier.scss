@@ -486,22 +486,7 @@
         }
     }
 
-    // Outside of the overview the header is reduced even further: no key facts, smaller shield
-    &:not([data-active-tab='overview']) {
-        .dossier-bio-fields {
-            display: none;
-        }
-        .shield {
-            width: 76px;
-            height: 76px;
-        }
-        .dossier-header {
-            grid-template-columns: 76px minmax(0, 1fr) 310px 58px;
-        }
-        .dossier-header input.dossier-name {
-            font-size: 1.7rem;
-        }
-    }
+    // The header of the overview stays the same on every tab (a different size on other tabs made the sheet jump when switching)
 
     // Narrower windows: the wounds move below the identity, the banner disappears
     @container dossier (max-width: 900px) {
@@ -514,13 +499,9 @@
             width: 90px;
             height: 90px;
         }
-        &:not([data-active-tab='overview']) .dossier-header {
-            grid-template-columns: 76px minmax(0, 1fr) 58px;
-        }
     }
     @container dossier (max-width: 640px) {
-        .dossier-header,
-        &:not([data-active-tab='overview']) .dossier-header {
+        .dossier-header {
             grid-template-columns: 76px minmax(0, 1fr);
             grid-template-areas: 'shield ident' 'wounds wounds';
         }
