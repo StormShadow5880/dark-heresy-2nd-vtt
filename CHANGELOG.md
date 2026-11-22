@@ -6,6 +6,10 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
 
 ## [1.9.0] – Unreleased
 
+### Item sheets: codex design
+
+- Talent, trait and generic item sheets use the new parchment design (dark red header, emblem, tier/level plaque, gold divider). All fields and data paths are unchanged. See `docs/codex-sheets.md`.
+
 ### Psychic powers: readable formulas
 
 - Formulas like `2*@pr` or `[[@pr/2]]` are shown as "2 × PR" / the calculated value with the psy rating of the character (descriptions, range, chat). Dice formulas stay rollable; the compendium data is unchanged.

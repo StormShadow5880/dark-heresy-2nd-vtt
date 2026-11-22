@@ -1,41 +1,23 @@
-<div class="dh-wrapper">
-    <div class="dh-item">
-        <div class="dh-panel dh-grid-col-6">
-            <div class="dh-header">
-                <div class="dh-header__info">
-                    <div class="dh-header__logo dh-header__item-wrapper--span-4">
-                        <img class="dh-header__logo-image" src="{{item.img}}" data-edit="img" data-action="editImage" alt="{{item.name}}" title="{{item.name}}" />
-                    </div>
-                    <div class="dh-header__item-wrapper--span-4">
-                        <span class="dh-header__title">Name</span>
-                        <input class="dh-header__input" name="name" type="text" value="{{item.name}}" />
-                    </div>
-                    <div class="dh-header__item-wrapper">
-                        <span class="dh-header__title">Tier</span>
-                        <input class="dh-header__input" name="system.tier" type="number" data-dtype="Number" value="{{item.system.tier}}" />
-                    </div>
-                    <div class="dh-header__item-wrapper">
-                        <span class="dh-header__title">XP Cost</span>
-                        <input class="dh-header__input" name="system.cost" type="number" data-dtype="Number" value="{{item.system.cost}}" />
-                    </div>
-                    <div class="dh-header__item-wrapper--span-2">
-                        <span class="dh-header__title">Source</span>
-                        <input class="dh-header__input" name="system.source" type="text" value="{{item.system.source}}" />
-                    </div>
-                    <div class="dh-header__item-wrapper--span-4">
-                        <span class="dh-header__title">Aptitudes</span>
-                        <input class="dh-header__input" name="system.aptitudes" type="text" value="{{item.system.aptitudes}}" />
-                    </div>
-                    <div class="dh-header__item-wrapper--span-4">
-                        <span class="dh-header__title">Prerequisites</span>
-                        <input class="dh-header__input" name="system.prerequisites" type="text" value="{{item.system.prerequisites}}" />
-                    </div>
-                    <div class="dh-header__item-wrapper--text-area">
-                        <span class="dh-header__title">Benefit</span>
-                        <textarea class="dh-header__textarea" name="system.benefit">{{item.system.benefit}}</textarea>
-                    </div>
-                </div>
-            </div>
+<div class="dh-codex">
+    {{> systems/dark-heresy-2nd/templates/item/partial/codex-head.hbs plaqueLabel="Tier" plaqueField="system.tier" plaqueValue=item.system.tier}}
+
+    <section class="dh-codex__body dh-body">
+        <div class="dh-codex__row">
+            <label class="dh-codex__label" for="codex-aptitudes-{{item.id}}">Aptitudes</label>
+            <textarea id="codex-aptitudes-{{item.id}}" class="dh-codex__field" name="system.aptitudes" rows="1">{{item.system.aptitudes}}</textarea>
         </div>
-    </div>
+        <div class="dh-codex__row">
+            <label class="dh-codex__label" for="codex-prereq-{{item.id}}">Prerequisites</label>
+            <textarea id="codex-prereq-{{item.id}}" class="dh-codex__field" name="system.prerequisites" rows="1">{{item.system.prerequisites}}</textarea>
+        </div>
+        <div class="dh-codex__row">
+            <label class="dh-codex__label" for="codex-cost-{{item.id}}">XP Cost</label>
+            <input id="codex-cost-{{item.id}}" class="dh-codex__field dh-codex__field--short" name="system.cost" type="number" data-dtype="Number" value="{{item.system.cost}}" />
+        </div>
+
+        <div class="dh-codex__divider" aria-hidden="true"></div>
+
+        <h2 class="dh-codex__heading"><label for="codex-benefit-{{item.id}}">Benefit</label></h2>
+        <textarea id="codex-benefit-{{item.id}}" class="dh-codex__text" name="system.benefit">{{item.system.benefit}}</textarea>
+    </section>
 </div>

@@ -1,0 +1,23 @@
+{{!--
+  Header of the "codex" item sheets (parchment page, dark red header, emblem). The pictures are decoration only: name, image,
+  badge and source are real form fields.
+  Parameters: plaqueLabel, plaqueField, plaqueValue (optional badge, e.g. "Tier" / "system.tier").
+--}}
+<header class="dh-codex__head">
+    <div class="dh-codex__icon">
+        <img src="{{item.img}}" data-edit="img" data-action="editImage" alt="{{item.name}}" title="Change the image" />
+    </div>
+    <div class="dh-codex__titles">
+        <textarea class="dh-codex__name" name="name" rows="1" aria-label="Name" placeholder="Name" spellcheck="false">{{item.name}}</textarea>
+        <div class="dh-codex__meta">
+            {{#if plaqueField}}
+                <label class="dh-codex__plaque">
+                    <span>{{plaqueLabel}}</span>
+                    <input name="{{plaqueField}}" type="number" data-dtype="Number" value="{{plaqueValue}}" aria-label="{{plaqueLabel}}" />
+                </label>
+            {{/if}}
+            <input class="dh-codex__source" name="system.source" type="text" value="{{item.system.source}}" aria-label="Source" title="{{item.system.source}}" placeholder="Source" />
+        </div>
+    </div>
+    <span class="dh-codex__emblem" aria-hidden="true"></span>
+</header>

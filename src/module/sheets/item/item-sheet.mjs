@@ -3,7 +3,7 @@ import { DHSheetMixin } from '../dh-sheet-mixin.mjs';
 
 export class DarkHeresyItemSheet extends DHSheetMixin(foundry.applications.sheets.ItemSheetV2) {
     static DEFAULT_OPTIONS = {
-        position: { width: 650, height: 500 },
+        position: { width: 700, height: 520 },
     };
 
     static DEFAULT_TAB = 'description';
@@ -20,6 +20,10 @@ export class DarkHeresyItemSheet extends DHSheetMixin(foundry.applications.sheet
 
     _activateListeners(html) {
         super._activateListeners(html);
+        // the name of a codex sheet is a text area (long names wrap); Enter must not add a line break
+        html.find('textarea.dh-codex__name').on('keydown', (ev) => {
+            if (ev.key === 'Enter') ev.preventDefault();
+        });
         if (!this.isEditable) return;
 
         html.find('.sheet-control__hide-control').click(async (ev) => await this._sheetControlHideToggle(ev));

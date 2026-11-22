@@ -46,6 +46,8 @@
     @import 'src/scss/sheets/attack';
 }
 
+@import 'src/scss/sheets/codex';
+
 // ApplicationV2 window frames: the sheet/prompt content brings its own padding and borders
 .application.dh-sheet,
 .application.dh-prompt {

@@ -12,6 +12,7 @@ export class HandlebarManager {
     static preloadHandlebarsTemplates() {
         return foundry.applications.handlebars.loadTemplates([
             'systems/dark-heresy-2nd/templates/creator/creator.hbs',
+            'systems/dark-heresy-2nd/templates/item/partial/codex-head.hbs',
             'systems/dark-heresy-2nd/templates/chat/partials/damage-calc.hbs',
             'systems/dark-heresy-2nd/templates/chat/attack-card-chat.hbs',
             'systems/dark-heresy-2nd/templates/chat/healing-card-chat.hbs',
