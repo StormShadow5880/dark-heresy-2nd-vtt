@@ -254,6 +254,7 @@ async function announce(state) {
         announced = key;
         state.summarized = true;
         await saveState(state);
+        await restFatigue(state);
         await finalMessages(state);
         await publish(state);
     }
@@ -269,6 +270,16 @@ function summaryHtml(state) {
     return `<p>Elapsed ${hoursText(elapsed / HOUR)} of ${hoursText(state.plannedSeconds / HOUR)}, ${hoursText((state.plannedSeconds - elapsed) / HOUR)} left.<br>${watchLine}</p>`;
 }
 
+/** Complete rest takes fatigue away: 1 level per hour of rest, 6 hours remove everything (hours on watch do not count) */
+async function restFatigue(state) {
+    const { applyRestRecovery } = await import('./fatigue-manager.mjs');
+    for (const c of restSummary(state).characters) {
+        if (c.interrupted) continue;
+        const actor = game.actors.get(c.id);
+        if (actor && actor.system.fatigue?.value > 0) await applyRestRecovery(actor, c.rested / HOUR).catch((e) => console.error('Dark Heresy | rest fatigue', e));
+    }
+}
+
 async function finalMessages(state) {
     const sum = restSummary(state);
     const rows = sum.characters
@@ -276,7 +287,7 @@ async function finalMessages(state) {
         .join('');
     const head = state.status === 'cancelled' ? 'Rest cancelled' : sum.complete ? 'Rest finished' : 'Rest finished (interrupted)';
     await ChatMessage.create({ content: `<h3>${head}</h3><p>${state.plan.location ? `${esc(state.plan.location)}: ` : ''}${hoursText(state.elapsed / HOUR)} of ${hoursText(state.plannedSeconds / HOUR)} passed.</p>`, speaker: { alias: 'Rest' } });
-    await whisper(`<h3>${head}: details</h3><ul>${rows}</ul><p>Nothing was healed. Open the 24 h rest dialog to confirm which rest, treatment or recovery effects apply; an interrupted rest is not complete rest.</p><p><button type="button" data-dh-rest-effects>Open the 24 h rest dialog</button></p>`);
+    await whisper(`<h3>${head}: details</h3><ul>${rows}</ul><p>Nothing was healed (fatigue was reduced automatically for the hours of rest). Open the 24 h rest dialog to confirm which rest, treatment or recovery effects apply; an interrupted rest is not complete rest.</p><p><button type="button" data-dh-rest-effects>Open the 24 h rest dialog</button></p>`);
 }
 
 /** The whispered summary has a button for the existing 24 h rest dialog */

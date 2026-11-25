@@ -3,6 +3,7 @@
  * Everybody sees it; only the GM gets the time jumps and the settings. A jump only advances the world time: it never heals anybody,
  * rest and treatment still have to be confirmed (docs/world-clock.md).
  */
+import { timerView } from '../rules/fatigue.mjs';
 import { SYSTEM_ID } from '../system-id.mjs';
 import { timerRows } from '../rules/healing.mjs';
 import { CLOCK_MODES, HOUR, currentWatch, hoursText } from '../rules/rest.mjs';
@@ -275,6 +276,13 @@ function refreshSheets(delta = 0) {
     lastSheetRefresh = now;
     for (const app of foundry.applications.instances.values()) {
         if (!(app.actor && app.options?.classes?.includes('dossier') && app.rendered)) continue;
+        // the unconscious time of fatigue runs on the same clock
+        const wake = app.element.querySelector('[data-wake-text]');
+        if (wake) {
+            const v = timerView(app.actor.getFlag(SYSTEM_ID, 'fatigueTimer'), game.time.worldTime);
+            const text = v.active ? (v.ready ? 'Ready to wake up.' : `Wakes up in ${v.text}.`) : '';
+            if (wake.textContent !== text) wake.textContent = text;
+        }
         const list = app.element.querySelector('.healing-timers');
         const rows = timerRows(app.actor.getFlag(SYSTEM_ID, 'healingTimers'), game.time.worldTime);
         if (!list) {

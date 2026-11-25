@@ -513,13 +513,13 @@ async function invigourateCard(psyker, pr) {
  */
 export async function finishRest() {
     if (!game.user.isGM) return ui.notifications.warn('Only the GM can finish a rest.');
-    const actors = game.actors.filter((a) => a.type === 'acolyte' && a.system.wounds && (a.system.wounds.max - a.system.wounds.value > 0 || a.system.wounds.critical > 0));
-    if (!actors.length) return ui.notifications.info('Nobody is damaged.');
+    const actors = game.actors.filter((a) => a.type === 'acolyte' && a.system.wounds && (a.system.wounds.max - a.system.wounds.value > 0 || a.system.wounds.critical > 0 || a.system.fatigue?.value > 0));
+    if (!actors.length) return ui.notifications.info('Nobody is damaged or fatigued.');
     const rows = actors
         .map((a) => {
             const inj = actorInjury(a);
             return `<tr data-uuid="${esc(a.uuid)}"><td><input type="checkbox" name="on-${esc(a.id)}" /></td>
-                <td><b>${esc(a.name)}</b><br><small>${esc(inj.label)} · ${a.system.wounds.value}/${a.system.wounds.max}${inj.critical ? ` · ${inj.critical} crit.` : ''}</small></td>
+                <td><b>${esc(a.name)}</b><br><small>${esc(inj.label)} · ${a.system.wounds.value}/${a.system.wounds.max}${inj.critical ? ` · ${inj.critical} crit.` : ''}${a.system.fatigue?.value > 0 ? ` · fatigue ${a.system.fatigue.value}` : ''}</small></td>
                 <td><select name="rest-${esc(a.id)}"><option value="none">no rest</option><option value="rest">full rest</option><option value="bed">bed rest</option></select></td>
                 <td><input type="number" min="0" step="1" name="nat-${esc(a.id)}" value="0" title="natural healing (page 244)" /></td>
                 <td><input type="number" min="0" step="1" name="ext-${esc(a.id)}" value="0" title="Extended Care (page 109)" /></td>
@@ -530,7 +530,7 @@ export async function finishRest() {
         classes: ['dh-ui', 'dh-dialog'],
         window: { title: '24 hours of rest', resizable: true },
         position: { width: 760 },
-        content: `<p>Choose who rested for 24 hours and how. Without a confirmed rest nothing is healed.</p>
+        content: `<p>Choose who rested for 24 hours and how. Without a confirmed rest nothing is healed; a confirmed rest also removes all fatigue.</p>
             <table class="wtable wtable--full"><thead><tr><th></th><th>Character</th><th>Rest</th><th>Natural healing</th><th>Extended Care</th><th>Critical</th></tr></thead><tbody>${rows}</tbody></table>
             <p class="notes">The amounts of natural healing (p. 244) and of Extended Care (p. 109, with healer, assistants and consecutive days) are entered by the GM: they are not part of the system data. ${esc(HARDY_NOTE)}</p>
             <div class="form-group"><label><input type="checkbox" name="reset" /> also reset the First Aid / power timers of the chosen characters</label></div>`,
@@ -559,6 +559,8 @@ export async function finishRest() {
             } else info.push(`${a.name}: Toughness test passed (${check.roll.total}).`);
         }
         if (data.reset) await a.setFlag(SYSTEM_ID, 'healingTimers', {});
+        // 24 hours of rest: all fatigue is gone (6 hours of complete rest are enough)
+        if (a.system.fatigue?.value > 0) await (await import('./fatigue-manager.mjs')).applyRestRecovery(a, 24);
         const amount = nat + ext;
         if (amount < 1) continue;
         entries.push({ uuid: a.uuid, name: a.name, op: { type: 'heal', amount, allowCritical: true } });

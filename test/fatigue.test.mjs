@@ -74,3 +74,24 @@ test('halved characteristics are flagged', () => {
     applyFatigue(d, 3);
     assert.equal(d.fatigued, false);
 });
+
+import { unconsciousTimer, timerView, restRecovery } from '../src/module/rules/fatigue.mjs';
+
+test('the unconscious timer follows the world time', () => {
+    const t = unconsciousTimer(1000, 7);
+    assert.deepEqual(t, { since: 1000, until: 1000 + 420 });
+    assert.equal(timerView(t, 1000).ready, false);
+    assert.equal(timerView(t, 1000).text, '7 min');
+    assert.equal(timerView(t, 1000 + 400).text, '20 s');
+    assert.equal(timerView(t, 1000 + 420).ready, true);
+    assert.equal(timerView(t, 99999).text, 'ready to wake up');
+    assert.equal(timerView(null, 0).active, false);
+});
+
+test('rest: 1 hour removes 1 level, 6 hours everything', () => {
+    assert.deepEqual(restRecovery({ value: 5, hours: 1 }), { before: 5, removed: 1, after: 4, all: false });
+    assert.equal(restRecovery({ value: 5, hours: 3 }).after, 2);
+    assert.equal(restRecovery({ value: 5, hours: 6 }).after, 0);
+    assert.equal(restRecovery({ value: 2, hours: 5 }).after, 0, 'never below 0');
+    assert.equal(restRecovery({ value: 5, hours: 0.9 }).after, 5, 'only whole hours count');
+});

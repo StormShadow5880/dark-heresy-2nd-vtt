@@ -83,3 +83,33 @@ export function crossing(from, to, max) {
     if (from <= limit && to > limit) return 'unconscious';
     return null;
 }
+
+/* ------------------------------ coupled to the game clock ------------------------------ */
+
+export const HOUR_SECONDS = 3600;
+/** Complete rest: 1 hour removes 1 level, 6 hours remove all fatigue (rule summary, to be verified) */
+export const FULL_REST_HOURS = 6;
+
+/** The timer that is stored when a character collapses: { since, until } in world seconds */
+export function unconsciousTimer(now, minutes) {
+    const since = Number(now) || 0;
+    return { since, until: since + Math.max(0, Number(minutes) || 0) * 60 };
+}
+
+/** State of the timer for the sheet: ready when the unconscious time is over; text like "6 min" */
+export function timerView(timer, now) {
+    if (!timer || !Number.isFinite(Number(timer.until))) return { active: false, ready: false, remaining: 0, text: '' };
+    const remaining = Math.max(0, Number(timer.until) - Number(now));
+    if (remaining <= 0) return { active: true, ready: true, remaining: 0, text: 'ready to wake up' };
+    const min = Math.floor(remaining / 60);
+    const sec = Math.ceil(remaining % 60);
+    return { active: true, ready: false, remaining, text: min > 0 ? `${min} min ${sec ? `${sec} s` : ''}`.trim() : `${sec} s` };
+}
+
+/** Fatigue removed by complete rest: whole hours, 6 hours or more remove everything */
+export function restRecovery({ value, hours }) {
+    const before = Math.max(0, Math.floor(Number(value) || 0));
+    const h = Math.max(0, Math.floor(Number(hours) || 0));
+    const removed = h >= FULL_REST_HOURS ? before : Math.min(before, h);
+    return { before, removed, after: before - removed, all: h >= FULL_REST_HOURS };
+}

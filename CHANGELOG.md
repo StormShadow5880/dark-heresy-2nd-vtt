@@ -8,7 +8,7 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
 
 ### Fatigue fix and consequences
 
-- Characteristics halved by fatigue and the skills based on them are marked in orange. Over the fatigue limit the sheet shows an "unconscious" banner (10 − Toughness Bonus minutes) with a "Wake up" button; the chat reports crossing the limit. More than twice the limit: dead. Rule text from the errata summary, see `docs/fatigue.md`.
+- Characteristics halved by fatigue and the skills based on them are marked in orange. Over the fatigue limit the sheet shows an "unconscious" banner (10 − Toughness Bonus minutes) with a "Wake up" button; the chat reports crossing the limit. More than twice the limit: dead. The unconscious time and the recovery run on the game clock (automatic wake-up, rest planner and 24 h rest reduce fatigue, a Fate Point removes all). Rule text from the errata summary, see `docs/fatigue.md`.
 
 - The fatigue limit (Toughness Bonus + Willpower Bonus) is calculated from the bonuses before fatigue. Before, it shrank while the fatigue rose (a higher fatigue halves Toughness), so the counter stopped at e.g. 5 of 6. See `rules/fatigue.mjs`.
 

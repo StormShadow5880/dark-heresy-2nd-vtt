@@ -32,6 +32,7 @@ import { DarkHeresySettings } from './dark-heresy-settings.mjs';
 import { DHTargetedActionManager } from './actions/targeted-action-manager.mjs';
 import { DHBasicActionManager } from './actions/basic-action-manager.mjs';
 import { crossing as fatigueCrossing, fatigueState } from './rules/fatigue.mjs';
+import { clearTimer, processTimers, startUnconscious } from './actions/fatigue-manager.mjs';
 import { decorateTracker, refreshAccountViews } from './combat/action-account.mjs';
 import { DHCombatActionManager } from './actions/combat-action-manager.mjs';
 import { DarkHeresyCyberneticSheet } from './sheets/item/cybernetic-sheet.mjs';
@@ -75,6 +76,8 @@ export class HooksManager {
         Hooks.on('renderCombatTracker', (app, html) => decorateTracker(html instanceof HTMLElement ? html : html?.[0] ?? document));
         Hooks.on('getSceneControlButtons', HooksManager.gmTools);
         Hooks.on('preUpdateActor', HooksManager.preUpdateActor);
+        // the unconscious time of fatigue runs on the world clock
+        Hooks.on('updateWorldTime', () => processTimers().catch((e) => console.error('Dark Heresy | fatigue timers', e)));
         Hooks.on('updateActor', HooksManager.updateActor);
         registerWoundsSyncHooks();
 
@@ -175,6 +178,7 @@ Enable Debug with: game.dh.debug = true
         registerRelationSocket();
         if (game.users.activeGM?.id === game.user.id) migrateJournalPatrons().then((n) => n && ui.notifications.info(`${n} patron(s) converted to patron actors.`)).catch((e) => console.warn('Dark Heresy 2e | patron migration failed', e));
         initTimeRunner();
+        processTimers().catch((e) => console.error('Dark Heresy | fatigue timers', e));
         initWorldClock();
         applyRulebookStyles();
         ensureImportMacro().catch((e) => console.warn('Dark Heresy 2e | macro could not be created', e));
@@ -272,6 +276,9 @@ Enable Debug with: game.dh.debug = true
         const t = actor.characteristics?.toughness;
         const state = fatigueState({ value: to, max: actor.system.fatigue.max, toughnessBonus: t?.bonusBeforeFatigue ?? t?.bonus });
         const kind = fatigueCrossing(options.dhFatigueFrom, Number(to), actor.system.fatigue.max);
+        // the unconscious time runs on the world clock; back below the limit it ends
+        if (state.unconscious && !state.dead) await startUnconscious(actor);
+        else if (!state.unconscious) await clearTimer(actor);
         if (!kind) return;
         const name = foundry.utils.escapeHTML(actor.name);
         const text =
