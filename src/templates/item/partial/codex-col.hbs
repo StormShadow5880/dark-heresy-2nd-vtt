@@ -1,0 +1,11 @@
+{{!-- A column of a section panel (e.g. Ammunition): label above, value below. Parameters: label, name, value, number, options. --}}
+<label class="dh-codex__col">
+    <span>{{label}}</span>
+    {{#if options}}
+        <select class="dh-codex__field" name="{{name}}">{{selectOptions options selected=value}}</select>
+    {{else if number}}
+        <input class="dh-codex__field" name="{{name}}" type="number" data-dtype="Number" value="{{value}}" />
+    {{else}}
+        <input class="dh-codex__field" name="{{name}}" type="text" value="{{value}}" />
+    {{/if}}
+</label>

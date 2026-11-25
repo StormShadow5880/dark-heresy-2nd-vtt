@@ -1,14 +1,14 @@
 <div class="dh-codex">
     {{> systems/dark-heresy-2nd/templates/item/partial/codex-head.hbs}}
 
-    <section class="dh-codex__body dh-body">
-        <div class="dh-codex__facts">
-            <label class="dh-codex__fact"><span>Weight</span><input class="dh-codex__field" name="system.weight" type="number" data-dtype="Number" value="{{item.system.weight}}" /></label>
-            <label class="dh-codex__fact dh-codex__fact--check"><input name="system.backpack.inBackpack" type="checkbox" data-dtype="Boolean" {{checked item.system.backpack.inBackpack}}/><span>In Backpack</span></label>
-            <label class="dh-codex__fact"><span>Availability</span><select class="dh-codex__field" name="system.availability">{{selectOptions (arrayToObject dh.items.availability) selected=item.system.availability}}</select></label>
-            <label class="dh-codex__fact"><span>Craftsmanship</span><select class="dh-codex__field" name="system.craftsmanship">{{selectOptions (arrayToObject dh.items.craftsmanship) selected=item.system.craftsmanship}}</select></label>
-        </div>
+    <div class="dh-codex__facts">
+        {{> systems/dark-heresy-2nd/templates/item/partial/codex-fact.hbs label="Weight" name="system.weight" value=item.system.weight number=true}}
+        {{> systems/dark-heresy-2nd/templates/item/partial/codex-fact.hbs label="Availability" name="system.availability" value=item.system.availability options=(arrayToObject dh.items.availability)}}
+        {{> systems/dark-heresy-2nd/templates/item/partial/codex-fact.hbs label="Craftsmanship" name="system.craftsmanship" value=item.system.craftsmanship options=(arrayToObject dh.items.craftsmanship)}}
+        {{> systems/dark-heresy-2nd/templates/item/partial/codex-check.hbs label="In Backpack" name="system.backpack.inBackpack" value=item.system.backpack.inBackpack}}
+    </div>
 
+    <section class="dh-codex__body dh-body">
         <div class="dh-codex__divider" aria-hidden="true"></div>
         <h2 class="dh-codex__heading"><label for="codex-description-{{item.id}}">Description</label></h2>
         <textarea id="codex-description-{{item.id}}" class="dh-codex__text" name="system.description">{{item.system.description}}</textarea>

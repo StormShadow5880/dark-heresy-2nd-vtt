@@ -16,7 +16,7 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
 
 ### Item sheets: codex design
 
-- Talent, trait, gear, weapon, psychic power and generic item sheets use the new parchment design (dark red header, emblem, tier/level plaque, gold divider). All fields and data paths are unchanged. See `docs/codex-sheets.md`.
+- All item sheets (talent, trait, gear, weapon, armour, cybernetic, force field, ammunition, weapon modification, attack special, critical injury, peer/enemy, journal entry, storage location, psychic power and generic) share one layout: header, stat bar, facts, section and tabs. Before this entry: talent, trait, gear, weapon, psychic power and generic item sheets use the new parchment design (dark red header, emblem, tier/level plaque, gold divider). All fields and data paths are unchanged. See `docs/codex-sheets.md`.
 
 ### Psychic powers: readable formulas
 

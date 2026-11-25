@@ -13,6 +13,10 @@ export class HandlebarManager {
         return foundry.applications.handlebars.loadTemplates([
             'systems/dark-heresy-2nd/templates/creator/creator.hbs',
             'systems/dark-heresy-2nd/templates/item/partial/codex-head.hbs',
+            'systems/dark-heresy-2nd/templates/item/partial/codex-stat.hbs',
+            'systems/dark-heresy-2nd/templates/item/partial/codex-fact.hbs',
+            'systems/dark-heresy-2nd/templates/item/partial/codex-check.hbs',
+            'systems/dark-heresy-2nd/templates/item/partial/codex-col.hbs',
             'systems/dark-heresy-2nd/templates/actor/dossier/action-account.hbs',
             'systems/dark-heresy-2nd/templates/chat/partials/damage-calc.hbs',
             'systems/dark-heresy-2nd/templates/chat/attack-card-chat.hbs',

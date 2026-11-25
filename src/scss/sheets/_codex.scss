@@ -251,41 +251,153 @@ $cx-body: 'IM Fell DW Pica', 'Palatino Linotype', Georgia, 'Times New Roman', se
     }
 
 
-    // ---- facts (small fields under the header of gear, weapon and psychic power sheets) -----------------------------
+    // ---- stat bar: the key values of an item as tiles (damage, type, pen, range …) ----------------------------------------
+    &__stats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.6cqw;
+        margin-top: 2.2cqw;
+
+        &--six {
+            grid-template-columns: repeat(6, minmax(0, 1fr));
+            gap: 1cqw;
+        }
+    }
+
+    &__stat {
+        flex: 1 1 auto;
+        display: grid;
+        grid-template-columns: auto auto minmax(3ch, 1fr);
+        align-items: center;
+        gap: 0.9cqw;
+        min-width: 0;
+        margin: 0;
+        padding: 1cqw 1.4cqw;
+        border: 1px solid rgba(110, 82, 40, 0.75);
+        border-radius: 1.2cqw;
+        background: rgba(255, 252, 240, 0.35);
+        box-shadow: inset 0 0 0 0.25cqw rgba(255, 252, 240, 0.5);
+
+        > i {
+            color: var(--cx-red);
+            font-size: 2.4cqw;
+        }
+    }
+
+    // narrow pages: no icons, the values need the room
+    @container (max-width: 640px) {
+        &__stat > i {
+            display: none;
+        }
+
+        &__stat {
+            grid-template-columns: auto minmax(3ch, 1fr);
+        }
+    }
+
+    &__stat-label {
+        padding-right: 1cqw;
+        border-right: 1px solid rgba(110, 82, 40, 0.6);
+        color: var(--cx-ink-soft);
+        font-family: $cx-title;
+        font-size: clamp(10px, 1.7cqw, 19px);
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+    }
+
+    input.dh-codex__stat-value,
+    select.dh-codex__stat-value {
+        width: 100%;
+        min-width: 0;
+        height: auto;
+        padding: 0;
+        border: 0;
+        border-bottom: 1px solid transparent;
+        background: transparent;
+        font-family: $cx-title;
+        font-size: clamp(15px, 2.9cqw, 34px);
+        font-weight: 700;
+        line-height: 1.1;
+        text-align: center;
+        appearance: none;
+        field-sizing: content;
+        min-width: 3ch;
+        max-width: 18cqw;
+
+        &:hover,
+        &:focus {
+            border-bottom-color: rgba(110, 82, 40, 0.6);
+        }
+    }
+
+    &__stats--six &__stat {
+        flex: 1 1 0;
+        grid-template-columns: 1fr;
+        justify-items: center;
+        gap: 0.2cqw;
+        padding: 0.8cqw 0.6cqw;
+
+        > i {
+            display: none;
+        }
+    }
+
+    &__stats--six &__stat-label {
+        padding: 0;
+        border: 0;
+        font-size: clamp(9px, 1.4cqw, 15px);
+    }
+
+    &__stats--six input.dh-codex__stat-value {
+        font-size: clamp(14px, 2.6cqw, 30px);
+    }
+
+    // ---- facts: label left, field right, two columns ------------------------------------------------------------------
     &__facts {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(13em, 1fr));
-        gap: 1.2cqw 2cqw;
-        margin-top: 2.4cqw;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1cqw 0;
+        margin-top: 2.2cqw;
         padding: 1.4cqw 0;
         border-top: 1px solid rgba(141, 107, 52, 0.6);
         border-bottom: 1px solid rgba(141, 107, 52, 0.6);
+
+        > * {
+            padding: 0 2cqw;
+        }
+
+        > :nth-child(odd) {
+            border-right: 1px solid rgba(141, 107, 52, 0.45);
+            padding-left: 0.4cqw;
+        }
     }
 
     &__fact {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5cqw;
+        display: grid;
+        grid-template-columns: 10em minmax(0, 1fr);
+        align-items: center;
+        gap: 1.4cqw;
         min-width: 0;
         margin: 0;
 
         > span {
             color: var(--cx-ink-soft);
             font-family: $cx-title;
-            font-size: clamp(10px, 1.6cqw, 18px);
+            font-size: clamp(10px, 1.7cqw, 19px);
             font-weight: 700;
-            letter-spacing: 0.14em;
+            letter-spacing: 0.12em;
             text-transform: uppercase;
         }
 
         &--check {
-            flex-direction: row;
+            display: flex;
             align-items: center;
-            gap: 1cqw;
+            gap: 1.2cqw;
 
             input {
-                width: 1.4em;
-                height: 1.4em;
+                width: 1.5em;
+                height: 1.5em;
                 margin: 0;
                 accent-color: var(--cx-red);
             }
@@ -296,50 +408,117 @@ $cx-body: 'IM Fell DW Pica', 'Palatino Linotype', Georgia, 'Times New Roman', se
         padding-block: 0.3cqw;
     }
 
+    // ---- a section with a title pill (ammunition …) -------------------------------------------------------------------
+    &__section {
+        position: relative;
+        margin-top: 3.4cqw;
+        padding: 3cqw 1.6cqw 1.4cqw;
+        border: 1px solid rgba(110, 82, 40, 0.75);
+        border-radius: 1.4cqw;
+        background: rgba(255, 252, 240, 0.25);
+    }
+
+    &__section-title {
+        position: absolute;
+        top: -1.9cqw;
+        left: 1cqw;
+        margin: 0;
+        padding: 0.5cqw 3.6cqw 0.5cqw 2.4cqw;
+        border: 0;
+        background: var(--cx-red);
+        clip-path: polygon(0 0, calc(100% - 1.8cqw) 0, 100% 100%, 0 100%);
+        color: var(--cx-cream, #efe2c0);
+        font-family: $cx-title;
+        font-size: clamp(13px, 2.8cqw, 32px);
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+    }
+
+    &__cols {
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: minmax(0, 1fr);
+        gap: 0;
+    }
+
+    &__col {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.8cqw;
+        margin: 0;
+        padding: 0 1.4cqw;
+        min-width: 0;
+
+        + & {
+            border-left: 1px solid rgba(110, 82, 40, 0.5);
+        }
+
+        > span {
+            color: var(--cx-red);
+            font-family: $cx-title;
+            font-size: clamp(10px, 1.8cqw, 20px);
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+        }
+
+        .dh-codex__field {
+            text-align: center;
+        }
+
+        &--pair div {
+            display: flex;
+            align-items: center;
+            gap: 0.8cqw;
+        }
+    }
+
     // ---- tabs and the legacy panels of the tab pages -------------------------------------------------------------------
     &__tabs {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: flex-end;
-        gap: 1cqw;
-        margin: 1.6cqw 0 0;
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: minmax(0, 1fr);
+        gap: 0.4cqw;
+        margin: 2.4cqw 0 0;
         padding: 0;
         background: none;
         border: 0;
 
         label {
+            display: block;
             margin: 0;
             cursor: pointer;
         }
 
-        .dh-navigation__item-left {
-            margin-right: auto;
-        }
-
         a {
-            display: inline-block;
-            padding: 0.5cqw 1.8cqw;
+            display: block;
+            padding: 0.9cqw 1cqw;
             border: 1px solid rgba(110, 82, 40, 0.65);
+            border-bottom: 0;
             background: rgba(255, 252, 240, 0.35);
             color: var(--cx-ink-soft);
             font-family: $cx-title;
-            font-size: clamp(10px, 1.7cqw, 19px);
+            font-size: clamp(12px, 2.4cqw, 28px);
             font-weight: 700;
             letter-spacing: 0.14em;
+            text-align: center;
             text-transform: uppercase;
             text-decoration: none;
 
             &.active {
                 background: var(--cx-red);
                 border-color: var(--cx-red);
-                color: $cx-cream;
+                color: var(--cx-cream, #efe2c0);
             }
         }
     }
 
     // the tab pages keep their old panels, they only sit on the parchment now
     &__body.dh-wrapper {
-        margin-top: 1.6cqw;
+        margin-top: 0;
+        padding-top: 0.6cqw;
+        border-top: 1px solid var(--cx-red);
         background: none;
 
         .dh-panel {

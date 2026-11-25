@@ -1,0 +1,11 @@
+{{!-- One row of the facts grid: label left, field right. Parameters: label, name, value, number (true = number field), options (select instead of text). --}}
+<label class="dh-codex__fact">
+    <span>{{label}}</span>
+    {{#if options}}
+        <select class="dh-codex__field" name="{{name}}">{{selectOptions options selected=value}}</select>
+    {{else if number}}
+        <input class="dh-codex__field" name="{{name}}" type="number" data-dtype="Number" value="{{value}}" />
+    {{else}}
+        <input class="dh-codex__field" name="{{name}}" type="text" value="{{value}}" />
+    {{/if}}
+</label>

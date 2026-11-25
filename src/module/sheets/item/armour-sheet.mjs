@@ -2,7 +2,7 @@ import { DarkHeresyItemContainerSheet } from './item-container-sheet.mjs';
 
 export class DarkHeresyArmourSheet extends DarkHeresyItemContainerSheet {
     static DEFAULT_OPTIONS = {
-        position: { width: 820, height: 575 },
+        position: { width: 820, height: 680 },
     };
 
     static DEFAULT_TAB = 'stats';

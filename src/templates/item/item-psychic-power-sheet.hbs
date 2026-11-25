@@ -1,26 +1,27 @@
 <div class="dh-codex dh-codex--psychic">
     {{> systems/dark-heresy-2nd/templates/item/partial/codex-head.hbs plaqueText=true plaqueHint="Discipline" plaqueField="system.discipline" plaqueValue=item.system.discipline}}
 
-    <div class="dh-codex__facts">
-        <label class="dh-codex__fact"><span>XP Cost</span><input class="dh-codex__field" name="system.cost" type="number" data-dtype="Number" value="{{item.system.cost}}" /></label>
-        <label class="dh-codex__fact"><span>Prerequisites</span><input class="dh-codex__field" name="system.prerequisites" type="text" value="{{item.system.prerequisites}}" /></label>
-        <label class="dh-codex__fact"><span>Range</span><input class="dh-codex__field" name="system.range" type="text" value="{{item.system.range}}" /></label>
-        <label class="dh-codex__fact"><span>Action</span><select class="dh-codex__field" name="system.action">{{selectOptions (arrayToObject dh.combat.action_speeds) selected=item.system.action}}</select></label>
-        <label class="dh-codex__fact"><span>Sustained</span><select class="dh-codex__field" name="system.sustained">{{selectOptions (arrayToObject dh.combat.sustained_speeds) selected=item.system.sustained}}</select></label>
-        <label class="dh-codex__fact"><span>Subtype</span><select class="dh-codex__field" name="system.subtype">{{selectOptions (arrayToObject dh.combat.psychic_subtypes) selected=item.system.subtype}}</select></label>
+    <div class="dh-codex__stats">
+        {{> systems/dark-heresy-2nd/templates/item/partial/codex-stat.hbs icon="fa-burst" label="Damage" name="system.damage" value=item.system.damage}}
+        {{> systems/dark-heresy-2nd/templates/item/partial/codex-stat.hbs icon="fa-bolt" label="Type" name="system.damageType" value=item.system.damageType options=(arrayToObject dh.combat.damage_types)}}
+        {{> systems/dark-heresy-2nd/templates/item/partial/codex-stat.hbs icon="fa-shield-halved" label="Pen" name="system.penetration" value=item.system.penetration}}
+        {{> systems/dark-heresy-2nd/templates/item/partial/codex-stat.hbs icon="fa-crosshairs" label="Range" name="system.range" value=item.system.range}}
     </div>
 
-    <div class="dh-navigation dh-codex__tabs" data-group="primary">
-        <label class="dh-navigation__item">
-            <a class="item" data-tab="stats" data-group="primary">action</a>
-        </label>
-        <label class="dh-navigation__item">
-            <a class="item" data-tab="effects" data-group="primary">effects</a>
-        </label>
-        <label class="dh-navigation__item">
-            <a class="item" data-tab="description" data-group="primary">description</a>
-        </label>
+    <div class="dh-codex__facts">
+        {{> systems/dark-heresy-2nd/templates/item/partial/codex-fact.hbs label="XP Cost" name="system.cost" value=item.system.cost number=true}}
+        {{> systems/dark-heresy-2nd/templates/item/partial/codex-fact.hbs label="Prerequisites" name="system.prerequisites" value=item.system.prerequisites}}
+        {{> systems/dark-heresy-2nd/templates/item/partial/codex-fact.hbs label="Action" name="system.action" value=item.system.action options=(arrayToObject dh.combat.action_speeds)}}
+        {{> systems/dark-heresy-2nd/templates/item/partial/codex-fact.hbs label="Sustained" name="system.sustained" value=item.system.sustained options=(arrayToObject dh.combat.sustained_speeds)}}
+        {{> systems/dark-heresy-2nd/templates/item/partial/codex-fact.hbs label="Subtype" name="system.subtype" value=item.system.subtype options=(arrayToObject dh.combat.psychic_subtypes)}}
+        {{> systems/dark-heresy-2nd/templates/item/partial/codex-fact.hbs label="Attack" name="system.attackType" value=item.system.attackType options=(arrayToObject dh.combat.psychic_attacks)}}
     </div>
+
+    <nav class="dh-navigation dh-codex__tabs" data-group="primary">
+        <label class="dh-navigation__item"><a class="item" data-tab="stats" data-group="primary">Action</a></label>
+        <label class="dh-navigation__item"><a class="item" data-tab="description" data-group="primary">Description</a></label>
+        <label class="dh-navigation__item"><a class="item" data-tab="effects" data-group="primary">Effects</a></label>
+    </nav>
 
     <section class="dh-codex__body dh-wrapper dh-body">
                     <div class="tab" data-group="primary" data-tab="stats">
@@ -85,33 +86,7 @@
                             {{/if}}
 
                         </div>
-                        <div class="dh-panel dh-grid-col-2 dh-grid-row-1">
-                            <h1 class="dh-panel__header">Damage</h1>
-                            <div class="dh-field__wrapper">
-                                <span class="dh-field__header">Attack</span>
-                                <select class="dh-field__input" name="system.attackType">
-                                    {{selectOptions (arrayToObject dh.combat.psychic_attacks)
-                                                    selected=item.system.attackType}}
-                                </select>
-                            </div>
-                            <div class="dh-field__wrapper">
-                                <span class="dh-field__header">Roll</span>
-                                <input class="dh-field__input" type="text" name="system.damage"
-                                       value="{{item.system.damage}}" />
-                            </div>
-                            <div class="dh-field__wrapper">
-                                <span class="dh-field__header">Type</span>
-                                <select class="dh-field__input" name="system.damageType">
-                                    {{selectOptions (arrayToObject dh.combat.damage_types)
-                                                    selected=item.system.damageType}}
-                                </select>
-                            </div>
-                            <div class="dh-field__wrapper">
-                                <span class="dh-field__header">Pen</span>
-                                <input class="dh-field__input" type="text" name="system.penetration"
-                                       value="{{item.system.penetration}}" />
-                            </div>
-                        </div>
+                        
                         <div class="dh-panel dh-grid-col-2 dh-grid-row-1">
                             <h1 class="dh-panel__header">Attack Specials</h1>
                             <div class="dh-table--border dh-attackspecialtable--border">

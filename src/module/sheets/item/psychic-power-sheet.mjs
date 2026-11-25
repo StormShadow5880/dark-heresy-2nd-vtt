@@ -3,7 +3,7 @@ import { CHARACTERISTIC_LABELS, EFFECT_FIELDS, effectRows, effectSummary, canSus
 
 export class DarkHeresyPsychicPowerSheet extends DarkHeresyItemContainerSheet {
     static DEFAULT_OPTIONS = {
-        position: { width: 820, height: 575 },
+        position: { width: 820, height: 700 },
         actions: {
             addPsychicEffect: DarkHeresyPsychicPowerSheet.#onAddEffect,
             removePsychicEffect: DarkHeresyPsychicPowerSheet.#onRemoveEffect,

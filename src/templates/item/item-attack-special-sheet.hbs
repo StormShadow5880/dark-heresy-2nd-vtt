@@ -1,41 +1,20 @@
-<div class="dh-wrapper">
-    <div class="dh-item">
-        <div class="dh-panel dh-grid-col-6">
-            <div class="dh-header">
-                <div class="dh-header__info">
-                    <div class="dh-header__logo dh-header__item-wrapper--span-4">
-                        <img class="dh-header__logo-image" src="{{item.img}}" data-edit="img" data-action="editImage" alt="{{item.name}}" title="{{item.name}}" />
-                    </div>
-                    <div class="dh-header__item-wrapper--span-4">
-                        <span class="dh-header__title">Name</span>
-                        <input class="dh-header__input" name="name" type="text" value="{{item.name}}" />
-                    </div>
-                    <div class="dh-header__item-wrapper--span-2">
-                        <span class="dh-header__title">Has Level</span>
-                        <input name="system.hasLevel" type="checkbox" data-dtype="Boolean" {{checked item.system.hasLevel}} />
-                    </div>
-                    <div class="dh-header__item-wrapper--span-2">
-                        <span class="dh-header__title">Enabled</span>
-                        <input name="system.enabled" type="checkbox" data-dtype="Boolean" {{checked item.system.enabled}} />
-                    </div>
-                    <div class="dh-header__item-wrapper--span-2">
-                        <span class="dh-header__title">Level</span>
-                        {{#if item.system.hasLevel}}
-                            <input class="dh-header__input" name="system.level" type="number" data-dtype="Number" value="{{item.system.level}}" />
-                        {{else}}
-                            <span class="dh-header__display">N/A</span>
-                        {{/if}}
-                    </div>
-                    <div class="dh-header__item-wrapper--span-2">
-                        <span class="dh-header__title">Source</span>
-                        <input class="dh-header__input" name="system.source" type="text" value="{{item.system.source}}" />
-                    </div>
-                    <div class="dh-header__item-wrapper--text-area">
-                        <span class="dh-header__title">Description</span>
-                        <textarea class="dh-header__textarea" name="system.description">{{item.system.description}}</textarea>
-                    </div>
-                </div>
-            </div>
-        </div>
+<div class="dh-codex">
+    {{> systems/dark-heresy-2nd/templates/item/partial/codex-head.hbs}}
+
+    {{#if item.system.hasLevel}}
+    <div class="dh-codex__stats">
+        {{> systems/dark-heresy-2nd/templates/item/partial/codex-stat.hbs icon="fa-layer-group" label="Level" name="system.level" value=item.system.level number=true}}
     </div>
+    {{/if}}
+
+    <div class="dh-codex__facts">
+        {{> systems/dark-heresy-2nd/templates/item/partial/codex-check.hbs label="Has Level" name="system.hasLevel" value=item.system.hasLevel}}
+        {{> systems/dark-heresy-2nd/templates/item/partial/codex-check.hbs label="Enabled" name="system.enabled" value=item.system.enabled}}
+    </div>
+
+    <section class="dh-codex__body dh-body">
+        <div class="dh-codex__divider" aria-hidden="true"></div>
+        <h2 class="dh-codex__heading"><label for="codex-description-{{item.id}}">Description</label></h2>
+        <textarea id="codex-description-{{item.id}}" class="dh-codex__text" name="system.description">{{item.system.description}}</textarea>
+    </section>
 </div>

@@ -1,23 +1,13 @@
-<div class="dh-wrapper">
-    <div class="dh-item">
-        <div class="dh-panel dh-grid-col-6">
-            <div class="dh-header">
-                <div class="dh-header__info">
-                    <div class="dh-header__logo dh-header__item-wrapper--span-4" style="min-height:50px"></div>
-                    <div class="dh-header__item-wrapper--span-2">
-                        <span class="dh-header__title">Name</span>
-                        <input class="dh-header__input" name="name" type="text" value="{{item.name}}" />
-                    </div>
-                    <div class="dh-header__item-wrapper--span-2">
-                        <span class="dh-header__title">Modifier</span>
-                        <input class="dh-header__input" name="system.modifier" type="number" data-dtype="Number" value="{{item.system.modifier}}" />
-                    </div>
-                    <div class="dh-header__item-wrapper--text-area">
-                        <span class="dh-header__title">Description</span>
-                        <textarea class="dh-header__textarea" name="system.description">{{item.system.description}}</textarea>
-                    </div>
-                </div>
-            </div>
-        </div>
+<div class="dh-codex">
+    {{> systems/dark-heresy-2nd/templates/item/partial/codex-head.hbs}}
+
+    <div class="dh-codex__stats">
+        {{> systems/dark-heresy-2nd/templates/item/partial/codex-stat.hbs icon="fa-handshake" label="Modifier" name="system.modifier" value=item.system.modifier number=true}}
     </div>
+
+    <section class="dh-codex__body dh-body">
+        <div class="dh-codex__divider" aria-hidden="true"></div>
+        <h2 class="dh-codex__heading"><label for="codex-description-{{item.id}}">Description</label></h2>
+        <textarea id="codex-description-{{item.id}}" class="dh-codex__text" name="system.description">{{item.system.description}}</textarea>
+    </section>
 </div>

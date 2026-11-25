@@ -1,0 +1,12 @@
+{{!-- One tile of the stat bar: icon, label, value. Parameters: icon, label, name, value, number (true = number field), options (select instead of text). --}}
+<label class="dh-codex__stat">
+    <i class="fa-solid {{icon}}" aria-hidden="true"></i>
+    <span class="dh-codex__stat-label">{{label}}</span>
+    {{#if options}}
+        <select class="dh-codex__stat-value" name="{{name}}">{{selectOptions options selected=value}}</select>
+    {{else if number}}
+        <input class="dh-codex__stat-value" name="{{name}}" type="number" data-dtype="Number" value="{{value}}" />
+    {{else}}
+        <input class="dh-codex__stat-value" name="{{name}}" type="text" value="{{value}}" />
+    {{/if}}
+</label>

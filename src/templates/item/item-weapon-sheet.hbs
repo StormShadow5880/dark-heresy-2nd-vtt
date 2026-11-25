@@ -1,246 +1,193 @@
 <div class="dh-codex">
     {{> systems/dark-heresy-2nd/templates/item/partial/codex-head.hbs}}
 
-    <div class="dh-codex__facts">
-        <label class="dh-codex__fact"><span>Class</span><select class="dh-codex__field" name="system.class">{{selectOptions (arrayToObject dh.combat.weapon_class) selected=item.system.class}}</select></label>
-        <label class="dh-codex__fact"><span>Type</span><select class="dh-codex__field" name="system.type">{{selectOptions (arrayToObject dh.combat.weapon_type) selected=item.system.type}}</select></label>
-        <label class="dh-codex__fact"><span>Weight</span><input class="dh-codex__field" name="system.weight" type="number" data-dtype="Number" value="{{item.system.weight}}" /></label>
-        <label class="dh-codex__fact dh-codex__fact--check"><input name="system.equipped" type="checkbox" data-dtype="Boolean" {{checked item.system.equipped}}/><span>Equipped</span></label>
-        <label class="dh-codex__fact dh-codex__fact--check"><input name="system.backpack.inBackpack" type="checkbox" data-dtype="Boolean" {{checked item.system.backpack.inBackpack}}/><span>In Backpack</span></label>
-        <label class="dh-codex__fact"><span>Availability</span><select class="dh-codex__field" name="system.availability">{{selectOptions (arrayToObject dh.items.availability) selected=item.system.availability}}</select></label>
-        <label class="dh-codex__fact"><span>Craftsmanship</span><select class="dh-codex__field" name="system.craftsmanship">{{selectOptions (arrayToObject dh.items.craftsmanship) selected=item.system.craftsmanship}}</select></label>
+    <div class="dh-codex__stats">
+        {{> systems/dark-heresy-2nd/templates/item/partial/codex-stat.hbs icon="fa-burst" label="Damage" name="system.damage" value=item.system.damage}}
+        {{> systems/dark-heresy-2nd/templates/item/partial/codex-stat.hbs icon="fa-bolt" label="Type" name="system.damageType" value=item.system.damageType options=(arrayToObject dh.combat.damage_types)}}
+        {{> systems/dark-heresy-2nd/templates/item/partial/codex-stat.hbs icon="fa-shield-halved" label="Pen" name="system.penetration" value=item.system.penetration}}
+        {{#if item.isRanged}}
+            {{> systems/dark-heresy-2nd/templates/item/partial/codex-stat.hbs icon="fa-crosshairs" label="Range" name="system.range" value=item.system.range}}
+        {{/if}}
     </div>
 
-    <div class="dh-navigation dh-codex__tabs" data-group="primary">
-        <label class="dh-navigation__item dh-navigation__item-left">
-            <a class="item" data-tab="active-effects" data-group="primary">active effects</a>
-        </label>
-        <label class="dh-navigation__item">
-            <a class="item" data-tab="stats" data-group="primary">stats</a>
-        </label>
-        <label class="dh-navigation__item">
-            <a class="item" data-tab="description" data-group="primary">description</a>
-        </label>
+    <div class="dh-codex__facts">
+        {{> systems/dark-heresy-2nd/templates/item/partial/codex-fact.hbs label="Class" name="system.class" value=item.system.class options=(arrayToObject dh.combat.weapon_class)}}
+        {{> systems/dark-heresy-2nd/templates/item/partial/codex-fact.hbs label="Weapon Type" name="system.type" value=item.system.type options=(arrayToObject dh.combat.weapon_type)}}
+        {{> systems/dark-heresy-2nd/templates/item/partial/codex-fact.hbs label="Weight" name="system.weight" value=item.system.weight number=true}}
+        {{> systems/dark-heresy-2nd/templates/item/partial/codex-fact.hbs label="Availability" name="system.availability" value=item.system.availability options=(arrayToObject dh.items.availability)}}
+        {{> systems/dark-heresy-2nd/templates/item/partial/codex-fact.hbs label="Craftsmanship" name="system.craftsmanship" value=item.system.craftsmanship options=(arrayToObject dh.items.craftsmanship)}}
+        {{> systems/dark-heresy-2nd/templates/item/partial/codex-fact.hbs label="Attack Bonus" name="system.attackBonus" value=item.system.attackBonus}}
+        {{> systems/dark-heresy-2nd/templates/item/partial/codex-check.hbs label="Equipped" name="system.equipped" value=item.system.equipped}}
+        {{> systems/dark-heresy-2nd/templates/item/partial/codex-check.hbs label="In Backpack" name="system.backpack.inBackpack" value=item.system.backpack.inBackpack}}
     </div>
+
+    {{#if item.isRanged}}
+    <section class="dh-codex__section">
+        <h3 class="dh-codex__section-title">Ammunition</h3>
+        <div class="dh-codex__cols">
+            {{> systems/dark-heresy-2nd/templates/item/partial/codex-col.hbs label="Single" name="system.rateOfFire.single" value=item.system.rateOfFire.single number=true}}
+            {{> systems/dark-heresy-2nd/templates/item/partial/codex-col.hbs label="Burst" name="system.rateOfFire.burst" value=item.system.rateOfFire.burst number=true}}
+            {{> systems/dark-heresy-2nd/templates/item/partial/codex-col.hbs label="Full" name="system.rateOfFire.full" value=item.system.rateOfFire.full number=true}}
+            <div class="dh-codex__col dh-codex__col--pair">
+                <span>Current / Max</span>
+                <div><input class="dh-codex__field" name="system.clip.value" type="number" data-dtype="Number" value="{{item.system.clip.value}}" aria-label="Current" /> / <input class="dh-codex__field" name="system.clip.max" type="number" data-dtype="Number" value="{{item.system.clip.max}}" aria-label="Max" /></div>
+            </div>
+            {{> systems/dark-heresy-2nd/templates/item/partial/codex-col.hbs label="Reload" name="system.reload" value=item.system.reload options=(arrayToObject dh.combat.action_speeds)}}
+        </div>
+    </section>
+    {{/if}}
+
+    <nav class="dh-navigation dh-codex__tabs" data-group="primary">
+        <label class="dh-navigation__item"><a class="item" data-tab="stats" data-group="primary">Stats</a></label>
+        <label class="dh-navigation__item"><a class="item" data-tab="description" data-group="primary">Description</a></label>
+        <label class="dh-navigation__item"><a class="item" data-tab="active-effects" data-group="primary">Active Effects</a></label>
+    </nav>
 
     <section class="dh-codex__body dh-wrapper dh-body">
-                    <div class="tab" data-group="primary" data-tab="active-effects">
-                        {{> systems/dark-heresy-2nd/templates/item/panel/active-effects-panel.hbs}}
-                    </div>
-
-                    <div class="tab" data-group="primary" data-tab="stats">
-                        <div class="dh-panel dh-grid-col-2 dh-grid-row-1">
-                            <h1 class="dh-panel__header">Damage</h1>
-                            <div class="dh-field__wrapper">
-                                <span class="dh-field__header">Roll</span>
-                                <input class="dh-field__input" type="text" name="system.damage"
-                                       value="{{item.system.damage}}" />
-                            </div>
-                            <div class="dh-field__wrapper">
-                                <span class="dh-field__header">Type</span>
-                                <select class="dh-field__input" name="system.damageType">
-                                    {{selectOptions (arrayToObject dh.combat.damage_types)
-                                                    selected=item.system.damageType}}
-                                </select>
-                            </div>
-                            <div class="dh-field__wrapper">
-                                <span class="dh-field__header">Pen</span>
-                                <input class="dh-field__input" type="text" name="system.penetration"
-                                       value="{{item.system.penetration}}" />
-                            </div>
-
-                            <h1 class="dh-panel__header">Attack</h1>
-                            <div class="dh-field__wrapper">
-                                <span class="dh-field__header">Bonus</span>
-                                <input class="dh-field__input" type="text" name="system.attackBonus"
-                                       value="{{item.system.attackBonus}}" />
-                            </div>
+        <div class="tab" data-group="primary" data-tab="stats">
+            {{#if item.isRanged}}
+            <div class="dh-panel dh-grid-col-6">
+                <div>
+                    <h1 class="dh-panel__header">Loaded Ammo</h1>
+                    <div class="dh-table--border dh-ammotable--border">
+                        <div class="table-row--head">
+                            <div class="table-cell--span2">Name</div>
+                            <div class="table-cell--last"></div>
                         </div>
-
-                        {{#if item.isRanged}}
-                            <div class="dh-panel dh-grid-col-2 dh-grid-row-1">
-                                <h1 class="dh-panel__header">Ranged Attack</h1>
-                                <div class="dh-field__wrapper">
-                                    <span class="dh-field__header">Range (m)</span>
-                                    <input class="dh-field__input" type="text" name="system.range"
-                                           value="{{item.system.range}}" />
-                                </div>
-                                <div class="dh-field__wrapper">
-                                    <span class="dh-field__header">Single</span>
-                                    <input class="dh-field__input" type="number" data-dtype="Number"
-                                           name="system.rateOfFire.single" value="{{item.system.rateOfFire.single}}" />
-                                </div>
-                                <div class="dh-field__wrapper">
-                                    <span class="dh-field__header">Burst</span>
-                                    <input class="dh-field__input" type="number" data-dtype="Number"
-                                           name="system.rateOfFire.burst" value="{{item.system.rateOfFire.burst}}" />
-                                </div>
-                                <div class="dh-field__wrapper">
-                                    <span class="dh-field__header">Full</span>
-                                    <input class="dh-field__input" type="number" data-dtype="Number"
-                                           name="system.rateOfFire.full" value="{{item.system.rateOfFire.full}}" />
-                                </div>
-                            </div>
-                            <div class="dh-panel dh-grid-col-2 dh-grid-row-1">
-                                <h1 class="dh-panel__header">Ammo</h1>
-                                <div class="dh-field__wrapper">
-                                    <span class="dh-field__header">Reload</span>
-                                    <select class="dh-field__input" name="system.reload">
-                                        {{selectOptions (arrayToObject dh.combat.action_speeds) selected=item.system.reload}}
-                                    </select>
-                                </div>
-                                <div class="dh-field__wrapper">
-                                    <span class="dh-field__header">Current</span>
-                                    <input class="dh-field__input" type="number" data-dtype="Number"
-                                           name="system.clip.value" value="{{item.system.clip.value}}" />
-                                </div>
-                                <div class="dh-field__wrapper">
-                                    <span class="dh-field__header">Max</span>
-                                    <input class="dh-field__input" type="number" data-dtype="Number"
-                                           name="system.clip.max" value="{{item.system.clip.max}}" />
-                                </div>
-                                <div>
-                                    <h1 class="dh-panel__header">Loaded Ammo</h1>
-                                    <div class="dh-table--border dh-ammotable--border">
-                                        <div class="table-row--head">
-                                            <div class="table-cell--span2">Name</div>
-                                            <div class="table-cell--last"></div>
-                                        </div>
-                                        {{#each item.items as | embedded |}}
-                                            {{#if embedded.isAmmunition}}
-                                                <div class="table-row">
-                                                    <div class="table-cell--settingstoggle">
-                                                        <label class="dh-control-button item-edit"
-                                                               data-item-id="{{embedded.id}}">
-                                                            <span
-                                                                class="dh-control-button__span material-icons">{{defaultVal
-                                                                icon 'settings'}}</span>
-                                                        </label>
-                                                    </div>
-                                                    <div class="table-cell--left">
-                                                        {{> systems/dark-heresy-2nd/templates/actor/partial/trait-toggle.hbs toggle=(concat 'description_' embedded.id) text=embedded.name}}
-                                                    </div>
-                                                    <div class="table-cell--last">
-                                                        <label class="dh-control-button item-delete"
-                                                               data-item-id="{{embedded.id}}">
-                                                            <span
-                                                                class="dh-control-button__span material-icons">{{defaultVal
-                                                                icon 'delete'}}</span>
-                                                        </label>
-                                                    </div>
-                                                    <div
-                                                        class="table-cell--description description_{{embedded.id}}" {{hideIfNot
-                                                        (isExpanded (concat 'description_' embedded.id ))}}>
-                                                        <span>{{embedded.system.description}}</span>
-                                                    </div>
-                                                </div>
-                                            {{/if}}
-                                        {{/each}}
+                        {{#each item.items as | embedded |}}
+                            {{#if embedded.isAmmunition}}
+                                <div class="table-row">
+                                    <div class="table-cell--settingstoggle">
+                                        <label class="dh-control-button item-edit"
+                                               data-item-id="{{embedded.id}}">
+                                            <span
+                                                class="dh-control-button__span material-icons">{{defaultVal
+                                                icon 'settings'}}</span>
+                                        </label>
+                                    </div>
+                                    <div class="table-cell--left">
+                                        {{> systems/dark-heresy-2nd/templates/actor/partial/trait-toggle.hbs toggle=(concat 'description_' embedded.id) text=embedded.name}}
+                                    </div>
+                                    <div class="table-cell--last">
+                                        <label class="dh-control-button item-delete"
+                                               data-item-id="{{embedded.id}}">
+                                            <span
+                                                class="dh-control-button__span material-icons">{{defaultVal
+                                                icon 'delete'}}</span>
+                                        </label>
+                                    </div>
+                                    <div
+                                        class="table-cell--description description_{{embedded.id}}" {{hideIfNot
+                                        (isExpanded (concat 'description_' embedded.id ))}}>
+                                        <span>{{embedded.system.description}}</span>
                                     </div>
                                 </div>
+                            {{/if}}
+                        {{/each}}
+                    </div>
+                </div>
+            </div>
+            {{/if}}
+            <div class="dh-panel dh-grid-col-3">
+                <h1 class="dh-panel__header">Weapon Mods</h1>
+                <div class="dh-table--border dh-weaponmodtable--border">
+                    <div class="table-row--head">
+                        <div class="table-cell--span2">Name</div>
+                        <div class="table-cell">Craftsmanship</div>
+                        <div class="table-cell">Installed</div>
+                        <div class="table-cell--last"></div>
+                    </div>
+                    {{#each item.items as | embedded |}}
+                        {{#if embedded.isWeaponModification}}
+                            <div class="table-row">
+                                <div class="table-cell--settingstoggle">
+                                    <label class="dh-control-button item-edit"
+                                           data-item-id="{{embedded.id}}">
+                                        <span class="dh-control-button__span material-icons">{{defaultVal
+                                            icon 'settings'}}</span>
+                                    </label>
+                                </div>
+                                <div class="table-cell--left">
+                                    {{> systems/dark-heresy-2nd/templates/actor/partial/trait-toggle.hbs toggle=(concat 'description_' embedded.id) text=embedded.name}}
+                                </div>
+                                <div class="table-cell">
+                                    <span>{{embedded.system.craftsmanship}}</span>
+                                </div>
+                                <div class="table-cell">
+                                    <span>{{embedded.system.equipped}}</span>
+                                </div>
+                                <div class="table-cell--last">
+                                    <label class="dh-control-button item-delete"
+                                           data-item-id="{{embedded.id}}">
+                                        <span class="dh-control-button__span material-icons">{{defaultVal
+                                            icon 'delete'}}</span>
+                                    </label>
+                                </div>
+                                <div class="table-cell--description description_{{embedded.id}}" {{hideIfNot
+                                    (isExpanded (concat 'description_' embedded.id ))}}>
+                                    <span>{{embedded.system.description}}</span>
+                                </div>
                             </div>
-                        {{else}}
-                            <div class="dh-panel dh-grid-col-4"></div>
                         {{/if}}
-
-                        <div class="dh-panel dh-grid-col-3">
-                            <h1 class="dh-panel__header">Weapon Mods</h1>
-                            <div class="dh-table--border dh-weaponmodtable--border">
-                                <div class="table-row--head">
-                                    <div class="table-cell--span2">Name</div>
-                                    <div class="table-cell">Craftsmanship</div>
-                                    <div class="table-cell">Installed</div>
-                                    <div class="table-cell--last"></div>
-                                </div>
-                                {{#each item.items as | embedded |}}
-                                    {{#if embedded.isWeaponModification}}
-                                        <div class="table-row">
-                                            <div class="table-cell--settingstoggle">
-                                                <label class="dh-control-button item-edit"
-                                                       data-item-id="{{embedded.id}}">
-                                                    <span class="dh-control-button__span material-icons">{{defaultVal
-                                                        icon 'settings'}}</span>
-                                                </label>
-                                            </div>
-                                            <div class="table-cell--left">
-                                                {{> systems/dark-heresy-2nd/templates/actor/partial/trait-toggle.hbs toggle=(concat 'description_' embedded.id) text=embedded.name}}
-                                            </div>
-                                            <div class="table-cell">
-                                                <span>{{embedded.system.craftsmanship}}</span>
-                                            </div>
-                                            <div class="table-cell">
-                                                <span>{{embedded.system.equipped}}</span>
-                                            </div>
-                                            <div class="table-cell--last">
-                                                <label class="dh-control-button item-delete"
-                                                       data-item-id="{{embedded.id}}">
-                                                    <span class="dh-control-button__span material-icons">{{defaultVal
-                                                        icon 'delete'}}</span>
-                                                </label>
-                                            </div>
-                                            <div class="table-cell--description description_{{embedded.id}}" {{hideIfNot
-                                                (isExpanded (concat 'description_' embedded.id ))}}>
-                                                <span>{{embedded.system.description}}</span>
-                                            </div>
-                                        </div>
-                                    {{/if}}
-                                {{/each}}
-                            </div>
-                        </div>
-                        <div class="dh-panel dh-grid-col-3">
-                            <h1 class="dh-panel__header">Weapon Special</h1>
-                            <div class="dh-table--border dh-attackspecialtable--border">
-                                <div class="table-row--head">
-                                    <div class="table-cell--span2">Name</div>
-                                    <div class="table-cell">Enabled</div>
-                                    <div class="table-cell">Level</div>
-                                    <div class="table-cell--last"></div>
-                                </div>
-                                {{#each item.items as | embedded |}}
-                                    {{#if embedded.isAttackSpecial}}
-                                        <div class="table-row">
-                                            <div class="table-cell--settingstoggle">
-                                                <label class="dh-control-button item-edit"
-                                                       data-item-id="{{embedded.id}}">
-                                                    <span class="dh-control-button__span material-icons">{{defaultVal
-                                                        icon 'settings'}}</span>
-                                                </label>
-                                            </div>
-                                            <div class="table-cell--left">
-                                                {{> systems/dark-heresy-2nd/templates/actor/partial/trait-toggle.hbs toggle=(concat 'description_' embedded.id) text=embedded.name}}
-                                            </div>
-                                            <div class="table-cell">
-                                                <span class="display">{{embedded.system.enabled}}</span>
-                                            </div>
-                                            <div class="table-cell">
-                                                <span class="display">{{defaultVal embedded.system.level
-                                                                                   'N/A'}}</span>
-                                            </div>
-                                            <div class="table-cell--last">
-                                                <label class="dh-control-button item-delete"
-                                                       data-item-id="{{embedded.id}}">
-                                                    <span class="dh-control-button__span material-icons">{{defaultVal
-                                                        icon 'delete'}}</span>
-                                                </label>
-                                            </div>
-                                            <div class="table-cell--description description_{{embedded.id}}" {{hideIfNot
-                                                (isExpanded (concat 'description_' embedded.id ))}}>
-                                                <span>{{embedded.system.description}}</span>
-                                            </div>
-                                        </div>
-                                    {{/if}}
-                                {{/each}}
-                            </div>
-                        </div>
+                    {{/each}}
+                </div>
+            </div>
+            <div class="dh-panel dh-grid-col-3">
+                <h1 class="dh-panel__header">Weapon Special</h1>
+                <div class="dh-table--border dh-attackspecialtable--border">
+                    <div class="table-row--head">
+                        <div class="table-cell--span2">Name</div>
+                        <div class="table-cell">Enabled</div>
+                        <div class="table-cell">Level</div>
+                        <div class="table-cell--last"></div>
                     </div>
-                    <div class="tab" data-group="primary" data-tab="description">
-                        <div class="dh-header__info dh-grid-col-6">
-                            <div class="dh-header__item-wrapper--text-area">
-                                <span class="dh-header__title">Description</span>
-                                <textarea class="dh-header__textarea"
-                                          name="system.description">{{item.system.description}}</textarea>
+                    {{#each item.items as | embedded |}}
+                        {{#if embedded.isAttackSpecial}}
+                            <div class="table-row">
+                                <div class="table-cell--settingstoggle">
+                                    <label class="dh-control-button item-edit"
+                                           data-item-id="{{embedded.id}}">
+                                        <span class="dh-control-button__span material-icons">{{defaultVal
+                                            icon 'settings'}}</span>
+                                    </label>
+                                </div>
+                                <div class="table-cell--left">
+                                    {{> systems/dark-heresy-2nd/templates/actor/partial/trait-toggle.hbs toggle=(concat 'description_' embedded.id) text=embedded.name}}
+                                </div>
+                                <div class="table-cell">
+                                    <span class="display">{{embedded.system.enabled}}</span>
+                                </div>
+                                <div class="table-cell">
+                                    <span class="display">{{defaultVal embedded.system.level
+                                                                       'N/A'}}</span>
+                                </div>
+                                <div class="table-cell--last">
+                                    <label class="dh-control-button item-delete"
+                                           data-item-id="{{embedded.id}}">
+                                        <span class="dh-control-button__span material-icons">{{defaultVal
+                                            icon 'delete'}}</span>
+                                    </label>
+                                </div>
+                                <div class="table-cell--description description_{{embedded.id}}" {{hideIfNot
+                                    (isExpanded (concat 'description_' embedded.id ))}}>
+                                    <span>{{embedded.system.description}}</span>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                </section>
+                        {{/if}}
+                    {{/each}}
+                </div>
+            </div>
+        </div>
+        <div class="tab" data-group="primary" data-tab="description">
+            <div class="dh-header__info dh-grid-col-6">
+                <div class="dh-header__item-wrapper--text-area">
+                    <span class="dh-header__title">Description</span>
+                    <textarea class="dh-header__textarea" name="system.description">{{item.system.description}}</textarea>
+                </div>
+            </div>
+        </div>
+        <div class="tab" data-group="primary" data-tab="active-effects">
+            {{> systems/dark-heresy-2nd/templates/item/panel/active-effects-panel.hbs}}
+        </div>
+    </section>
 </div>
