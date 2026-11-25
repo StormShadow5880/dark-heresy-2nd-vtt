@@ -6,6 +6,10 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
 
 ## [1.9.0] – Unreleased
 
+### Fatigue fix
+
+- The fatigue limit (Toughness Bonus + Willpower Bonus) is calculated from the bonuses before fatigue. Before, it shrank while the fatigue rose (a higher fatigue halves Toughness), so the counter stopped at e.g. 5 of 6. See `rules/fatigue.mjs`.
+
 ### Combat: action account
 
 - Each turn a character has 1 Full Action (= 2 Half Actions). Weapon attacks, psychic powers and sustained powers are taken from it; if something does not fit, the player is asked. The Combat tab shows the account and lets you take other actions by hand. See `docs/action-account.md`.
