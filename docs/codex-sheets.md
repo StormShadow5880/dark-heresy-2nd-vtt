@@ -20,7 +20,7 @@ All item sheets use the same kit, so they look alike. Only the fields differ.
 | Critical injury | - | Type, Part | Description |
 | Peer / Enemy | Modifier | - | Description |
 | Journal entry | - | Place, Time | Description |
-| Storage location | - | - | tabs Items / Description |
+| Storage location | - | - | tabs Contents / Description; centred rule headings, table (Item, Type, + button, "No items stored"), Description below |
 | Talent | plaque Tier | Aptitudes, Prerequisites, XP Cost | Benefit |
 | Trait | plaque Level | - | Description |
 | All other items (aptitude, mutation, malignancy …) | - | - | Description |

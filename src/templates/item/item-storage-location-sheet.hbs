@@ -1,57 +1,38 @@
 <div class="dh-codex">
     {{> systems/dark-heresy-2nd/templates/item/partial/codex-head.hbs}}
 
-    <nav class="dh-navigation dh-codex__tabs" data-group="primary">
-        <label class="dh-navigation__item"><a class="item" data-tab="items" data-group="primary">Items</a></label>
+    <nav class="dh-navigation dh-codex__tabs dh-codex__tabs--inset" data-group="primary">
+        <label class="dh-navigation__item"><a class="item" data-tab="contents" data-group="primary">Contents</a></label>
         <label class="dh-navigation__item"><a class="item" data-tab="description" data-group="primary">Description</a></label>
     </nav>
 
-    <section class="dh-codex__body dh-wrapper dh-body">
-        <div class="tab" data-group="primary" data-tab="items">
-            <div class="dh-panel dh-grid-col-6">
-                <h1 class="dh-panel__header">Stored Items</h1>
-                <div class="dh-table--border dh-storagegeartable--border">
-                    <div class="table-row--head">
-                        <div class="table-cell--span2">Name</div>
-                        <div class="table-cell">Type</div>
-                        <div class="table-cell--last"></div>
+    <section class="dh-codex__body dh-body">
+        <div class="tab" data-group="primary" data-tab="contents">
+            <div class="dh-codex__rule"><h2>Stored Items</h2></div>
+            <div class="dh-codex__table" role="table" aria-label="Stored items">
+                <div class="dh-codex__trow dh-codex__trow--head" role="row">
+                    <span role="columnheader">Item</span>
+                    <span role="columnheader">Type</span>
+                    <span class="dh-codex__tact">
+                        <button type="button" class="item-create" data-type="gear" aria-label="New item" title="New item (other items: drag them onto this window)"><i class="fa-solid fa-plus"></i></button>
+                    </span>
+                </div>
+                {{#each item.items as |embedded|}}
+                    <div class="dh-codex__trow item-drag" role="row" data-item-id="{{embedded.id}}" data-item-type="{{embedded.type}}">
+                        <span role="cell"><a class="item-edit" data-item-id="{{embedded.id}}" title="Open the item card">{{embedded.name}}</a></span>
+                        <span role="cell">{{capitalize embedded.type}}</span>
+                        <span class="dh-codex__tact">
+                            <button type="button" class="item-delete" data-item-id="{{embedded.id}}" aria-label="Delete {{embedded.name}}" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                        </span>
                     </div>
-                    {{#each item.items as | embedded |}}
-                        <div class="table-row item-drag" data-item-id="{{embedded.id}}" data-item-type="{{embedded.type}}">
-                            <div class="table-cell--settingstoggle">
-                                <label class="dh-control-button item-edit" data-item-id="{{embedded.id}}">
-                                    <span class="dh-control-button__span material-icons">{{defaultVal icon
-                                                                                                      'settings'}}</span>
-                                </label>
-                            </div>
-                            <div class="table-cell--left">
-                                {{> systems/dark-heresy-2nd/templates/actor/partial/trait-toggle.hbs toggle=(concat 'description_' embedded.id) text=embedded.name}}
-                            </div>
-                            <div class="table-cell">
-                                <span>{{capitalize embedded.type}}</span>
-                            </div>
-                            <div class="table-cell--last">
-                                <label class="dh-control-button item-delete" data-item-id="{{embedded.id}}">
-                                    <span class="dh-control-button__span material-icons">{{defaultVal icon
-                                                                                                      'delete'}}</span>
-                                </label>
-                            </div>
-                            <div class="table-cell--description description_{{embedded.id}}" {{hideIfNot
-                                (isExpanded (concat 'description_' embedded.id ))}}>
-                                <span>{{embedded.system.description}}</span>
-                            </div>
-                        </div>
-                    {{/each}}
-                </div>
+                {{else}}
+                    <div class="dh-codex__empty"><em>No items stored</em></div>
+                {{/each}}
             </div>
         </div>
-        <div class="tab" data-group="primary" data-tab="description">
-            <div class="dh-header__info dh-grid-col-6">
-                <div class="dh-header__item-wrapper--text-area">
-                    <span class="dh-header__title">Description</span>
-                    <textarea class="dh-header__textarea" name="system.description">{{item.system.description}}</textarea>
-                </div>
-            </div>
-        </div>
+        <div class="tab" data-group="primary" data-tab="description"></div>
+
+        <div class="dh-codex__rule"><h2><label for="codex-description-{{item.id}}">Description</label></h2></div>
+        <textarea id="codex-description-{{item.id}}" class="dh-codex__text" name="system.description">{{item.system.description}}</textarea>
     </section>
 </div>

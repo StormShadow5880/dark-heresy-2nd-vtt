@@ -514,6 +514,109 @@ $cx-body: 'IM Fell DW Pica', 'Palatino Linotype', Georgia, 'Times New Roman', se
         }
     }
 
+
+    // ---- storage list (rule headings, table, empty state) ---------------------------------------------------------------
+    &__tabs--inset {
+        margin-inline: 8cqw;
+    }
+
+    &__rule {
+        display: flex;
+        align-items: center;
+        gap: 2.2cqw;
+        margin: 2.4cqw 0 1.4cqw;
+
+        &::before,
+        &::after {
+            content: '';
+            flex: 1;
+            height: 0;
+            border-top: 2px solid rgba(141, 107, 52, 0.85);
+        }
+
+        h2 {
+            margin: 0;
+            padding: 0;
+            border: 0;
+            color: var(--cx-red);
+            font-family: $cx-title;
+            font-size: clamp(14px, 3cqw, 34px);
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+        }
+    }
+
+    &__table {
+        border: 1px solid rgba(110, 82, 40, 0.75);
+        border-radius: 0.6cqw;
+        background: rgba(255, 252, 240, 0.25);
+    }
+
+    &__trow {
+        display: grid;
+        grid-template-columns: minmax(0, 2fr) minmax(0, 1.2fr) 5cqw;
+        align-items: center;
+        gap: 1cqw;
+        padding: 0.8cqw 1.4cqw;
+        border-top: 1px solid rgba(141, 107, 52, 0.4);
+
+        &:first-child {
+            border-top: 0;
+        }
+
+        &--head {
+            border-top: 0;
+            border-bottom: 1px solid rgba(110, 82, 40, 0.75);
+            font-family: $cx-title;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        a {
+            cursor: pointer;
+            color: inherit;
+            text-decoration: underline dotted;
+            text-underline-offset: 3px;
+        }
+    }
+
+    &__tact {
+        display: flex;
+        justify-content: flex-end;
+
+        button {
+            width: 3.4cqw;
+            height: 3.4cqw;
+            min-width: 24px;
+            min-height: 24px;
+            padding: 0;
+            border: 1px solid var(--cx-red);
+            border-radius: 0.5cqw;
+            background: var(--cx-red);
+            color: var(--cx-cream, #efe2c0);
+            line-height: 1;
+            cursor: pointer;
+        }
+    }
+
+    &__empty {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 2cqw;
+        padding: 3cqw 1cqw;
+        color: var(--cx-ink-soft);
+        font-size: 1.15em;
+
+        &::before,
+        &::after {
+            content: '';
+            width: 6cqw;
+            border-top: 1px solid rgba(141, 107, 52, 0.7);
+        }
+    }
+
     // the tab pages keep their old panels, they only sit on the parchment now
     &__body.dh-wrapper {
         margin-top: 0;

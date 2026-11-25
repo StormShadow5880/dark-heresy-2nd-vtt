@@ -5,7 +5,7 @@ export class DarkHeresyStorageLocationSheet extends DarkHeresyItemContainerSheet
         position: { width: 760, height: 560 },
     };
 
-    static DEFAULT_TAB = 'items';
+    static DEFAULT_TAB = 'contents';
 
     static PARTS = {
         sheet: { template: `systems/dark-heresy-2nd/templates/item/item-storage-location-sheet.hbs`, scrollable: ['.dh-body'] },
