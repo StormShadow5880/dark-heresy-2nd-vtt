@@ -10,7 +10,7 @@ All item sheets use the same kit, so they look alike. Only the fields differ.
 | --- | --- | --- | --- |
 | Weapon | Damage, Type, Pen, Range (ranged) | Class, Weapon Type, Weight, Availability, Craftsmanship, Attack Bonus, Equipped, In Backpack | Ammunition section (Single, Burst, Full, Current/Max, Reload); tabs Stats (loaded ammo, mods, specials) / Description / Active Effects |
 | Armour | six tiles: Head, Arms, Body, Legs | Type, Max Agility, Weight, Availability, Craftsmanship, Equipped, In Backpack | tabs Stats (armour mods) / Description / Active Effects |
-| Psychic power (violet variant) | Damage, Type, Pen, Range | XP Cost, Prerequisites, Action, Sustained, Subtype, Attack; the discipline is in the plaque | tabs Action / Description / Effects |
+| Psychic power (violet variant) | Damage, Type, Pen, Range | XP Cost, Prerequisites, Action, Sustained, Subtype, Attack; the discipline is in the plaque | tabs Action (panels Manifestation, Attack Specials with "+ Add", Effects While Sustained) / Description / Effects (definitions table) |
 | Gear, consumable, drug, tool | - | Weight, Availability, Craftsmanship, In Backpack | Description |
 | Cybernetic | armour points (only with "Has Armour Points") | Weight, Availability, Craftsmanship, Has Armour Points, Equipped | Description |
 | Force field | Protection | Weight, Availability, Craftsmanship, Activated, Overloaded, Equipped, In Backpack | Description |

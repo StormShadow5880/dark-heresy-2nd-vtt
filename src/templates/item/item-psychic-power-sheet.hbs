@@ -24,118 +24,53 @@
     </nav>
 
     <section class="dh-codex__body dh-wrapper dh-body">
-                    <div class="tab" data-group="primary" data-tab="stats">
-                        <div class="dh-panel dh-grid-col-2 dh-grid-row-1">
-                            <h1 class="dh-panel__header">Action</h1>
-                            <div class="dh-field__wrapper">
-                                <span class="dh-field__header">Bonus</span>
-                                <input class="dh-field__input" type="text" name="system.target.bonus"
-                                       value="{{item.system.target.bonus}}" />
-                            </div>
+        <div class="tab" data-group="primary" data-tab="stats">
+            <section class="dh-codex__panel">
+                <h3 class="dh-codex__panel-title">Manifestation</h3>
+                <div class="dh-codex__panel-body">
+                    <div class="dh-codex__line"><span>Bonus</span><input class="dh-codex__field" type="text" name="system.target.bonus" value="{{item.system.target.bonus}}" /></div>
+                    <div class="dh-codex__line"><span>Use Skill</span><input name="system.target.useSkill" type="checkbox" data-dtype="Boolean" {{checked item.system.target.useSkill}} /></div>
+                    {{#if item.system.target.useSkill}}
+                    <div class="dh-codex__line"><span>Skill</span><input class="dh-codex__field" type="text" name="system.target.skill" value="{{item.system.target.skill}}" /></div>
+                    {{else}}
+                    <div class="dh-codex__line"><span>Characteristic</span><select class="dh-codex__field" name="system.target.characteristic">{{selectOptions dh.combat.characteristics selected=item.system.target.characteristic}}</select></div>
+                    {{/if}}
+                    <div class="dh-codex__line"><span>Is Opposed</span><input name="system.target.isOpposed" type="checkbox" data-dtype="Boolean" {{checked item.system.target.isOpposed}} /></div>
+                    <div class="dh-codex__line"><span>Use Opposed Skill</span><input name="system.target.useOpposedSkill" type="checkbox" data-dtype="Boolean" {{checked item.system.target.useOpposedSkill}} /></div>
+                    {{#if item.system.target.useOpposedSkill}}
+                    <div class="dh-codex__line"><span>Opposed Skill</span><input class="dh-codex__field" type="text" name="system.target.opposedSkill" value="{{item.system.target.opposedSkill}}" /></div>
+                    {{else}}
+                    <div class="dh-codex__line"><span>Opposed Characteristic</span><select class="dh-codex__field" name="system.target.opposed">{{selectOptions dh.combat.characteristics selected=item.system.target.opposed}}</select></div>
+                    {{/if}}
+                </div>
+            </section>
 
-                            <div class="dh-field__wrapper">
-                                <span class="dh-field__header">Use Skill</span>
-                                <div class='dh-field__input check'>
-                                    <input name="system.target.useSkill" type="checkbox" data-dtype="Boolean" {{checked
-                                        item.system.target.useSkill}}/>
-                                </div>
+            <section class="dh-codex__panel">
+                <h3 class="dh-codex__panel-title">Attack Specials</h3>
+                <div class="dh-codex__panel-body">
+                    {{#each item.items as |embedded|}}
+                        {{#if embedded.isAttackSpecial}}
+                            <div class="dh-codex__trow dh-codex__trow--special item-drag" data-item-id="{{embedded.id}}" data-item-type="{{embedded.type}}">
+                                <span><a class="item-edit" data-item-id="{{embedded.id}}" title="Open the item card">{{embedded.name}}</a></span>
+                                <span>{{#if embedded.system.enabled}}Enabled{{else}}Off{{/if}}</span>
+                                <span>{{defaultVal embedded.system.level 'N/A'}}</span>
+                                <span class="dh-codex__tact"><button type="button" class="item-delete" data-item-id="{{embedded.id}}" aria-label="Delete {{embedded.name}}" title="Delete"><i class="fa-solid fa-trash"></i></button></span>
                             </div>
-                            {{#if item.system.target.useSkill}}
-                                <div class="dh-field__wrapper">
-                                    <span class="dh-field__header">Skill</span>
-                                    <input class="dh-field__input" type="text" name="system.target.skill"
-                                           value="{{item.system.target.skill}}" />
-                                </div>
-                            {{else}}
-                                <div class="dh-field__wrapper">
-                                    <span class="dh-field__header">Characteristic</span>
-                                    <select class="dh-field__input" name="system.target.characteristic">
-                                        {{selectOptions dh.combat.characteristics selected=item.system.target.characteristic}}
-                                    </select>
-                                </div>
-                            {{/if}}
-
-                            <div class="dh-field__wrapper">
-                                <span class="dh-field__header">Is Opposed</span>
-                                <div class='dh-field__input check'>
-                                    <input name="system.target.isOpposed" type="checkbox" data-dtype="Boolean" {{checked
-                                        item.system.target.isOpposed}}/>
-                                </div>
-                            </div>
-                            <div class="dh-field__wrapper">
-                                <span class="dh-field__header">Use Opposed Skill</span>
-                                <div class='dh-field__input check'>
-                                    <input name="system.target.useOpposedSkill" type="checkbox" data-dtype="Boolean" {{checked
-                                        item.system.target.useOpposedSkill}}/>
-                                </div>
-                            </div>
-
-                            {{#if item.system.target.useOpposedSkill}}
-                                <div class="dh-field__wrapper">
-                                    <span class="dh-field__header">Opposed Skill</span>
-                                    <input class="dh-field__input" type="text" name="system.target.opposedSkill"
-                                           value="{{item.system.target.opposedSkill}}" />
-                                </div>
-                            {{else}}
-                                <div class="dh-field__wrapper">
-                                    <span class="dh-field__header">Opposed Characteristic</span>
-                                    <select class="dh-field__input" name="system.target.opposed">
-                                        {{selectOptions dh.combat.characteristics selected=item.system.target.opposed}}
-                                    </select>
-                                </div>
-                            {{/if}}
-
-                        </div>
-                        
-                        <div class="dh-panel dh-grid-col-2 dh-grid-row-1">
-                            <h1 class="dh-panel__header">Attack Specials</h1>
-                            <div class="dh-table--border dh-attackspecialtable--border">
-                                <div class="table-row--head">
-                                    <div class="table-cell--span2">Name</div>
-                                    <div class="table-cell">Enabled</div>
-                                    <div class="table-cell">Level</div>
-                                    <div class="table-cell--last"></div>
-                                </div>
-                                {{#each item.items as | embedded |}}
-                                    {{#if embedded.isAttackSpecial}}
-                                        <div class="table-row">
-                                            <div class="table-cell--settingstoggle">
-                                                <label class="dh-control-button item-edit"
-                                                       data-item-id="{{embedded.id}}">
-                                                    <span class="dh-control-button__span material-icons">{{defaultVal
-                                                        icon 'settings'}}</span>
-                                                </label>
-                                            </div>
-                                            <div class="table-cell--left">
-                                                {{> systems/dark-heresy-2nd/templates/actor/partial/trait-toggle.hbs toggle=(concat 'description_' embedded.id) text=embedded.name}}
-                                            </div>
-                                            <div class="table-cell">
-                                                <span class="display">{{embedded.system.enabled}}</span>
-                                            </div>
-                                            <div class="table-cell">
-                                                <span class="display">{{defaultVal embedded.system.level
-                                                                                   'N/A'}}</span>
-                                            </div>
-                                            <div class="table-cell--last">
-                                                <label class="dh-control-button item-delete"
-                                                       data-item-id="{{embedded.id}}">
-                                                    <span class="dh-control-button__span material-icons">{{defaultVal
-                                                        icon 'delete'}}</span>
-                                                </label>
-                                            </div>
-                                            <div class="table-cell--description description_{{embedded.id}}" {{hideIfNot
-                                                (isExpanded (concat 'description_' embedded.id ))}}>
-                                                <span>{{embedded.system.description}}</span>
-                                            </div>
-                                        </div>
-                                    {{/if}}
-                                {{/each}}
-                            </div>
-                        </div>
+                        {{/if}}
+                    {{/each}}
+                    <div class="dh-codex__dashed">
+                        <em class="dh-codex__none">No attack specials have been added.</em>
+                        <button type="button" class="dh-codex__btn item-create" data-type="attackSpecial"><i class="fa-solid fa-plus"></i> Add</button>
                     </div>
-                    <div class="tab" data-group="primary" data-tab="effects">
-                        <div class="dh-panel dh-grid-col-6">
-                            <h1 class="dh-panel__header">While the power is in effect</h1>
+                </div>
+            </section>
+
+            <section class="dh-codex__panel">
+                <h3 class="dh-codex__panel-title">Effects While Sustained</h3>
+                <div class="dh-codex__panel-body">
+                    <div class="dh-codex__info">
+                        <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+                        <div>
                             <div class="dh-effect-cards">
                                 {{#each effectSummary as |e|}}
                                     <div class="dh-effect-card {{#if e.fixed}}dh-effect-card--fixed{{/if}}" data-tooltip="{{e.characteristic}} · {{e.field}}">
@@ -149,40 +84,52 @@
                             <p class="dh-effect-state">
                                 {{#if canSustain}}Applied after a successful manifestation. The power is sustained ({{item.system.sustained}}) until it is ended and reduces the current psy rating.{{else}}Sustained is "No": the effects are not applied automatically.{{/if}}
                             </p>
-                            {{#if editable}}
-                            <p class="dh-effect-help">After a successful manifestation these changes are applied to the psyker as an Active Effect
-                                (only for powers that can be sustained, the Sustained field is not "No"). Leave <em>Fixed</em> empty to calculate the
-                                value from the psy rating: psy rating ÷ <em>Divide</em>, rounded as selected.</p>
-                            <table class="dh-effect-table">
-                                <thead>
-                                    <tr><th>Characteristic</th><th>Field</th><th>Fixed</th><th>PR ÷</th><th>Rounding</th><th></th></tr>
-                                </thead>
-                                <tbody>
-                                    {{#each effectRows as |row i|}}
-                                        <tr>
-                                            <td><select name="system.autoEffects.{{i}}.characteristic">{{selectOptions @root.effectCharacteristics selected=row.characteristic}}</select></td>
-                                            <td><select name="system.autoEffects.{{i}}.field">{{selectOptions @root.effectFields selected=row.field}}</select></td>
-                                            <td><input type="number" data-dtype="Number" name="system.autoEffects.{{i}}.value" value="{{row.value}}" placeholder="from PR" /></td>
-                                            <td><input type="number" data-dtype="Number" name="system.autoEffects.{{i}}.pr.divide" value="{{row.pr.divide}}" /></td>
-                                            <td><select name="system.autoEffects.{{i}}.pr.round">{{selectOptions @root.effectRounding selected=row.pr.round}}</select></td>
-                                            <td><button type="button" data-action="removePsychicEffect" data-index="{{i}}" aria-label="Remove effect">✕</button></td>
-                                        </tr>
-                                    {{else}}
-                                        <tr><td colspan="6">No effects. The power can still be sustained, it just does not change any values.</td></tr>
-                                    {{/each}}
-                                </tbody>
-                            </table>
-                            <button type="button" data-action="addPsychicEffect">+ Add effect</button>
-                            {{/if}}
                         </div>
                     </div>
-                    <div class="tab" data-group="primary" data-tab="description">
-                        <div class="dh-header__info dh-grid-col-6">
-                            <div class="dh-header__item-wrapper--text-area">
-                                <span class="dh-header__title">Description</span>
-                                <textarea class="dh-header__textarea" name="system.description">{{item.system.description}}</textarea>
-                            </div>
-                        </div>
-                    </div>
-                </section>
+                </div>
+            </section>
+        </div>
+
+        <div class="tab" data-group="primary" data-tab="effects">
+            <section class="dh-codex__panel">
+                <h3 class="dh-codex__panel-title">Effect Definitions</h3>
+                <div class="dh-codex__panel-body">
+                    {{#if editable}}
+                    <p class="dh-effect-help">After a successful manifestation these changes are applied to the psyker as an Active Effect
+                        (only for powers that can be sustained, the Sustained field is not "No"). Leave <em>Fixed</em> empty to calculate the
+                        value from the psy rating: psy rating ÷ <em>Divide</em>, rounded as selected.</p>
+                    <table class="dh-effect-table">
+                        <thead>
+                            <tr><th>Characteristic</th><th>Field</th><th>Fixed</th><th>PR ÷</th><th>Rounding</th><th></th></tr>
+                        </thead>
+                        <tbody>
+                            {{#each effectRows as |row i|}}
+                                <tr>
+                                    <td><select name="system.autoEffects.{{i}}.characteristic">{{selectOptions @root.effectCharacteristics selected=row.characteristic}}</select></td>
+                                    <td><select name="system.autoEffects.{{i}}.field">{{selectOptions @root.effectFields selected=row.field}}</select></td>
+                                    <td><input type="number" data-dtype="Number" name="system.autoEffects.{{i}}.value" value="{{row.value}}" placeholder="from PR" /></td>
+                                    <td><input type="number" data-dtype="Number" name="system.autoEffects.{{i}}.pr.divide" value="{{row.pr.divide}}" /></td>
+                                    <td><select name="system.autoEffects.{{i}}.pr.round">{{selectOptions @root.effectRounding selected=row.pr.round}}</select></td>
+                                    <td><button type="button" data-action="removePsychicEffect" data-index="{{i}}" aria-label="Remove effect">✕</button></td>
+                                </tr>
+                            {{else}}
+                                <tr><td colspan="6">No effects. The power can still be sustained, it just does not change any values.</td></tr>
+                            {{/each}}
+                        </tbody>
+                    </table>
+                    <button type="button" class="dh-codex__btn" data-action="addPsychicEffect"><i class="fa-solid fa-plus"></i> Add effect</button>
+                    {{/if}}
+                </div>
+            </section>
+        </div>
+
+        <div class="tab" data-group="primary" data-tab="description">
+            <section class="dh-codex__panel">
+                <h3 class="dh-codex__panel-title"><label for="codex-description-{{item.id}}">Description</label></h3>
+                <div class="dh-codex__panel-body">
+                    <textarea id="codex-description-{{item.id}}" class="dh-codex__text" name="system.description">{{item.system.description}}</textarea>
+                </div>
+            </section>
+        </div>
+    </section>
 </div>

@@ -617,6 +617,159 @@ $cx-body: 'IM Fell DW Pica', 'Palatino Linotype', Georgia, 'Times New Roman', se
         }
     }
 
+
+    // the new panels fill the page (the old tab pages are a six column grid)
+    &--psychic &__body.dh-wrapper .tab.active {
+        display: block;
+    }
+
+    // inside the old wrapper the generic form rules of the old stylesheet are stronger: say it again with more weight
+    &--psychic &__body &__field,
+    &--psychic &__body &__text {
+        height: auto;
+        padding: 0.5cqw 1.2cqw;
+        border: 1px solid rgba(110, 82, 40, 0.65);
+        border-radius: 0;
+        background: rgba(255, 252, 240, 0.3);
+        color: $cx-ink;
+        font-family: $cx-body;
+        font-size: inherit;
+        box-shadow: none;
+    }
+
+    &--psychic &__body &__panel-title {
+        padding: 0.7cqw 1.8cqw;
+        margin: 0;
+        color: var(--cx-red);
+        font-family: $cx-title;
+        font-size: clamp(13px, 2.6cqw, 30px);
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        text-align: left;
+    }
+
+    &--psychic &__body &__btn {
+        width: auto;
+        align-self: center;
+        margin-top: 1cqw;
+        border: 1px solid var(--cx-red);
+        background: var(--cx-red);
+        color: var(--cx-cream, #efe2c0);
+        font-family: $cx-title;
+        font-size: clamp(11px, 1.8cqw, 20px);
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+    }
+
+    // ---- panels with a title bar (tab pages of psychic powers; usable by every sheet) -----------------------------------
+    &__panel {
+        margin-top: 1.8cqw;
+        border: 1px solid rgba(110, 82, 40, 0.75);
+        border-radius: 1cqw;
+        background: rgba(255, 252, 240, 0.25);
+        overflow: hidden;
+    }
+
+    &__panel-title {
+        margin: 0;
+        padding: 0.7cqw 1.8cqw;
+        border: 0;
+        border-bottom: 1px solid rgba(110, 82, 40, 0.75);
+        background: var(--cx-ribbon-a);
+        color: var(--cx-red);
+        font-family: $cx-title;
+        font-size: clamp(13px, 2.6cqw, 30px);
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+    }
+
+    &__panel-body {
+        padding: 0.8cqw 2.2cqw 1.4cqw;
+    }
+
+    &__line {
+        display: grid;
+        grid-template-columns: minmax(9em, 34%) minmax(0, 1fr);
+        align-items: center;
+        gap: 1.4cqw;
+        padding: 0.6cqw 0;
+        border-bottom: 1px solid rgba(141, 107, 52, 0.4);
+
+        > span {
+            color: var(--cx-ink-soft);
+            font-family: $cx-title;
+            font-size: clamp(10px, 1.7cqw, 19px);
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        input[type='checkbox'] {
+            width: 1.5em;
+            height: 1.5em;
+            margin: 0;
+            accent-color: var(--cx-red);
+            justify-self: start;
+        }
+    }
+
+    &__dashed {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1cqw;
+        margin-top: 0.8cqw;
+        padding: 1.6cqw;
+        border: 1px dashed rgba(110, 82, 40, 0.7);
+        border-radius: 0.8cqw;
+        color: var(--cx-ink-soft);
+    }
+
+    // the "nothing added" text only shows while there is no row before it
+    &__trow--special ~ &__dashed &__none {
+        display: none;
+    }
+
+    &__trow--special {
+        grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr) 5cqw;
+    }
+
+    &__btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.8cqw;
+        height: auto;
+        min-height: 3.2cqw;
+        padding: 0.4cqw 2.2cqw;
+        border: 1px solid var(--cx-red);
+        border-radius: 0.5cqw;
+        background: var(--cx-red);
+        color: var(--cx-cream, #efe2c0);
+        font-family: $cx-title;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        cursor: pointer;
+    }
+
+    &__info {
+        display: flex;
+        align-items: center;
+        gap: 1.6cqw;
+
+        > i {
+            padding-right: 1.6cqw;
+            border-right: 1px solid rgba(141, 107, 52, 0.6);
+            color: var(--cx-red);
+            font-size: 3cqw;
+        }
+
+        > div {
+            flex: 1;
+            min-width: 0;
+        }
+    }
+
     // the tab pages keep their old panels, they only sit on the parchment now
     &__body.dh-wrapper {
         margin-top: 0;
