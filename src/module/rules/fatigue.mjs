@@ -18,7 +18,10 @@ export function bonusOf(total, unnatural = 0) {
  */
 export function applyFatigue(characteristic, fatigue) {
     characteristic.bonusBeforeFatigue = characteristic.bonus;
+    characteristic.totalBeforeFatigue = characteristic.total;
+    characteristic.fatigued = false;
     if (Number(fatigue) > characteristic.bonus) {
+        characteristic.fatigued = true;
         characteristic.total = Math.ceil(characteristic.total / 2);
         characteristic.bonus = bonusOf(characteristic.total, characteristic.unnatural);
     }
@@ -30,4 +33,53 @@ export function fatigueMax(characteristics) {
     const t = characteristics?.toughness;
     const w = characteristics?.willpower;
     return (Number(t?.bonusBeforeFatigue ?? t?.bonus) || 0) + (Number(w?.bonusBeforeFatigue ?? w?.bonus) || 0);
+}
+
+/*
+ * Consequences of the fatigue level (to be verified against the printed rules: the text below comes from the official errata
+ * as quoted by the table, see docs/fatigue.md).
+ *   - fatigue above the limit (threshold)        → unconscious
+ *   - unconscious for 10 − Toughness Bonus minutes, then fatigue drops by the Toughness Bonus; if it is still above the limit
+ *     the character wakes up one level below the limit
+ *   - fatigue above twice the limit              → the character dies
+ */
+
+export const UNCONSCIOUS_BASE_MINUTES = 10;
+
+/** The state for a fatigue value: level ok | tired | limit | unconscious | dead */
+export function fatigueState({ value, max, toughnessBonus }) {
+    const v = Number(value) || 0;
+    const limit = Number(max) || 0;
+    const tb = Number(toughnessBonus) || 0;
+    const minutes = Math.max(0, UNCONSCIOUS_BASE_MINUTES - tb);
+    let level = 'ok';
+    if (limit > 0 && v > limit * 2) level = 'dead';
+    else if (limit > 0 && v > limit) level = 'unconscious';
+    else if (limit > 0 && v === limit) level = 'limit';
+    else if (v > 0) level = 'tired';
+    const text = {
+        ok: '',
+        tired: 'Tired: characteristics with a bonus below the fatigue are halved.',
+        limit: 'At the fatigue limit: one more level and the character collapses.',
+        unconscious: `Over the fatigue limit: unconscious for ${minutes} minute${minutes === 1 ? '' : 's'}.`,
+        dead: 'Fatigue is more than twice the limit: the character dies.',
+    }[level];
+    return { level, value: v, limit, deathAbove: limit * 2, minutes, unconscious: level === 'unconscious' || level === 'dead', dead: level === 'dead', text };
+}
+
+/** Fatigue after waking up: reduced by the Toughness Bonus, at most one level below the limit */
+export function wakeUpValue({ value, max, toughnessBonus }) {
+    const v = Number(value) || 0;
+    const limit = Number(max) || 0;
+    const after = Math.max(0, v - (Number(toughnessBonus) || 0));
+    return limit > 0 && after > limit ? Math.max(0, limit - 1) : after;
+}
+
+/** Did a change of the fatigue cross the limit? Used for the notice in the chat. */
+export function crossing(from, to, max) {
+    const limit = Number(max) || 0;
+    if (limit <= 0) return null;
+    if (from <= limit * 2 && to > limit * 2) return 'dead';
+    if (from <= limit && to > limit) return 'unconscious';
+    return null;
 }

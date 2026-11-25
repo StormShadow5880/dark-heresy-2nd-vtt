@@ -1,14 +1,21 @@
 <section class="tab dossier-tab" data-tab="overview" data-group="primary">
+    {{#if dossier.fatigue.unconscious}}
+        <div class="fatigue-banner {{#if dossier.fatigue.dead}}is-dead{{/if}}" role="alert">
+            <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+            <span><strong>Fatigue {{dossier.fatigue.value}} / {{dossier.fatigue.limit}}:</strong> {{dossier.fatigue.text}}{{#unless dossier.fatigue.dead}} On waking up the fatigue drops by the Toughness Bonus.{{/unless}}</span>
+            {{#unless dossier.fatigue.dead}}<button type="button" class="icon-btn" data-action="wakeUp" data-tooltip="Wake up: fatigue drops by the Toughness Bonus"><i class="fa-solid fa-sun"></i> Wake up</button>{{/unless}}
+        </div>
+    {{/if}}
     <div class="ov2">
         <div class="ov2__main">
             <article class="panel panel--characteristics">
                 <h2 class="panel__title">Characteristics</h2>
                 <div class="chars">
                 {{#each dossier.characteristics as |c|}}
-                    <div class="char {{#if c.hasBonus}}char--bonus{{/if}} {{#if c.hasNegative}}char--negative{{/if}} actor-drag" data-item-type="characteristic" data-item-id="{{c.key}}" data-char="{{c.key}}">
+                    <div class="char {{#if c.hasBonus}}char--bonus{{/if}} {{#if c.hasNegative}}char--negative{{/if}} {{#if c.fatigued}}char--fatigued{{/if}} actor-drag" data-item-type="characteristic" data-item-id="{{c.key}}" data-char="{{c.key}}">
                         <button type="button" class="char__edit-toggle" data-action="toggleCharEdit" data-char="{{c.key}}" data-tooltip="Pin details" aria-label="Pin details of {{c.label}}"><i class="fa-solid fa-thumbtack"></i></button>
                         <span class="char__short" data-tooltip="{{c.label}}">{{c.short}}</span>
-                        <button type="button" class="char__roll roll-characteristic" data-characteristic="{{c.key}}" data-tooltip="Roll {{c.label}} test (W100 ≤ {{c.total}})">{{c.total}}</button>
+                        <button type="button" class="char__roll roll-characteristic" data-characteristic="{{c.key}}" data-tooltip="Roll {{c.label}} test (W100 ≤ {{c.total}}){{#if c.fatigued}} · {{c.fatigueTip}}{{/if}}">{{c.total}}</button>
                         <div class="char__foot">
                             <span class="char__bonus" data-tooltip="Bonus = {{c.bonusText}}">Bonus {{c.bonus}}</span>
                             <span class="pips" data-tooltip="Advances: {{c.advanceLabel}}">{{#each c.advancePips as |on|}}<i class="pip {{#if on}}on{{/if}}"></i>{{/each}}</span>
@@ -44,7 +51,7 @@
                             <button type="button" class="step" data-action="adjustDamage" data-delta="1" aria-label="Take one point of damage">+</button>
                         </li>
                         {{#each dossier.statusTiles as |t|}}
-                            <li class="stat-list__row" data-tooltip="{{t.tooltip}}">
+                            <li class="stat-list__row {{#if t.level}}is-{{t.level}}{{/if}}" data-tooltip="{{t.tooltip}}">
                                 <i class="sicon sicon--{{t.id}}"></i>
                                 <span class="stat-list__label">{{t.label}}</span>
                                 <span class="stat-list__value">{{t.value}}</span>
@@ -79,7 +86,7 @@
                     <h2 class="panel__title">Key Skills <span class="panel__hint">{{dossier.quickSkills.length}} <button type="button" class="icon-btn" data-action="goTab" data-tab="skills" data-tooltip="Choose key skills on the Skills tab"><i class="fa-solid fa-pen"></i></button></span></h2>
                     <ul class="qs qs--one">
                         {{#each dossier.quickSkills as |s|}}
-                            <li class="qs__item" data-tooltip="{{s.label}} · {{s.training}} ({{s.characteristic}})">
+                            <li class="qs__item {{#if s.fatigued}}is-fatigued{{/if}}" data-tooltip="{{s.label}} · {{s.training}} ({{s.characteristic}})">
                                 <span class="qs__name">{{s.label}} <small>{{s.characteristic}}</small></span>
                                 <span class="qs__pips">{{#each s.pips as |p|}}<i class="pip {{#if p.filled}}on{{/if}}"></i>{{/each}}</span>
                                 <span class="qs__target">{{s.total}}</span>

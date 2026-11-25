@@ -4,6 +4,7 @@
  * rules are not re-implemented in the templates.
  */
 import { prettifyDescription, prettyRange } from '../../rules/psy-text.mjs';
+import { fatigueState } from '../../rules/fatigue.mjs';
 import { hasDescription } from '../../rules/item-description.mjs';
 import { SYSTEM_ID } from '../../system-id.mjs';
 import { SKILL_DESCRIPTIONS } from '../../rules/skill-descriptions.mjs';
@@ -108,8 +109,16 @@ export function buildCharacteristics(actor) {
             bonusText: `${tens} (tens digit)${toNumber(c.unnatural) ? ` + ${toNumber(c.unnatural)} (unnatural)` : ''}`,
             hasBonus: !!c.has_bonus,
             hasNegative: !!c.has_negative,
+            fatigued: !!c.fatigued,
+            fatigueTip: c.fatigued ? `Fatigue: halved (${c.totalBeforeFatigue} → ${c.total})` : '',
         };
     });
+}
+
+/** Fatigue level of the actor (ok, tired, limit, unconscious, dead) with the text for the sheet */
+export function fatigueStateOf(actor) {
+    const t = actor.characteristics?.toughness;
+    return fatigueState({ value: actor.system?.fatigue?.value, max: actor.system?.fatigue?.max, toughnessBonus: t?.bonusBeforeFatigue ?? t?.bonus });
 }
 
 export function buildResources(actor) {
@@ -191,6 +200,7 @@ function skillDetail(actor, skillKey, specKey) {
 
 export function buildSkills(actor) {
     const favorites = getFavoriteSkills(actor);
+    const fatiguedShort = new Set(CHARACTERISTIC_ORDER.map((k) => actor.characteristics[k]).filter((c) => c?.fatigued).map((c) => c.short));
     const charIndex = (short) => CHARACTERISTIC_ORDER.findIndex((k) => actor.characteristics[k]?.short === short);
     const rows = [];
 
@@ -208,6 +218,7 @@ export function buildSkills(actor) {
             training: TRAINING_LEVELS[advance] ?? advance,
             trainingBonus: actor._skillAdvanceToValue(advance),
             total: skill.current,
+            fatigued: fatiguedShort.has(short),
             trained: advance >= 1,
             pips: [1, 2, 3, 4].map((level) => ({ level, filled: advance >= level, label: TRAINING_PIP_LABELS[level] })),
             favorite: favorites.includes(id),
@@ -572,7 +583,7 @@ export function buildStatusTiles(actor) {
     const r = Object.fromEntries(buildResources(actor).map((res) => [res.id, res]));
     const withMax = (res, label) => `${label} ${res.value}${res.max ? ' / ' + res.max : ''}`;
     return [
-        { id: 'fatigue', label: 'Fatigue', path: 'system.fatigue.value', value: r.fatigue.value, max: r.fatigue.max, tooltip: withMax(r.fatigue, 'Fatigue') },
+        { id: 'fatigue', label: 'Fatigue', path: 'system.fatigue.value', value: r.fatigue.value, max: r.fatigue.max, tooltip: withMax(r.fatigue, 'Fatigue'), level: fatigueStateOf(actor).level },
         {
             id: 'fate',
             label: 'Fate',

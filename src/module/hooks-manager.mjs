@@ -31,6 +31,7 @@ import { DarkHeresyGearSheet } from './sheets/item/gear-sheet.mjs';
 import { DarkHeresySettings } from './dark-heresy-settings.mjs';
 import { DHTargetedActionManager } from './actions/targeted-action-manager.mjs';
 import { DHBasicActionManager } from './actions/basic-action-manager.mjs';
+import { crossing as fatigueCrossing, fatigueState } from './rules/fatigue.mjs';
 import { decorateTracker, refreshAccountViews } from './combat/action-account.mjs';
 import { DHCombatActionManager } from './actions/combat-action-manager.mjs';
 import { DarkHeresyCyberneticSheet } from './sheets/item/cybernetic-sheet.mjs';
@@ -73,6 +74,7 @@ export class HooksManager {
         for (const hook of ['updateCombatant', 'updateCombat', 'deleteCombat']) Hooks.on(hook, () => refreshAccountViews());
         Hooks.on('renderCombatTracker', (app, html) => decorateTracker(html instanceof HTMLElement ? html : html?.[0] ?? document));
         Hooks.on('getSceneControlButtons', HooksManager.gmTools);
+        Hooks.on('preUpdateActor', HooksManager.preUpdateActor);
         Hooks.on('updateActor', HooksManager.updateActor);
         registerWoundsSyncHooks();
 
@@ -251,10 +253,32 @@ Enable Debug with: game.dh.debug = true
     }
 
     /** Active psychic effects follow a changed psy rating */
+    /** Remembers the fatigue before the change, so that crossing the limit can be reported */
+    static preUpdateActor(actor, changes, options) {
+        if (foundry.utils.getProperty(changes, 'system.fatigue.value') !== undefined) options.dhFatigueFrom = Number(actor.system?.fatigue?.value) || 0;
+    }
+
     static async updateActor(actor, changes, options, userId) {
         if (userId !== game.user.id) return;
+        await HooksManager.reportFatigue(actor, changes, options);
         if (foundry.utils.getProperty(changes, 'system.psy.rating') === undefined) return;
         await refreshPsychicEffects(actor);
+    }
+
+    /** A chat message when the fatigue crosses the limit (unconscious) or twice the limit (dead) */
+    static async reportFatigue(actor, changes, options) {
+        const to = foundry.utils.getProperty(changes, 'system.fatigue.value');
+        if (to === undefined || options?.dhFatigueFrom === undefined) return;
+        const t = actor.characteristics?.toughness;
+        const state = fatigueState({ value: to, max: actor.system.fatigue.max, toughnessBonus: t?.bonusBeforeFatigue ?? t?.bonus });
+        const kind = fatigueCrossing(options.dhFatigueFrom, Number(to), actor.system.fatigue.max);
+        if (!kind) return;
+        const name = foundry.utils.escapeHTML(actor.name);
+        const text =
+            kind === 'dead'
+                ? `<strong>${name}</strong> has more than twice the fatigue limit (${state.value} / ${state.limit}): the character dies.`
+                : `<strong>${name}</strong> exceeds the fatigue limit (${state.value} / ${state.limit}) and collapses: unconscious for ${state.minutes} minute${state.minutes === 1 ? '' : 's'}. On waking up the fatigue drops by the Toughness Bonus.`;
+        await ChatMessage.create({ speaker: ChatMessage.getSpeaker({ actor }), content: `<div class="dh-chat"><p>${text}</p></div>`, style: CONST.CHAT_MESSAGE_STYLES.OTHER });
     }
 
     static hotbarDrop(bar, data, slot) {

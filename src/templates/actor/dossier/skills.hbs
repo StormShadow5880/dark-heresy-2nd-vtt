@@ -19,7 +19,7 @@
                 <span></span><span>Skill</span><span>Char.</span><span>Training (Known · +10 · +20 · +30)</span><span class="num">Mod.</span><span class="num">Target</span><span></span>
             </div>
             {{#each dossier.skills as |s|}}
-                <div class="skill-row {{#if s.trained}}is-trained{{/if}} actor-drag" data-name="{{toLowerCase s.label}}" data-trained="{{s.trained}}" data-favorite="{{s.favorite}}"
+                <div class="skill-row {{#if s.trained}}is-trained{{/if}} {{#if s.fatigued}}is-fatigued{{/if}} actor-drag" data-name="{{toLowerCase s.label}}" data-trained="{{s.trained}}" data-favorite="{{s.favorite}}"
                      data-item-type="skill" data-item-id="{{s.skillKey}}" {{#if s.specKey}}data-speciality="{{s.specKey}}"{{/if}}
                      style="--name-order: {{s.nameOrder}}; --char-order: {{s.charOrder}};">
                     <button type="button" class="icon-btn star {{#if s.favorite}}on{{/if}}" data-action="toggleFavorite" data-skill-id="{{s.id}}" data-tooltip="Favourite" aria-pressed="{{s.favorite}}">

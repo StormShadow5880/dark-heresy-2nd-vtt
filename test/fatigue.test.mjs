@@ -42,3 +42,35 @@ test('unnatural bonus stays after halving and bonuses are remembered', () => {
     assert.equal(c.bonus, 4);
     assert.equal(bonusOf(20, 2), 4);
 });
+
+import { fatigueState, wakeUpValue, crossing } from '../src/module/rules/fatigue.mjs';
+
+test('levels: tired, limit, unconscious above the limit, dead above twice the limit', () => {
+    const lvl = (value) => fatigueState({ value, max: 7, toughnessBonus: 3 }).level;
+    assert.deepEqual([0, 1, 7, 8, 14, 15].map(lvl), ['ok', 'tired', 'limit', 'unconscious', 'unconscious', 'dead']);
+    assert.equal(fatigueState({ value: 8, max: 7, toughnessBonus: 3 }).minutes, 7, '10 − Toughness Bonus minutes');
+    assert.equal(fatigueState({ value: 8, max: 7, toughnessBonus: 12 }).minutes, 0);
+});
+
+test('waking up: fatigue drops by the Toughness Bonus, at most one level below the limit', () => {
+    assert.equal(wakeUpValue({ value: 8, max: 7, toughnessBonus: 3 }), 5);
+    assert.equal(wakeUpValue({ value: 13, max: 7, toughnessBonus: 3 }), 6, 'still above the limit: limit − 1');
+    assert.equal(wakeUpValue({ value: 2, max: 7, toughnessBonus: 3 }), 0);
+});
+
+test('crossing the limit is reported once', () => {
+    assert.equal(crossing(7, 8, 7), 'unconscious');
+    assert.equal(crossing(8, 9, 7), null);
+    assert.equal(crossing(14, 15, 7), 'dead');
+    assert.equal(crossing(3, 4, 7), null);
+});
+
+test('halved characteristics are flagged', () => {
+    const c = { total: 30, unnatural: 0, bonus: 3 };
+    applyFatigue(c, 4);
+    assert.equal(c.fatigued, true);
+    assert.equal(c.totalBeforeFatigue, 30);
+    const d = { total: 30, unnatural: 0, bonus: 3 };
+    applyFatigue(d, 3);
+    assert.equal(d.fatigued, false);
+});

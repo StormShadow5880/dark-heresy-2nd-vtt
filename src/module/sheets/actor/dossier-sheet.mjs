@@ -1,6 +1,7 @@
 import { AcolyteSheet } from './acolyte-sheet.mjs';
 import { prettifyDescription } from '../../rules/psy-text.mjs';
 import { SYSTEM_ID } from '../../system-id.mjs';
+import { wakeUpValue } from '../../rules/fatigue.mjs';
 import { chooseAndSpend, refundAction, resetAccount, viewFor as accountViewFor } from '../../combat/action-account.mjs';
 import {
     buildArmour,
@@ -14,6 +15,7 @@ import {
     buildEquippedArmour,
     buildPsychic,
     buildQuickSkills,
+    fatigueStateOf,
     enrichPowerDescriptions,
     buildRelations,
     buildResources,
@@ -56,6 +58,7 @@ export class AcolyteDossierSheet extends AcolyteSheet {
             toggleEquipped: AcolyteDossierSheet.#onToggleEquipped,
             reloadWeapon: AcolyteDossierSheet.#onReloadWeapon,
             takeAction: AcolyteDossierSheet.#onTakeAction,
+            wakeUp: AcolyteDossierSheet.#onWakeUp,
             refundAction: AcolyteDossierSheet.#onRefundAction,
             resetAccount: AcolyteDossierSheet.#onResetAccount,
             adjustValue: AcolyteDossierSheet.#onAdjustValue,
@@ -122,6 +125,7 @@ export class AcolyteDossierSheet extends AcolyteSheet {
             characteristics: buildCharacteristics(actor),
             resources: resources,
             account: accountViewFor(actor),
+            fatigue: fatigueStateOf(actor),
             statusTiles: buildStatusTiles(actor),
             res: Object.fromEntries(resources.map((r) => [r.id, r])),
             skills,
@@ -388,6 +392,15 @@ export class AcolyteDossierSheet extends AcolyteSheet {
     }
 
     /** Clicking a critical pip sets that level, clicking the highest filled one lowers it by one */
+    /** Wake up after the unconscious time: fatigue drops by the Toughness Bonus (at most one level below the limit) */
+    static async #onWakeUp() {
+        const actor = this.actor;
+        const t = actor.characteristics.toughness;
+        const after = wakeUpValue({ value: actor.system.fatigue.value, max: actor.system.fatigue.max, toughnessBonus: t.bonusBeforeFatigue ?? t.bonus });
+        await actor.update({ 'system.fatigue.value': after });
+        await ChatMessage.create({ speaker: ChatMessage.getSpeaker({ actor }), content: `<div class="dh-chat"><p><strong>${foundry.utils.escapeHTML(actor.name)}</strong> wakes up. Fatigue is now ${after}.</p></div>`, style: CONST.CHAT_MESSAGE_STYLES.OTHER });
+    }
+
     static async #onTakeAction() {
         await chooseAndSpend(this.actor);
     }
