@@ -11,6 +11,7 @@
  *
  * The rules (what a defence prevents, armour and toughness, distances) are in rules/combat-resolution.mjs.
  */
+import { useReactionFor } from '../combat/action-account.mjs';
 import { SYSTEM_ID } from '../system-id.mjs';
 import { damageLines, effectOfRoll, playBlast, playResolution } from '../vfx/vfx.mjs';
 import { toFormula } from '../rules/formula.mjs';
@@ -136,6 +137,8 @@ async function resolveTarget(messageId, targetUuid, choice, userId) {
     let outcome = { prevented: 0, remaining: entry.hits, missed: false };
     let evasion = null;
     if (choice === 'dodge' || choice === 'parry') {
+        // a Dodge or Parry uses the Reaction of the round (once per attack and target: a repeated answer does not use a second one)
+        if (!(await useReactionFor(target, `${messageId}:${targetUuid}`, choice === 'dodge' ? 'a Dodge' : 'a Parry'))) return;
         const targetNumber = Number(target.skills?.[choice]?.current);
         if (!Number.isFinite(targetNumber)) return ui.notifications.warn(`${target.name} has no ${choice} value.`);
         const check = await target.rollCheck(targetNumber);

@@ -19,6 +19,8 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
 
 ### Combat: action account
 
+- Reactions: one per combat round, used by Dodge and Parry (not by Take the Hit), shown on the Combat tab; Defensive Stance gives one more, All Out Attack gives it up; the GM confirms a Dodge/Parry without a Reaction left. See `docs/action-account.md`.
+
 - Each turn a character has 1 Full Action (= 2 Half Actions). Weapon attacks, psychic powers and sustained powers are taken from it; if something does not fit, the player is asked. The Combat tab shows the account and lets you take other actions by hand. See `docs/action-account.md`.
 
 ### Psychic: sustained powers at the start of the turn

@@ -7,7 +7,7 @@ import { roles } from '../../rules/roles.mjs';
 import { ORIGIN_FIELDS, isUnlocked, originLocked, UNLOCK_FLAG } from '../../rules/origin-lock.mjs';
 import { groupedOptions, isDlc, sourceLabel } from '../../rules/sources.mjs';
 import { timerView } from '../../rules/fatigue.mjs';
-import { chooseAndSpend, refundAction, resetAccount, viewFor as accountViewFor } from '../../combat/action-account.mjs';
+import { giveReactionBack, takeReaction, chooseAndSpend, refundAction, resetAccount, viewFor as accountViewFor } from '../../combat/action-account.mjs';
 import {
     buildArmour,
     buildCharacteristics,
@@ -82,6 +82,8 @@ export class AcolyteDossierSheet extends AcolyteSheet {
             reloadWeapon: AcolyteDossierSheet.#onReloadWeapon,
             takeAction: AcolyteDossierSheet.#onTakeAction,
             wakeUp: AcolyteDossierSheet.#onWakeUp,
+            takeReaction: AcolyteDossierSheet.#onTakeReaction,
+            restoreReaction: AcolyteDossierSheet.#onRestoreReaction,
             toggleOriginLock: AcolyteDossierSheet.#onToggleOriginLock,
             fateFatigue: AcolyteDossierSheet.#onFateFatigue,
             refundAction: AcolyteDossierSheet.#onRefundAction,
@@ -433,6 +435,14 @@ export class AcolyteDossierSheet extends AcolyteSheet {
     static async #onFateFatigue() {
         const { fateRemovesFatigue } = await import('../../actions/fatigue-manager.mjs');
         await fateRemovesFatigue(this.actor);
+    }
+
+    static async #onTakeReaction() {
+        await takeReaction(this.actor);
+    }
+
+    static async #onRestoreReaction() {
+        await giveReactionBack(this.actor);
     }
 
     static async #onTakeAction() {

@@ -27,8 +27,9 @@ async function store(combatant, account) {
 /** Data for the sheet: null when there is no turn of this actor */
 export function viewFor(actor) {
     const combatant = activeCombatantFor(actor);
-    if (!combatant) return { active: false };
-    return { active: true, ...accountView(accountOf(combatant)) };
+    const reaction = reactionViewFor(actor);
+    if (!combatant) return { active: false, reaction };
+    return { active: true, reaction, ...accountView(accountOf(combatant)) };
 }
 
 /** Takes an action from the account without asking (sustaining powers, manual entries, …) */
@@ -59,6 +60,9 @@ export async function guardAction(actor, { name, cost, variable = false }) {
         if (ok !== true) return false;
     }
     await store(combatant, chargeAccount(account, { name, cost }));
+    // actions that change the Reaction of the round
+    if (name === 'Defensive Stance') await giveExtraReaction(actor);
+    if (name === 'All Out Attack') await giveUpReaction(actor);
     if (variable) ui.notifications.info(`${name} can cost a Half or a Full Action: the Half Action was taken from the account. Use "Take an action" on the sheet for the rest.`);
     return true;
 }
@@ -159,3 +163,59 @@ export function decorateTracker(root = document) {
         console.debug('Dark Heresy | combat tracker pips', err);
     }
 }
+
+/* ------------------------------ Reactions ------------------------------ */
+
+import { addExtraReaction, forceReaction, forfeitReaction, reactionView, readReaction, restoreReaction, useReaction } from '../rules/reactions.mjs';
+
+const REACTION_FLAG = 'reactionState';
+
+/** The combatant of the actor in the running combat (any turn), or null */
+export function combatantOfActor(actor, combat = game.combat) {
+    if (!accountEnabled() || !combat?.started) return null;
+    return combat.combatants.find((c) => !c.isDefeated && (c.actorId === actor.id || c.actor === actor || c.actor?.uuid === actor.uuid)) ?? null;
+}
+
+const reactionOf = (combatant, combat = game.combat) => readReaction(combatant.getFlag(SYSTEM_ID, REACTION_FLAG), combat.round);
+
+/** Data for the sheet: null outside of a combat */
+export function reactionViewFor(actor) {
+    const combatant = combatantOfActor(actor);
+    return combatant ? { inCombat: true, ...reactionView(reactionOf(combatant)) } : { inCombat: false };
+}
+
+/**
+ * Uses the Reaction of a character for an event (GM client). Outside of a combat nothing is counted. Without a Reaction left the GM
+ * is asked; if he declines, false is returned and nothing is used. The same key is never counted twice.
+ * @returns {Promise<boolean>} true: go on (used, repeated or not counted); false: do not make the reaction
+ */
+export async function useReactionFor(actor, key, label = 'a reaction') {
+    const combatant = combatantOfActor(actor);
+    if (!combatant) return true;
+    let result = useReaction(reactionOf(combatant), key);
+    if (result.status === 'none-left') {
+        const ok = await foundry.applications.api.DialogV2.confirm({
+            classes: ['dh-ui', 'dh-dialog'],
+            window: { title: 'No Reaction left' },
+            content: `<p>${foundry.utils.escapeHTML(actor.name)} has no Reaction left this round. Allow ${foundry.utils.escapeHTML(label)} anyway?</p>`,
+            rejectClose: false,
+            modal: false,
+        });
+        if (ok !== true) return false;
+        result = forceReaction(reactionOf(combatant), key);
+    }
+    if (result.used) await combatant.setFlag(SYSTEM_ID, REACTION_FLAG, result.state);
+    return true;
+}
+
+async function changeReaction(actor, fn) {
+    const combatant = combatantOfActor(actor);
+    if (!combatant) return false;
+    await combatant.setFlag(SYSTEM_ID, REACTION_FLAG, fn(reactionOf(combatant)));
+    return true;
+}
+
+export const giveExtraReaction = (actor) => changeReaction(actor, (s) => addExtraReaction(s));
+export const giveUpReaction = (actor) => changeReaction(actor, (s) => forfeitReaction(s));
+export const giveReactionBack = (actor) => changeReaction(actor, (s) => restoreReaction(s));
+export const takeReaction = async (actor) => useReactionFor(actor, `manual:${foundry.utils.randomID()}`, 'this reaction');

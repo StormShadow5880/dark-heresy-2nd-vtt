@@ -9,3 +9,13 @@
 {{else}}
     <div class="action-account__text is-idle">Actions: it is not the turn of this character.</div>
 {{/if}}
+{{#if acct.reaction.inCombat}}
+    <div class="action-account__reaction">
+        <div class="action-account__pips" role="img" aria-label="{{acct.reaction.text}}">{{#each acct.reaction.pips}}<i class="pip pip--reaction {{#if on}}is-on{{/if}}"></i>{{/each}}</div>
+        <div class="action-account__text {{#if acct.reaction.over}}is-over{{/if}}"><strong>Reaction this round:</strong> {{acct.reaction.text}} <small>· one per round, Dodge and Parry use it, Take the Hit does not</small></div>
+        <div class="action-account__btns">
+            <button type="button" class="icon-btn" data-action="takeReaction" data-tooltip="Use the Reaction by hand"><i class="fa-solid fa-shield-halved"></i></button>
+            <button type="button" class="icon-btn" data-action="restoreReaction" data-tooltip="Give the last Reaction back"><i class="fa-solid fa-rotate-left"></i></button>
+        </div>
+    </div>
+{{/if}}

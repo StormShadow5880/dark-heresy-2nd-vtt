@@ -14,3 +14,13 @@ Each turn a character has **1 Full Action = 2 Half Actions**. Everything that co
 - **Not part of it:** Reactions (Evasion, Parry …), skill tests, damage rolls and anything that is not rolled through the weapon or power dialog (take those by hand).
 
 Code: `rules/action-account.mjs` (pure, tested in `test/action-account.test.mjs`), `combat/action-account.mjs` (Foundry side), account panel `templates/actor/dossier/action-account.hbs`.
+
+## Reactions
+
+- **Semantics (documented decision):** one Reaction per combat round, counted per **global round** of the combat: it is available again when the round counter changes, not at the start of the character's own turn. The sources available to the project say "one Reaction per round" but do not settle whether a reset at the start of the own turn is identical; nothing was changed silently: there was no reaction rule before. If the table prefers the reset at the own turn, only `readReaction(stored, key)` in `rules/reactions.mjs` has to be given a different key (round → round and turn).
+- **What uses it:** a Dodge or a Parry answered on an attack card (the evasion test in `combat-resolution-manager.mjs`, which runs only on the GM client). "Take the Hit" does not use it. The key is "message id + target": a repeated answer, a second socket message or a redraw never uses a second Reaction (test `test/reactions.test.mjs`; the attack row is also closed after the first answer).
+- **None left:** the GM is asked whether to allow the Dodge/Parry anyway; if he declines, nothing happens and the target can still choose Take the Hit. Allowed over the limit it is shown as "over the limit".
+- **Other actions:** Defensive Stance (taken from the action account) gives one additional Reaction, All Out Attack gives up the Reaction of the round; both count for the round in which the action was taken (they do not carry over). Other talents or effects with additional or limited Reactions are **not** modelled (no rule text in the project data); the GM can use the buttons on the Combat tab.
+- **Display:** the Combat tab shows the Reaction of the round (pips and text) whenever the character is in a running combat (also outside of its own turn), with buttons to use it by hand or give it back.
+- **Combat edge cases:** state lives on the combatant (flag `reactionState`, keyed by the round), so a reload keeps it; a defeated combatant is ignored; navigating the combat tracker backwards gives the state of the earlier round back as fresh (the stored round does not match). Not tested in a running Foundry.
+- **Not covered:** the evasion of area attacks (blast) is not counted as a Reaction yet; outside of a combat nothing is counted.
