@@ -379,3 +379,42 @@ data:
 img: systems/dark-heresy-2nd/icons/talents/red/gr_08.png
 name: Writing Kit
 type: tool
+---
+data:
+    availability: Plentiful
+    craftsmanship: Common
+    description: A portable timepiece. The weight is not recorded in the available data.
+    source: Core Rulebook p. 170 (from a secondary equipment list, not yet checked against the book)
+img: systems/dark-heresy-2nd/icons/talents/red/gr_08.png
+name: Chrono
+type: tool
+---
+data:
+    availability: Scarce
+    craftsmanship: Common
+    description: Increases the carrying capacity by 15 kg; a stowed item can be reached as a Free Action. The carrying capacity is not changed automatically.
+    weight: 2
+    source: Core Rulebook p. 170 (from a secondary equipment list, not yet checked against the book)
+img: systems/dark-heresy-2nd/icons/talents/red/gr_08.png
+name: Combat Vest
+type: tool
+---
+data:
+    availability: Abundant
+    craftsmanship: Common
+    description: Lights an area of about a dozen metres or more (the exact range is not recorded); lasts 1d5 hours. Listed together with the Stablight.
+    weight: 0.5
+    source: Core Rulebook p. 176 (from a secondary equipment list, not yet checked against the book)
+img: systems/dark-heresy-2nd/icons/talents/red/gr_08.png
+name: Glow-Globe
+type: tool
+---
+data:
+    availability: Abundant
+    craftsmanship: Common
+    description: Lights an area of about a dozen metres or more (the exact range is not recorded); lasts 1d5 hours. Listed together with the Glow-Globe.
+    weight: 0.5
+    source: Core Rulebook p. 176 (from a secondary equipment list, not yet checked against the book)
+img: systems/dark-heresy-2nd/icons/talents/red/gr_08.png
+name: Stablight
+type: tool
