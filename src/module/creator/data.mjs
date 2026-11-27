@@ -12,8 +12,11 @@
 import { homeworlds } from '../rules/homeworlds.mjs';
 import { backgrounds } from '../rules/backgrounds.mjs';
 import { roles } from '../rules/roles.mjs';
+import { isDlc } from '../rules/sources.mjs';
 
 export const SOURCE_CORE = 'dh2-core';
+/** Expansion books (Enemies Within, Without, Beyond, Forgotten Gods): marked as DLC in the wizard */
+export const SOURCE_EXPANSION = 'dh2-expansion';
 
 export const DEFAULT_STARTING_XP = 1000;
 export const POINT_BUY = { base: 25, positive: 30, negative: 20, points: 60, max: 40 };
@@ -292,6 +295,182 @@ export const BACKGROUND_DEFS = [
     };
 });
 
+/**
+ * Backgrounds of the expansion books (DLC), built from the same data as the core backgrounds. Special rules that need a roll or a
+ * decision (the Mutant's mutations and corruption, the Exorcised's malignancy) are shown as the bonus text, they are not rolled here.
+ */
+export const EXPANSION_BACKGROUND_DEFS = [
+    {
+        name: 'Adepta Sororitas',
+        skills: [
+            free('bg-skill-1', S('athletics')),
+            slot('bg-skill-2', S('charm'), S('intimidate')),
+            free('bg-skill-3', S('commonLore', 'Adepta Sororitas')),
+            free('bg-skill-4', S('linguistics', 'High Gothic')),
+            slot('bg-skill-5', S('medicae'), S('parry')),
+        ],
+        talents: [
+            {
+                id: 'bg-wt',
+                label: 'Weapon Training',
+                options: [
+                    [{ talent: 'Weapon Training', spec: 'Flame' }, { talent: 'Weapon Training', spec: 'Chain' }],
+                    [{ talent: 'Weapon Training', spec: 'Las' }, { talent: 'Weapon Training', spec: 'Chain' }],
+                ],
+            },
+        ],
+        equipment: [
+            { id: 'eq-1', options: [['Hand Flamer'], ['Laspistol']] },
+            { id: 'eq-2', options: [['Chainblade']] },
+            { id: 'eq-3', options: [['Armoured Bodyglove']] },
+            { id: 'eq-4', options: [['Chrono']] },
+            { id: 'eq-5', options: [['Dataslate']] },
+            { id: 'eq-6', options: [['Stablight']] },
+            { id: 'eq-7', options: [['Micro-bead']] },
+        ],
+        aptitudeChoice: ['Offence', 'Social'],
+    },
+    {
+        name: 'Mutant',
+        skills: [
+            slot('bg-skill-1', S('acrobatics'), S('athletics')),
+            free('bg-skill-2', S('awareness')),
+            slot('bg-skill-3', S('deceive'), S('intimidate')),
+            free('bg-skill-4', S('forbiddenLore', 'Mutants')),
+            free('bg-skill-5', S('survival')),
+        ],
+        talents: [
+            { talent: 'Weapon Training', spec: 'Low-Tech' },
+            { talent: 'Weapon Training', spec: 'Solid Projectile' },
+        ],
+        equipment: [
+            { id: 'eq-1', options: [['Shotgun'], ['Stub Revolver', 'Great Weapon']] },
+            { id: 'eq-2', options: [['Grapnel and Line']] },
+            { id: 'eq-3', options: [['Heavy Leathers']] },
+            { id: 'eq-4', options: [['Combat Vest']] },
+            { id: 'eq-5', options: [['Stimm', 2]] },
+        ],
+        aptitudeChoice: ['Fieldcraft', 'Offence'],
+    },
+    {
+        name: 'Heretek',
+        skills: [
+            slot('bg-skill-1', S('deceive'), S('inquiry')),
+            { id: 'bg-skill-2', pick: pick('bg-skill-2', 'Forbidden Lore speciality', 'forbiddenLore') },
+            slot('bg-skill-3', S('medicae'), S('security')),
+            free('bg-skill-4', S('techUse')),
+            { id: 'bg-skill-5', pick: pick('bg-skill-5', 'Trade speciality', 'trade') },
+        ],
+        talents: [{ talent: 'Weapon Training', spec: 'Solid Projectile' }],
+        traits: [{ trait: 'Mechanicus Implants' }],
+        equipment: [
+            { id: 'eq-1', options: [['Stub Revolver', 'Expander Bullets', 2], ['Stub Revolver', 'Man-Stopper Rounds', 2]] },
+            { id: 'eq-2', options: [['Web Grenade']] },
+            { id: 'eq-3', options: [['Combi-tool']] },
+            { id: 'eq-4', options: [['Flak Cloak']] },
+            { id: 'eq-5', options: [['Filtration Plugs']] },
+            { id: 'eq-6', options: [['De-tox']] },
+            { id: 'eq-7', options: [['Dataslate']] },
+            { id: 'eq-8', options: [['Stablight']] },
+        ],
+        aptitudeChoice: ['Finesse', 'Tech'],
+    },
+    {
+        name: 'Imperial Navy',
+        skills: [
+            free('bg-skill-1', S('athletics')),
+            slot('bg-skill-2', S('command'), S('intimidate')),
+            free('bg-skill-3', S('commonLore', 'Imperial Navy')),
+            free('bg-skill-4', S('navigate', 'Stellar')),
+            slot('bg-skill-5', S('operate', 'Aeronautica'), S('operate', 'Voidship')),
+        ],
+        talents: [
+            {
+                id: 'bg-wt',
+                label: 'Weapon Training',
+                options: [
+                    [{ talent: 'Weapon Training', spec: 'Chain' }, { talent: 'Weapon Training', spec: 'Solid Projectile' }],
+                    [{ talent: 'Weapon Training', spec: 'Shock' }, { talent: 'Weapon Training', spec: 'Solid Projectile' }],
+                ],
+            },
+        ],
+        equipment: [
+            { id: 'eq-1', options: [['Combat Shotgun'], ['Hand Cannon']] },
+            { id: 'eq-2', options: [['Chainsword'], ['Shock Whip']] },
+            { id: 'eq-3', options: [['Flak Coat']] },
+            { id: 'eq-4', options: [['Rebreather']] },
+            { id: 'eq-5', options: [['Micro-bead']] },
+        ],
+        aptitudeChoice: ['Offence', 'Tech'],
+    },
+    {
+        name: 'Rogue Trader',
+        skills: [
+            slot('bg-skill-1', S('charm'), S('scrutiny')),
+            free('bg-skill-2', S('commerce')),
+            free('bg-skill-3', S('commonLore', 'Rogue Traders')),
+            { id: 'bg-skill-4', pick: pick('bg-skill-4', 'Alien language', 'linguistics') },
+            slot('bg-skill-5', S('operate', 'Surface'), S('operate', 'Aeronautica')),
+        ],
+        talents: [
+            {
+                id: 'bg-wt',
+                label: 'Weapon Training',
+                options: [
+                    [{ talent: 'Weapon Training', spec: 'Las' }, { talent: 'Weapon Training', spec: 'Shock' }],
+                    [{ talent: 'Weapon Training', spec: 'Solid Projectile' }, { talent: 'Weapon Training', spec: 'Shock' }],
+                ],
+            },
+        ],
+        equipment: [
+            { id: 'eq-1', options: [['Laspistol'], ['Autopistol']] },
+            { id: 'eq-2', options: [['Shock Maul']] },
+            { id: 'eq-3', options: [['Mesh Cloak'], ['Carapace Chestplate']] },
+            { id: 'eq-4', options: [['Auspex']] },
+            { id: 'eq-5', options: [['Chrono']] },
+        ],
+        aptitudeChoice: ['Finesse', 'Social'],
+    },
+    {
+        name: 'Exorcised',
+        skills: [
+            free('bg-skill-1', S('awareness')),
+            slot('bg-skill-2', S('deceive'), S('inquiry')),
+            free('bg-skill-3', S('dodge')),
+            free('bg-skill-4', S('forbiddenLore', 'Daemonology')),
+            slot('bg-skill-5', S('intimidate'), S('scrutiny')),
+        ],
+        talents: [
+            { talent: 'Hatred', spec: 'Daemons' },
+            { talent: 'Weapon Training', spec: 'Solid Projectile' },
+            { talent: 'Weapon Training', spec: 'Chain' },
+        ],
+        equipment: [
+            { id: 'eq-1', options: [['Autopistol'], ['Stub Revolver']] },
+            { id: 'eq-2', options: [['Shotgun']] },
+            { id: 'eq-3', options: [['Chainblade']] },
+            { id: 'eq-4', options: [['Imperial Robes']] },
+            { id: 'eq-5', options: [['Obscura', 3], ['Tranq', 3]] },
+            { id: 'eq-6', options: [['Disguise Kit'], ['Excruciator Kit']] },
+            { id: 'eq-7', options: [['Rebreather']] },
+            { id: 'eq-8', options: [['Stablight'], ['Glow-Globe']] },
+        ],
+        aptitudeChoice: ['Defence', 'Knowledge'],
+    },
+].map((def) => {
+    const rule = backgrounds().find((b) => b.name === def.name);
+    return {
+        id: `background.${slug(def.name)}`,
+        source: SOURCE_EXPANSION,
+        name: def.name,
+        bonus: rule.background_bonus,
+        bookPage: rule.source,
+        recommendedRoles: [],
+        traits: [],
+        ...def,
+    };
+});
+
 export const ROLE_DEFS = [
     { name: 'Assassin', talentOptions: [{ talent: 'Jaded' }, { talent: 'Leap Up' }] },
     { name: 'Chirurgeon', talentOptions: [{ talent: 'Resistance', needsSpec: 'Resistance (choose one)' }, { talent: 'Takedown' }] },
@@ -315,8 +494,64 @@ export const ROLE_DEFS = [
     };
 });
 
-export const HOMEWORLDS = HOMEWORLD_DEFS;
-export const BACKGROUNDS = BACKGROUND_DEFS;
-export const ROLES = ROLE_DEFS;
+/** Roles of the expansion books (DLC) */
+export const EXPANSION_ROLE_DEFS = [
+    { name: 'Fanatic', talentOptions: [{ talent: 'Deny the Witch' }, { talent: 'Jaded' }] },
+    { name: 'Penitent', talentOptions: [{ talent: 'Die Hard' }, { talent: 'Flagellant' }] },
+    { name: 'Ace', talentOptions: [{ talent: 'Hard Target' }, { talent: 'Hotshot Pilot' }] },
+    { name: 'Crusader', talentOptions: [{ talent: 'Bodyguard' }, { talent: 'Deny the Witch' }] },
+].map((def) => {
+    const rule = roles().find((r) => r.name === def.name);
+    return {
+        id: `role.${slug(def.name)}`,
+        source: SOURCE_EXPANSION,
+        name: def.name,
+        aptitudes: rule.role_aptitudes,
+        bonus: rule.role_bonus,
+        bookPage: rule.source,
+        ...def,
+    };
+});
+
+/**
+ * Home worlds of the expansion books (DLC): the nine archetypes and the specific locations, built from rules/homeworlds.mjs.
+ * Starting talents that the bonus text names without a choice are granted; skills, traits and rolls of the bonus text are shown as
+ * the bonus text only (the wizard has no way to grant them from a home world).
+ */
+const EXPANSION_HOMEWORLD_TALENTS = {
+    Temperance: [{ talent: 'Weapon Training', spec: 'Flame' }],
+    Rund: [{ talent: 'Hatred', spec: 'Heretics' }],
+    "The Emperor's Song": [{ talent: 'Deny the Witch' }],
+    'Vouxis Prime': [{ talent: 'Blind Fighting' }],
+    Pellenne: [{ talent: 'Resistance', spec: 'Radiation' }],
+};
+
+export const EXPANSION_HOMEWORLD_DEFS = homeworlds()
+    .filter((h) => isDlc(h.source))
+    .map((rule) => {
+        const [base, dice] = String(rule.wounds).split('+');
+        return {
+            id: `homeworld.${slug(rule.name)}`,
+            source: SOURCE_EXPANSION,
+            name: rule.name,
+            description: rule.parent ? `A location of the home world type ${rule.parent}.` : 'A home world of the expansion books.',
+            hint: '',
+            positive: rule.bonus_characteristics.map(characteristicKey),
+            negative: characteristicKey(rule.negative_characteristic),
+            fateThreshold: rule.fate_threshold,
+            blessing: rule.emperors_blessing,
+            aptitude: rule.aptitude,
+            wounds: { base: Number(base), dice },
+            bonus: { ...rule.home_world_bonus, mechanic: 'C' },
+            bookPage: rule.source,
+            recommendedBackgrounds: [],
+            choices: [],
+            talents: EXPANSION_HOMEWORLD_TALENTS[rule.name] ?? [],
+        };
+    });
+
+export const HOMEWORLDS = [...HOMEWORLD_DEFS, ...EXPANSION_HOMEWORLD_DEFS];
+export const BACKGROUNDS = [...BACKGROUND_DEFS, ...EXPANSION_BACKGROUND_DEFS];
+export const ROLES = [...ROLE_DEFS, ...EXPANSION_ROLE_DEFS];
 
 export const byId = (list, id) => list.find((d) => d.id === id) ?? null;

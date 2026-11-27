@@ -5,6 +5,7 @@
 import { SYSTEM_ID } from '../system-id.mjs';
 import { markTooltips } from '../ui/tooltips.mjs';
 import { aptitudeName, buildQuotes, describeQuote, num } from '../rules/advancement.mjs';
+import { isDlc, sourceLabel } from '../rules/sources.mjs';
 import { BACKGROUNDS, CHARACTERISTICS, HOMEWORLDS, POINT_BUY, ROLES, byId } from './data.mjs';
 import { STEPS, computeCharacter, newDraft, replayAdvances, stepBlockers, stepStatus } from './character.mjs';
 import { applyFormData, logEvent, markStepDone, pruneChoices, rerollCharacteristic, revalidateAdvances, setBackground, setCharacteristicRoll, setHomeWorld, setRole } from './draft.mjs';
@@ -162,6 +163,8 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
             positiveText: h.positive.map(label).join(', '),
             negativeText: label(h.negative),
             woundsText: `${h.wounds.base}+${h.wounds.dice}`,
+            bookLabel: sourceLabel(h.bookPage),
+            dlc: isDlc(h.bookPage),
         }));
         context.hwChoices = choicesFor('homeworld');
         context.backgrounds = BACKGROUNDS.map((b) => ({
@@ -170,6 +173,8 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
             skillText: b.skills.map((s) => (s.pick ? 'Scholastic Lore (pick)' : s.options.map((o) => `${skillName(o.skill)}${o.spec ? ` (${o.spec})` : ''}`).join(' / '))).join('; '),
             talentText: b.talents.map((t) => (t.options ? t.options.map((p) => p.map((x) => `${x.talent} (${x.spec})`).join(' + ')).join(' or ') : `${t.talent}${t.spec ? ` (${t.spec})` : ''}`)).join('; '),
             aptitudeText: b.aptitudeChoice.join(' or '),
+            bookLabel: sourceLabel(b.bookPage),
+            dlc: isDlc(b.bookPage),
         }));
         context.bgChoice = choices.find((c) => c.id === 'bg-apt');
         context.roles = ROLES.map((r) => ({
@@ -177,6 +182,8 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
             selected: r.id === draft.roleId,
             aptitudeText: r.aptitudes.join(', '),
             talentText: r.talentOptions.map((t) => t.needsSpec ?? `${t.talent}${t.spec ? ` (${t.spec})` : ''}`).join(' or '),
+            bookLabel: sourceLabel(r.bookPage),
+            dlc: isDlc(r.bookPage),
         }));
         context.roleChoices = choicesFor('role');
         context.aptitudeChoices = choicesFor('aptitudes');

@@ -53,7 +53,7 @@ test('all six home worlds: modifiers, fate, blessing, aptitude and wounds', () =
         'Shrine World': [['fellowship', 'willpower'], 'perception', 3, 6, 'Willpower', 7],
         Voidborn: [['intelligence', 'willpower'], 'strength', 3, 5, 'Intelligence', 7],
     };
-    assert.equal(data.HOMEWORLDS.length, 6);
+    assert.equal(data.HOMEWORLDS.filter((h) => h.source === 'dh2-core').length, 6);
     for (const [name, [pos, neg, fate, blessing, apt, wounds]] of Object.entries(expected)) {
         const h = hw(name);
         assert.deepEqual(h.positive, pos, name);
@@ -79,8 +79,12 @@ test('divination table covers 1-100 without gaps and without overlaps', () => {
 });
 
 test('7 backgrounds and 8 roles with structured data', () => {
-    assert.equal(data.BACKGROUNDS.length, 7);
-    assert.equal(data.ROLES.length, 8);
+    assert.equal(data.BACKGROUNDS.filter((b) => b.source === 'dh2-core').length, 7);
+    assert.equal(data.ROLES.filter((r) => r.source === 'dh2-core').length, 8);
+    // expansion books (DLC): 6 backgrounds, 4 roles, 31 home worlds (9 archetypes, Novo Arcadia and 21 locations)
+    assert.equal(data.BACKGROUNDS.filter((b) => b.source === 'dh2-expansion').length, 6);
+    assert.equal(data.ROLES.filter((r) => r.source === 'dh2-expansion').length, 4);
+    assert.equal(data.HOMEWORLDS.filter((h) => h.source === 'dh2-expansion').length, 31);
     for (const b of data.BACKGROUNDS) {
         assert.equal(b.skills.length >= 5, true, b.name);
         assert.equal(b.aptitudeChoice.length, 2, b.name);
@@ -290,4 +294,15 @@ test('blockers explain what is open in every step and match the step status', ()
         if (['welcome', 'elite', 'xp', 'review'].includes(step)) continue;
         assert.equal(status[step], blockers[step].length === 0, step);
     }
+});
+
+test('expansion home worlds are complete and know their source', () => {
+    for (const h of data.HOMEWORLDS.filter((x) => x.source === 'dh2-expansion')) {
+        assert.equal(h.positive.length, 2, h.name);
+        assert.ok(h.negative && h.aptitude, h.name);
+        assert.ok(h.wounds.base > 0 && h.wounds.dice === '1d5', h.name);
+        assert.ok(/^PG \d+ (EI|EO|EB|FG)$/.test(h.bookPage), `${h.name}: ${h.bookPage}`);
+    }
+    assert.deepEqual(hw('Temperance').talents, [{ talent: 'Weapon Training', spec: 'Flame' }]);
+    assert.equal(data.ROLES.find((r) => r.name === 'Ace').aptitudes.includes('Tech'), true);
 });

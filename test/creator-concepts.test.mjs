@@ -78,7 +78,7 @@ test('Mystic: Psyker elite advance data reaches the actor', async () => {
     assert.ok(!rogueActor.items.some((i) => i.name === 'Sanctioned'));
 });
 
-test('all 6 x 7 x 8 combinations are possible (unusual combinations stay allowed)', async () => {
+test('all home world x background x role combinations are possible (unusual combinations stay allowed)', async () => {
     let count = 0;
     for (const h of data.HOMEWORLDS)
         for (const b of data.BACKGROUNDS)
@@ -90,7 +90,7 @@ test('all 6 x 7 x 8 combinations are possible (unusual combinations stay allowed
                 assert.equal(new Set(ids).size, ids.length);
                 count++;
             }
-    assert.equal(count, 336);
+    assert.equal(count, data.HOMEWORLDS.length * data.BACKGROUNDS.length * data.ROLES.length);
 });
 
 test('point buy character: values come from the distribution and stay valid after a reload', () => {

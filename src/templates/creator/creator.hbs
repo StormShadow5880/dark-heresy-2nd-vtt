@@ -69,7 +69,7 @@
                         </dl>
                         <p class="bonus"><b>{{h.bonus.name}}.</b> {{h.bonus.benefit}}</p>
                         <small class="why">{{h.hint}}</small>
-                        <small class="src">{{h.bookPage}}</small>
+                        <small class="src">{{h.bookLabel}}{{#if h.dlc}} · DLC{{/if}}</small>
                     </button>
                 {{/each}}
             </div>
@@ -145,7 +145,7 @@
                             <div><dt>Talents</dt><dd>{{b.talentText}}</dd></div>
                         </dl>
                         <p class="bonus"><b>{{b.bonus.name}}.</b> {{b.bonus.benefit}}</p>
-                        <small class="src">{{b.bookPage}}</small>
+                        <small class="src">{{b.bookLabel}}{{#if b.dlc}} · DLC{{/if}}</small>
                     </button>
                 {{/each}}
             </div>
@@ -168,7 +168,7 @@
                         </dl>
                         <p class="bonus"><b>{{r.bonus.name}}.</b> {{r.bonus.benefit}}</p>
                         {{#if r.grantsElite}}<small class="why">Grants the {{r.grantsElite}} elite advance at creation.</small>{{/if}}
-                        <small class="src">{{r.bookPage}}</small>
+                        <small class="src">{{r.bookLabel}}{{#if r.dlc}} · DLC{{/if}}</small>
                     </button>
                 {{/each}}
             </div>
