@@ -13,3 +13,25 @@
 
 Not automated: the unconscious state is not set as a status on the token. Rest outside the rest planner and the 24 h dialog is not detected (the GM can lower the counter by hand).
 Code: `rules/fatigue.mjs` (tested in `test/fatigue.test.mjs`).
+
+## Review against the rules summary of the project notes (core rulebook p. 233, FAQ/errata)
+
+Source status: the rules text comes from a summary of the printed rules and of the official FAQ/errata v1.2, passed on by the project owner. It was not checked against the book here.
+
+| Rule | Status in the system |
+| --- | --- |
+| A characteristic is exhausted when the fatigue is higher than its Characteristic Bonus | done: compared with the bonus *before* fatigue (unnatural bonus included) |
+| Structured time: exhausted characteristic counts half, rounded up | done: total is halved and rounded up for the whole sheet (tests, skills); the stored values (base, advances, modifiers) are not touched, the effect is calculated again with every refresh |
+| FAQ: the bonus of an exhausted characteristic is reduced for its uses (movement, melee damage, Toughness damage reduction) | done as "the bonus is calculated from the halved total", so all bonuses of the sheet follow. The wording of the FAQ may mean something else for single uses: **not decided, open** |
+| Narrative time: tasks with a test on an exhausted characteristic take twice as long | not automated (narrative decision of the GM); the sheet marks the exhausted characteristics and skills |
+| Threshold = Toughness Bonus + Willpower Bonus | done, from the bonuses before fatigue (see below) |
+| Over the threshold: unconscious for 10 − Toughness Bonus minutes; on waking the fatigue drops by the Toughness Bonus, at most to one below the threshold | done (timer on the world clock, automatic wake-up, banner) |
+| Death: the long errata text says "more than twice the threshold", the GM screen "reaches twice" | long text used, conflict documented; the banner shows it, nothing is deleted |
+| 1 hour of complete rest −1, 6 hours all; a Fate Point removes all | done for the rest planner (hours on watch do not count) and the 24 h dialog; a plain time jump is not a rest; Fate Point button on the counter |
+| Talent / effect / GM exceptions | none known in the data; the GM can change the counter by hand at any time |
+
+**Threshold and exhausted Toughness/Willpower (open question):** if the reduced bonuses were used for the threshold, a rising fatigue would lower its own limit (Toughness and Willpower are exhausted first). That is a self-reinforcing loop, so it is **not** introduced. Options: (1) threshold from the bonuses before fatigue (implemented, tested: `test/fatigue.test.mjs`); (2) threshold from the reduced bonuses once, without feedback (calculate the limit with the fatigue value at the time of the last change); (3) GM decision per case. Switch the implementation only after the rule is confirmed.
+
+## Blood Loss (page 243 of the project notes)
+
+Existing behaviour (checked in the code, not changed): a character with the effect "Bleeding" gets a chat card at the start of its turn (processed on the first GM client, setting "Active Effect Processing"); the card has an "Apply Fatigue" button for the +1 fatigue and the note that a Difficult (−10) Medicae test as a Free Action (once per round) ends it. **Not automated:** the Medicae test and ending the effect (the GM or player removes the effect by hand), the Willpower test of the talent The Hard, the Medicae mechadendrite (Half Action), the limit of one attempt per round; nothing is calculated outside combat (no time scale is invented for bleeding outside combat). The "Staunch Bleeding" power exists as a compendium power.
