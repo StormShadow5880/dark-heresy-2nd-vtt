@@ -7,7 +7,10 @@
     </div>
 
     <div class="dossier-identity">
-        <input class="dossier-name" name="name" type="text" value="{{actor.name}}" aria-label="Name" />
+        <div class="dossier-name-row">
+            <input class="dossier-name" name="name" type="text" value="{{actor.name}}" aria-label="Name" />
+            {{#if dossier.isGM}}<button type="button" class="icon-btn" data-action="showState" data-tooltip="Module state of this character: timers, combat counters, locks (GM)" aria-label="Module state"><i class="fa-solid fa-database"></i></button>{{/if}}
+        </div>
         <div class="dossier-bio-fields">
             {{#each dossier.bioFields as |field|}}
                 <label class="dossier-field">

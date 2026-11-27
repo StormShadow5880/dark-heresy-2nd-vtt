@@ -13,3 +13,7 @@ The **optional parts** can be switched off in the system settings (each shows "M
 | Module: Visual effects (`vfx`) | no animations and sounds |
 
 Code: `src/module/modules.mjs` (`moduleOn(name)`); the places that check it are the start in `hooks-manager.mjs`, the sheet context and the templates of the biography and combat tab.
+
+## State overview
+
+All hidden state of the system (timers, combat counters, locks, the sustained marker) is named once in `src/module/rules/state-flags.mjs` with what it is for and whether it can be reset safely. The GM sees it per character with the "Module state" button (database icon) in the header of the dossier and can reset single entries; the experience log, the creation record and the relationships cannot be reset there. A test requires every flag that the code writes to be registered, so new state cannot appear unnoticed. The data stays where it is (no migration); only the overview and the rule "every flag is registered" are new.

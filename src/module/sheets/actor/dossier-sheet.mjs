@@ -83,6 +83,7 @@ export class AcolyteDossierSheet extends AcolyteSheet {
             reloadWeapon: AcolyteDossierSheet.#onReloadWeapon,
             takeAction: AcolyteDossierSheet.#onTakeAction,
             wakeUp: AcolyteDossierSheet.#onWakeUp,
+            showState: AcolyteDossierSheet.#onShowState,
             takeReaction: AcolyteDossierSheet.#onTakeReaction,
             restoreReaction: AcolyteDossierSheet.#onRestoreReaction,
             toggleOriginLock: AcolyteDossierSheet.#onToggleOriginLock,
@@ -437,6 +438,11 @@ export class AcolyteDossierSheet extends AcolyteSheet {
     static async #onFateFatigue() {
         const { fateRemovesFatigue } = await import('../../actions/fatigue-manager.mjs');
         await fateRemovesFatigue(this.actor);
+    }
+
+    static async #onShowState() {
+        const { openStateDialog } = await import('../../ui/state-dialog.mjs');
+        await openStateDialog(this.actor);
     }
 
     static async #onTakeReaction() {

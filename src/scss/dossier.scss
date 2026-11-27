@@ -3308,3 +3308,14 @@ $fatigue-colour: #e39a3b;
         flex: 1;
     }
 }
+
+.dossier-name-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .dossier-name {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+}

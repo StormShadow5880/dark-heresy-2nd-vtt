@@ -8,6 +8,8 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
 
 ### Optional modules
 
+- Module state: every hidden flag of the system is registered in one list; the GM sees and resets the state of a character (timers, combat counters, locks) with the database button in the dossier header. See `docs/modules.md`.
+
 - One source for the creation data: the rules lists of backgrounds and roles keep only name, bonus and source (and the role aptitudes); starting skills, talents, equipment and aptitude choices exist once, as structured data in `creator/data.mjs`.
 
 - The old "Classic" acolyte sheet was removed (the dossier is the only character sheet), with its template and 10 panel templates that nothing used any more. NPC and vehicle sheets are unchanged; characters that had the classic sheet selected open with the dossier.
