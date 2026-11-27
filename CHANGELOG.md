@@ -8,6 +8,8 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
 
 ### Optional modules
 
+- The old "Classic" acolyte sheet was removed (the dossier is the only character sheet), with its template and 10 panel templates that nothing used any more. NPC and vehicle sheets are unchanged; characters that had the classic sheet selected open with the dossier.
+
 - Time (clock bar, running clock, rest planner) and Patrons/relationships can be switched off, like the existing switches for the action account, the sustained powers question and the visual effects. A part that is off does not start. See `docs/modules.md`.
 - `template.json` cleaned up (see `docs/data-models-migration.md`); aptitude items now have description and source fields.
 

@@ -16,9 +16,9 @@ export class AcolyteSheet extends ActorContainerSheet {
 
     static DEFAULT_TAB = 'main';
 
-    static PARTS = {
-        sheet: { template: `systems/dark-heresy-2nd/templates/actor/actor-acolyte-sheet.hbs`, scrollable: ['.dh-body'] },
-    };
+    // no template of its own: this class holds the shared roll and combat handlers of the dossier sheet and of the NPC sheet
+    // (the old "Classic" acolyte sheet was removed, the dossier is the only character sheet)
+    static PARTS = {};
 
     _activateListeners(html) {
         super._activateListeners(html);

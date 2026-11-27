@@ -1,6 +1,5 @@
 import { DarkHeresyItem } from './documents/item.mjs';
 import { DarkHeresy } from './rules/config.mjs';
-import { AcolyteSheet } from './sheets/actor/acolyte-sheet.mjs';
 import { AcolyteDossierSheet } from './sheets/actor/dossier-sheet.mjs';
 import { DarkHeresyItemSheet } from './sheets/item/item-sheet.mjs';
 import { DarkHeresyWeaponSheet } from './sheets/item/weapon-sheet.mjs';
@@ -143,7 +142,6 @@ Enable Debug with: game.dh.debug = true
             game.dh.warn('Unable to unregister core sheets', err);
         }
         Actors.registerSheet(SYSTEM_ID, AcolyteDossierSheet, {types: ['acolyte'], makeDefault: true, label: 'Dark Heresy Dossier'});
-        Actors.registerSheet(SYSTEM_ID, AcolyteSheet, {types: ['acolyte'], makeDefault: false, label: 'Dark Heresy Classic'});
         Actors.registerSheet(SYSTEM_ID, NpcSheet, {types: ['npc'], makeDefault: true });
         Actors.registerSheet(SYSTEM_ID, PatronSheet, {types: ['patron'], makeDefault: true, label: 'Patron Dossier'});
         Actors.registerSheet(SYSTEM_ID, VehicleSheet, {types: ['vehicle'], makeDefault: true });
