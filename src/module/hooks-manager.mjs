@@ -32,6 +32,7 @@ import { DarkHeresySettings } from './dark-heresy-settings.mjs';
 import { DHTargetedActionManager } from './actions/targeted-action-manager.mjs';
 import { DHBasicActionManager } from './actions/basic-action-manager.mjs';
 import { crossing as fatigueCrossing, fatigueState } from './rules/fatigue.mjs';
+import { changedOrigin, originLocked } from './rules/origin-lock.mjs';
 import { clearTimer, processTimers, startUnconscious } from './actions/fatigue-manager.mjs';
 import { decorateTracker, refreshAccountViews } from './combat/action-account.mjs';
 import { DHCombatActionManager } from './actions/combat-action-manager.mjs';
@@ -259,6 +260,11 @@ Enable Debug with: game.dh.debug = true
     /** Active psychic effects follow a changed psy rating */
     /** Remembers the fatigue before the change, so that crossing the limit can be reported */
     static preUpdateActor(actor, changes, options) {
+        // home world, background and role are fixed after the creation (the GM can still change them)
+        if (originLocked(actor) && changedOrigin(actor, changes).length) {
+            ui.notifications.warn('Home world, background and role are fixed after the character was created. Ask the GM to change them.');
+            return false;
+        }
         if (foundry.utils.getProperty(changes, 'system.fatigue.value') !== undefined) options.dhFatigueFrom = Number(actor.system?.fatigue?.value) || 0;
     }
 

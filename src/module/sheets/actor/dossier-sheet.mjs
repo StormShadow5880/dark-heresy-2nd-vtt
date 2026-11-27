@@ -4,6 +4,7 @@ import { SYSTEM_ID } from '../../system-id.mjs';
 import { homeworlds } from '../../rules/homeworlds.mjs';
 import { backgrounds } from '../../rules/backgrounds.mjs';
 import { roles } from '../../rules/roles.mjs';
+import { ORIGIN_FIELDS, originLocked } from '../../rules/origin-lock.mjs';
 import { groupedOptions, isDlc, sourceLabel } from '../../rules/sources.mjs';
 import { timerView } from '../../rules/fatigue.mjs';
 import { chooseAndSpend, refundAction, resetAccount, viewFor as accountViewFor } from '../../combat/action-account.mjs';
@@ -52,7 +53,8 @@ const SOURCED = { homeWorld: homeworlds, background: backgrounds, role: roles };
 /** A select of the header: label, value, options; home world, background and role grouped by book, with the source of the choice */
 function bioField(actor, key) {
     const value = actor.bio?.[key] ?? '';
-    const field = { key, label: key === 'homeWorld' ? 'Home World' : key.charAt(0).toUpperCase() + key.slice(1), value, options: CONFIG.dh.bio[key] };
+    const locked = ORIGIN_FIELDS.includes(key) && originLocked(actor);
+    const field = { key, locked, label: key === 'homeWorld' ? 'Home World' : key.charAt(0).toUpperCase() + key.slice(1), value, options: CONFIG.dh.bio[key] };
     const list = SOURCED[key]?.();
     if (list) {
         field.groups = groupedOptions(list, value);

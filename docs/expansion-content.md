@@ -23,3 +23,5 @@ Everything that is not in the Core Rulebook is expansion content ("DLC"). Each h
 - Adepta Sororitas, Mutant, Heretek, Imperial Navy, Exorcised and the roles Fanatic, Penitent, Ace and Crusader were already in the system with the same aptitudes and bonuses; they are now marked as expansion content with their book. "Rogue Trader Fleet" of the file is the existing background "Rogue Trader" (the name stays, characters store it).
 
 **Not part of the character creation wizard:** the wizard offers the six core home worlds and the core backgrounds and roles with curated choices; expansion content is chosen in the sheet header.
+
+**Fixed after creation:** home world, background and role of a character made with the creation wizard (flag `creator`) cannot be changed by a player any more: the selects are disabled with a lock symbol, and an update by another way (macro, other form) is rejected in `preUpdateActor`. The GM can still change them. Characters that were not made with the wizard stay editable. Code: `rules/origin-lock.mjs`.

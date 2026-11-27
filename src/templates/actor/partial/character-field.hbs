@@ -1,7 +1,7 @@
 <div class="dh-header__item-wrapper--{{cleanFieldName key}}">
     <span class="dh-header__title">{{capitalize key}}</span>
     {{#if options}}
-        <select class="dh-header__select acolyte-{{key}}" name="system.bio.{{key}}">
+        <select class="dh-header__select acolyte-{{key}}" name="system.bio.{{key}}" {{#if (lookup @root.lockedBio key)}}disabled title="Fixed after character creation"{{/if}}>
             <option value=""></option>
             {{selectOptions (arrayToObject options) selected=this.value}}
         </select>
