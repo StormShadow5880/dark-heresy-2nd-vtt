@@ -1,17 +1,19 @@
 import { SYSTEM_ID } from '../system-id.mjs';
 
 /**
- * Home world, background and role are fixed once the character was made with the creation wizard (the wizard marks the actor
- * with the flag `creator`). A player cannot change them afterwards; the GM still can (corrections). Characters that were not
- * made with the wizard stay editable, they have no "creation" to be finished.
+ * Home world, background and role are fixed for every character: a player cannot change them. The GM can, and can lift the lock
+ * of one character for corrections or rebuilds (flag `originUnlocked`, switched in the sheet header); the lock comes back when
+ * the GM switches it on again.
  */
 export const ORIGIN_FIELDS = ['homeWorld', 'background', 'role'];
+export const UNLOCK_FLAG = 'originUnlocked';
 
 export const isCreated = (actor) => !!actor?.getFlag?.(SYSTEM_ID, 'creator');
+export const isUnlocked = (actor) => !!actor?.getFlag?.(SYSTEM_ID, UNLOCK_FLAG);
 
 /** Is the origin of this actor locked for this user? */
 export function originLocked(actor, user = game.user) {
-    return isCreated(actor) && !user?.isGM;
+    return actor?.type === 'acolyte' && !user?.isGM && !isUnlocked(actor);
 }
 
 /** The changed origin fields of an update (only real changes against the current values) */

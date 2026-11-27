@@ -4,7 +4,7 @@ import { SYSTEM_ID } from '../../system-id.mjs';
 import { homeworlds } from '../../rules/homeworlds.mjs';
 import { backgrounds } from '../../rules/backgrounds.mjs';
 import { roles } from '../../rules/roles.mjs';
-import { ORIGIN_FIELDS, originLocked } from '../../rules/origin-lock.mjs';
+import { ORIGIN_FIELDS, isUnlocked, originLocked, UNLOCK_FLAG } from '../../rules/origin-lock.mjs';
 import { groupedOptions, isDlc, sourceLabel } from '../../rules/sources.mjs';
 import { timerView } from '../../rules/fatigue.mjs';
 import { chooseAndSpend, refundAction, resetAccount, viewFor as accountViewFor } from '../../combat/action-account.mjs';
@@ -53,8 +53,9 @@ const SOURCED = { homeWorld: homeworlds, background: backgrounds, role: roles };
 /** A select of the header: label, value, options; home world, background and role grouped by book, with the source of the choice */
 function bioField(actor, key) {
     const value = actor.bio?.[key] ?? '';
-    const locked = ORIGIN_FIELDS.includes(key) && originLocked(actor);
-    const field = { key, locked, label: key === 'homeWorld' ? 'Home World' : key.charAt(0).toUpperCase() + key.slice(1), value, options: CONFIG.dh.bio[key] };
+    const origin = ORIGIN_FIELDS.includes(key);
+    const locked = origin && originLocked(actor);
+    const field = { key, locked, origin, unlocked: origin && isUnlocked(actor), gm: game.user.isGM, label: key === 'homeWorld' ? 'Home World' : key.charAt(0).toUpperCase() + key.slice(1), value, options: CONFIG.dh.bio[key] };
     const list = SOURCED[key]?.();
     if (list) {
         field.groups = groupedOptions(list, value);
@@ -81,6 +82,7 @@ export class AcolyteDossierSheet extends AcolyteSheet {
             reloadWeapon: AcolyteDossierSheet.#onReloadWeapon,
             takeAction: AcolyteDossierSheet.#onTakeAction,
             wakeUp: AcolyteDossierSheet.#onWakeUp,
+            toggleOriginLock: AcolyteDossierSheet.#onToggleOriginLock,
             fateFatigue: AcolyteDossierSheet.#onFateFatigue,
             refundAction: AcolyteDossierSheet.#onRefundAction,
             resetAccount: AcolyteDossierSheet.#onResetAccount,
@@ -419,6 +421,13 @@ export class AcolyteDossierSheet extends AcolyteSheet {
             if (!ok) return;
         }
         await wakeUp(this.actor);
+    }
+
+    /** GM: lifts or restores the lock of home world, background and role of this character */
+    static async #onToggleOriginLock() {
+        if (!game.user.isGM) return;
+        if (isUnlocked(this.actor)) await this.actor.unsetFlag(SYSTEM_ID, UNLOCK_FLAG);
+        else await this.actor.setFlag(SYSTEM_ID, UNLOCK_FLAG, true);
     }
 
     static async #onFateFatigue() {

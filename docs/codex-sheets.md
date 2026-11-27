@@ -40,4 +40,4 @@ All item sheets use the same kit, so they look alike. Only the fields differ.
 
 ## Psychic power variant
 
-`dh-codex--psychic` sets the pictures and colours (CSS variables `--cx-*`): violet warp header, eye emblem, violet parchment (`arkanes-pergament`), violet ribbons and tabs. Files: `warp-header`, `psyker-emblem`, `plakette-psy`, `icon-rahmen-psy`, `auge-trennlinie` (cut and compressed from the psychic asset pack; `auge-trennlinie` is prepared but not used yet because the layout has no divider). A further variant (e.g. for another item group) only needs its own set of variables.
+`dh-codex--psychic` sets the pictures and colours (CSS variables `--cx-*`): violet warp header, eye emblem, violet parchment (`arkanes-pergament`), violet ribbons and tabs. Files: `warp-header`, `psyker-emblem`, `plakette-psy`, `icon-rahmen-psy`, `auge-trennlinie` (cut and compressed from the psychic asset pack); `auge-trennlinie` is the divider between the facts and the tabs of the psychic power sheet. A further variant (e.g. for another item group) only needs its own set of variables.

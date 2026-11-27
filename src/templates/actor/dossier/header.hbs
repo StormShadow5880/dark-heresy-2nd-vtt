@@ -11,7 +11,7 @@
         <div class="dossier-bio-fields">
             {{#each dossier.bioFields as |field|}}
                 <label class="dossier-field">
-                    <span class="dossier-field__label">{{field.label}}{{#if field.locked}} <i class="fa-solid fa-lock" data-tooltip="Fixed after character creation (the GM can change it)" aria-label="Fixed after character creation"></i>{{/if}}</span>
+                    <span class="dossier-field__label">{{field.label}}{{#if field.origin}}{{#if field.gm}} <button type="button" class="icon-btn" data-action="toggleOriginLock" data-tooltip="{{#if field.unlocked}}Unlocked for the players: click to lock home world, background and role again{{else}}Locked for the players: click to unlock home world, background and role of this character{{/if}}" aria-label="Lock or unlock the origin"><i class="fa-solid {{#if field.unlocked}}fa-lock-open{{else}}fa-lock{{/if}}"></i></button>{{else}}{{#if field.locked}} <i class="fa-solid fa-lock" data-tooltip="Fixed: only the GM can change it" aria-label="Fixed"></i>{{/if}}{{/if}}{{/if}}</span>
                     <select class="acolyte-{{field.key}}" name="system.bio.{{field.key}}" {{#if field.locked}}disabled{{/if}} {{#if field.sourceText}}title="{{field.sourceText}}" data-tooltip="{{field.sourceText}}"{{/if}}>
                         <option value=""></option>
                         {{#if field.groups}}

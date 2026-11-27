@@ -9,7 +9,7 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
 ### Expansion content (DLC) and sources
 
 - 21 specific home world locations from the Enemies Within/Without/Beyond and Forgotten Gods books. Home world, background and role are grouped by book in the header select; the source (book and page) is shown in the tooltips and with the origin bonuses. Quarantine World corrected (+Perception). The character creation wizard offers all of it (31 home worlds, 6 backgrounds, 4 roles, marked DLC with book and page); the home world step has two stages (type, then general variant or specific world). See `docs/expansion-content.md`.
-- Home world, background and role are fixed after the character was made with the creation wizard: players cannot change them (lock symbol, disabled selects, and changes by other ways are rejected); the GM still can. Characters that were not made with the wizard stay editable.
+- Home world, background and role are fixed for every character: players cannot change them (lock symbol, disabled selects, changes by other ways are rejected). The GM can change them and can lift the lock of one character with the lock button in the header (and lock it again).
 
 ### Fatigue fix and consequences
 
@@ -26,6 +26,8 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
 - In combat the psyker is asked at the start of his turn which sustained powers he keeps. Free actions cost nothing, the others are taken from the actions of the turn (1 Full Action); powers that are not ticked end. See `docs/sustained-powers.md`.
 
 ### Item sheets: codex design
+
+- The tab pages of weapon and armour use the titled panels (Loaded Ammo, Weapon Mods, Weapon Special, Armour Mods, Active Effects) like the psychic power sheet; the psychic power sheet has the eye divider.
 
 - All item sheets (talent, trait, gear, weapon, armour, cybernetic, force field, ammunition, weapon modification, attack special, critical injury, peer/enemy, journal entry, storage location, psychic power and generic) share one layout: header, stat bar, facts, section and tabs. Before this entry: talent, trait, gear, weapon, psychic power and generic item sheets use the new parchment design (dark red header, emblem, tier/level plaque, gold divider). All fields and data paths are unchanged. See `docs/codex-sheets.md`.
 

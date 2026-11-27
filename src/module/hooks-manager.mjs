@@ -260,9 +260,9 @@ Enable Debug with: game.dh.debug = true
     /** Active psychic effects follow a changed psy rating */
     /** Remembers the fatigue before the change, so that crossing the limit can be reported */
     static preUpdateActor(actor, changes, options) {
-        // home world, background and role are fixed after the creation (the GM can still change them)
+        // home world, background and role are fixed for players (the GM can change them or lift the lock)
         if (originLocked(actor) && changedOrigin(actor, changes).length) {
-            ui.notifications.warn('Home world, background and role are fixed after the character was created. Ask the GM to change them.');
+            ui.notifications.warn('Home world, background and role are fixed. Ask the GM to change them or to lift the lock.');
             return false;
         }
         if (foundry.utils.getProperty(changes, 'system.fatigue.value') !== undefined) options.dhFatigueFrom = Number(actor.system?.fatigue?.value) || 0;

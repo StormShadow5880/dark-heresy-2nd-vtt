@@ -619,13 +619,14 @@ $cx-body: 'IM Fell DW Pica', 'Palatino Linotype', Georgia, 'Times New Roman', se
 
 
     // the new panels fill the page (the old tab pages are a six column grid)
-    &--psychic &__body.dh-wrapper .tab.active {
+    &__body.dh-wrapper .tab.active {
         display: block;
     }
 
     // inside the old wrapper the generic form rules of the old stylesheet are stronger: say it again with more weight
-    &--psychic &__body &__field,
-    &--psychic &__body &__text {
+    &__body input#{&}__field,
+    &__body select#{&}__field,
+    &__body textarea#{&}__text {
         height: auto;
         padding: 0.5cqw 1.2cqw;
         border: 1px solid rgba(110, 82, 40, 0.65);
@@ -637,7 +638,7 @@ $cx-body: 'IM Fell DW Pica', 'Palatino Linotype', Georgia, 'Times New Roman', se
         box-shadow: none;
     }
 
-    &--psychic &__body &__panel-title {
+    &__body &__panel-title {
         padding: 0.7cqw 1.8cqw;
         margin: 0;
         color: var(--cx-red);
@@ -648,7 +649,7 @@ $cx-body: 'IM Fell DW Pica', 'Palatino Linotype', Georgia, 'Times New Roman', se
         text-align: left;
     }
 
-    &--psychic &__body &__btn {
+    &__body &__btn {
         width: auto;
         align-self: center;
         margin-top: 1cqw;

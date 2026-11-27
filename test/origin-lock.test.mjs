@@ -3,24 +3,26 @@ import assert from 'node:assert/strict';
 import { installFoundryStubs } from './helpers.mjs';
 
 installFoundryStubs();
-const { originLocked, changedOrigin, isCreated } = await import('../src/module/rules/origin-lock.mjs');
+const { originLocked, changedOrigin, isUnlocked } = await import('../src/module/rules/origin-lock.mjs');
 
-const actor = (created, bio = { homeWorld: 'Hive World', background: 'Outcast', role: 'Seeker' }) => ({ system: { bio }, getFlag: (scope, key) => (created && key === 'creator' ? { done: true } : undefined) });
+const actor = (flags = {}, bio = { homeWorld: 'Hive World', background: 'Outcast', role: 'Seeker' }) => ({ type: 'acolyte', system: { bio }, getFlag: (scope, key) => flags[key] });
 const gm = { isGM: true };
 const player = { isGM: false };
 
-test('a created character: the player cannot change the origin, the GM can', () => {
-    assert.equal(isCreated(actor(true)), true);
-    assert.equal(originLocked(actor(true), player), true);
-    assert.equal(originLocked(actor(true), gm), false);
+test('the origin is locked for players on every character, the GM can always change it', () => {
+    assert.equal(originLocked(actor(), player), true);
+    assert.equal(originLocked(actor({ creator: { done: true } }), player), true);
+    assert.equal(originLocked(actor(), gm), false);
 });
 
-test('a character that was not made with the wizard stays editable', () => {
-    assert.equal(originLocked(actor(false), player), false);
+test('the GM lifts the lock of one character (flag), and it can be locked again', () => {
+    assert.equal(isUnlocked(actor({ originUnlocked: true })), true);
+    assert.equal(originLocked(actor({ originUnlocked: true }), player), false);
+    assert.equal(originLocked(actor({ originUnlocked: false }), player), true);
 });
 
 test('only real changes of home world, background or role count', () => {
-    const a = actor(true);
+    const a = actor();
     assert.deepEqual(changedOrigin(a, { system: { bio: { role: 'Mystic' } } }), ['role']);
     assert.deepEqual(changedOrigin(a, { system: { bio: { role: 'Seeker', age: '30' } } }), [], 'same value is no change');
     assert.deepEqual(changedOrigin(a, { system: { bio: { gender: 'x' } } }), []);

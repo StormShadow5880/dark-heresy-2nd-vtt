@@ -46,9 +46,8 @@
     <section class="dh-codex__body dh-wrapper dh-body">
         <div class="tab" data-group="primary" data-tab="stats">
             {{#if item.isRanged}}
-            <div class="dh-panel dh-grid-col-6">
-                <div>
-                    <h1 class="dh-panel__header">Loaded Ammo</h1>
+            <section class="dh-codex__panel"><h3 class="dh-codex__panel-title">Loaded Ammo</h3><div class="dh-codex__panel-body"><div>
+                    
                     <div class="dh-table--border dh-ammotable--border">
                         <div class="table-row--head">
                             <div class="table-cell--span2">Name</div>
@@ -86,10 +85,9 @@
                         {{/each}}
                     </div>
                 </div>
-            </div>
+            </div></section>
             {{/if}}
-            <div class="dh-panel dh-grid-col-3">
-                <h1 class="dh-panel__header">Weapon Mods</h1>
+            <section class="dh-codex__panel"><h3 class="dh-codex__panel-title">Weapon Mods</h3><div class="dh-codex__panel-body">
                 <div class="dh-table--border dh-weaponmodtable--border">
                     <div class="table-row--head">
                         <div class="table-cell--span2">Name</div>
@@ -131,9 +129,8 @@
                         {{/if}}
                     {{/each}}
                 </div>
-            </div>
-            <div class="dh-panel dh-grid-col-3">
-                <h1 class="dh-panel__header">Weapon Special</h1>
+            </div></section>
+            <section class="dh-codex__panel"><h3 class="dh-codex__panel-title">Weapon Special</h3><div class="dh-codex__panel-body">
                 <div class="dh-table--border dh-attackspecialtable--border">
                     <div class="table-row--head">
                         <div class="table-cell--span2">Name</div>
@@ -176,7 +173,7 @@
                         {{/if}}
                     {{/each}}
                 </div>
-            </div>
+            </div></section>
         </div>
         <div class="tab" data-group="primary" data-tab="description">
             <div class="dh-header__info dh-grid-col-6">
