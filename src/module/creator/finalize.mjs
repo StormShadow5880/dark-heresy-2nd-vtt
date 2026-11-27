@@ -76,6 +76,12 @@ export async function buildCharacterData(draft, env, resolve) {
             .filter(Boolean)
             .join('\n\n'),
     };
+    // rolls, choices and decisions of the origin that are not done (yet): listed on the character so that nobody forgets them
+    const openRules = state.consequences.filter((c) => c.status !== 'resolved');
+    if (openRules.length) {
+        const lines = openRules.map((c) => `- ${c.source}: ${c.label}${c.blocked ? ` (open: ${c.blocked})` : c.status === 'manual' ? ' (apply by hand)' : ' (not rolled)'}`);
+        system.bio.notes = `${system.bio.notes}\n\nOpen rules from the character creation:\n${lines.join('\n')}`.trim();
+    }
     if (bio.homeWorldName) system.bio.notes = `Home world: ${bio.homeWorldName}\n\n${system.bio.notes}`.trim();
     system.wounds = { ...system.wounds, max: state.wounds.max, value: state.wounds.max, critical: 0, rolled: true };
     system.fate = { ...system.fate, max: state.fate.threshold, value: state.fate.current };
@@ -109,7 +115,9 @@ export async function buildCharacterData(draft, env, resolve) {
     for (const trait of state.traits) {
         const found = await resolve('trait', trait.name);
         if (!found) missing.push(`Trait: ${trait.name}`);
-        add(found ? clean(found) : { name: trait.name, type: 'trait', system: {} });
+        const traitData = found ? clean(found) : { name: trait.name, type: 'trait', system: {} };
+        if (trait.level) traitData.system = { ...traitData.system, level: trait.level };
+        add(traitData);
     }
     for (const eq of state.equipment) {
         const found = await resolve('equipment', eq.name);
@@ -128,6 +136,7 @@ export async function buildCharacterData(draft, env, resolve) {
             createdAt: Date.now(),
             aptitudes: state.aptitudes.map(({ id, source, original, replacement }) => ({ id, source, original, replacement: !!replacement })),
             warnings: state.warnings,
+            consequences: state.consequences.map(({ id, source, kind, label, status, result, blocked }) => ({ id, source, kind, label, status, result, blocked })),
             missing,
             overrides: draft.overrides,
             log: draft.log,

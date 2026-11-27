@@ -51,6 +51,7 @@ export function newDraft() {
         fate: { roll: null },
         divination: { roll: null },
         corruptionRoll: null,
+        consequenceRolls: {},
         biography: {},
         completedSteps: [],
         overrides: [],
@@ -96,6 +97,7 @@ export function computeCharacter(draft, env) {
         elite: [],
         psy: null,
         corruption: 0,
+        consequences: [],
         wounds: null,
         fate: null,
         divination: null,
@@ -108,6 +110,23 @@ export function computeCharacter(draft, env) {
         return c;
     };
 
+    // Rolls, choices and decisions that come with a home world or a background. A rolled result is stored in the draft (it is not
+    // rolled again when the player goes back) and applied here; what cannot be automated stays open and is listed in the notes.
+    const consequence = (owner, def) => {
+        const id = `${owner.id}:${def.id}`;
+        const stored = (draft.consequenceRolls ?? {})[id];
+        const entry = { id, source: owner.name, kind: def.kind, label: def.label, formula: def.formula ?? null, blocked: def.blocked ?? null, status: 'open', result: null };
+        if (def.kind === 'manual') entry.status = 'manual';
+        else if (def.blocked) entry.status = 'blocked';
+        else if (def.kind === 'roll' && stored) {
+            entry.status = 'resolved';
+            entry.result = stored;
+            if (def.apply === 'corruption') extraCorruption += Number(stored.total) || 0;
+        }
+        out.consequences.push(entry);
+    };
+    let extraCorruption = 0;
+
     /* ----- home world ------------------------------------------------ */
     const hw = out.homeWorld;
     if (hw) {
@@ -116,6 +135,8 @@ export function computeCharacter(draft, env) {
             if (c.resolved) out.talents.push({ name: def.options[Number(c.value)].talent, source: hw.name });
         }
         for (const t of hw.talents) out.talents.push({ name: talentName(t), source: hw.name });
+        for (const t of hw.traits ?? []) out.traits.push({ name: t.trait, level: t.level, source: hw.name });
+        for (const c of hw.consequences ?? []) consequence(hw, c);
         out.bonuses.push({ source: 'Home World', name: hw.bonus.name, benefit: hw.bonus.benefit, mechanic: hw.bonus.mechanic });
     }
 
@@ -145,6 +166,7 @@ export function computeCharacter(draft, env) {
     const bg = out.background;
     const grantedSkills = []; // {skill, spec}
     const grantSkill = (entry) => grantedSkills.push(entry);
+    for (const entry of hw?.skills ?? []) grantSkill(entry);
     if (bg) {
         out.bonuses.push({ source: 'Background', name: bg.bonus.name, benefit: bg.bonus.benefit, mechanic: 'C' });
         for (const slotDef of bg.skills) {
@@ -178,6 +200,8 @@ export function computeCharacter(draft, env) {
             } else out.talents.push({ name: talentName(t), source: bg.name });
         }
         for (const trait of bg.traits) out.traits.push({ name: trait.trait, source: bg.name, note: trait.note });
+        if (bg.corruption) extraCorruption += bg.corruption;
+        for (const c of bg.consequences ?? []) consequence(bg, c);
         for (const group of bg.equipment) {
             const choiceId = `eq-${group.id}`;
             let selected = group.options[0];
@@ -274,9 +298,11 @@ export function computeCharacter(draft, env) {
         if (entry.spec) {
             const sk = entry.specKey ?? specKey(entry.spec);
             const spec = (target.specs[sk] ??= { label: entry.spec, advance: 0 });
-            spec.advance = Math.min(MAX_SKILL_RANK, spec.advance + 1); // granted twice: one more rank (core FAQ)
-        } else target.advance = Math.min(MAX_SKILL_RANK, target.advance + 1);
+            spec.advance = Math.min(MAX_SKILL_RANK, spec.advance + (entry.ranks ?? 1)); // granted twice: one more rank (core FAQ)
+        } else target.advance = Math.min(MAX_SKILL_RANK, target.advance + (entry.ranks ?? 1));
     }
+
+    out.corruption = extraCorruption;
 
     /* ----- elite / psyker ------------------------------------------------ */
     if (out.elite.includes('Psyker')) {
@@ -287,7 +313,7 @@ export function computeCharacter(draft, env) {
             if (!out.traits.some((t) => t.name === 'Sanctioned')) out.traits.push({ name: 'Sanctioned', source: 'Adeptus Astra Telepathica' });
         } else {
             const roll = Number(draft.corruptionRoll);
-            out.corruption = Number.isInteger(roll) && roll >= 1 ? roll + 3 : 0;
+            out.corruption += Number.isInteger(roll) && roll >= 1 ? roll + 3 : 0;
             out.corruptionPending = !(Number.isInteger(roll) && roll >= 1);
             out.warnings.push('Rogue psyker: not sanctioned, gains 1d10+3 corruption points.');
         }

@@ -58,6 +58,7 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
             reroll: CharacterCreator.#onReroll,
             pointBuy: CharacterCreator.#onPointBuy,
             rollVital: CharacterCreator.#onRollVital,
+            rollConsequence: CharacterCreator.#onRollConsequence,
             buy: CharacterCreator.#onBuy,
             buyTalent: CharacterCreator.#onBuyTalent,
             removeAdvance: CharacterCreator.#onRemoveAdvance,
@@ -200,6 +201,7 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
               }
             : null;
         context.hwChoices = choicesFor('homeworld');
+        context.consequences = state.consequences.map((c) => ({ ...c, canRoll: c.status === 'open' && !!c.formula, resultText: c.result ? `${c.result.formula}: ${c.result.dice.join(' + ')}${c.result.total !== c.result.dice.reduce((a, b) => a + b, 0) ? ` → ${c.result.total}` : ''}` : '' }));
         context.backgrounds = BACKGROUNDS.map((b) => ({
             ...b,
             selected: b.id === draft.backgroundId,
@@ -466,6 +468,20 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
         const key = target.dataset.key;
         const points = this.draft.characteristics.points;
         points[key] = Math.max(0, num(points[key]) + Number(target.dataset.delta));
+        await this.#changed();
+    }
+
+    /** A roll that comes with a home world or background (e.g. starting Corruption): rolled once, stored in the draft */
+    static async #onRollConsequence(event, target) {
+        const entry = computeCharacter(this.draft, this.env).consequences.find((c) => c.id === target.dataset.id);
+        if (!entry || entry.status !== 'open' || !entry.formula) return;
+        this.draft.consequenceRolls ??= {};
+        if (this.draft.consequenceRolls[entry.id]) return; // never rolled twice
+        const dice = await rollDice(entry.formula, entry.label);
+        const modifier = Number((entry.formula.match(/([+-]\d+)$/) ?? [])[1] ?? 0);
+        const total = dice.reduce((a, b) => a + b, 0) + modifier;
+        this.draft.consequenceRolls[entry.id] = { formula: entry.formula, dice, total };
+        logEvent(this.draft, `${entry.source}: ${entry.label} rolled ${total}`);
         await this.#changed();
     }
 

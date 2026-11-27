@@ -80,6 +80,9 @@ export const HOMEWORLD_DEFS = [
         bonus: { ...rule.home_world_bonus, mechanic: name === 'Forge World' || name === 'Voidborn' ? 'A' : 'C' },
         bookPage: rule.source,
         recommendedBackgrounds: [],
+        skills: [],
+        traits: [],
+        consequences: [],
         choices:
             name === 'Forge World'
                 ? [{ id: 'hw-talent', type: 'choose-one', label: "Omnissiah's Chosen: talent", options: [{ talent: 'Technical Knock' }, { talent: 'Weapon-Tech' }], required: true }]
@@ -291,6 +294,8 @@ export const BACKGROUND_DEFS = [
         bookPage: rule.source,
         recommendedRoles: [],
         traits: [],
+        consequences: [],
+        corruption: 0,
         ...def,
     };
 });
@@ -351,6 +356,12 @@ export const EXPANSION_BACKGROUND_DEFS = [
             { id: 'eq-5', options: [['Stimm', 2]] },
         ],
         aptitudeChoice: ['Fieldcraft', 'Offence'],
+        // the starting Corruption of the Mutant (data: "corruption": 10) and the rolls of the mutation rules
+        corruption: 10,
+        consequences: [
+            { id: 'mutation', kind: 'roll', formula: '5d10', label: 'Mutation roll (5d10, Core Rulebook Table 8-16)', blocked: 'the mutation table is not part of the system data (it belongs to the private import package)' },
+            { id: 'mutant-traits', kind: 'manual', label: 'Trait choices of the Mutant: Amphibious, Dark-sight, Natural Weapons, Sonar Sense, Sturdy, Toxic (1), Unnatural Agility (1), Unnatural Strength (1), Unnatural Toughness (1). May deliberately fail resistance tests against mutation or malignancy; may substitute a mutation roll for a malignancy.' },
+        ],
     },
     {
         name: 'Heretek',
@@ -456,6 +467,7 @@ export const EXPANSION_BACKGROUND_DEFS = [
             { id: 'eq-8', options: [['Stablight'], ['Glow-Globe']] },
         ],
         aptitudeChoice: ['Defence', 'Knowledge'],
+        consequences: [{ id: 'malignancy', kind: 'choice', label: 'One Malignancy (Core Rulebook Table 8-15)', blocked: 'the malignancy table is not part of the system data (it belongs to the private import package)' }],
     },
 ].map((def) => {
     const rule = backgrounds().find((b) => b.name === def.name);
@@ -467,6 +479,8 @@ export const EXPANSION_BACKGROUND_DEFS = [
         bookPage: rule.source,
         recommendedRoles: [],
         traits: [],
+        consequences: [],
+        corruption: 0,
         ...def,
     };
 });
@@ -524,6 +538,38 @@ const EXPANSION_HOMEWORLD_TALENTS = {
     "The Emperor's Song": [{ talent: 'Deny the Witch' }],
     'Vouxis Prime': [{ talent: 'Blind Fighting' }],
     Pellenne: [{ talent: 'Resistance', spec: 'Radiation' }],
+    'Penal Colony': [{ talent: 'Peer', spec: 'Criminal Cartels' }],
+};
+
+/**
+ * Fixed starting skills of the expansion home worlds (rank 1 unless `ranks` says otherwise), only where the bonus text names them
+ * without a choice or a condition. Whether a specific world also gets the starting skills of its parent type is NOT assumed: the
+ * data says "mechanics inherited" for characteristics, fate, wounds and aptitude only.
+ */
+const EXPANSION_HOMEWORLD_SKILLS = {
+    Pellenne: [{ skill: 'trade', spec: 'Prospector' }],
+    'Port Aquila': [{ skill: 'commerce' }],
+    "Snope's World": [{ skill: 'deceive' }, { skill: 'scrutiny' }],
+    'Vouxis Prime': [{ skill: 'trade', spec: 'Sculptor', ranks: 2 }],
+    'Daemon World': [{ skill: 'psyniscience' }],
+    'Penal Colony': [{ skill: 'commonLore', spec: 'Underworld' }, { skill: 'scrutiny' }],
+};
+const EXPANSION_HOMEWORLD_TRAITS = { 'Agri-World': [{ trait: 'Brutal Charge', level: 2 }] };
+
+/**
+ * Consequences of a home world or background that need a roll, a choice or a decision. kind: 'roll' (formula; with `apply` the result
+ * is added to the character), 'choice' (the player chooses), 'manual' (the text says what to do by hand). `blocked` names what is
+ * missing to automate it (for example a table that is not part of the system data): the consequence is shown as open in the wizard and
+ * in the creation notes instead of pretending it was done.
+ */
+const EXPANSION_HOMEWORLD_CONSEQUENCES = {
+    'Daemon World': [{ id: 'corruption', kind: 'roll', formula: '1d10+5', apply: 'corruption', label: 'Starting Corruption (1d10+5)' }],
+    Tuchulcha: [
+        { id: 'corruption', kind: 'roll', formula: '3d5', apply: 'corruption', label: 'Starting Corruption (3d5 instead of the usual Daemon World amount)' },
+        { id: 'psyniscience', kind: 'manual', label: 'The text does not say whether the Daemon World starting skill (Psyniscience rank 1) applies: decide at the table.' },
+    ],
+    Pellenne: [{ id: 'hatred-or-darksight', kind: 'choice', label: 'Hatred (Mutants) or the Dark-sight trait', blocked: 'a choice between a talent and a trait is not supported by the wizard yet: add it by hand' }],
+    Kul: [{ id: 'lore-ranks', kind: 'manual', label: 'Forbidden Lore (The Warp) and (Daemonology) ranks equal to half the Intelligence Bonus (round down), unless already higher: add them after the characteristics are final.' }],
 };
 
 export const EXPANSION_HOMEWORLD_DEFS = homeworlds()
@@ -549,6 +595,9 @@ export const EXPANSION_HOMEWORLD_DEFS = homeworlds()
             recommendedBackgrounds: [],
             choices: [],
             talents: EXPANSION_HOMEWORLD_TALENTS[rule.name] ?? [],
+            skills: EXPANSION_HOMEWORLD_SKILLS[rule.name] ?? [],
+            traits: EXPANSION_HOMEWORLD_TRAITS[rule.name] ?? [],
+            consequences: EXPANSION_HOMEWORLD_CONSEQUENCES[rule.name] ?? [],
         };
     });
 

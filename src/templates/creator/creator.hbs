@@ -1,3 +1,22 @@
+{{#*inline "consequences"}}
+    {{#if consequences.length}}
+        <div class="consequences">
+            <h4>Rolls, choices and decisions of your origin</h4>
+            <ul class="list">
+                {{#each consequences as |c|}}
+                    <li class="cq cq--{{c.status}}">
+                        <b>{{c.source}}:</b> {{c.label}}
+                        {{#if c.resultText}} <span class="cq__result">Rolled {{c.resultText}}</span>{{/if}}
+                        {{#if c.canRoll}} <button type="button" class="btn" data-action="rollConsequence" data-id="{{c.id}}"><i class="fa-solid fa-dice"></i> Roll {{c.formula}}</button>{{/if}}
+                        {{#if c.blocked}}<br /><small class="why"><i class="fa-solid fa-triangle-exclamation"></i> Open: {{c.blocked}}. It is listed in the creation notes.</small>{{/if}}
+                        {{#if (eq c.status "manual")}}<br /><small class="why"><i class="fa-solid fa-triangle-exclamation"></i> Not automated: apply by hand. It is listed in the creation notes.</small>{{/if}}
+                        {{#if (eq c.status "open")}}{{#unless c.canRoll}}{{#unless c.blocked}}<br /><small class="why">Open</small>{{/unless}}{{/unless}}{{/if}}
+                    </li>
+                {{/each}}
+            </ul>
+        </div>
+    {{/if}}
+{{/inline}}
 <div class="creator">
     {{!-- ================= left: navigation ================= --}}
     <nav class="creator__nav" aria-label="Creation steps">
@@ -103,6 +122,7 @@
                     {{/each}}
                 </div>
             {{/if}}
+            {{> consequences}}
         {{/if}}
 
         {{!-- 3 characteristics --}}
@@ -180,6 +200,9 @@
                 {{/each}}
             </div>
         {{/if}}
+
+        {{!-- 4b consequences of the background --}}
+        {{#if at.background}}{{> consequences}}{{/if}}
 
         {{!-- 5 role --}}
         {{#if at.role}}
@@ -337,6 +360,7 @@
             <div class="panel">
                 <ul class="checklist">{{#each review.checklist as |c|}}<li class="{{#if c.done}}ok{{else}}warn{{/if}}"><i class="fa-solid {{#if c.done}}fa-check{{else}}fa-xmark{{/if}}"></i> {{c.label}}{{#if c.optional}} <small>(optional)</small>{{/if}}</li>{{/each}}</ul>
                 {{#each review.warnings as |w|}}<p class="note"><i class="fa-solid fa-triangle-exclamation"></i> {{w}}</p>{{/each}}
+                {{> consequences}}
                 <p class="hint">Finalizing creates the acolyte with all items in one step. If anything fails, nothing is created.</p>
                 <button type="button" class="btn btn--primary" data-action="finalize" {{#unless review.ready}}disabled{{/unless}}><i class="fa-solid fa-stamp"></i> Finalize Character</button>
             </div>
