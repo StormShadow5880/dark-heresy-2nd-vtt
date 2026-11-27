@@ -40,7 +40,7 @@ Everything else (`Weapon Training (any melee)`, `Rank 4 in selected skill`, an i
 
 A second automatic extraction (talent descriptions of the printed pages 123-133, not checked against the book or all errata) was compared with the compendium: tiers of all 80 listed talents are identical, the prerequisites are identical except for the wording of Superior Chirurgeon ("Rank 2 in Medicae" / "Rank 2 in the Medicae skill": same meaning). The aptitudes are identical except:
 
-- **Blind Fighting:** compendium "Perception, Fieldcraft", extraction "Perception, Defence". **Conflict, not changed** (only the book can decide).
+- **Blind Fighting:** compendium "Perception, Fieldcraft". The second extraction listed "Perception, Defence"; that was a mistake in the data passed on (corrected by the project owner: the earlier extraction and the FFG beta update both say Fieldcraft). **The compendium entry stays unchanged.** The beta update is not the printed final text, so a final check against the Core Rulebook is still sensible.
 - Inescapable Attack, Precision Killer, Two-Weapon Wielder: "/" in the compendium, "or" in the extraction: same meaning (the checker reads "/" as alternatives).
 - Armour-Monger / Favoured by the Warp are stored as "Armor-Monger" / "Favored by the Warp" (US spelling, aliases are read).
 
