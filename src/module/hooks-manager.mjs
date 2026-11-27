@@ -34,6 +34,7 @@ import { DHBasicActionManager } from './actions/basic-action-manager.mjs';
 import { crossing as fatigueCrossing, fatigueState } from './rules/fatigue.mjs';
 import { changedOrigin, originLocked } from './rules/origin-lock.mjs';
 import { clearTimer, processTimers, startUnconscious } from './actions/fatigue-manager.mjs';
+import { moduleOn } from './modules.mjs';
 import { decorateTracker, refreshAccountViews } from './combat/action-account.mjs';
 import { DHCombatActionManager } from './actions/combat-action-manager.mjs';
 import { DarkHeresyCyberneticSheet } from './sheets/item/cybernetic-sheet.mjs';
@@ -73,7 +74,7 @@ export class HooksManager {
         Hooks.on('preDeleteItem', HooksManager.preDeleteItem);
         Hooks.on('renderActorDirectory', HooksManager.renderActorDirectory);
         // the action account of a turn follows the combat (sheets and combat tracker)
-        for (const hook of ['updateCombatant', 'updateCombat', 'deleteCombat']) Hooks.on(hook, () => refreshAccountViews());
+        for (const hook of ['updateCombatant', 'updateCombat', 'deleteCombat']) Hooks.on(hook, () => moduleOn('combat') && refreshAccountViews());
         Hooks.on('renderCombatTracker', (app, html) => decorateTracker(html instanceof HTMLElement ? html : html?.[0] ?? document));
         Hooks.on('getSceneControlButtons', HooksManager.gmTools);
         Hooks.on('preUpdateActor', HooksManager.preUpdateActor);
@@ -175,12 +176,12 @@ Enable Debug with: game.dh.debug = true
         registerCombatSocket();
         registerHealingSocket();
         registerHealingLockSocket();
-        registerTimeSocket();
-        registerRelationSocket();
-        if (game.users.activeGM?.id === game.user.id) migrateJournalPatrons().then((n) => n && ui.notifications.info(`${n} patron(s) converted to patron actors.`)).catch((e) => console.warn('Dark Heresy 2e | patron migration failed', e));
-        initTimeRunner();
+        if (moduleOn('time')) registerTimeSocket();
+        if (moduleOn('relations')) registerRelationSocket();
+        if (moduleOn('relations') && game.users.activeGM?.id === game.user.id) migrateJournalPatrons().then((n) => n && ui.notifications.info(`${n} patron(s) converted to patron actors.`)).catch((e) => console.warn('Dark Heresy 2e | patron migration failed', e));
+        if (moduleOn('time')) initTimeRunner();
         processTimers().catch((e) => console.error('Dark Heresy | fatigue timers', e));
-        initWorldClock();
+        if (moduleOn('time')) initWorldClock();
         applyRulebookStyles();
         ensureImportMacro().catch((e) => console.warn('Dark Heresy 2e | macro could not be created', e));
         await syncAllWounds();
@@ -233,8 +234,10 @@ Enable Debug with: game.dh.debug = true
         const add = (name, title, icon, run) => {
             tools[name] = { name, title, icon, order: Object.keys(tools).length, visible: true, button: true, onChange: async () => run() };
         };
-        add('dhPatrons', 'Patrons', 'fa-solid fa-user-tie', async () => (await import('./sheets/patron-dossier.mjs')).openPatronDirectory());
-        add('dhFactions', 'Factions', 'fa-solid fa-landmark', async () => (await import('./relations/factions.mjs')).openFactionManager());
+        if (moduleOn('relations')) {
+            add('dhPatrons', 'Patrons', 'fa-solid fa-user-tie', async () => (await import('./sheets/patron-dossier.mjs')).openPatronDirectory());
+            add('dhFactions', 'Factions', 'fa-solid fa-landmark', async () => (await import('./relations/factions.mjs')).openFactionManager());
+        }
         add('dhRest24', '24 h rest', 'fa-solid fa-bed', async () => (await import('./actions/healing-manager.mjs')).finishRest());
     }
 

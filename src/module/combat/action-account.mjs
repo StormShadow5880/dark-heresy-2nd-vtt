@@ -26,10 +26,11 @@ async function store(combatant, account) {
 
 /** Data for the sheet: null when there is no turn of this actor */
 export function viewFor(actor) {
+    if (!accountEnabled()) return { enabled: false, active: false, reaction: { inCombat: false } };
     const combatant = activeCombatantFor(actor);
     const reaction = reactionViewFor(actor);
-    if (!combatant) return { active: false, reaction };
-    return { active: true, reaction, ...accountView(accountOf(combatant)) };
+    if (!combatant) return { enabled: true, active: false, reaction };
+    return { enabled: true, active: true, reaction, ...accountView(accountOf(combatant)) };
 }
 
 /** Takes an action from the account without asking (sustaining powers, manual entries, …) */

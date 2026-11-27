@@ -27,6 +27,7 @@
                 <textarea class="notes" name="system.bio.notes" rows="14" aria-label="Notes">{{actor.system.bio.notes}}</textarea>
             </div>
         </article>
+        {{#if dossier.relationsEnabled}}
         <article class="panel panel--relations">
             <h2 class="panel__title">Patron &amp; Relationships
                 {{#if dossier.isGM}}<button type="button" class="icon-btn" data-action="manageFactions" data-tooltip="Manage the list of factions"><i class="fa-solid fa-landmark"></i></button>{{/if}}
@@ -91,6 +92,7 @@
                 </section>
             </div>
         </article>
+        {{/if}}
         <article class="panel">
             <h2 class="panel__title">Enemies
                 <button type="button" class="icon-btn item-create" data-type="enemy" data-tooltip="New enemy"><i class="fa-solid fa-plus"></i></button>

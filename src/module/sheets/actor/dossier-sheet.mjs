@@ -1,6 +1,7 @@
 import { AcolyteSheet } from './acolyte-sheet.mjs';
 import { prettifyDescription } from '../../rules/psy-text.mjs';
 import { SYSTEM_ID } from '../../system-id.mjs';
+import { moduleOn } from '../../modules.mjs';
 import { homeworlds } from '../../rules/homeworlds.mjs';
 import { backgrounds } from '../../rules/backgrounds.mjs';
 import { roles } from '../../rules/roles.mjs';
@@ -182,7 +183,8 @@ export class AcolyteDossierSheet extends AcolyteSheet {
         Object.assign(context.dossier, await buildTalentsAndTraits(actor));
         await enrichPowerDescriptions(actor, context.dossier.psychic.powers);
         // patron and relationships (Biography)
-        context.dossier.network = await buildNetworkView(actor);
+        context.dossier.relationsEnabled = moduleOn('relations');
+        context.dossier.network = context.dossier.relationsEnabled ? await buildNetworkView(actor) : { groups: [], loose: [] };
         const patronDoc = actorPatronDoc(actor);
         const patron = patronDoc ? publicPatron(patronDoc) : null;
         context.dossier.patron = patron

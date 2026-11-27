@@ -52,7 +52,7 @@ export class DarkHeresySettings {
             type: Boolean,
         });
         game.settings.register(SYSTEM_ID, DarkHeresySettings.SETTINGS.vfx, {
-            name: 'Visual Effects (Sequencer + JB2A)',
+            name: 'Module: Visual Effects (Sequencer + JB2A)',
             hint: 'Play animations for Las weapons, Psychic Bolt and Psychic Blast. Needs the modules Sequencer and JB2A Free Content; without them everything works as before.',
             scope: 'world',
             config: true,
@@ -89,8 +89,26 @@ export class DarkHeresySettings {
             type: Number,
             range: { min: 0, max: 1, step: 0.05 },
         });
+        game.settings.register(SYSTEM_ID, 'module-time', {
+            name: 'Module: Time (clock bar, running clock, rest planner)',
+            hint: 'Switch off to run without the world clock bar, the automatic clock and the rest planner. The world time itself, the First Aid and recovery timers, the 24 h rest and the unconscious time of fatigue keep working. Stored data is not touched.',
+            scope: 'world',
+            config: true,
+            default: true,
+            type: Boolean,
+            requiresReload: true,
+        });
+        game.settings.register(SYSTEM_ID, 'module-relations', {
+            name: 'Module: Patrons, contacts and relationships',
+            hint: 'Switch off to hide the patron and relationship panel, the relationship section of social tests and the patron and faction tools. Existing patrons and contacts stay stored.',
+            scope: 'world',
+            config: true,
+            default: true,
+            type: Boolean,
+            requiresReload: true,
+        });
         game.settings.register(SYSTEM_ID, 'action-account', {
-            name: 'Action account in combat',
+            name: 'Module: Action account and reactions in combat',
             hint: 'Each turn a character has 1 Full Action (= 2 Half Actions). Attacks, psychic powers and sustained powers are taken from it; if an action does not fit, the player is asked whether to do it anyway. Other actions are taken by hand on the sheet.',
             scope: 'world',
             config: true,
@@ -98,7 +116,7 @@ export class DarkHeresySettings {
             type: Boolean,
         });
         game.settings.register(SYSTEM_ID, 'sustain-prompt', {
-            name: 'Ask about sustained powers at the start of the turn',
+            name: 'Module: Ask about sustained powers at the start of the turn',
             hint: 'In combat the psyker is asked at the start of his turn which sustained powers he keeps. The cost (Free, Half or Full Action) is taken from the actions of the turn; powers that are not kept end.',
             scope: 'world',
             config: true,

@@ -1,3 +1,4 @@
+import { moduleOn } from '../modules.mjs';
 import { sendActionDataToChat } from '../rolls/roll-helpers.mjs';
 import { actionDialog } from './dialog-helpers.mjs';
 import { isSocialSkill } from '../rules/relations.mjs';
@@ -14,7 +15,7 @@ export async function prepareSimpleRoll(simpleSkillData) {
     const skillKey = simpleSkillData.skillKey;
     const actor = simpleSkillData.rollData.actor;
     let ctx = null;
-    if (actor && isSocialSkill(skillKey)) {
+    if (actor && isSocialSkill(skillKey) && moduleOn('relations')) {
         try {
             ctx = await relationContext(actor);
             const section = sectionHtml(ctx, simpleSkillData.relationPreset ?? {});
