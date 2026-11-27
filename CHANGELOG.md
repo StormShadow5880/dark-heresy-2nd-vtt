@@ -33,6 +33,8 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
 
 ### Psychic powers: readable formulas
 
+- Psy rating ÷ 2 is rounded up (general DH2 rule; PR 1-5 give 1, 1, 2, 2, 3); an explicit rounding of a power would take precedence. See `docs/psy-rounding.md`.
+
 - Formulas like `2*@pr` or `[[@pr/2]]` are shown as "2 × PR" / the calculated value with the psy rating of the character (descriptions, range, chat). Dice formulas stay rollable; the compendium data is unchanged.
 
 ### Talents and Spend EP

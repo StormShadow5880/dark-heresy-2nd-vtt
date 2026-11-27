@@ -605,7 +605,7 @@ export async function enrichPowerDescriptions(actor, powers) {
     await Promise.all(
         powers.map(async (p) => {
             const item = actor.items.get(p.id);
-            p.descriptionHtml = await enrich(prettifyDescription(item?.system?.description ?? '', actor.psy?.rating ?? 0), { rollData: { actor, item, pr: actor.psy?.rating ?? 0 } });
+            p.descriptionHtml = await enrich(prettifyDescription(item?.system?.description ?? '', actor.psy?.rating ?? 0, item?.name), { rollData: { actor, item, pr: actor.psy?.rating ?? 0 } });
         }),
     );
 }
