@@ -107,4 +107,16 @@ export const SKILL_APTITUDES = {
  * Talents that can be bought more than once, each time for a different choice (weapon group, field, ...).
  * The choice is written into the name, e.g. "Weapon Training (Las)".
  */
-export const MULTIPLE_TALENTS = ['Weapon Training', 'Exotic Weapon Training', 'Peer', 'Resistance', 'Hatred', 'Enemy'];
+export const MULTIPLE_TALENTS = ['Weapon Training', 'Exotic Weapon Training', 'Peer', 'Resistance', 'Hatred', 'Enemy', 'Two-Weapon Wielder'];
+
+/**
+ * Talents whose specialisations are a fixed list (the choice must be one of them). Two-Weapon Wielder: Melee and Ranged are bought
+ * separately (core rulebook p. 132 as quoted in the project notes, not checked against the book).
+ */
+export const TALENT_SPECIALISATIONS = { 'Two-Weapon Wielder': ['Melee', 'Ranged'] };
+
+/**
+ * Talents that the extracted text says cannot be bought with XP in the normal way (the GM hands them out). A purchase is blocked and
+ * only the GM can override it. Not checked against the book.
+ */
+export const NOT_XP_PURCHASABLE = ['Enemy'];

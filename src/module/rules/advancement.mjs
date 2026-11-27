@@ -14,6 +14,8 @@ import {
     CHARACTERISTIC_LEVELS,
     IMPLICIT_APTITUDES,
     MULTIPLE_TALENTS,
+    NOT_XP_PURCHASABLE,
+    TALENT_SPECIALISATIONS,
     SKILL_APTITUDES,
     SKILL_COSTS,
     SKILL_LEVELS,
@@ -177,12 +179,26 @@ export function talentQuote(actor, talent, choice = '', owned = ownedAptitudes(a
     if (tier < 1 || tier > MAX_TALENT_TIER) return { ...quote, advanceable: false, error: `${talent.name} has no valid tier (${talent.tier}).` };
     if (!parseRequirement(talent.aptitudes).length) return { ...quote, advanceable: false, error: `${talent.name} has no aptitudes defined.` };
     if (multiple && !choice) return { ...quote, advanceable: false, error: `${talent.name} needs a choice, for example a weapon group.` };
+    const fixed = TALENT_SPECIALISATIONS[talent.name];
+    if (fixed && !fixed.some((f) => f.toLowerCase() === String(choice).trim().toLowerCase())) return { ...quote, advanceable: false, error: `${talent.name}: choose ${fixed.join(' or ')}.` };
     if (ownedTalentNames(actor).has(name.trim().toLowerCase())) {
         return { ...quote, advanceable: false, maxed: true, error: `${name} is already learned.` };
     }
     quote.cost = lookupCost(TALENT_COSTS, quote.matches, tier);
     // the prerequisites of the talent against this character: every requirement that can be read is checked, the rest is "manual"
     quote.prerequisiteCheck = quote.prerequisites ? evaluatePrerequisites(quote.prerequisites, viewOf(actor, knownTalents ?? knownTalentSet())) : null;
+    const addCheck = (status, message) => {
+        const c = quote.prerequisiteCheck && !quote.prerequisiteCheck.empty ? quote.prerequisiteCheck : { empty: false, status: 'met', clauses: [], unmet: [], manual: [] };
+        if (status === 'unmet') c.unmet = [...c.unmet, message];
+        else c.manual = [...c.manual, message];
+        c.status = c.unmet.length ? 'unmet' : c.manual.length ? 'manual' : c.status;
+        quote.prerequisiteCheck = c;
+        quote.prerequisites ||= message;
+    };
+    // a talent that is not bought with XP in the normal way: blocked, only the GM can override
+    if (NOT_XP_PURCHASABLE.some((n) => n.toLowerCase() === talent.name.toLowerCase())) addCheck('unmet', `${talent.name} is not bought with XP (the GM hands it out)`);
+    // a character with the old general entry of a talent that is split into specialisations: the GM decides
+    if (fixed && [...ownedTalentNames(actor)].includes(talent.name.toLowerCase())) addCheck('manual', `the character has the old general ${talent.name} without a specialisation: the GM decides whether it already covers ${choice}`);
     return quote;
 }
 

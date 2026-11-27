@@ -6,7 +6,7 @@ import { installFoundryStubs, makeActor } from './helpers.mjs';
 
 const notes = installFoundryStubs();
 const adv = await import('../src/module/rules/advancement.mjs');
-const { TALENT_COSTS } = await import('../src/module/rules/advancement-data.mjs');
+const { TALENT_COSTS, TALENT_SPECIALISATIONS } = await import('../src/module/rules/advancement-data.mjs');
 const { purchaseAdvancement } = await import('../src/module/rules/experience.mjs');
 const { evaluatePrerequisites, normalizeName, viewOf } = await import('../src/module/rules/prerequisites.mjs');
 
@@ -38,7 +38,7 @@ test('every talent of the compendium can be priced: valid tier, two aptitudes, p
         const groups = adv.parseRequirement(t.aptitudes);
         assert.equal(groups.length, 2, `${t.name}: aptitudes "${t.aptitudes}"`);
         assert.ok([1, 2, 3].includes(Number(t.tier)), `${t.name}: tier ${t.tier}`);
-        const choice = adv.isMultipleTalent(t.name) ? 'X' : '';
+        const choice = adv.isMultipleTalent(t.name) ? (TALENT_SPECIALISATIONS[t.name]?.[0] ?? 'X') : '';
         const price = (names) => adv.talentQuote(actorWith({ aptitudes: names }), t, choice).cost;
         // "General" is implicit for everybody: a talent with General starts with one match
         const implicit = groups.filter((g) => g.includes('general')).length;
@@ -52,7 +52,7 @@ test('every talent of the compendium can be priced: valid tier, two aptitudes, p
 });
 
 test('the choice talents of the system need a choice and the other talents do not', () => {
-    for (const name of ['Weapon Training', 'Exotic Weapon Training', 'Peer', 'Resistance', 'Hatred', 'Enemy']) {
+    for (const name of ['Weapon Training', 'Exotic Weapon Training', 'Peer', 'Resistance', 'Hatred', 'Enemy', 'Two-Weapon Wielder']) {
         const q = adv.talentQuote(actorWith(), byName[name]);
         assert.equal(q.multiple, true, name);
         assert.equal(q.advanceable, false, name);
@@ -207,4 +207,43 @@ test('psychic powers: without a Psy Rating the purchase has to be confirmed; wit
     const free = await purchaseAdvancement(actorWith(), { kind: 'power', key: 'X', power: { ...aura, name: 'X', cost: 0 }, silent: true });
     assert.equal(free.ok, false);
     assert.match(free.errors[0], /no price/);
+});
+
+test('Two-Weapon Wielder is bought as Melee or Ranged, separately', () => {
+    const wielder = byName['Two-Weapon Wielder'];
+    assert.equal(adv.isMultipleTalent('Two-Weapon Wielder'), true);
+    assert.match(adv.talentQuote(actorWith(), wielder).error, /choice/);
+    assert.match(adv.talentQuote(actorWith(), wielder, 'Sideways').error, /choose Melee or Ranged/);
+    const melee = adv.talentQuote(actorWith(), wielder, 'melee');
+    assert.equal(melee.advanceable !== false, true);
+    assert.equal(melee.label ?? melee.name, 'Two-Weapon Wielder (melee)');
+    assert.equal(melee.tier, 2);
+    // one specialisation does not block the other
+    const owned = actorWith({ talents: ['Two-Weapon Wielder (Melee)'] });
+    assert.equal(!!adv.talentQuote(owned, wielder, 'Ranged').maxed, false);
+    assert.equal(adv.talentQuote(owned, wielder, 'Melee').maxed, true);
+});
+
+test('an old general Two-Weapon Wielder is not read as a specialisation: the GM decides', () => {
+    const wielder = byName['Two-Weapon Wielder'];
+    const old = actorWith({ talents: ['Two-Weapon Wielder'] });
+    const q = adv.talentQuote(old, wielder, 'Melee');
+    assert.equal(q.prerequisiteCheck.status, 'manual');
+    assert.match(q.prerequisiteCheck.manual.join(' '), /old general Two-Weapon Wielder/);
+    // the purchase needs the confirmation
+    assert.equal(adv.checkPurchase(old, q).ok, false);
+    assert.equal(adv.checkPurchase(old, q, { prerequisitesConfirmed: true }).ok, true);
+    // Two-Weapon Master needs both specialisations: the old entry gives "manual", not "met"
+    const master = adv.talentQuote(old, byName['Two-Weapon Master'], '');
+    assert.notEqual(master.prerequisiteCheck.clauses.find((c) => /Two-Weapon Wielder/.test(c.text ?? c.requirement ?? ''))?.status, 'met');
+});
+
+test('Enemy is not bought with XP: blocked, only a GM can override', () => {
+    const enemy = byName.Enemy;
+    const q = adv.talentQuote(actorWith(), enemy, 'Cultists');
+    assert.equal(q.prerequisiteCheck.status, 'unmet');
+    const rich = Object.assign(actorWith(), {});
+    rich.system.experience = { total: 5000, used: 0 };
+    assert.equal(adv.checkPurchase(rich, q).ok, false);
+    assert.equal(adv.checkPurchase(rich, q, { gmOverride: true }).ok, true);
 });

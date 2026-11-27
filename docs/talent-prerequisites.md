@@ -35,3 +35,19 @@ Everything else (`Weapon Training (any melee)`, `Rank 4 in selected skill`, an i
 "Spend EP" opens one window with the lists **Characteristics, Skills, Talents, Psychic Powers** and **Other** (manual entry for the Psy Rating or anything without a price). Every row shows level (tier / discipline), the value now → after the advance, the matching aptitudes (0–2), the result of the prerequisites and the price; a search field and "Only what I can buy" filter the list. A row is bought with its **Buy** button after a short confirmation (price, EP afterwards, prerequisites, the choice of a choice talent, a note; the confirmation of "?" requirements; the GM override). The "coin" button of a row in the advancement overview opens the catalogue on that row and goes straight to the confirmation.
 - **Psychic powers:** priced by the cost in the data of the power (76 of the 114 powers in the compendium have one); a power without a price cannot be bought automatically (use "Other"). A character without Psy Rating is not blocked, the purchase has to be confirmed. The power is created on the character with that cost; EP and log are written in one step.
 - Checked: `test/catalog.test.mjs` (the four lists, prices, status, can-buy and reasons, filters) and the purchase tests above, including psychic powers. The window itself has been looked at in a test page, **not in Foundry**: please try one purchase of each kind.
+
+## Comparison with the extraction of the pages 123-133 (second source)
+
+A second automatic extraction (talent descriptions of the printed pages 123-133, not checked against the book or all errata) was compared with the compendium: tiers of all 80 listed talents are identical, the prerequisites are identical except for the wording of Superior Chirurgeon ("Rank 2 in Medicae" / "Rank 2 in the Medicae skill": same meaning). The aptitudes are identical except:
+
+- **Blind Fighting:** compendium "Perception, Fieldcraft", extraction "Perception, Defence". **Conflict, not changed** (only the book can decide).
+- Inescapable Attack, Precision Killer, Two-Weapon Wielder: "/" in the compendium, "or" in the extraction: same meaning (the checker reads "/" as alternatives).
+- Armour-Monger / Favoured by the Warp are stored as "Armor-Monger" / "Favored by the Warp" (US spelling, aliases are read).
+
+## Two-Weapon Wielder
+
+Bought as **Melee** or **Ranged** (separate entries, "Two-Weapon Wielder (Melee)"), tier 2, aptitudes Weapon Skill / Ballistic Skill and Finesse, no prerequisite (as quoted in the project notes: core rulebook p. 132, not checked against the book). Characters who already have the old general entry keep it unchanged; it is never read as one or both specialisations: buying a specialisation and the prerequisite check of Two-Weapon Master ("Two-Weapon Wielder (Melee, Ranged)") show a note and need the confirmation of the GM. The attack logic of the talent (the extra Half Action attack as a Free Action) is not automated.
+
+## Enemy
+
+According to the extraction Enemy is not bought with XP: a purchase is blocked, only a GM can override it (`NOT_XP_PURCHASABLE` in `rules/advancement-data.mjs`).

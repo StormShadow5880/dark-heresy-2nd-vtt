@@ -1,3 +1,4 @@
+import { TALENT_SPECIALISATIONS } from './advancement-data.mjs';
 /**
  * Talent prerequisites (pure). The prerequisites of the talents are short texts from the rulebook, e.g.
  *   "Agility 45, Ambidextrous, Ballistic Skill 40 or Weapon Skill 40, Two-Weapon Wielder (Melee, Ranged)"
@@ -107,6 +108,9 @@ function ownedSpecs(view, base) {
     return { specs, plain, any: plain || specs.size > 0 };
 }
 
+/** Talents that were split into specialisations: an old general entry of them is a decision for the GM */
+const SPLIT_TALENTS = new Set(Object.keys(TALENT_SPECIALISATIONS).map((n) => norm(n)));
+
 /** Checks one requirement string against the character view */
 export function checkRequirement(text, view) {
     const t = text.trim();
@@ -158,6 +162,8 @@ export function checkRequirement(text, view) {
         if (!spec) return res(owned.any || asOtherItem ? 'met' : 'unmet', t, owned.any ? 'learned' : asOtherItem ? 'owned' : 'not learned');
         const wanted = spec.split(',').map(norm).filter(Boolean);
         const ok = wanted.every((w) => owned.specs.has(w));
+        // an old general entry without a specialisation (before the talent was split): never read as one or all specialisations, the GM decides
+        if (!ok && owned.plain && SPLIT_TALENTS.has(base)) return res('manual', t, `has the old general ${name} without a specialisation: the GM decides whether it covers ${spec}`);
         return res(ok ? 'met' : 'unmet', t, ok ? 'learned' : `${name} (${spec}) not learned`);
     }
 
