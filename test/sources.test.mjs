@@ -50,3 +50,10 @@ test('the specific locations of the expansion books are home worlds of their par
 test('names are unique (an actor stores the name)', () => {
     for (const list of [homeworlds(), backgrounds(), roles()]) assert.equal(new Set(list.map((e) => e.name)).size, list.length);
 });
+
+test('starting skills, talents and equipment of a background exist once (structured, in the creator); the rules list holds only name, bonus and source', async () => {
+    const { backgrounds } = await import('../src/module/rules/backgrounds.mjs');
+    const { roles } = await import('../src/module/rules/roles.mjs');
+    for (const b of backgrounds()) assert.deepEqual(Object.keys(b).sort(), ['background_bonus', 'name', 'source'], b.name);
+    for (const r of roles()) assert.deepEqual(Object.keys(r).sort(), ['name', 'role_aptitudes', 'role_bonus', 'source'], r.name);
+});

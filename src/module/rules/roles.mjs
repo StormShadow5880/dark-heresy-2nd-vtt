@@ -1,9 +1,13 @@
+/**
+ * Roles: the aptitudes, the bonus text and the source of every role.
+ * Only what the sheet and the character creation read from here is kept (name, bonus, source, aptitudes); starting skills, talents, equipment and
+ * aptitude choices live ONCE in the structured definitions of creator/data.mjs.
+ */
 export function roles() {
     return [
         {
             name: 'Assassin',
             role_aptitudes: ['Agility', 'Ballistic Skill or Weapon Skill', 'Fieldcraft', 'Finesse', 'Perception'],
-            role_talents: ['Jaded', 'Leap Up'],
             role_bonus: {
                 name: 'Sure Kill',
                 benefit:
@@ -14,7 +18,6 @@ export function roles() {
         {
             name: 'Chirurgeon',
             role_aptitudes: ['Fieldcraft', 'Intelligence', 'Knowledge', 'Strength', 'Toughness'],
-            role_talents: ['Resistance (Pick One)', 'Takedown'],
             role_bonus: {
                 name: 'Dedicated Healer',
                 benefit:
@@ -25,7 +28,6 @@ export function roles() {
         {
             name: 'Desperado',
             role_aptitudes: ['Agility', 'Ballistic Skill', 'Defense', 'Fellowship', 'Finesse'],
-            role_talents: ['Catfall', 'Quick Draw'],
             role_bonus: {
                 name: 'Move and Shoot',
                 benefit:
@@ -36,7 +38,6 @@ export function roles() {
         {
             name: 'Hierophant',
             role_aptitudes: ['Fellowship', 'Offence', 'Social', 'Toughness', 'Willpower'],
-            role_talents: ['Double Team', 'Hatred (Pick One)'],
             role_bonus: {
                 name: 'Sway the Masses',
                 benefit:
@@ -47,7 +48,6 @@ export function roles() {
         {
             name: 'Mystic',
             role_aptitudes: ['Defense', 'Intelligence', 'Knowledge', 'Perception', 'Willpower'],
-            role_talents: ['Resistance (Psychic Powers)', 'Warp Sense'],
             role_bonus: {
                 name: 'Stare into the Warp',
                 benefit:
@@ -58,7 +58,6 @@ export function roles() {
         {
             name: 'Sage',
             role_aptitudes: ['Intelligence', 'Knowledge', 'Perception', 'Tech', 'Willpower'],
-            role_talents: ['Ambidextrous', 'Clues from the Crowds'],
             role_bonus: {
                 name: 'Quest for Knowledge',
                 benefit:
@@ -69,7 +68,6 @@ export function roles() {
         {
             name: 'Seeker',
             role_aptitudes: ['Fellowship', 'Intelligence', 'Perception', 'Social', 'Tech'],
-            role_talents: ['Keen Intuition', 'Disarm'],
             role_bonus: {
                 name: 'Nothing Escapes My Sight',
                 benefit:
@@ -80,7 +78,6 @@ export function roles() {
         {
             name: 'Warrior',
             role_aptitudes: ['Ballistic Skill', 'Defense', 'Offence', 'Strength', 'Weapon Skill'],
-            role_talents: ['Iron Jaw', 'Rapid Reload'],
             role_bonus: {
                 name: 'Expert at Violence',
                 benefit:
@@ -91,7 +88,6 @@ export function roles() {
         {
             name: 'Fanatic',
             role_aptitudes: ['Leadership', 'Offence', 'Toughness', 'Weapon Skill', 'Willpower'],
-            role_talents: ['Deny the Witch', 'Jaded'],
             role_bonus: {
                 name: 'Death to All Who Oppose Me!',
                 benefit:
@@ -102,7 +98,6 @@ export function roles() {
         {
             name: 'Penitent',
             role_aptitudes: ['Agility', 'Fieldcraft', 'Intelligence', 'Offence', 'Toughness'],
-            role_talents: ['Die Hard', 'Flagellant'],
             role_bonus: {
                 name: 'Cleansing Pain',
                 benefit:
@@ -113,7 +108,6 @@ export function roles() {
         {
             name: 'Ace',
             role_aptitudes: ['Agility', 'Finesse', 'Perception', 'Tech', 'Willpower'],
-            role_talents: ['Hard Target', 'Hotshot Pilot'],
             role_bonus: {
                 name: 'Right Stuff',
                 benefit:
@@ -124,7 +118,6 @@ export function roles() {
         {
             name: 'Crusader',
             role_aptitudes: ['Knowledge', 'Offence', 'Strength', 'Toughness', 'Willpower'],
-            role_talents: ['Bodyguard', 'Deny the Witch'],
             role_bonus: {
                 name: 'Smite the Unholy',
                 benefit:
