@@ -534,6 +534,8 @@ export const EXPANSION_HOMEWORLD_DEFS = homeworlds()
             id: `homeworld.${slug(rule.name)}`,
             source: SOURCE_EXPANSION,
             name: rule.name,
+            // `parent` comes from the data (rules/homeworlds.mjs, the specific locations of the books): the creator groups by it
+            parent: rule.parent ?? null,
             description: rule.parent ? `A location of the home world type ${rule.parent}.` : 'A home world of the expansion books.',
             hint: '',
             positive: rule.bonus_characteristics.map(characteristicKey),

@@ -6,6 +6,7 @@ import { SYSTEM_ID } from '../system-id.mjs';
 import { markTooltips } from '../ui/tooltips.mjs';
 import { aptitudeName, buildQuotes, describeQuote, num } from '../rules/advancement.mjs';
 import { isDlc, sourceLabel } from '../rules/sources.mjs';
+import { differences, homeworldGroups, typeIdOf } from './homeworld-groups.mjs';
 import { BACKGROUNDS, CHARACTERISTICS, HOMEWORLDS, POINT_BUY, ROLES, byId } from './data.mjs';
 import { STEPS, computeCharacter, newDraft, replayAdvances, stepBlockers, stepStatus } from './character.mjs';
 import { applyFormData, logEvent, markStepDone, pruneChoices, rerollCharacteristic, revalidateAdvances, setBackground, setCharacteristicRoll, setHomeWorld, setRole } from './draft.mjs';
@@ -48,6 +49,7 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
             restart: CharacterCreator.#onRestart,
             cancel: CharacterCreator.#onCancel,
             selectHomeWorld: CharacterCreator.#onSelectHomeWorld,
+            selectHomeWorldType: CharacterCreator.#onSelectHomeWorldType,
             selectBackground: CharacterCreator.#onSelectBackground,
             selectRole: CharacterCreator.#onSelectRole,
             randomPick: CharacterCreator.#onRandomPick,
@@ -157,7 +159,8 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
             overrides: draft.overrides,
         };
 
-        context.homeWorlds = HOMEWORLDS.map((h) => ({
+        // two steps: the type of home world, then (where it has variants) the general variant or a specific world
+        const hwCard = (h) => ({
             ...h,
             selected: h.id === draft.homeWorldId,
             positiveText: h.positive.map(label).join(', '),
@@ -165,7 +168,37 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
             woundsText: `${h.wounds.base}+${h.wounds.dice}`,
             bookLabel: sourceLabel(h.bookPage),
             dlc: isDlc(h.bookPage),
-        }));
+        });
+        const hwGroups = homeworldGroups(HOMEWORLDS);
+        const currentTypeId = this.hwType ?? typeIdOf(HOMEWORLDS, draft.homeWorldId);
+        const typeCard = (g) => ({
+            id: g.type.id,
+            name: g.type.name,
+            bookLabel: sourceLabel(g.type.bookPage),
+            dlc: isDlc(g.type.bookPage),
+            variantCount: g.variants.length,
+            current: g.type.id === currentTypeId,
+            chosen: g.type.id === typeIdOf(HOMEWORLDS, draft.homeWorldId),
+        });
+        const cards = hwGroups.map(typeCard);
+        context.hwTypeSections = [
+            { title: 'Core Rulebook', types: cards.filter((c) => !c.dlc) },
+            { title: 'Expansion books (DLC)', types: cards.filter((c) => c.dlc) },
+        ].filter((x) => x.types.length);
+        const hwCurrent = hwGroups.find((g) => g.type.id === currentTypeId);
+        context.hwStage2 = hwCurrent
+            ? {
+                  typeName: hwCurrent.type.name,
+                  hasVariants: hwCurrent.variants.length > 0,
+                  entries: [hwCurrent.type, ...hwCurrent.variants].map((h, i) => ({
+                      ...hwCard(h),
+                      isGeneral: i === 0,
+                      parent: h.parent,
+                      diffs: i === 0 ? [] : differences(hwCurrent.type, h, label),
+                      sameValues: i > 0 && differences(hwCurrent.type, h, label).length === 0,
+                  })),
+              }
+            : null;
         context.hwChoices = choicesFor('homeworld');
         context.backgrounds = BACKGROUNDS.map((b) => ({
             ...b,
@@ -361,8 +394,19 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
         this.close();
     }
 
+    /** Step one: the type. A type without variants is the choice, otherwise the variants are shown. */
+    static async #onSelectHomeWorldType(event, target) {
+        const group = homeworldGroups(HOMEWORLDS).find((g) => g.type.id === target.dataset.id);
+        if (!group) return;
+        this.hwType = group.type.id;
+        if (!group.variants.length) setHomeWorld(this.draft, group.type.id);
+        await this.#changed();
+    }
+
+    /** Step two: the general variant or a specific world */
     static async #onSelectHomeWorld(event, target) {
         setHomeWorld(this.draft, target.dataset.id);
+        this.hwType = typeIdOf(HOMEWORLDS, target.dataset.id);
         await this.#changed();
     }
 
@@ -378,7 +422,11 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
 
     static async #onRandomPick(event, target) {
         const what = target.dataset.what;
-        if (what === 'homeworld') setHomeWorld(this.draft, pick(HOMEWORLDS).id);
+        if (what === 'homeworld') {
+            const id = pick(HOMEWORLDS).id;
+            setHomeWorld(this.draft, id);
+            this.hwType = typeIdOf(HOMEWORLDS, id);
+        }
         if (what === 'background') setBackground(this.draft, pick(BACKGROUNDS).id);
         if (what === 'role') setRole(this.draft, pick(ROLES).id);
         await this.#changed();

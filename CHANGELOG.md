@@ -8,7 +8,7 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
 
 ### Expansion content (DLC) and sources
 
-- 21 specific home world locations from the Enemies Within/Without/Beyond and Forgotten Gods books. Home world, background and role are grouped by book in the header select; the source (book and page) is shown in the tooltips and with the origin bonuses. Quarantine World corrected (+Perception). The character creation wizard offers all of it (31 home worlds, 6 backgrounds, 4 roles, marked DLC with book and page). See `docs/expansion-content.md`.
+- 21 specific home world locations from the Enemies Within/Without/Beyond and Forgotten Gods books. Home world, background and role are grouped by book in the header select; the source (book and page) is shown in the tooltips and with the origin bonuses. Quarantine World corrected (+Perception). The character creation wizard offers all of it (31 home worlds, 6 backgrounds, 4 roles, marked DLC with book and page); the home world step has two stages (type, then general variant or specific world). See `docs/expansion-content.md`.
 - Home world, background and role are fixed after the character was made with the creation wizard: players cannot change them (lock symbol, disabled selects, and changes by other ways are rejected); the GM still can. Characters that were not made with the wizard stay editable.
 
 ### Fatigue fix and consequences
