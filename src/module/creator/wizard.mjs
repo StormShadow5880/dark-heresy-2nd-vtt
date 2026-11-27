@@ -200,6 +200,14 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
                   })),
               }
             : null;
+        // status line and preview: what is chosen and what is still missing
+        const hwSelected = hwCurrent ? context.hwStage2.entries.find((e) => e.selected) ?? null : null;
+        context.hwPreview = hwSelected;
+        context.hwStatus = !hwCurrent
+            ? { state: 'none', text: 'Choose a home world type.' }
+            : hwSelected
+              ? { state: 'done', text: `Home world chosen: ${hwSelected.name}${hwSelected.parent ? ` (${hwSelected.parent})` : ''}.` }
+              : { state: 'half', text: `Home world type chosen: ${hwCurrent.type.name}. Now choose the specific home world below: the general ${hwCurrent.type.name} or one of its ${hwCurrent.variants.length} specific worlds.` };
         context.hwChoices = choicesFor('homeworld');
         context.consequences = state.consequences.map((c) => ({ ...c, canRoll: c.status === 'open' && !!c.formula, resultText: c.result ? `${c.result.formula}: ${c.result.dice.join(' + ')}${c.result.total !== c.result.dice.reduce((a, b) => a + b, 0) ? ` → ${c.result.total}` : ''}` : '' }));
         context.backgrounds = BACKGROUNDS.map((b) => ({

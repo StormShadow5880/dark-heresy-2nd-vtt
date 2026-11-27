@@ -74,53 +74,63 @@
                 <div class="field"><label>{{c.label}}</label>
                     <select name="c.{{c.id}}"><option value="">– choose –</option>{{#each c.options as |o|}}<option value="{{o.value}}" {{#if o.selected}}selected{{/if}}>{{o.label}}</option>{{/each}}</select></div>
             {{/each}}
+            <div class="hw-status hw-status--{{hwStatus.state}}" role="status">
+                <ol class="hw-steps">
+                    <li class="{{#if hwStage2}}is-done{{else}}is-now{{/if}}"><b>1</b> Type{{#if hwStage2}}: {{hwStage2.typeName}}{{/if}}</li>
+                    <li class="{{#if hwPreview}}is-done{{else}}{{#if hwStage2}}is-now{{/if}}{{/if}}"><b>2</b> Specific home world{{#if hwPreview}}: {{hwPreview.name}}{{/if}}</li>
+                </ol>
+                <p>{{#if (eq hwStatus.state "done")}}<i class="fa-solid fa-circle-check"></i>{{else}}<i class="fa-solid fa-circle-exclamation"></i>{{/if}} {{hwStatus.text}}</p>
+            </div>
+
             <h4 class="hw-heading">1. Type of home world</h4>
-            {{#each hwTypeSections as |sec|}}
-                <p class="hw-section">{{sec.title}}</p>
-                <div class="hw-types">
+            <div class="hw-types">
+                {{#each hwTypeSections as |sec|}}
                     {{#each sec.types as |t|}}
-                        <button type="button" class="hw-type {{#if t.current}}is-current{{/if}} {{#if t.chosen}}is-chosen{{/if}}" data-action="selectHomeWorldType" data-id="{{t.id}}" aria-pressed="{{t.current}}">
-                            <b>{{t.name}}</b>
-                            <small>{{t.bookLabel}}{{#if t.dlc}} · DLC{{/if}}</small>
-                            {{#if t.variantCount}}<small class="hw-type__more">{{t.variantCount}} specific world{{#if (gt t.variantCount 1)}}s{{/if}}</small>{{/if}}
+                        <button type="button" class="hw-type {{#if t.current}}is-current{{/if}} {{#if t.chosen}}is-chosen{{/if}}" data-action="selectHomeWorldType" data-id="{{t.id}}" aria-pressed="{{t.current}}" title="{{t.bookLabel}}{{#if t.dlc}} (DLC){{/if}}">
+                            {{t.name}}{{#if t.dlc}} <i class="hw-badge">DLC</i>{{/if}}{{#if t.variantCount}} <i class="hw-type__n">+{{t.variantCount}}</i>{{/if}}
                         </button>
                     {{/each}}
-                </div>
-            {{/each}}
+                {{/each}}
+            </div>
 
             {{#if hwStage2}}
-                <h4 class="hw-heading">{{#if hwStage2.hasVariants}}2. {{hwStage2.typeName}}: general or a specific world{{else}}2. {{hwStage2.typeName}}{{/if}}</h4>
+                <h4 class="hw-heading">2. {{#if hwStage2.hasVariants}}{{hwStage2.typeName}}: general or a specific world{{else}}{{hwStage2.typeName}}{{/if}}</h4>
                 <div class="hw-variants">
                     {{#each hwStage2.entries as |h|}}
                         <button type="button" class="hw-variant {{#if h.selected}}is-selected{{/if}}" data-action="selectHomeWorld" data-id="{{h.id}}" aria-pressed="{{h.selected}}">
-                            <span class="hw-variant__head">
-                                <b>{{#if h.isGeneral}}{{#if ../hwStage2.hasVariants}}General {{/if}}{{/if}}{{h.name}}</b>
-                                <small>{{h.bookLabel}}{{#if h.dlc}} · DLC{{/if}}</small>
-                                {{#if h.parent}}<small>Mechanics inherited from {{h.parent}}</small>{{/if}}
-                            </span>
-                            <span class="hw-variant__body">
-                                <em>{{h.description}}</em>
-                                <dl>
-                                    <div><dt>Positive</dt><dd>{{h.positiveText}}</dd></div>
-                                    <div><dt>Negative</dt><dd>{{h.negativeText}}</dd></div>
-                                    <div><dt>Fate</dt><dd>{{h.fateThreshold}} (blessing {{h.blessing}}+)</dd></div>
-                                    <div><dt>Wounds</dt><dd>{{h.woundsText}}</dd></div>
-                                    <div><dt>Aptitude</dt><dd>{{h.aptitude}}</dd></div>
-                                </dl>
-                                <p class="bonus"><b>{{h.bonus.name}}.</b> {{h.bonus.benefit}}</p>
-                                {{#unless h.isGeneral}}
-                                    {{#if h.diffs.length}}
-                                        <p class="hw-diff"><b>Differs from the general {{../hwStage2.typeName}}:</b> {{#each h.diffs as |d|}}{{d.label}} {{d.variant}} (general: {{d.general}}){{#unless @last}}; {{/unless}}{{/each}}</p>
-                                    {{else}}
-                                        <p class="hw-diff">Same characteristics, fate, wounds and aptitude as the general {{../hwStage2.typeName}}; it has its own bonus.</p>
-                                    {{/if}}
-                                {{/unless}}
-                                {{#if h.talents.length}}<p class="hw-diff"><b>Starting talent:</b> {{#each h.talents as |t|}}{{t.talent}}{{#if t.spec}} ({{t.spec}}){{/if}}{{#unless @last}}, {{/unless}}{{/each}}</p>{{/if}}
-                                <small class="why">{{h.hint}}</small>
-                            </span>
+                            <b>{{#if h.isGeneral}}{{#if ../hwStage2.hasVariants}}General {{/if}}{{/if}}{{h.name}}</b>
+                            <small>{{h.bookLabel}}{{#if h.dlc}} <i class="hw-badge">DLC</i>{{/if}}</small>
+                            <small class="hw-variant__bonus">{{h.bonus.name}}</small>
                         </button>
                     {{/each}}
                 </div>
+            {{/if}}
+
+            {{#if hwPreview}}
+                <section class="hw-preview" aria-label="Rules of {{hwPreview.name}}">
+                    <header>
+                        <b>{{hwPreview.name}}</b>
+                        <small>{{hwPreview.bookLabel}}{{#if hwPreview.dlc}} <i class="hw-badge">DLC</i>{{/if}}{{#if hwPreview.parent}} · mechanics inherited from {{hwPreview.parent}}{{/if}}</small>
+                    </header>
+                    <p class="hw-preview__text">{{hwPreview.description}}</p>
+                    <dl class="hw-preview__stats">
+                        <div><dt>Positive</dt><dd>{{hwPreview.positiveText}}</dd></div>
+                        <div><dt>Negative</dt><dd>{{hwPreview.negativeText}}</dd></div>
+                        <div><dt>Fate</dt><dd>{{hwPreview.fateThreshold}} <small>(blessing {{hwPreview.blessing}}+)</small></dd></div>
+                        <div><dt>Wounds</dt><dd>{{hwPreview.woundsText}}</dd></div>
+                        <div><dt>Aptitude</dt><dd>{{hwPreview.aptitude}}</dd></div>
+                    </dl>
+                    <p class="hw-preview__rule"><b>{{hwPreview.bonus.name}}.</b> {{hwPreview.bonus.benefit}}</p>
+                    {{#unless hwPreview.isGeneral}}
+                        {{#if hwPreview.diffs.length}}
+                            <p class="hw-diff"><b>Differs from the general {{hwStage2.typeName}}:</b> {{#each hwPreview.diffs as |d|}}{{d.label}} {{d.variant}} (general: {{d.general}}){{#unless @last}}; {{/unless}}{{/each}}</p>
+                        {{else}}
+                            <p class="hw-diff">Same characteristics, fate, wounds and aptitude as the general {{hwStage2.typeName}}; it has its own bonus.</p>
+                        {{/if}}
+                    {{/unless}}
+                    {{#if hwPreview.talents.length}}<p class="hw-diff"><b>Starting talent:</b> {{#each hwPreview.talents as |t|}}{{t.talent}}{{#if t.spec}} ({{t.spec}}){{/if}}{{#unless @last}}, {{/unless}}{{/each}}</p>{{/if}}
+                    {{#if hwPreview.skills.length}}<p class="hw-diff"><b>Starting skills:</b> {{#each hwPreview.skills as |k|}}{{k.skill}}{{#if k.spec}} ({{k.spec}}){{/if}}{{#if k.ranks}} rank {{k.ranks}}{{/if}}{{#unless @last}}, {{/unless}}{{/each}}</p>{{/if}}
+                </section>
             {{/if}}
             {{> consequences}}
         {{/if}}
