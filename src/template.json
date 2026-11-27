@@ -957,10 +957,6 @@
         "npc": {
             "templates": ["base", "creature", "npc"]
         },
-        "xenos": {
-            "templates": ["base", "creature", "npc"],
-            "species": ""
-        },
         "vehicle": {
             "templates": ["base", "vehicle", "npc"]
         },
@@ -1065,10 +1061,10 @@
             "weaponType": ""
         },
         "aptitude": {
-            "template": ["itemDescription"]
+            "templates": ["itemDescription"]
         },
         "armour": {
-            "templates": ["physicalItem", "itemDescription", "container", "backpack", "armourPoints"],
+            "templates": ["physicalItem", "itemDescription", "backpack", "armourPoints"],
             "container": true,
             "containerTypes": ["armourModification"],
             "maxAgility": 0
@@ -1082,10 +1078,8 @@
             "hasLevel": false,
             "level": 0
         },
-        "bonus": {
-            "source": "",
-            "name": "",
-            "benefit": ""
+        "backpack": {
+            "templates": ["physicalItem", "itemDescription"]
         },
         "criticalInjury": {
             "templates": ["itemDescription"],
@@ -1177,7 +1171,7 @@
             "level": 0
         },
         "weapon": {
-            "templates": ["physicalItem", "itemDescription", "damage", "attack", "action", "container", "backpack"],
+            "templates": ["physicalItem", "itemDescription", "damage", "attack", "action", "backpack"],
             "container": true,
             "containerTypes": ["weaponModification", "attackSpecial", "ammunition"],
             "class": "",
