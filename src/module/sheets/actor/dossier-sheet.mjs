@@ -1,6 +1,10 @@
 import { AcolyteSheet } from './acolyte-sheet.mjs';
 import { prettifyDescription } from '../../rules/psy-text.mjs';
 import { SYSTEM_ID } from '../../system-id.mjs';
+import { homeworlds } from '../../rules/homeworlds.mjs';
+import { backgrounds } from '../../rules/backgrounds.mjs';
+import { roles } from '../../rules/roles.mjs';
+import { groupedOptions, isDlc, sourceLabel } from '../../rules/sources.mjs';
 import { timerView } from '../../rules/fatigue.mjs';
 import { chooseAndSpend, refundAction, resetAccount, viewFor as accountViewFor } from '../../combat/action-account.mjs';
 import {
@@ -41,6 +45,22 @@ import { addContact, addFaction, buildNetworkView, removeFaction, setContactFiel
 import { actorPatronDoc, assignPatron, patronDocs, publicPatron } from '../../relations/store.mjs';
 
 const T = 'systems/dark-heresy-2nd/templates/actor/dossier';
+
+/** Rules lists of the header selects that carry a source (book and page): they are grouped by book */
+const SOURCED = { homeWorld: homeworlds, background: backgrounds, role: roles };
+
+/** A select of the header: label, value, options; home world, background and role grouped by book, with the source of the choice */
+function bioField(actor, key) {
+    const value = actor.bio?.[key] ?? '';
+    const field = { key, label: key === 'homeWorld' ? 'Home World' : key.charAt(0).toUpperCase() + key.slice(1), value, options: CONFIG.dh.bio[key] };
+    const list = SOURCED[key]?.();
+    if (list) {
+        field.groups = groupedOptions(list, value);
+        const current = list.find((e) => e.name === value);
+        field.sourceText = current ? `${current.name}: ${sourceLabel(current.source)}${isDlc(current.source) ? ' (expansion content)' : ''}` : '';
+    }
+    return field;
+}
 
 /** Sheet-wide UI state that must survive re-renders (filters are not stored on the actor) */
 const DEFAULT_SKILL_UI = { query: '', mode: 'all', sort: 'name' };
@@ -146,12 +166,7 @@ export class AcolyteDossierSheet extends AcolyteSheet {
             equippedArmour: buildEquippedArmour(actor),
             relations: buildRelations(actor),
             favorites: getFavoriteSkills(actor),
-            bioFields: ['homeWorld', 'background', 'role', 'elite', 'divination'].map((key) => ({
-                key,
-                label: key === 'homeWorld' ? 'Home World' : key.charAt(0).toUpperCase() + key.slice(1),
-                value: actor.bio?.[key] ?? '',
-                options: CONFIG.dh.bio[key],
-            })),
+            bioFields: ['homeWorld', 'background', 'role', 'elite', 'divination'].map((key) => bioField(actor, key)),
             characteristicAdvanceLevels: CHARACTERISTIC_ADVANCE_LEVELS,
             trainingLevels: TRAINING_LEVELS,
             skillUi: this._skillUi,

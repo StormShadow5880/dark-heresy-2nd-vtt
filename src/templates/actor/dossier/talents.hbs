@@ -76,10 +76,10 @@
                             <details>
                                 <summary>
                                     <span class="grow">{{ab.name}}</span>
-                                    <span class="pill">{{ab.source}}</span>
+                                    <span class="pill" data-tooltip="{{#if ab.book}}{{ab.book}}{{/if}}">{{ab.source}}{{#if ab.dlc}} · DLC{{/if}}</span>
                                     <button type="button" class="icon-btn bonus-vocalize" data-bonus-name="{{ab.name}}" data-tooltip="Show in chat"><i class="fa-solid fa-comment"></i></button>
                                 </summary>
-                                <div class="detail prose">{{#if ab.benefit}}{{ab.benefit}}{{else}}No description.{{/if}}</div>
+                                <div class="detail prose">{{#if ab.benefit}}{{ab.benefit}}{{else}}No description.{{/if}}{{#if ab.book}}<p class="source-line"><small>Source: {{ab.book}}{{#if ab.dlc}} (expansion content){{/if}}</small></p>{{/if}}</div>
                             </details>
                         </li>
                     {{else}}

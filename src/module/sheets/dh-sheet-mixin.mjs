@@ -39,6 +39,17 @@ export function DHSheetMixin(Base) {
         /** The tab that is shown when the sheet is opened */
         static DEFAULT_TAB = 'main';
 
+        /**
+         * The fields of a Dark Heresy sheet are always editable for everybody who may edit the document (owner, GM) unless the
+         * document lies in a locked compendium. Newer Foundry versions can also report a sheet as not editable for reasons of their
+         * own (a play mode of the sheet); this system has no such mode, and the template fields would all be disabled.
+         */
+        get isEditable() {
+            const document = this.document;
+            if (document.pack && game.packs.get(document.pack)?.locked) return false;
+            return !!document.isOwner;
+        }
+
         /** Only show the document name, the default V2 title is prefixed by the (unlocalized) document type. */
         get title() {
             return this.document.name;

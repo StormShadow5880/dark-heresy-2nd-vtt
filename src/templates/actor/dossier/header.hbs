@@ -12,9 +12,17 @@
             {{#each dossier.bioFields as |field|}}
                 <label class="dossier-field">
                     <span class="dossier-field__label">{{field.label}}</span>
-                    <select class="acolyte-{{field.key}}" name="system.bio.{{field.key}}">
+                    <select class="acolyte-{{field.key}}" name="system.bio.{{field.key}}" {{#if field.sourceText}}title="{{field.sourceText}}" data-tooltip="{{field.sourceText}}"{{/if}}>
                         <option value=""></option>
-                        {{selectOptions (arrayToObject field.options) selected=field.value}}
+                        {{#if field.groups}}
+                            {{#each field.groups as |g|}}
+                                <optgroup label="{{g.label}}">
+                                    {{#each g.options as |o|}}<option value="{{o.name}}" {{#if o.selected}}selected{{/if}} title="{{o.source}}">{{o.name}}</option>{{/each}}
+                                </optgroup>
+                            {{/each}}
+                        {{else}}
+                            {{selectOptions (arrayToObject field.options) selected=field.value}}
+                        {{/if}}
                     </select>
                 </label>
             {{/each}}

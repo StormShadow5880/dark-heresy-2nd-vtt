@@ -1,3 +1,4 @@
+import { isDlc, sourceLabel } from '../rules/sources.mjs';
 import { applyFatigue, fatigueMax } from '../rules/fatigue.mjs';
 import { prettifyDescription } from '../rules/psy-text.mjs';
 import { homeworlds } from '../rules/homeworlds.mjs';
@@ -219,6 +220,8 @@ export class DarkHeresyAcolyte extends DarkHeresyBaseActor {
             if (this.backgroundEffects.homeworld) {
                 this.backgroundEffects.abilities.push({
                     source: 'Homeworld',
+                    book: sourceLabel(this.backgroundEffects.homeworld.source),
+                    dlc: isDlc(this.backgroundEffects.homeworld.source),
                     ...this.backgroundEffects.homeworld.home_world_bonus,
                 });
             }
@@ -228,6 +231,8 @@ export class DarkHeresyAcolyte extends DarkHeresyBaseActor {
             if (this.backgroundEffects.background) {
                 this.backgroundEffects.abilities.push({
                     source: 'Background',
+                    book: sourceLabel(this.backgroundEffects.background.source),
+                    dlc: isDlc(this.backgroundEffects.background.source),
                     ...this.backgroundEffects.background.background_bonus,
                 });
             }
@@ -237,6 +242,8 @@ export class DarkHeresyAcolyte extends DarkHeresyBaseActor {
             if (this.backgroundEffects.role) {
                 this.backgroundEffects.abilities.push({
                     source: 'Role',
+                    book: sourceLabel(this.backgroundEffects.role.source),
+                    dlc: isDlc(this.backgroundEffects.role.source),
                     ...this.backgroundEffects.role.role_bonus,
                 });
             }

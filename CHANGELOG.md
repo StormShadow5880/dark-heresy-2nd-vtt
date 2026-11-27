@@ -6,6 +6,11 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
 
 ## [1.9.0] – Unreleased
 
+### Expansion content (DLC) and sources
+
+- 21 specific home world locations from the Enemies Within/Without/Beyond and Forgotten Gods books. Home world, background and role are grouped by book in the header select; the source (book and page) is shown in the tooltips and with the origin bonuses. Quarantine World corrected (+Perception). See `docs/expansion-content.md`.
+- Sheets: the fields of the sheets are editable for everybody who may edit the document (a sheet that Foundry reports as not editable no longer disables all fields).
+
 ### Fatigue fix and consequences
 
 - Characteristics halved by fatigue and the skills based on them are marked in orange. Over the fatigue limit the sheet shows an "unconscious" banner (10 − Toughness Bonus minutes) with a "Wake up" button; the chat reports crossing the limit. More than twice the limit: dead. The unconscious time and the recovery run on the game clock (automatic wake-up, rest planner and 24 h rest reduce fatigue, a Fate Point removes all). Rule text from the errata summary, see `docs/fatigue.md`.
