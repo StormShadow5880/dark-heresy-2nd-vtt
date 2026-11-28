@@ -51,7 +51,7 @@
                             <button type="button" class="step" data-action="adjustDamage" data-delta="1" aria-label="Take one point of damage">+</button>
                         </li>
                         {{#each dossier.statusTiles as |t|}}
-                            <li class="stat-list__row {{#if t.level}}is-{{t.level}}{{/if}} {{#if (eq t.id "fatigue")}}has-extra{{/if}}" data-tooltip="{{t.tooltip}}">
+                            <li class="stat-list__row {{#if t.level}}is-{{t.level}}{{/if}} {{#if (eq t.id "fatigue")}}has-extra{{/if}}{{#if t.garden}}has-extra{{/if}}" data-tooltip="{{t.tooltip}}">
                                 <i class="sicon sicon--{{t.id}}"></i>
                                 <span class="stat-list__label">{{t.label}}</span>
                                 <span class="stat-list__value">{{t.value}}{{#if t.hasEffective}}<small class="stat-list__eff" data-tooltip="The first level of fatigue is stored but has no effect: the effects are calculated as fatigue {{t.effective}}"> → {{t.effective}}</small>{{/if}}</span>
