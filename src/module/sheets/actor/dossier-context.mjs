@@ -105,6 +105,14 @@ export function buildCharacteristics(actor) {
             bonusText: `${tens} (tens digit)${toNumber(c.unnatural) ? ` + ${toNumber(c.unnatural)} (unnatural)` : ''}`,
             hasBonus: !!c.has_bonus,
             hasNegative: !!c.has_negative,
+            // raised by an effect (a power, an Active Effect): the prepared value is higher than the stored one
+            boosted: toNumber(c.unnatural) > toNumber(stored.unnatural) || toNumber(c.modifier) > toNumber(stored.modifier),
+            boostTip: [
+                toNumber(c.modifier) > toNumber(stored.modifier) ? `+${toNumber(c.modifier) - toNumber(stored.modifier)} characteristic` : '',
+                toNumber(c.unnatural) > toNumber(stored.unnatural) ? `+${toNumber(c.unnatural) - toNumber(stored.unnatural)} unnatural` : '',
+            ]
+                .filter(Boolean)
+                .join(', '),
             fatigued: !!c.fatigued,
             fatigueTip: c.fatigued ? `Fatigue: halved (${c.totalBeforeFatigue} → ${c.total})` : '',
         };

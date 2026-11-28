@@ -12,10 +12,10 @@
                 <h2 class="panel__title">Characteristics</h2>
                 <div class="chars">
                 {{#each dossier.characteristics as |c|}}
-                    <div class="char {{#if c.hasBonus}}char--bonus{{/if}} {{#if c.hasNegative}}char--negative{{/if}} {{#if c.fatigued}}char--fatigued{{/if}} actor-drag" data-item-type="characteristic" data-item-id="{{c.key}}" data-char="{{c.key}}">
+                    <div class="char {{#if c.hasBonus}}char--bonus{{/if}} {{#if c.hasNegative}}char--negative{{/if}} {{#if c.fatigued}}char--fatigued{{/if}} {{#if c.boosted}}char--boosted{{/if}} actor-drag" data-item-type="characteristic" data-item-id="{{c.key}}" data-char="{{c.key}}">
                         <button type="button" class="char__edit-toggle" data-action="toggleCharEdit" data-char="{{c.key}}" data-tooltip="Pin details" aria-label="Pin details of {{c.label}}"><i class="fa-solid fa-thumbtack"></i></button>
                         <span class="char__short" data-tooltip="{{c.label}}">{{c.short}}</span>
-                        <button type="button" class="char__roll roll-characteristic" data-characteristic="{{c.key}}" data-tooltip="Roll {{c.label}} test (W100 ≤ {{c.total}}){{#if c.fatigued}} · {{c.fatigueTip}}{{/if}}">{{c.total}}</button>
+                        <button type="button" class="char__roll roll-characteristic" data-characteristic="{{c.key}}" data-tooltip="Roll {{c.label}} test (W100 ≤ {{c.total}}){{#if c.fatigued}} · {{c.fatigueTip}}{{/if}}{{#if c.boosted}} · Boosted: {{c.boostTip}}{{/if}}">{{c.total}}</button>
                         <div class="char__foot">
                             <span class="char__bonus" data-tooltip="Bonus = {{c.bonusText}}">Bonus {{c.bonus}}</span>
                             <span class="pips" data-tooltip="Advances: {{c.advanceLabel}}">{{#each c.advancePips as |on|}}<i class="pip {{#if on}}on{{/if}}"></i>{{/each}}</span>
