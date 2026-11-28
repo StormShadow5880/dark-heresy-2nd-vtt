@@ -91,7 +91,7 @@
                     {{#if this.modifiers.bonus}}
                         <div class="dh-field__wrapper">
                             <span class="dh-field__span">Rating Bonus</span>
-                            <span class="dh-field__span">{{modifiers.bonus}}</span>
+                            <span class="dh-field__span">{{signed modifiers.bonus}}</span>
                         </div>
                     {{/if}}
                     <div class="dh-field__wrapper">
@@ -141,6 +141,35 @@
                     <div class="dh-field__wrapper">
                         <span class="dh-field__span">Max Range</span>
                         <span class="dh-field__span">{{maxRange}}m</span>
+                    </div>
+                </div>
+                <div class="dh-panel dh-grid-col-6 dh-result">
+                    <div class="dh-header">
+                        <div class="dh-header__info">
+                            <div class="dh-header__item-wrapper--span-4 dh-header__borderless">
+                                <span class="dh-header__subtitle">Result</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dh-field__wrapper">
+                        <span class="dh-field__span">Base ({{baseChar}})</span>
+                        <span class="dh-field__span">{{baseTarget}}</span>
+                    </div>
+                    {{#each summary.lines as |line|}}
+                        <div class="dh-field__wrapper">
+                            <span class="dh-field__span">{{line.label}}</span>
+                            <span class="dh-field__span">{{line.text}}</span>
+                        </div>
+                    {{/each}}
+                    {{#if summary.capped}}
+                        <div class="dh-field__wrapper">
+                            <span class="dh-field__span">Limit (±60)</span>
+                            <span class="dh-field__span">{{signed summary.applied}} counts</span>
+                        </div>
+                    {{/if}}
+                    <div class="dh-field__wrapper dh-result__total">
+                        <span class="dh-field__span"><b>Target</b></span>
+                        <span class="dh-field__span"><b>{{summary.text}}</b></span>
                     </div>
                 </div>
             </div>

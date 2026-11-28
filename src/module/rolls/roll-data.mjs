@@ -9,6 +9,7 @@ import { calculateWeaponModifiersAttackBonuses, updateWeaponModifiers } from '..
 import { hitDropdown } from '../rules/hit-locations.mjs';
 import { DarkHeresy } from '../rules/config.mjs';
 import { toFormula } from '../rules/formula.mjs';
+import { summariseModifiers } from '../rules/roll-summary.mjs';
 
 export class RollData {
     difficulties = rollDifficulties();
@@ -112,6 +113,11 @@ export class RollData {
             }
         }
         return str.join(' | ');
+    }
+
+    /** The result line of the dialog: what is really calculated (rules/roll-summary.mjs) */
+    get summary() {
+        return summariseModifiers(this.baseTarget, this.modifiers);
     }
 
     get modifiedTarget() {

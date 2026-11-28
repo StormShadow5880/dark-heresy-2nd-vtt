@@ -564,3 +564,10 @@
         font-weight: 700;
     }
 }
+
+// result line of a roll dialog: the calculation that is really used
+.dh-result__total {
+    border-top: 1px solid var(--ds-gold, #b69a62);
+    margin-top: 4px;
+    padding-top: 4px;
+}
