@@ -260,14 +260,13 @@
             gap: 4px;
         }
         &__pip {
-            // angular cell, same look as the cells of the wound bar
-            width: 16px;
+            width: 10px;
             height: 10px;
             padding: 0;
             min-width: 0;
             border: 1px solid #8a7a58;
-            border-radius: 0;
             background: #0c0c0b;
+            transform: rotate(45deg);
             cursor: pointer;
             &.on {
                 background: #b02a2a;
@@ -1166,16 +1165,15 @@
     }
 
     // ------------------------------------------------ Pips, bars, counters
-    // angular cells (like the wound bar), never rotated or rounded
     .pip {
         display: inline-block;
-        width: 14px;
-        height: 8px;
+        width: 9px;
+        height: 9px;
         margin-right: 3px;
         padding: 0;
         border: 1px solid var(--ds-gold);
-        border-radius: 0;
         background: #0c0c0b;
+        transform: rotate(45deg);
         vertical-align: middle;
         &.on {
             background: var(--ds-gold);
@@ -1183,7 +1181,7 @@
         &--btn {
             cursor: pointer;
             min-width: 0;
-            height: 8px;
+            height: 9px;
             line-height: 1;
             &:hover,
             &:focus-visible {
@@ -1197,8 +1195,8 @@
         gap: 2px;
         padding: 0 3px;
         .pip {
-            width: 11px;
-            height: 6px;
+            width: 7px;
+            height: 7px;
             margin: 0 2px;
         }
     }
@@ -1357,7 +1355,7 @@
             padding: 0;
             gap: 0;
             .pip {
-                width: 8px;
+                width: 5px;
                 height: 5px;
                 margin: 0 1px;
             }
@@ -1517,8 +1515,8 @@
         &__pips {
             white-space: nowrap;
             .pip {
-                width: 9px;
-                height: 5px;
+                width: 6px;
+                height: 6px;
                 margin: 0 2px;
             }
         }
@@ -3235,10 +3233,10 @@
 }
 
 .pip {
-    width: 18px;
-    height: 10px;
+    width: 16px;
+    height: 16px;
     border: 2px solid var(--ds-gold, #c9a14a);
-    border-radius: 0;
+    border-radius: 50%;
     display: inline-block;
     box-sizing: border-box;
 
@@ -3254,8 +3252,8 @@
     vertical-align: middle;
 
     .pip {
-        width: 12px;
-        height: 7px;
+        width: 9px;
+        height: 9px;
         border-width: 1px;
     }
 }
