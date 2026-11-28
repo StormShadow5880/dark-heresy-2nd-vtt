@@ -1,5 +1,5 @@
 import { isDlc, sourceLabel } from '../rules/sources.mjs';
-import { applyFatigue, fatigueMax } from '../rules/fatigue.mjs';
+import { applyFatigue, effectiveFatigue, fatigueMax, fatigueOrigin } from '../rules/fatigue.mjs';
 import { prettifyDescription } from '../rules/psy-text.mjs';
 import { homeworlds } from '../rules/homeworlds.mjs';
 import { backgrounds } from '../rules/backgrounds.mjs';
@@ -280,7 +280,7 @@ export class DarkHeresyAcolyte extends DarkHeresyBaseActor {
                 }
             }
 
-            applyFatigue(characteristic, this.fatigue.value);
+            applyFatigue(characteristic, effectiveFatigue(this.fatigue.value, fatigueOrigin(this.bio).ignoredLevels));
         }
 
         this.system.insanityBonus = Math.floor(this.insanity / 10);
@@ -288,7 +288,7 @@ export class DarkHeresyAcolyte extends DarkHeresyBaseActor {
         this.psy.currentRating = this.psy.rating - this.psy.sustained;
         this.initiative.bonus = this.characteristics[this.initiative.characteristic].bonus;
         // the limit comes from the bonuses before fatigue (see rules/fatigue.mjs), otherwise it would shrink while the fatigue rises
-        this.fatigue.max = fatigueMax(this.characteristics);
+        this.fatigue.max = fatigueMax(this.characteristics, { toughnessExtra: fatigueOrigin(this.bio).thresholdToughnessExtra });
     }
 
     /**

@@ -5,7 +5,7 @@ import { TRAINING_LEVELS } from '../../rules/skill-training.mjs';
  * rules are not re-implemented in the templates.
  */
 import { prettifyDescription, prettyRange } from '../../rules/psy-text.mjs';
-import { fatigueState } from '../../rules/fatigue.mjs';
+import { fatigueOrigin, fatigueState } from '../../rules/fatigue.mjs';
 import { hasDescription } from '../../rules/item-description.mjs';
 import { SYSTEM_ID } from '../../system-id.mjs';
 import { SKILL_DESCRIPTIONS } from '../../rules/skill-descriptions.mjs';
@@ -113,7 +113,7 @@ export function buildCharacteristics(actor) {
 /** Fatigue level of the actor (ok, tired, limit, unconscious, dead) with the text for the sheet */
 export function fatigueStateOf(actor) {
     const t = actor.characteristics?.toughness;
-    return fatigueState({ value: actor.system?.fatigue?.value, max: actor.system?.fatigue?.max, toughnessBonus: t?.bonusBeforeFatigue ?? t?.bonus });
+    return fatigueState({ value: actor.system?.fatigue?.value, max: actor.system?.fatigue?.max, toughnessBonus: t?.bonusBeforeFatigue ?? t?.bonus, ignoredLevels: fatigueOrigin(actor.bio).ignoredLevels });
 }
 
 export function buildResources(actor) {
@@ -578,7 +578,7 @@ export function buildStatusTiles(actor) {
     const r = Object.fromEntries(buildResources(actor).map((res) => [res.id, res]));
     const withMax = (res, label) => `${label} ${res.value}${res.max ? ' / ' + res.max : ''}`;
     return [
-        { id: 'fatigue', label: 'Fatigue', path: 'system.fatigue.value', value: r.fatigue.value, max: r.fatigue.max, tooltip: withMax(r.fatigue, 'Fatigue'), level: fatigueStateOf(actor).level },
+        { id: 'fatigue', label: 'Fatigue', path: 'system.fatigue.value', value: r.fatigue.value, max: r.fatigue.max, tooltip: `${withMax(r.fatigue, 'Fatigue')}${fatigueStateOf(actor).ignored ? ` · effect as ${fatigueStateOf(actor).value} (the first level has no effect)` : ''}${fatigueOrigin(actor.bio).thresholdToughnessExtra ? ' · limit includes +2 Toughness Bonus (Outcast)' : ''}`, level: fatigueStateOf(actor).level, effective: fatigueStateOf(actor).value, hasEffective: fatigueStateOf(actor).ignored > 0 },
         {
             id: 'fate',
             label: 'Fate',

@@ -35,3 +35,12 @@ Source status: the rules text comes from a summary of the printed rules and of t
 ## Blood Loss (page 243 of the project notes)
 
 Existing behaviour (checked in the code, not changed): a character with the effect "Bleeding" gets a chat card at the start of its turn (processed on the first GM client, setting "Active Effect Processing"); the card has an "Apply Fatigue" button for the +1 fatigue and the note that a Difficult (−10) Medicae test as a Free Action (once per round) ends it. **Not automated:** the Medicae test and ending the effect (the GM or player removes the effect by hand), the Willpower test of the talent The Hard, the Medicae mechadendrite (Half Action), the limit of one attempt per round; nothing is calculated outside combat (no time scale is invented for bleeding outside combat). The "Staunch Bleeding" power exists as a compendium power.
+
+## Origins that change fatigue (Outcast, Kalto)
+
+Source status: the bonus texts stored in the system ("Never Quit", "Deny Thyself"); the wording was checked against secondary summaries only, not against the book.
+
+- **Outcast ("Never Quit": counts the Toughness Bonus as two higher for purposes of determining Fatigue):** the fatigue **threshold** is Toughness Bonus + 2 + Willpower Bonus. The Toughness Bonus for damage reduction and all other uses is **not** raised; the unconscious time (10 − Toughness Bonus) and the waking up (fatigue − Toughness Bonus) use the real Toughness Bonus. **Open rule question:** the wording "for determining Fatigue" may also affect other fatigue calculations (for example which characteristics are exhausted); that is not decided and not applied.
+- **Kalto ("Deny Thyself": ignores the effects of the first level of fatigue):** the first level is stored and shown but has no effect. **Project decision (interpretation, not a checked rule):** all effects are calculated with `max(0, stored fatigue − 1)`: stored 0, 1, 2, 3 → effect as 0, 0, 1, 2. The stored fatigue is never changed; the sheet shows "stored → effective" (counter, banner, tooltip). Exhausted characteristics, the threshold crossing, unconscious, death and waking up use the effective value; rest recovery and the Fate Point work on the stored value. The "+2 Toughness Bonus for starvation" of Kalto is **not** applied to the threshold or to damage (there is no starvation rule in the system).
+- Both origins together are possible (tested): stored 9 with Kalto = effect 8, limit 9 with Outcast.
+- Code: `fatigueOrigin`, `effectiveFatigue` in `rules/fatigue.mjs`; tests in `test/fatigue.test.mjs`.

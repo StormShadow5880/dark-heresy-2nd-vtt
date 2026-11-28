@@ -6,6 +6,10 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
 
 ## [1.9.0] – Unreleased
 
+### Origins: Pellenne, Kul, Daemon World, Outcast, Kalto
+
+- Pellenne: choose exactly one of Hatred (Mutants) or Dark-sight in the wizard. Kul: the free Forbidden Lore ranks are calculated from the Intelligence Bonus at the end of the creation (project decision). Daemon World: more ranks of Psyniscience need the Psyker aptitude. Outcast: the fatigue threshold includes +2 Toughness Bonus. Kalto: the first level of fatigue has no effect (project decision for the rest). See `docs/fatigue.md` and `docs/origin-special-rules.md`.
+
 ### Mutant background
 
 - The Mutant chooses exactly one starting trait in the wizard (with its parameter; Unnatural traits also set the unnatural bonus), has 10 Corruption and rolls the starting mutation (5d10, saved; the concrete result of Table 8-16 stays open until the table is available). Changing the background removes the trait. See `docs/expansion-content.md`.

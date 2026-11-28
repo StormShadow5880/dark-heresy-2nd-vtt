@@ -1,5 +1,5 @@
 import { SYSTEM_ID } from '../system-id.mjs';
-import { fatigueState, restRecovery, timerView, unconsciousTimer, wakeUpValue } from '../rules/fatigue.mjs';
+import { fatigueOrigin, fatigueState, restRecovery, timerView, unconsciousTimer, wakeUpValue } from '../rules/fatigue.mjs';
 
 /**
  * Fatigue on the game clock: the unconscious time runs on the world time (like the healing timers), a rest takes fatigue
@@ -15,7 +15,7 @@ export const timerViewOf = (actor) => timerView(timerOf(actor), game.time.worldT
 
 function stateOf(actor, value = actor.system.fatigue.value) {
     const t = actor.characteristics?.toughness;
-    return fatigueState({ value, max: actor.system.fatigue.max, toughnessBonus: t?.bonusBeforeFatigue ?? t?.bonus });
+    return fatigueState({ value, max: actor.system.fatigue.max, toughnessBonus: t?.bonusBeforeFatigue ?? t?.bonus, ignoredLevels: fatigueOrigin(actor.system.bio).ignoredLevels });
 }
 
 /** The limit was crossed: the unconscious time starts on the world clock */
@@ -32,7 +32,7 @@ export async function clearTimer(actor) {
 /** Wakes the character up: fatigue drops by the Toughness Bonus (at most one level below the limit) */
 export async function wakeUp(actor, { automatic = false } = {}) {
     const t = actor.characteristics.toughness;
-    const after = wakeUpValue({ value: actor.system.fatigue.value, max: actor.system.fatigue.max, toughnessBonus: t.bonusBeforeFatigue ?? t.bonus });
+    const after = wakeUpValue({ value: actor.system.fatigue.value, max: actor.system.fatigue.max, toughnessBonus: t.bonusBeforeFatigue ?? t.bonus, ignoredLevels: fatigueOrigin(actor.system.bio).ignoredLevels });
     await actor.update({ 'system.fatigue.value': after });
     await clearTimer(actor);
     await say(actor, `<p><strong>${esc(actor.name)}</strong> wakes up${automatic ? ' (the unconscious time is over)' : ''}. Fatigue is now ${after}.</p>`);

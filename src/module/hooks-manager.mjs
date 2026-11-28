@@ -30,7 +30,7 @@ import { DarkHeresyGearSheet } from './sheets/item/gear-sheet.mjs';
 import { DarkHeresySettings } from './dark-heresy-settings.mjs';
 import { DHTargetedActionManager } from './actions/targeted-action-manager.mjs';
 import { DHBasicActionManager } from './actions/basic-action-manager.mjs';
-import { crossing as fatigueCrossing, fatigueState } from './rules/fatigue.mjs';
+import { crossing as fatigueCrossing, effectiveFatigue, fatigueOrigin, fatigueState } from './rules/fatigue.mjs';
 import { changedOrigin, originLocked } from './rules/origin-lock.mjs';
 import { clearTimer, processTimers, startUnconscious } from './actions/fatigue-manager.mjs';
 import { moduleOn } from './modules.mjs';
@@ -281,8 +281,9 @@ Enable Debug with: game.dh.debug = true
         const to = foundry.utils.getProperty(changes, 'system.fatigue.value');
         if (to === undefined || options?.dhFatigueFrom === undefined) return;
         const t = actor.characteristics?.toughness;
-        const state = fatigueState({ value: to, max: actor.system.fatigue.max, toughnessBonus: t?.bonusBeforeFatigue ?? t?.bonus });
-        const kind = fatigueCrossing(options.dhFatigueFrom, Number(to), actor.system.fatigue.max);
+        const ignored = fatigueOrigin(actor.system.bio).ignoredLevels;
+        const state = fatigueState({ value: to, max: actor.system.fatigue.max, toughnessBonus: t?.bonusBeforeFatigue ?? t?.bonus, ignoredLevels: ignored });
+        const kind = fatigueCrossing(effectiveFatigue(options.dhFatigueFrom, ignored), effectiveFatigue(to, ignored), actor.system.fatigue.max);
         // the unconscious time runs on the world clock; back below the limit it ends
         if (state.unconscious && !state.dead) await startUnconscious(actor);
         else if (!state.unconscious) await clearTimer(actor);

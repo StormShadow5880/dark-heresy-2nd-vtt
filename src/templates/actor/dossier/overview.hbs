@@ -2,7 +2,7 @@
     {{#if dossier.fatigue.unconscious}}
         <div class="fatigue-banner {{#if dossier.fatigue.dead}}is-dead{{/if}}" role="alert">
             <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
-            <span><strong>Fatigue {{dossier.fatigue.value}} / {{dossier.fatigue.limit}}:</strong> {{dossier.fatigue.text}}{{#unless dossier.fatigue.dead}} <span data-wake-text>{{#if dossier.fatigue.wake.active}}{{#if dossier.fatigue.wake.ready}}Ready to wake up.{{else}}Wakes up in {{dossier.fatigue.wake.text}}.{{/if}}{{/if}}</span> On waking up the fatigue drops by the Toughness Bonus.{{/unless}}</span>
+            <span><strong>Fatigue {{dossier.fatigue.stored}}{{#if dossier.fatigue.ignored}} (effect as {{dossier.fatigue.value}}){{/if}} / {{dossier.fatigue.limit}}:</strong> {{dossier.fatigue.text}}{{#unless dossier.fatigue.dead}} <span data-wake-text>{{#if dossier.fatigue.wake.active}}{{#if dossier.fatigue.wake.ready}}Ready to wake up.{{else}}Wakes up in {{dossier.fatigue.wake.text}}.{{/if}}{{/if}}</span> On waking up the fatigue drops by the Toughness Bonus.{{/unless}}</span>
             {{#unless dossier.fatigue.dead}}<button type="button" class="icon-btn" data-action="wakeUp" data-tooltip="Wake up: fatigue drops by the Toughness Bonus"><i class="fa-solid fa-sun"></i> Wake up</button>{{/unless}}
         </div>
     {{/if}}
@@ -54,7 +54,7 @@
                             <li class="stat-list__row {{#if t.level}}is-{{t.level}}{{/if}} {{#if (eq t.id "fatigue")}}has-extra{{/if}}" data-tooltip="{{t.tooltip}}">
                                 <i class="sicon sicon--{{t.id}}"></i>
                                 <span class="stat-list__label">{{t.label}}</span>
-                                <span class="stat-list__value">{{t.value}}</span>
+                                <span class="stat-list__value">{{t.value}}{{#if t.hasEffective}}<small class="stat-list__eff" data-tooltip="The first level of fatigue is stored but has no effect: the effects are calculated as fatigue {{t.effective}}"> → {{t.effective}}</small>{{/if}}</span>
                                 {{#if (eq t.id "fatigue")}}<button type="button" class="step" data-action="fateFatigue" data-tooltip="Spend a Fate Point: remove all fatigue" aria-label="Spend a Fate Point to remove all fatigue"><i class="fa-solid fa-star"></i></button>{{/if}}
                                 <button type="button" class="step" data-action="adjustValue" data-path="{{t.path}}" data-delta="-1" data-max="{{t.max}}" aria-label="Decrease {{t.label}}">−</button>
                                 <button type="button" class="step" data-action="adjustValue" data-path="{{t.path}}" data-delta="1" data-max="{{t.max}}" aria-label="Increase {{t.label}}">+</button>
