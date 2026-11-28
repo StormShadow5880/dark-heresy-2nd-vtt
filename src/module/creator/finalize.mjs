@@ -5,6 +5,7 @@
  * with ONE Actor.create call, so either the whole character exists or nothing does. After creation the number of
  * items is verified; an inconsistent actor is deleted again and an error is reported.
  */
+import { maxWoundsFromCharacteristics } from '../rules/imperium-maledictum.mjs';
 import { SYSTEM_ID } from '../system-id.mjs';
 import { STEPS, computeCharacter, replayAdvances, stepStatus, talentName } from './character.mjs';
 import { CHARACTERISTIC_KEYS } from './data.mjs';
@@ -83,7 +84,13 @@ export async function buildCharacterData(draft, env, resolve) {
         system.bio.notes = `${system.bio.notes}\n\nOpen rules from the character creation:\n${lines.join('\n')}`.trim();
     }
     if (bio.homeWorldName) system.bio.notes = `Home world: ${bio.homeWorldName}\n\n${system.bio.notes}`.trim();
-    system.wounds = { ...system.wounds, max: state.wounds.max, value: state.wounds.max, critical: 0, rolled: true };
+    if (state.wounds.derived) {
+        // calculated maximum (Imperium Maledictum rule): from the final characteristics, nothing was rolled
+        const max = maxWoundsFromCharacteristics(system.characteristics, system.wounds?.modifier);
+        system.wounds = { ...system.wounds, max, value: max, critical: 0, rolled: false };
+    } else {
+        system.wounds = { ...system.wounds, max: state.wounds.max, value: state.wounds.max, critical: 0, rolled: true };
+    }
     system.fate = { ...system.fate, max: state.fate.threshold, value: state.fate.current };
     if (state.psy) system.psy = { ...system.psy, rating: state.psy.rating, class: state.psy.class };
     if (state.corruption) system.corruption = state.corruption;

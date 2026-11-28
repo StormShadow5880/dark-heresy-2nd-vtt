@@ -322,8 +322,13 @@ export function computeCharacter(draft, env) {
 
     /* ----- wounds, fate, divination ------------------------------------ */
     if (hw) {
-        const max = draft.wounds.roll ? woundsFromRoll(hw, draft.wounds.roll) : null;
-        out.wounds = max ? { max, value: max, roll: draft.wounds.roll } : null;
+        if (env.derivedWounds) {
+            // Imperium Maledictum rule (world setting): the maximum is calculated from the characteristics, no wounds are rolled
+            out.wounds = { derived: true, max: null, value: null, roll: null };
+        } else {
+            const max = draft.wounds.roll ? woundsFromRoll(hw, draft.wounds.roll) : null;
+            out.wounds = max ? { max, value: max, roll: draft.wounds.roll } : null;
+        }
         const fate = draft.fate.roll ? fateFromRoll(hw, draft.fate.roll) : null;
         out.fate = fate ? { ...fate, current: fate.threshold } : null;
     }

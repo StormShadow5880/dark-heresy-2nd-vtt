@@ -2,6 +2,8 @@
  * The character creation wizard (ApplicationV2). It only edits the creation draft (draft.mjs) and shows what
  * character.mjs computes from it; the rules live there, not here.
  */
+import { maxWoundsFromCharacteristics } from '../rules/imperium-maledictum.mjs';
+import { woundsFormulaIsIM } from '../rules/wounds-setting.mjs';
 import { SYSTEM_ID } from '../system-id.mjs';
 import { markTooltips } from '../ui/tooltips.mjs';
 import { aptitudeName, buildQuotes, describeQuote, num } from '../rules/advancement.mjs';
@@ -93,6 +95,7 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
         return {
             startingXp: num(game.settings.get(SYSTEM_ID, CREATOR_SETTINGS.startingXp), 1000),
             systemDefaults: foundry.utils.deepClone(game.model.Actor.acolyte),
+            derivedWounds: woundsFormulaIsIM(),
         };
     }
 
@@ -155,7 +158,7 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
             veteranAllowed: !!game.settings.get(SYSTEM_ID, CREATOR_SETTINGS.veteran),
             randomAllowed: !!game.settings.get(SYSTEM_ID, CREATOR_SETTINGS.random) || game.user.isGM,
             startingXp: env.startingXp,
-            derivedWounds: game.settings.get(SYSTEM_ID, 'wounds-formula') === 'im',
+            derivedWounds: woundsFormulaIsIM(),
             showLog: this.showLog,
             log: [...draft.log].reverse().slice(0, 40).map((e) => ({ ...e, date: new Date(e.time).toLocaleTimeString() })),
             overrides: draft.overrides,
@@ -274,6 +277,8 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
             divination: state.divination,
             divinationNotes: state.divinationNotes,
             woundsRoll: draft.wounds.roll,
+            woundsDerived: !!state.wounds?.derived,
+            derivedWoundsMax: maxWoundsFromCharacteristics(sim.actor.system.characteristics),
             fateRoll: draft.fate.roll,
             divinationRoll: draft.divination.roll,
             hasHomeWorld: !!state.homeWorld,
@@ -324,7 +329,7 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
             background: state.background?.name ?? '–',
             role: state.role?.name ?? '–',
             chars,
-            wounds: state.wounds?.max ?? '–',
+            wounds: state.wounds?.derived ? `${maxWoundsFromCharacteristics(simActor.system.characteristics)} (calculated)` : state.wounds?.max ?? '–',
             fate: state.fate?.threshold ?? '–',
             aptitudes: state.aptitudes.map((a) => a.name),
             xp: num(simActor.system.experience.total) - num(simActor.system.experience.used),
@@ -503,7 +508,7 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
             this.draft.corruptionRoll = (await rollDice('1d10', 'Corruption of a rogue psyker (1d10+3)'))[0];
         } else if (!this.draft.homeWorldId) {
             return ui.notifications.warn('Choose a home world first.');
-        } else if (what === 'wounds' && !this.draft.wounds.roll) {
+        } else if (what === 'wounds' && !this.draft.wounds.roll && !this.env.derivedWounds) {
             this.draft.wounds.roll = (await rollDice('1d5', 'Wounds (1d5)'))[0];
             logEvent(this.draft, `Wounds: rolled ${this.draft.wounds.roll}`);
         } else if (what === 'fate' && !this.draft.fate.roll) {

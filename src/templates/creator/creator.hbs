@@ -274,7 +274,8 @@
             {{#unless vitals.hasHomeWorld}}<p class="warn">Choose a home world first.</p>{{/unless}}
             <div class="panel">
                 <h4>Wounds</h4>
-                {{#if vitals.wounds}}<p>Rolled {{vitals.woundsRoll}}: <b>{{vitals.wounds.max}} wounds</b> ({{state.homeWorld.wounds.base}} + 1d5).{{#if derivedWounds}} <small>With the Imperium Maledictum wound rule (world setting) the sheet shows the calculated maximum.</small>{{/if}}</p>
+                {{#if vitals.woundsDerived}}<p>Wounds are <b>calculated</b> (world setting, Imperium Maledictum rule: Strength Bonus + 2 × Toughness Bonus + Willpower Bonus). Nothing is rolled. With your characteristics now: <b>{{vitals.derivedWoundsMax}} wounds</b>; the sheet keeps the value up to date when the characteristics change.</p>
+                {{else if vitals.wounds}}<p>Rolled {{vitals.woundsRoll}}: <b>{{vitals.wounds.max}} wounds</b> ({{state.homeWorld.wounds.base}} + 1d5).</p>
                 {{else}}<button type="button" class="btn" data-action="rollVital" data-what="wounds"><i class="fa-solid fa-dice-d6"></i> Roll 1d5</button>{{/if}}
                 <h4>Fate</h4>
                 {{#if vitals.fate}}<p>Emperor's Blessing rolled {{vitals.fate.roll}}: {{#if vitals.fate.blessing}}blessed, +1{{else}}no blessing{{/if}}. <b>Fate threshold {{vitals.fate.threshold}}</b>, you start with {{vitals.fate.current}} fate points.</p>

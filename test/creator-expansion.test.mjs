@@ -114,3 +114,47 @@ test('skills are shown with a readable name and the training with its bonus, not
     assert.equal(skills.acrobatics.label, 'Acrobatics');
     assert.ok(skills.forbiddenLore.label.length > 0);
 });
+
+test('wounds: with the Imperium Maledictum rule nothing is rolled and the maximum is calculated; without it the roll is needed', async () => {
+    const d = complete('Hive World', 'Outcast', 'Seeker');
+    d.wounds.roll = null;
+    // normal rule: the wounds roll is missing
+    assert.equal(ch.computeCharacter(d, env).wounds, null);
+    // IM rule: no roll needed, the step is complete without it
+    const imEnv = { ...env, derivedWounds: true };
+    const s = ch.computeCharacter(d, imEnv);
+    assert.deepEqual(s.wounds, { derived: true, max: null, value: null, roll: null });
+    assert.equal(ch.stepStatus(s, d).vitals, true);
+    assert.equal(ch.stepBlockers ? ch.stepBlockers(s, d).vitals?.some((t) => /wounds/i.test(t)) ?? false : false, false);
+    // finalize: max and value come from the characteristics (SB + 2 TB + WPB, tens digits), not from a roll
+    const { data: actor } = await fin.buildCharacterData(d, imEnv, resolve);
+    const c = actor.system.characteristics;
+    const tens = (k) => Math.floor((c[k].base + c[k].advance * 5 + (c[k].modifier || 0)) / 10);
+    const expected = tens('strength') + 2 * tens('toughness') + tens('willpower');
+    assert.equal(actor.system.wounds.max, expected);
+    assert.equal(actor.system.wounds.value, expected);
+    assert.equal(actor.system.wounds.rolled, false);
+    // the normal rule still uses the roll
+    d.wounds.roll = 2;
+    const normal = await fin.buildCharacterData(d, env, resolve);
+    assert.equal(normal.data.system.wounds.rolled, true);
+});
+
+test('divination: the chosen characteristics change by the stated amount', () => {
+    const d = complete('Hive World', 'Outcast', 'Seeker');
+    d.divination.roll = 45; // "Increase Toughness or Willpower by 3, reduce Fellowship or Strength by 3"
+    d.choices['div-inc'] = undefined;
+    const base = ch.computeCharacter(complete('Hive World', 'Outcast', 'Seeker'), env).characteristics;
+    const s0 = ch.computeCharacter(d, env);
+    const open = s0.choices.filter((c) => c.id.startsWith('div-'));
+    assert.equal(open.length, 2, 'two choices: which to increase and which to reduce');
+    const inc = open.find((c) => /Increase/.test(c.label));
+    const red = open.find((c) => /Reduce/.test(c.label));
+    d.choices[inc.id] = 'toughness';
+    d.choices[red.id] = 'fellowship';
+    const after = ch.computeCharacter(d, env).characteristics;
+    assert.equal(after.toughness, base.toughness + 3);
+    assert.equal(after.fellowship, base.fellowship - 3);
+    assert.equal(after.strength, base.strength, 'the other options stay');
+    assert.equal(after.willpower, base.willpower);
+});

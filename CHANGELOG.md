@@ -6,6 +6,11 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
 
 ## [1.9.0] – Unreleased
 
+### Character creation: wounds and skills
+
+- With the Imperium Maledictum wound rule (world setting) the wizard does not ask for a wounds roll: the maximum is calculated from the final characteristics (Strength Bonus + 2 × Toughness Bonus + Willpower Bonus) when the character is created, and shown as calculated in the vitals step and the summary. Without that rule the roll works as before.
+- Skills in the wizard use readable names and the training with its bonus (Known (+0), Trained (+10) …) instead of lowercase "rank 1".
+
 ### Optional modules
 
 - Module state: every hidden flag of the system is registered in one list; the GM sees and resets the state of a character (timers, combat counters, locks) with the database button in the dossier header. See `docs/modules.md`.

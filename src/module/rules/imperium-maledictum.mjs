@@ -62,3 +62,17 @@ export function reconcileWounds({ persistedMax, computedMax, value }) {
     const next = Math.min(target, Math.max(0, remaining + (target - stored)));
     return { max: target, value: next };
 }
+
+/**
+ * The maximum wounds from the stored characteristics of a character (base, advances, modifier) before the sheet exists, e.g. in the
+ * character creation: the tens digit of each total, Strength + 2 x Toughness + Willpower. Unnatural bonus and fatigue are not part of it.
+ * @param characteristics {Record<string, {base?: number, advance?: number, modifier?: number}>}
+ */
+export function maxWoundsFromCharacteristics(characteristics, modifier = 0) {
+    const bonus = (key) => {
+        const c = characteristics?.[key] ?? {};
+        const total = (Number(c.base) || 0) + (Number(c.advance) || 0) * 5 + (Number(c.modifier) || 0);
+        return Math.floor(total / 10);
+    };
+    return maxWounds({ strength: bonus('strength'), toughness: bonus('toughness'), willpower: bonus('willpower') }, modifier);
+}
