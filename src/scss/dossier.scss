@@ -1180,8 +1180,17 @@
         }
         &--btn {
             cursor: pointer;
-            min-width: 0;
+            // the global button reset gives buttons width 100%: without a fixed box the rotated pip becomes an oval
+            flex: none;
+            box-sizing: border-box;
+            width: 9px;
+            min-width: 9px;
+            max-width: 9px;
             height: 9px;
+            min-height: 9px;
+            max-height: 9px;
+            padding: 0;
+            border-radius: 0;
             line-height: 1;
             &:hover,
             &:focus-visible {
