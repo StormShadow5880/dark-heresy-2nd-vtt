@@ -1,3 +1,4 @@
+import { TRAINING_LEVELS } from '../../rules/skill-training.mjs';
 /**
  * Builds the view model for the Dark Heresy dossier character sheet.
  * Everything here only READS existing actor data (computed in documents/acolyte.mjs);
@@ -25,13 +26,7 @@ export const CHARACTERISTIC_ORDER = [
     'influence',
 ];
 
-export const TRAINING_LEVELS = {
-    0: 'Unknown',
-    1: 'Known',
-    2: 'Trained',
-    3: 'Experienced',
-    4: 'Veteran',
-};
+export { TRAINING_LEVELS };
 
 export const TRAINING_PIP_LABELS = { 1: 'Known', 2: '+10', 3: '+20', 4: '+30' };
 

@@ -98,3 +98,19 @@ test('an old draft without stored consequence rolls still opens', () => {
     delete d.consequenceRolls;
     assert.doesNotThrow(() => ch.computeCharacter(d, env));
 });
+
+test('skills are shown with a readable name and the training with its bonus, not "rank 1"', async () => {
+    const { trainingText, readableSkillName } = await import('../src/module/rules/skill-training.mjs');
+    assert.equal(trainingText(1), 'Known (+0)');
+    assert.equal(trainingText(2), 'Trained (+10)');
+    assert.equal(trainingText(4), 'Veteran (+30)');
+    assert.equal(trainingText(0), 'Unknown (-20)');
+    assert.equal(readableSkillName('techUse', 'Tech Use'), 'Tech Use');
+    assert.equal(readableSkillName('commonLore'), 'Common Lore');
+    assert.equal(readableSkillName('acrobatics'), 'Acrobatics');
+    // the labels of the actor template are what the wizard shows
+    const { acolyteDefaults } = await import('./creator-helpers.mjs');
+    const skills = acolyteDefaults().skills;
+    assert.equal(skills.acrobatics.label, 'Acrobatics');
+    assert.ok(skills.forbiddenLore.label.length > 0);
+});

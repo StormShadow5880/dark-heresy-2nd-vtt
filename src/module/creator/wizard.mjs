@@ -5,6 +5,7 @@
 import { SYSTEM_ID } from '../system-id.mjs';
 import { markTooltips } from '../ui/tooltips.mjs';
 import { aptitudeName, buildQuotes, describeQuote, num } from '../rules/advancement.mjs';
+import { readableSkillName, trainingText } from '../rules/skill-training.mjs';
 import { isDlc, sourceLabel } from '../rules/sources.mjs';
 import { differences, homeworldGroups, typeIdOf } from './homeworld-groups.mjs';
 import { BACKGROUNDS, CHARACTERISTICS, HOMEWORLDS, POINT_BUY, ROLES, byId } from './data.mjs';
@@ -161,8 +162,10 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
         };
 
         // two steps: the type of home world, then (where it has variants) the general variant or a specific world
+        const skillLabel = (key) => readableSkillName(key, this.env.systemDefaults?.skills?.[key]?.label);
         const hwCard = (h) => ({
             ...h,
+            skillText: (h.skills ?? []).map((k) => `${skillLabel(k.skill)}${k.spec ? ` (${k.spec})` : ''}: ${trainingText(k.ranks ?? 1)}`),
             selected: h.id === draft.homeWorldId,
             positiveText: h.positive.map(label).join(', '),
             negativeText: label(h.negative),
@@ -234,8 +237,8 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
         context.vitalChoices = choicesFor('vitals');
         context.equipmentChoices = choicesFor('equipment');
         context.skillList = Object.entries(state.skills).flatMap(([key, s]) => [
-            ...(s.advance ? [{ name: key.replace(/([A-Z])/g, ' $1'), rank: s.advance }] : []),
-            ...Object.values(s.specs).map((sp) => ({ name: `${key.replace(/([A-Z])/g, ' $1')} (${sp.label})`, rank: sp.advance })),
+            ...(s.advance ? [{ name: skillLabel(key), rank: trainingText(s.advance) }] : []),
+            ...Object.values(s.specs).map((sp) => ({ name: `${skillLabel(key)} (${sp.label})`, rank: trainingText(sp.advance) })),
         ]);
 
         // characteristics

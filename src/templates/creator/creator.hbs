@@ -129,7 +129,7 @@
                         {{/if}}
                     {{/unless}}
                     {{#if hwPreview.talents.length}}<p class="hw-diff"><b>Starting talent:</b> {{#each hwPreview.talents as |t|}}{{t.talent}}{{#if t.spec}} ({{t.spec}}){{/if}}{{#unless @last}}, {{/unless}}{{/each}}</p>{{/if}}
-                    {{#if hwPreview.skills.length}}<p class="hw-diff"><b>Starting skills:</b> {{#each hwPreview.skills as |k|}}{{k.skill}}{{#if k.spec}} ({{k.spec}}){{/if}}{{#if k.ranks}} rank {{k.ranks}}{{/if}}{{#unless @last}}, {{/unless}}{{/each}}</p>{{/if}}
+                    {{#if hwPreview.skillText.length}}<p class="hw-diff"><b>Starting skills:</b> {{#each hwPreview.skillText as |k|}}{{k}}{{#unless @last}}, {{/unless}}{{/each}}</p>{{/if}}
                 </section>
             {{/if}}
             {{> consequences}}
@@ -263,7 +263,7 @@
                     <select name="c.{{c.id}}"><option value="">– choose –</option>{{#each c.options as |o|}}<option value="{{o.value}}" {{#if o.selected}}selected{{/if}}>{{o.label}}</option>{{/each}}</select></div>
             {{/each}}
             <div class="grid2">
-                <div><h4>Skills</h4><ul class="list">{{#each skillList as |s|}}<li>{{s.name}} <small>rank {{s.rank}}</small></li>{{else}}<li class="empty">Choose a background first.</li>{{/each}}</ul></div>
+                <div><h4>Skills</h4><ul class="list">{{#each skillList as |s|}}<li>{{s.name}} <small>{{s.rank}}</small></li>{{else}}<li class="empty">Choose a background first.</li>{{/each}}</ul></div>
                 <div><h4>Talents</h4><ul class="list">{{#each state.talents as |t|}}<li>{{t.name}} <small>{{t.source}}</small></li>{{else}}<li class="empty">None yet.</li>{{/each}}</ul>
                     <h4>Traits</h4><ul class="list">{{#each state.traits as |t|}}<li>{{t.name}} <small>{{t.source}}</small>{{#if t.note}}<br /><small>{{t.note}}</small>{{/if}}</li>{{else}}<li class="empty">None.</li>{{/each}}</ul></div>
             </div>
