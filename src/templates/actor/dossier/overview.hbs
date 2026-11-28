@@ -57,8 +57,8 @@
                                 <span class="stat-list__value">{{t.value}}{{#if t.hasEffective}}<small class="stat-list__eff" data-tooltip="The first level of fatigue is stored but has no effect: the effects are calculated as fatigue {{t.effective}}"> → {{t.effective}}</small>{{/if}}</span>
                                 {{#if (eq t.id "fatigue")}}<button type="button" class="step" data-action="fateFatigue" data-tooltip="Spend a Fate Point: remove all fatigue" aria-label="Spend a Fate Point to remove all fatigue"><i class="fa-solid fa-star"></i></button>{{/if}}
                                 {{#if t.garden}}<button type="button" class="step" data-action="removeInsanity" data-tooltip="Serenity of the Green: remove Insanity for 50 EP per point (the GM approves)" aria-label="Remove Insanity for experience"><i class="fa-solid fa-leaf"></i></button>{{/if}}
-                                <button type="button" class="step" data-action="adjustValue" data-path="{{t.path}}" data-delta="-1" data-max="{{t.max}}" aria-label="Decrease {{t.label}}">−</button>
-                                <button type="button" class="step" data-action="adjustValue" data-path="{{t.path}}" data-delta="1" data-max="{{t.max}}" aria-label="Increase {{t.label}}">+</button>
+                                <button type="button" class="step" data-action="adjustValue" data-path="{{t.path}}" data-delta="-1" data-max="{{#unless (eq t.id "fatigue")}}{{t.max}}{{/unless}}" aria-label="Decrease {{t.label}}">−</button>
+                                <button type="button" class="step" data-action="adjustValue" data-path="{{t.path}}" data-delta="1" data-max="{{#unless (eq t.id "fatigue")}}{{t.max}}{{/unless}}" aria-label="Increase {{t.label}}">+</button>
                             </li>
                         {{/each}}
                     </ul>
