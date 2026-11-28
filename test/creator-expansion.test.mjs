@@ -261,3 +261,46 @@ test('Unnatural traits also set the unnatural bonus of the characteristic (level
         for (const other of Object.keys(c)) if (other !== key) assert.equal(c[other].unnatural, base[other].unnatural, `${other} unchanged`);
     }
 });
+
+test('Pellenne: exactly one of Hatred (Mutants) or Dark-sight is given, once; changing the home world takes it back', async () => {
+    const pell = data.HOMEWORLDS.find((h) => h.name === 'Pellenne');
+    const d = complete('Pellenne', 'Outcast', 'Seeker');
+    // the wizard answers with the first option: Hatred (Mutants)
+    let s = ch.computeCharacter(d, env);
+    const c = s.choices.find((x) => x.id === 'hw-hatred-darksight');
+    assert.deepEqual(c.options.map((o) => o.label), ['Hatred (Mutants)', 'Dark-sight']);
+    assert.ok(s.talents.some((t) => t.name === 'Hatred (Mutants)' && t.source === 'Pellenne'));
+    assert.equal(s.traits.some((t) => t.name === 'Dark-sight'), false);
+    // going back and forward: still one
+    for (let i = 0; i < 3; i++) assert.equal(ch.computeCharacter(d, env).talents.filter((t) => t.name === 'Hatred (Mutants)').length, 1);
+    // the other option replaces it
+    d.choices['hw-hatred-darksight'] = '1';
+    s = ch.computeCharacter(d, env);
+    assert.ok(s.traits.some((t) => t.name === 'Dark-sight' && t.source === 'Pellenne'));
+    assert.equal(s.talents.some((t) => t.name === 'Hatred (Mutants)'), false);
+    // nothing is given before the choice
+    delete d.choices['hw-hatred-darksight'];
+    s = ch.computeCharacter(d, env);
+    assert.equal(s.traits.some((t) => t.name === 'Dark-sight'), false);
+    assert.equal(s.talents.some((t) => /Hatred/.test(t.name)), false);
+    // the other fixed grants stay (Resistance (Radiation), Trade (Prospector))
+    assert.ok(s.talents.some((t) => t.name === 'Resistance (Radiation)'));
+    // change of the home world: no orphan of the Pellenne choice
+    d.choices['hw-hatred-darksight'] = '1';
+    dr.setHomeWorld(d, pell.id);
+    dr.setHomeWorld(d, data.HOMEWORLDS.find((h) => h.name === 'Hive World').id);
+    await dr.pruneChoices(d, env);
+    assert.equal('hw-hatred-darksight' in d.choices, false);
+    s = ch.computeCharacter(d, env);
+    assert.equal(s.traits.some((t) => t.name === 'Dark-sight'), false);
+    assert.equal(s.talents.some((t) => t.source === 'Pellenne'), false);
+});
+
+test('Pellenne at the end: one item, an existing item of the same name is not removed', async () => {
+    const d = complete('Pellenne', 'Outcast', 'Seeker');
+    d.choices['hw-hatred-darksight'] = '1';
+    d.biography = { name: 'T' };
+    const { data: actor } = await fin.buildCharacterData(d, env, resolve);
+    assert.equal(actor.items.filter((i) => i.type === 'trait' && i.name === 'Dark-sight').length, 1);
+    assert.equal(actor.items.some((i) => i.type === 'talent' && /Hatred/.test(i.name)), false);
+});

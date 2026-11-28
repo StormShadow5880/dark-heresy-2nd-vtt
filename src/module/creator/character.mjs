@@ -132,8 +132,14 @@ export function computeCharacter(draft, env) {
     const hw = out.homeWorld;
     if (hw) {
         for (const def of hw.choices) {
-            const c = addChoice({ id: def.id, step: 'homeworld', label: def.label, options: def.options.map((o, i) => option(i, o.talent)) });
-            if (c.resolved) out.talents.push({ name: def.options[Number(c.value)].talent, source: hw.name });
+            // exactly one option is given: a talent (with its specialisation) or a trait; nothing is given before the choice is made
+            const text = (o) => (o.trait ? o.trait : o.spec ? `${o.talent} (${o.spec})` : o.talent);
+            const c = addChoice({ id: def.id, step: 'homeworld', label: def.label, options: def.options.map((o, i) => option(i, text(o))) });
+            if (c.resolved) {
+                const picked = def.options[Number(c.value)];
+                if (picked.trait) out.traits.push({ name: picked.trait, level: picked.level, source: hw.name });
+                else out.talents.push({ name: text(picked), source: hw.name });
+            }
         }
         for (const t of hw.talents) out.talents.push({ name: talentName(t), source: hw.name });
         for (const t of hw.traits ?? []) out.traits.push({ name: t.trait, level: t.level, source: hw.name });
