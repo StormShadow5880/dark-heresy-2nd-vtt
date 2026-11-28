@@ -36,6 +36,9 @@
                                 <button type="button" class="icon-btn item-edit" data-item-id="{{item.id}}" data-tooltip="Edit"><i class="fa-solid fa-pen"></i></button>
                                 <button type="button" class="icon-btn item-delete" data-item-id="{{item.id}}" data-tooltip="Delete"><i class="fa-solid fa-trash"></i></button>
                             </div>
+                            {{#if item.mods.length}}
+                                <div class="gear-mods" data-tooltip="Weapon modifications (open the weapon to change them)"><i class="fa-solid fa-screwdriver-wrench" aria-hidden="true"></i>{{#each item.mods as |m|}}<span class="gear-mod {{#if m.on}}is-on{{/if}}" data-tooltip="{{#if m.on}}Installed{{else}}Not installed{{/if}}">{{m.name}}</span>{{/each}}</div>
+                            {{/if}}
                             {{#if item.hasDescription}}
                                 <div class="gear-detail" id="gear-detail-{{item.id}}" role="region" aria-label="Description of {{item.name}}" aria-hidden="true"><div class="fold__inner"><div class="gear-detail__body"></div></div></div>
                             {{/if}}

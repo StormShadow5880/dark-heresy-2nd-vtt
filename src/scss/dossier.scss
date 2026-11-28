@@ -3347,3 +3347,23 @@ $fatigue-colour: #e39a3b;
     font-size: 0.74rem;
     white-space: nowrap;
 }
+
+// modifications installed in a weapon, shown under its row in the gear tab
+.application.dossier .gear-mods {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px;
+    padding: 0 8px 4px 52px;
+    font-size: 0.72rem;
+    color: var(--ds-muted);
+    .gear-mod {
+        padding: 0 7px;
+        border: 1px solid var(--ds-line);
+        color: var(--ds-text-2);
+        &.is-on {
+            border-color: var(--ds-gold);
+            color: var(--ds-gold);
+        }
+    }
+}

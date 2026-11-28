@@ -12,7 +12,7 @@
                 {{#each dossier.weapons as |w|}}
                     {{#if w.equipped}}
                         <tr class="item-drag" data-item-id="{{w.id}}" data-item-type="weapon">
-                            <td class="wtable__name" data-tooltip="{{w.class}}{{#if w.type}} · {{w.type}}{{/if}}"><img src="{{w.img}}" alt="" /> <span>{{w.name}}</span></td>
+                            <td class="wtable__name" data-tooltip="{{w.class}}{{#if w.type}} · {{w.type}}{{/if}}"><img src="{{w.img}}" alt="" /> <span>{{w.name}}</span>{{#if w.mods.length}} <small class="wtable__mods" data-tooltip="Installed modifications">+ {{#each w.mods as |m|}}{{m}}{{#unless @last}}, {{/unless}}{{/each}}</small>{{/if}}</td>
                             <td>{{w.damage}} <small>{{w.damageType}}</small></td>
                             <td>{{w.penetration}}</td>
                             <td>{{w.range}}</td>
@@ -109,7 +109,7 @@
                 {{#each dossier.weapons as |w|}}
                     {{#unless w.equipped}}
                         <tr class="item-drag is-unequipped" data-item-id="{{w.id}}" data-item-type="weapon">
-                            <td class="wtable__name" data-tooltip="{{w.class}}{{#if w.type}} · {{w.type}}{{/if}}"><img src="{{w.img}}" alt="" /> <span>{{w.name}}</span></td>
+                            <td class="wtable__name" data-tooltip="{{w.class}}{{#if w.type}} · {{w.type}}{{/if}}"><img src="{{w.img}}" alt="" /> <span>{{w.name}}</span>{{#if w.mods.length}} <small class="wtable__mods" data-tooltip="Installed modifications">+ {{#each w.mods as |m|}}{{m}}{{#unless @last}}, {{/unless}}{{/each}}</small>{{/if}}</td>
                             <td>{{w.damage}} <small>{{w.damageType}}</small></td>
                             <td>{{w.penetration}}</td>
                             <td>{{w.range}}</td>

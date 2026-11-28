@@ -296,6 +296,8 @@ export function buildWeapons(actor) {
                 clipMax: sys.clip?.max ?? 0,
                 reload: sys.reload,
                 specials,
+                // installed modifications (nested weapon modifications that are switched on)
+                mods: [...(item.items ?? [])].filter((n) => n.type === 'weaponModification' && (n.system?.equipped || n.system?.enabled)).map((n) => n.name),
                 equipped: item.equipped,
             };
         });
@@ -347,6 +349,10 @@ export function buildGear(actor) {
                 inBackpack: item.isInBackpack,
                 craftsmanship: item.system.craftsmanship,
                 hasDescription: hasDescription(item.system?.description),
+                // modifications installed in this item (nested items), with their state
+                mods: [...(item.items ?? [])]
+                    .filter((m) => m.type === 'weaponModification')
+                    .map((m) => ({ id: m.id, name: m.name, on: !!(m.system?.equipped || m.system?.enabled) })),
             }))
             .sort((a, b) => a.name.localeCompare(b.name)),
     }));
