@@ -77,6 +77,7 @@
                 <span class="wstate is-dead" data-tooltip="{{dossier.fatigue.text}}">Dead (fatigue)</span>
             {{else if dossier.fatigue.unconscious}}
                 <span class="wstate is-unconscious" data-tooltip="{{dossier.fatigue.text}}">Unconscious</span>
+                <button type="button" class="icon-btn wstate__wake" data-action="wakeUp" data-tooltip="Wake up: fatigue drops by the Toughness Bonus (at most one level below the limit)"><i class="fa-solid fa-sun"></i> Wake up</button>
             {{else if dossier.res.wounds.bar.serious}}
                 <span class="wstate is-serious">Seriously injured</span>
             {{else if dossier.res.wounds.bar.hasDamage}}

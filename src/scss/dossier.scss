@@ -3338,3 +3338,12 @@ $fatigue-colour: #e39a3b;
         min-width: 0;
     }
 }
+
+// wake-up button next to the "Unconscious" state in the header
+.application.dossier .crit .wstate__wake {
+    width: auto;
+    margin-left: 6px;
+    padding: 1px 8px;
+    font-size: 0.74rem;
+    white-space: nowrap;
+}
