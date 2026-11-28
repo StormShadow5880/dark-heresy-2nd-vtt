@@ -48,3 +48,19 @@ export function applyKulLoreRanks(skills, intelligenceBonus) {
     }
     return { ranks, wanted, capped, changes };
 }
+
+/**
+ * Adepta Sororitas background: "Whenever an Adepta Sororitas Character would gain 1 or more Corruption Points,
+ * she gains that many Insanity Points minus 1 (to a minimum of 0) instead."
+ * The player is offered the choice (project decision: the optional wording is offered, never forced).
+ * Returns the Insanity that replaces a Corruption gain.
+ */
+export function sororitasInsanity(corruptionGain) {
+    const gain = Math.floor(Number(corruptionGain) || 0);
+    return gain >= 1 ? Math.max(0, gain - 1) : 0;
+}
+
+/** True when the Sororitas offer applies to this change (background and a gain of at least 1) */
+export function sororitasOffer(background, corruptionGain) {
+    return background === 'Adepta Sororitas' && Math.floor(Number(corruptionGain) || 0) >= 1;
+}

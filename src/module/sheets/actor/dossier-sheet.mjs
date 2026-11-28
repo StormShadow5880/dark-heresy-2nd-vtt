@@ -8,6 +8,7 @@ import { roles } from '../../rules/roles.mjs';
 import { ORIGIN_FIELDS, isUnlocked, originLocked, UNLOCK_FLAG } from '../../rules/origin-lock.mjs';
 import { groupedOptions, isDlc, sourceLabel } from '../../rules/sources.mjs';
 import { timerView } from '../../rules/fatigue.mjs';
+import { sororitasInsanity, sororitasOffer } from '../../rules/origin-grants.mjs';
 import { giveReactionBack, takeReaction, chooseAndSpend, refundAction, resetAccount, viewFor as accountViewFor } from '../../combat/action-account.mjs';
 import {
     buildArmour,
@@ -559,7 +560,40 @@ export class AcolyteDossierSheet extends AcolyteSheet {
         const current = Number(foundry.utils.getProperty(this.actor, path) ?? 0);
         const next = stepCounter(current, Number(delta), target.dataset.max);
         if (next === current) return;
+        if (path === 'system.corruption' && sororitasOffer(this.actor.system.bio?.background, next - current)) {
+            return this.#sororitasCorruption(current, next);
+        }
         await this.actor.update({ [path]: next });
+    }
+
+    /**
+     * Adepta Sororitas: a Corruption gain can be replaced by Insanity (gain minus 1, at least 0).
+     * Only the +/- button asks (a rule-based gain); direct edits of the field and GM macros stay untouched,
+     * and nothing already gained is converted afterwards. The GM can book a plain correction.
+     */
+    async #sororitasCorruption(current, next) {
+        const gain = next - current;
+        const insanity = sororitasInsanity(gain);
+        const DialogV2 = foundry.applications.api.DialogV2;
+        const buttons = [
+            { action: 'corruption', label: `Gain ${gain} Corruption`, default: true },
+            { action: 'insanity', label: `Gain ${insanity} Insanity instead` },
+        ];
+        if (game.user.isGM) buttons.push({ action: 'correction', label: 'GM correction (no rule)' });
+        const choice = await DialogV2.wait({
+            window: { title: 'Adepta Sororitas: Corruption' },
+            content: `<p>This character would gain <strong>${gain} Corruption</strong>. As an Adepta Sororitas she may gain ${gain} − 1 = <strong>${insanity} Insanity</strong> instead (minimum 0).</p>`,
+            buttons,
+            rejectClose: false,
+            modal: false,
+        });
+        if (!choice) return;
+        if (choice === 'insanity') {
+            if (insanity > 0) await this.actor.update({ 'system.insanity': Number(this.actor.system.insanity ?? 0) + insanity });
+            ui.notifications.info(`Adepta Sororitas: ${gain} Corruption replaced by ${insanity} Insanity.`);
+            return;
+        }
+        await this.actor.update({ 'system.corruption': next });
     }
 
     static async #onSpendExperience() {

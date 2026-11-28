@@ -33,7 +33,7 @@ Review of all 37 home worlds, 13 backgrounds and 12 roles (bonus texts as stored
 | **Outcast** | counts Toughness Bonus as 2 higher **for determining Fatigue** | fatigue threshold (and the "exhausted" comparison?) uses the Toughness Bonus: not implemented, **the question is which of the two uses it means** |
 | **Kalto** | ignores the first level of Fatigue; +2 Toughness Bonus for starvation | fatigue counter (the first level has no effect) |
 | **Exorcised** | Insanity Bonus counts as 2 higher for avoiding Fear tests | Fear test target (no Fear test automation yet) |
-| **Adepta Sororitas** | every Corruption gain becomes Insanity gain minus 1 (minimum 0) | the Corruption counter (+/- buttons, wizard) could convert; not implemented |
+| **Adepta Sororitas** | every Corruption gain becomes Insanity gain minus 1 (minimum 0) | **implemented as an offer** at the Corruption +/- button (see below) |
 | **Garden World** | shock and mental trauma last half as long (rounded up); Insanity can be removed for 50 XP per point | Spend EP "Other" entry with a fixed price; no shock tables automated |
 | **Highborn** | Influence losses reduced by 1 (minimum 1) | no Influence-loss event exists |
 | Adeptus Administratum, Mechanicus | Availability counts one / two levels better | only display of the availability of items |
@@ -60,3 +60,12 @@ Quarantine World and Snope's World (Subtlety), Pursuit of Data (Research Station
 1. **Needs a decision before it can be automated:** Pellenne (talent or trait), Kul (when the Intelligence Bonus counts), Outcast and Kalto (what exactly counts for fatigue), Adepta Sororitas (Corruption conversion), Daemon World (Psyniscience restriction).
 2. **Blocked by missing data:** the mutation table (Table 8-16) and the malignancy table (8-15).
 3. **A single general feature would cover most of the rest:** a "this origin or talent applies" tick box with the bonus in the roll dialogs (group C) and a central "spend a Fate Point for ..." action (group D). Both need the exact printed wording per rule to be safe, and the decision how the tick box is shown.
+
+
+## Adepta Sororitas: Corruption conversion
+
+- Stored background text: "Whenever an Adepta Sororitas Character would gain 1 or more Corruption Points, she gains that many Insanity Points minus 1 (to a minimum of 0) instead." Source: the stored text of the background (expansion content); the publisher's general description may read as a fixed rule rather than a choice. **Discrepancy not resolved.**
+- **Project decision:** the player is offered the choice (gain Corruption / gain Insanity minus 1). Examples: 1 → 0, 2 → 1, 4 → 3 (`sororitasInsanity`, tested).
+- Only the +/- button on the sheet asks, because that is a rule-based gain. Direct edits of the field, macros and the update hooks are not rewritten; nothing already gained is converted afterwards. The GM gets a third button "GM correction (no rule)" that books the plain value.
+- Not covered: Corruption gained in the creation wizard (Mutant background does not apply; Sororitas starts with none) and gains by other automations (none exist).
+- Untested in Foundry (dialog).
