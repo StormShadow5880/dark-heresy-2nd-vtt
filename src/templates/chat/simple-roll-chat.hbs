@@ -19,6 +19,9 @@
                 {{#each activeModifiers}}<span class="dh-mod"><b>{{@key}}</b> {{this}}</span>{{/each}}
             </div>
         {{/if}}
+        {{#if originNotes}}
+            <div class="dh-mods dh-mods--center">{{#each originNotes}}<span class="dh-mod">{{this}}</span>{{/each}}</div>
+        {{/if}}
         {{#if relation}}
             <div class="dh-mods dh-mods--center">{{#each relation.lines}}<span class="dh-mod"><b>{{label}}</b> {{value}}</span>{{/each}}</div>
         {{/if}}

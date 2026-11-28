@@ -69,3 +69,24 @@ Quarantine World and Snope's World (Subtlety), Pursuit of Data (Research Station
 - Only the +/- button on the sheet asks, because that is a rule-based gain. Direct edits of the field, macros and the update hooks are not rewritten; nothing already gained is converted afterwards. The GM gets a third button "GM correction (no rule)" that books the plain value.
 - Not covered: Corruption gained in the creation wizard (Mutant background does not apply; Sororitas starts with none) and gains by other automations (none exist).
 - Untested in Foundry (dialog).
+
+## Origin bonuses in the skill roll dialog
+
+Code: `rules/origin-bonuses.mjs`, dialog section in `prompts/simple-prompt.mjs`, tests `test/origin-bonuses.test.mjs`. **Untested in Foundry (dialog, chat card).**
+
+- No blanket "+20" box. The dialog lists **named** options of the character's own home world, background and role that fit the skill, each with effect and condition. Nothing is ticked by default; the player judges the condition. The manual modifier and the GM modifiers stay as they were. The chat card shows every applied bonus by name.
+- Modifier options (stored wording, group C): Hive World (+20 Navigate (Surface), closed spaces), Frontier World (+20 Tech-Use weapon modifications, +10 repairs), Yanth (+20 Medicae/Survival, Crafting), The Oath Unspoken (+20 Commerce, opposed/Evaluate), Heretek (+20 Tech-Use, unfamiliar device, Forbidden Lore Rank 1+), Rogue Trader Fleet (+20 Interaction with aliens), Penitent (+10 first test after damage; the sheet does not track "first"). Forraliss: +1 degree of success on a successful Charm/Deceive, added after the roll.
+- Fate Point options (group D), **one radio choice, never automatic**: standard Fate +10 (from the Ministorum text), Adeptus Ministorum +20 (replaces the +10, not added), automatic success with degrees = characteristic bonus for Hierophant (Charm/Command/Intimidate, Willpower), Sage (Logic/Lore, Intelligence), Seeker (Awareness/Inquiry, Perception), Ace (Operate/Survival, Agility; vehicle/steed condition is the player's), Chirurgeon (Medicae, only after a failed First Aid test: no Fate Point is spent when the test succeeded). Disabled without a Fate Point; the Point is spent once, after the roll, only when the effect took effect.
+- Relationship tests resolved by the GM roll elsewhere: the named modifiers are added to the manual modifier, **no Fate Point is spent** (message shown).
+- **Not offered (stay as shown origin text):** Assassin, Warrior, Crusader, Fanatic, Ossuar, Tuchulcha, Thaur (attack/damage/Fear effects, no skill roll), Arbites (Willpower Bonus for degrees: wording in the data is garbled), Imperial Navy (Ballistic Skill degree, weapon dialog), Hrax (+10 Weapon Skill after first damage), Hive Desoleum (Willpower oath, no skill), Dark Echo and Rogue Trader Fear (+10 per Lore rank / vs aliens: the Fear test has no dialog), Port Aquila (substitute characteristic), Nexum (critical table).
+
+## Other open rules (audit for the last prompt)
+
+| Rule | Status | Missing |
+|---|---|---|
+| Exorcised malignancy | stays open: **Malignancy Table 8–15 not imported** | table text (private import package) |
+| Insanity bonus for Fear tests | not implemented: the Fear test has no dialog and no stored wording to hook | which tests, what exact modifier |
+| Garden World: 50 XP per Insanity point removed | not implemented as a purchase: the Spend EP entry has a fixed price, no Insanity-removal entry exists | printed wording and who removes (GM or the player) |
+| Highborn: Influence losses −1 (minimum 1) | not implemented: no Influence-loss event exists | a source of Influence losses |
+| Shrine World: no Fate loss on a 1d10 of 1 | not implemented: Fate is spent by hand and by the new dialog option; no d10 is rolled | whether the d10 roll replaces the cost or follows it |
+| Mutation Table 8–16 | open (concrete mutation) | table text |
