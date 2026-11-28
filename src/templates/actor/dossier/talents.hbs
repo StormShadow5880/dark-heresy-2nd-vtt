@@ -35,13 +35,15 @@
                 </h2>
                 <ul class="rows rows--detail">
                     {{#each dossier.traits as |t|}}
-                        <li class="item-drag" data-item-id="{{t.id}}">
+                        <li class="{{#unless t.derived}}item-drag{{/unless}} {{#if t.derived}}is-derived{{/if}}" {{#unless t.derived}}data-item-id="{{t.id}}"{{/unless}}>
                             <details>
                                 <summary>
-                                    <span class="grow">{{t.name}}</span>
-                                    {{#if t.level}}<span class="pill">{{t.level}}</span>{{/if}}
+                                    <span class="grow">{{t.name}}{{#if t.derived}} <small>(effect)</small>{{/if}}</span>
+                                    {{#if t.level}}<span class="pill">{{#if t.derived}}+{{/if}}{{t.level}}</span>{{/if}}
+                                    {{#unless t.derived}}
                                     <button type="button" class="icon-btn item-edit" data-item-id="{{t.id}}" data-tooltip="Edit"><i class="fa-solid fa-pen"></i></button>
                                     <button type="button" class="icon-btn item-delete" data-item-id="{{t.id}}" data-tooltip="Delete"><i class="fa-solid fa-trash"></i></button>
+                                    {{/unless}}
                                 </summary>
                                 <div class="detail prose">{{{t.description}}}</div>
                             </details>

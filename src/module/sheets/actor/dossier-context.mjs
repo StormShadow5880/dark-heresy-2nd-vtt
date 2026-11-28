@@ -406,6 +406,24 @@ export async function buildTalentsAndTraits(actor) {
             description: await enrich(item.system.description, item),
         });
     }
+    // Unnatural characteristics that an effect adds (a psychic power, an Active Effect): shown as read-only rows, they are not items
+    for (const key of CHARACTERISTIC_ORDER) {
+        const c = actor.characteristics[key];
+        const stored = actor._source?.system?.characteristics?.[key];
+        if (!c || !stored) continue;
+        const delta = toNumber(c.unnatural) - toNumber(stored.unnatural);
+        if (delta <= 0) continue;
+        const sources = [...(actor.effects ?? [])]
+            .filter((e) => !e.disabled && e.changes?.some((ch) => ch.key === `system.characteristics.${key}.unnatural`))
+            .map((e) => e.name);
+        traits.push({
+            id: '',
+            derived: true,
+            name: `Unnatural ${c.label}`,
+            level: delta,
+            description: `<p>Raised by ${sources.length ? sources.join(', ') : 'an effect'} for as long as it lasts: +${delta} Unnatural ${c.label} (bonus now ${c.bonus}). This row is not an item; it disappears with the effect.</p>`,
+        });
+    }
     traits.sort((a, b) => a.name.localeCompare(b.name));
 
     const aptitudes = actor.items
