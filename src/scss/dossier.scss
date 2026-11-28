@@ -417,6 +417,12 @@
             background: #7a1f1f;
             padding: 0 6px;
         }
+        // unconscious by fatigue: orange, the character is out but not dead
+        &.is-unconscious {
+            color: #1a1410;
+            background: #e39a3b;
+            padding: 0 6px;
+        }
     }
 
     // Experience banner hangs from the top frame edge
@@ -692,6 +698,10 @@
             border-bottom: 1px solid rgba(80, 70, 56, 0.4);
             &:last-child {
                 border-bottom: 0;
+            }
+            // the fatigue row has one more button (Fate Point): without the extra column the last button wrapped into a new line
+            &.has-extra {
+                grid-template-columns: 30px minmax(0, 1fr) auto 24px 24px 24px;
             }
         }
         &__label {

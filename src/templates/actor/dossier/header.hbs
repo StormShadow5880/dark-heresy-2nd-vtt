@@ -73,6 +73,10 @@
             </span>
             {{#if dossier.res.wounds.bar.dead}}
                 <span class="wstate is-dead">Dead</span>
+            {{else if dossier.fatigue.dead}}
+                <span class="wstate is-dead" data-tooltip="{{dossier.fatigue.text}}">Dead (fatigue)</span>
+            {{else if dossier.fatigue.unconscious}}
+                <span class="wstate is-unconscious" data-tooltip="{{dossier.fatigue.text}}">Unconscious</span>
             {{else if dossier.res.wounds.bar.serious}}
                 <span class="wstate is-serious">Seriously injured</span>
             {{else if dossier.res.wounds.bar.hasDamage}}

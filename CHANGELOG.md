@@ -6,6 +6,10 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
 
 ## [1.9.0] – Unreleased
 
+### Fatigue display
+
+- The fatigue row no longer breaks into two lines (the Fate Point button had no column). "Unconscious" (fatigue over the limit) is shown in orange in the header next to the wounds, where "Dead" appears.
+
 ### Wounds: fixed maximum
 
 - The maximum wounds are fixed for players: with the Imperium Maledictum rule (now the default of the setting "Maximum Wounds Rule"; a world that saved another choice keeps it) the maximum is calculated and only the GM can add a modifier; with the manual rule only the GM can change the maximum. Players see the value only.
