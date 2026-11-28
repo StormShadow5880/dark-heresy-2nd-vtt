@@ -123,7 +123,10 @@
                                 </div>
                                 <div class="table-cell--description description_{{embedded.id}}" {{hideIfNot
                                     (isExpanded (concat 'description_' embedded.id ))}}>
-                                    <span>{{embedded.system.description}}</span>
+                                    <span>{{#if embedded.system.description}}{{embedded.system.description}}{{else}}No effect text is stored for this modification.{{/if}}</span>
+                                    {{#if embedded.system.damage.damage}}<div>Damage: {{embedded.system.damage.damage}}</div>{{/if}}
+                                    {{#if embedded.system.damage.penetration}}<div>Penetration: {{embedded.system.damage.penetration}}</div>{{/if}}
+                                    {{#if embedded.system.attack.attackBonus}}<div>Attack bonus: {{embedded.system.attack.attackBonus}}</div>{{/if}}
                                 </div>
                             </div>
                         {{/if}}

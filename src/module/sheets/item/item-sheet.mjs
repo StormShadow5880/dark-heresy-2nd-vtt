@@ -12,6 +12,15 @@ export class DarkHeresyItemSheet extends DHSheetMixin(foundry.applications.sheet
         sheet: { template: `systems/dark-heresy-2nd/templates/item/item-sheet.hbs`, scrollable: ['.dh-body'] },
     };
 
+    /**
+     * An item that is nested in another item (weapon modifications, attack specials, ammunition) is not in a world or actor
+     * collection: the base class would try to create it. It is saved through its own update, which writes into the parent.
+     */
+    async _processSubmitData(event, form, submitData, options = {}) {
+        if (this.item.isNestedItem?.()) return this.item.update(submitData);
+        return super._processSubmitData(event, form, submitData, options);
+    }
+
     async _prepareContext(options) {
         const context = await super._prepareContext(options);
         context.item = this.item;
