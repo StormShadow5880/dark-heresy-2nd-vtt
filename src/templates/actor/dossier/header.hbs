@@ -40,9 +40,12 @@
                 <span>/</span>
                 {{#if dossier.res.wounds.derived}}
                     <span class="hmini__max" data-tooltip="{{dossier.res.wounds.breakdown}} · rule from Imperium Maledictum">{{dossier.res.wounds.max}}</span>
-                    <label class="hmini__mod" data-tooltip="Wounds modifier (talents, traits, special cases)">+<input type="number" data-dtype="Number" name="system.wounds.modifier" value="{{dossier.res.wounds.modifier}}" aria-label="Wounds modifier" /></label>
+                    {{!-- the maximum is calculated and fixed; only the GM can add a modifier for special cases --}}
+                    {{#if dossier.isGM}}<label class="hmini__mod" data-tooltip="Wounds modifier (GM: talents, traits, special cases)">+<input type="number" data-dtype="Number" name="system.wounds.modifier" value="{{dossier.res.wounds.modifier}}" aria-label="Wounds modifier" /></label>
+                    {{else if dossier.res.wounds.modifier}}<span class="hmini__mod" data-tooltip="Wounds modifier set by the GM">+{{dossier.res.wounds.modifier}}</span>{{/if}}
                 {{else}}
-                    <input type="number" data-dtype="Number" name="system.wounds.max" value="{{dossier.res.wounds.max}}" aria-label="Maximum wounds" />
+                    {{#if dossier.isGM}}<input type="number" data-dtype="Number" name="system.wounds.max" value="{{dossier.res.wounds.max}}" aria-label="Maximum wounds" />
+                    {{else}}<span class="hmini__max" data-tooltip="Maximum wounds (fixed, only the GM can change it)">{{dossier.res.wounds.max}}</span>{{/if}}
                 {{/if}}
             </span>
             <span class="hmini__steps">

@@ -37,7 +37,7 @@ export class DarkHeresySettings {
             hint: 'Imperium Maledictum: Max Wounds = Strength Bonus + 2 x Toughness Bonus + Willpower Bonus, calculated automatically for player characters and updated when traits, powers or effects change a characteristic. Manual: the maximum entered on the sheet is used.',
             scope: 'world',
             config: true,
-            default: 'manual',
+            default: 'im',
             type: String,
             choices: {
                 im: 'Imperium Maledictum (calculated)',

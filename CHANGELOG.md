@@ -6,6 +6,10 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
 
 ## [1.9.0] – Unreleased
 
+### Wounds: fixed maximum
+
+- The maximum wounds are fixed for players: with the Imperium Maledictum rule (now the default of the setting "Maximum Wounds Rule"; a world that saved another choice keeps it) the maximum is calculated and only the GM can add a modifier; with the manual rule only the GM can change the maximum. Players see the value only.
+
 ### Character creation: wounds and skills
 
 - With the Imperium Maledictum wound rule (world setting) the wizard does not ask for a wounds roll: the maximum is calculated from the final characteristics (Strength Bonus + 2 × Toughness Bonus + Willpower Bonus) when the character is created, and shown as calculated in the vitals step and the summary. Without that rule the roll works as before.
