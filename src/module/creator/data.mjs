@@ -296,6 +296,7 @@ export const BACKGROUND_DEFS = [
         traits: [],
         consequences: [],
         corruption: 0,
+        traitChoice: null,
         ...def,
     };
 });
@@ -356,11 +357,33 @@ export const EXPANSION_BACKGROUND_DEFS = [
             { id: 'eq-5', options: [['Stimm', 2]] },
         ],
         aptitudeChoice: ['Fieldcraft', 'Offence'],
-        // the starting Corruption of the Mutant (data: "corruption": 10) and the rolls of the mutation rules
+        // The Mutant: 10 starting Corruption, ONE starting trait of the list (chosen in the wizard, given when the character is finished, in
+        // addition to the starting mutation), and a starting mutation: 5d10 summed and looked up on Table 8-16 (this start rule replaces the
+        // normal handling of mutation and malignancy for this step). "Twisted Flesh" (the background ability) is separate and later.
         corruption: 10,
+        traitChoice: {
+            id: 'bg-mutant-trait',
+            label: 'Mutant: starting trait (choose one)',
+            options: [
+                { trait: 'Amphibious' },
+                { trait: 'Dark-sight' },
+                { trait: 'Natural Weapons' },
+                { trait: 'Sonar Sense' },
+                { trait: 'Sturdy' },
+                { trait: 'Toxic', level: 1 },
+                { trait: 'Unnatural Agility', level: 1 },
+                { trait: 'Unnatural Strength', level: 1 },
+                { trait: 'Unnatural Toughness', level: 1 },
+            ],
+        },
         consequences: [
-            { id: 'mutation', kind: 'roll', formula: '5d10', label: 'Mutation roll (5d10, Core Rulebook Table 8-16)', blocked: 'the mutation table is not part of the system data (it belongs to the private import package)' },
-            { id: 'mutant-traits', kind: 'manual', label: 'Trait choices of the Mutant: Amphibious, Dark-sight, Natural Weapons, Sonar Sense, Sturdy, Toxic (1), Unnatural Agility (1), Unnatural Strength (1), Unnatural Toughness (1). May deliberately fail resistance tests against mutation or malignancy; may substitute a mutation roll for a malignancy.' },
+            {
+                id: 'mutation',
+                kind: 'roll',
+                formula: '5d10',
+                label: 'Starting mutation: roll 5d10 and sum it, then look the result up on Table 8-16: Mutations (this start rule replaces the normal handling of mutation and malignancy)',
+                tableMissing: 'the concrete mutation from Table 8-16 is open: the table is not part of the system data (it belongs to the private import package); the 5d10 result is saved',
+            },
         ],
     },
     {
@@ -481,6 +504,7 @@ export const EXPANSION_BACKGROUND_DEFS = [
         traits: [],
         consequences: [],
         corruption: 0,
+        traitChoice: null,
         ...def,
     };
 });

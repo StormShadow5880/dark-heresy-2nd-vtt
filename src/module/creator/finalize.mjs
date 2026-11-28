@@ -80,7 +80,7 @@ export async function buildCharacterData(draft, env, resolve) {
     // rolls, choices and decisions of the origin that are not done (yet): listed on the character so that nobody forgets them
     const openRules = state.consequences.filter((c) => c.status !== 'resolved');
     if (openRules.length) {
-        const lines = openRules.map((c) => `- ${c.source}: ${c.label}${c.blocked ? ` (open: ${c.blocked})` : c.status === 'manual' ? ' (apply by hand)' : ' (not rolled)'}`);
+        const lines = openRules.map((c) => `- ${c.source}: ${c.label}${c.result ? ` — rolled ${c.result.formula} = ${c.result.total}` : ''}${c.blocked ? ` (open: ${c.blocked})` : c.status === 'manual' ? ' (apply by hand)' : c.result ? '' : ' (not rolled)'}`);
         system.bio.notes = `${system.bio.notes}\n\nOpen rules from the character creation:\n${lines.join('\n')}`.trim();
     }
     if (bio.homeWorldName) system.bio.notes = `Home world: ${bio.homeWorldName}\n\n${system.bio.notes}`.trim();
@@ -120,11 +120,18 @@ export async function buildCharacterData(draft, env, resolve) {
         add({ name: item.name, type: 'talent', img: item.img, system: item.system });
     }
     for (const trait of state.traits) {
-        const found = await resolve('trait', trait.name);
+        // "Unnatural Strength (1)" and the like: the compendium has one trait "Unnatural Characteristic"; the level is the unnatural bonus
+        const unnatural = /^Unnatural (Strength|Toughness|Agility|Intelligence|Perception|Willpower|Fellowship|Weapon Skill|Ballistic Skill)$/.exec(trait.name);
+        let found = await resolve('trait', trait.name);
+        if (!found && unnatural) found = await resolve('trait', 'Unnatural Characteristic');
         if (!found) missing.push(`Trait: ${trait.name}`);
-        const traitData = found ? clean(found) : { name: trait.name, type: 'trait', system: {} };
+        const traitData = found ? { ...clean(found), name: trait.name } : { name: trait.name, type: 'trait', system: {} };
         if (trait.level) traitData.system = { ...traitData.system, level: trait.level };
         add(traitData);
+        if (unnatural && trait.level) {
+            const key = unnatural[1].replace(/^./, (c) => c.toLowerCase()).replace(/ (\w)/g, (m, c) => c.toUpperCase());
+            if (system.characteristics?.[key]) system.characteristics[key].unnatural = (Number(system.characteristics[key].unnatural) || 0) + Number(trait.level);
+        }
     }
     for (const eq of state.equipment) {
         const found = await resolve('equipment', eq.name);

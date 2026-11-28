@@ -115,12 +115,13 @@ export function computeCharacter(draft, env) {
     const consequence = (owner, def) => {
         const id = `${owner.id}:${def.id}`;
         const stored = (draft.consequenceRolls ?? {})[id];
-        const entry = { id, source: owner.name, kind: def.kind, label: def.label, formula: def.formula ?? null, blocked: def.blocked ?? null, status: 'open', result: null };
+        const entry = { id, source: owner.name, kind: def.kind, label: def.label, formula: def.formula ?? null, blocked: def.blocked ?? def.tableMissing ?? null, status: 'open', result: null };
         if (def.kind === 'manual') entry.status = 'manual';
         else if (def.blocked) entry.status = 'blocked';
         else if (def.kind === 'roll' && stored) {
-            entry.status = 'resolved';
             entry.result = stored;
+            // a rolled result is kept; when the table that turns it into a concrete result is missing, that part stays open
+            entry.status = def.tableMissing ? 'table-open' : 'resolved';
             if (def.apply === 'corruption') extraCorruption += Number(stored.total) || 0;
         }
         out.consequences.push(entry);
@@ -201,6 +202,16 @@ export function computeCharacter(draft, env) {
         }
         for (const trait of bg.traits) out.traits.push({ name: trait.trait, source: bg.name, note: trait.note });
         if (bg.corruption) extraCorruption += bg.corruption;
+        // a starting trait chosen from a list (the Mutant); the trait is only given when the choice is made, so it follows the background
+        if (bg.traitChoice) {
+            const tc = bg.traitChoice;
+            const text = (o) => `${o.trait}${o.level ? ` (${o.level})` : ''}`;
+            const c = addChoice({ id: tc.id, step: 'skills', label: tc.label, options: tc.options.map((o, i) => option(i, text(o))) });
+            if (c.resolved) {
+                const picked = tc.options[Number(c.value)];
+                out.traits.push({ name: picked.trait, level: picked.level, source: bg.name });
+            }
+        }
         for (const c of bg.consequences ?? []) consequence(bg, c);
         for (const group of bg.equipment) {
             const choiceId = `eq-${group.id}`;

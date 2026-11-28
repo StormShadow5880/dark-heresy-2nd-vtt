@@ -6,6 +6,10 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
 
 ## [1.9.0] – Unreleased
 
+### Mutant background
+
+- The Mutant chooses exactly one starting trait in the wizard (with its parameter; Unnatural traits also set the unnatural bonus), has 10 Corruption and rolls the starting mutation (5d10, saved; the concrete result of Table 8-16 stays open until the table is available). Changing the background removes the trait. See `docs/expansion-content.md`.
+
 ### Fatigue display
 
 - The fatigue row no longer breaks into two lines (the Fate Point button had no column). "Unconscious" (fatigue over the limit) is shown in orange in the header next to the wounds, where "Dead" appears.
