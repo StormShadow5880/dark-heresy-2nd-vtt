@@ -2,6 +2,7 @@
  * The character creation wizard (ApplicationV2). It only edits the creation draft (draft.mjs) and shows what
  * character.mjs computes from it; the rules live there, not here.
  */
+import { MAX_SKILL_RANK, characteristicBonus, kulLoreRanks } from '../rules/origin-grants.mjs';
 import { maxWoundsFromCharacteristics } from '../rules/imperium-maledictum.mjs';
 import { woundsFormulaIsIM } from '../rules/wounds-setting.mjs';
 import { SYSTEM_ID } from '../system-id.mjs';
@@ -215,7 +216,7 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
               ? { state: 'done', text: `Home world chosen: ${hwSelected.name}${hwSelected.parent ? ` (${hwSelected.parent})` : ''}.` }
               : { state: 'half', text: `Home world type chosen: ${hwCurrent.type.name}. Now choose the specific home world below: the general ${hwCurrent.type.name} or one of its ${hwCurrent.variants.length} specific worlds.` };
         context.hwChoices = choicesFor('homeworld');
-        context.consequences = state.consequences.map((c) => ({ ...c, canRoll: c.status === 'open' && !!c.formula, resultText: c.result ? `${c.result.formula}: ${c.result.dice.join(' + ')}${c.result.total !== c.result.dice.reduce((a, b) => a + b, 0) ? ` → ${c.result.total}` : ''}` : '' }));
+        context.consequences = state.consequences.map((c) => ({ ...c, derivedText: c.derive === 'kul-lore' ? (() => { const k = kulLoreRanks(characteristicBonus(sim.actor.system.characteristics.intelligence)); return `With your characteristics now: Intelligence Bonus ${characteristicBonus(sim.actor.system.characteristics.intelligence)} → ${k.ranks} rank${k.ranks === 1 ? '' : 's'}${k.capped ? ` (half the bonus is ${k.wanted}, the maximum rank is ${MAX_SKILL_RANK}: the ranks are capped, check with the GM)` : ''}. The final value is calculated when you finish.`; })() : '', canRoll: c.status === 'open' && !!c.formula, resultText: c.result ? `${c.result.formula}: ${c.result.dice.join(' + ')}${c.result.total !== c.result.dice.reduce((a, b) => a + b, 0) ? ` → ${c.result.total}` : ''}` : '' }));
         context.backgrounds = BACKGROUNDS.map((b) => ({
             ...b,
             selected: b.id === draft.backgroundId,

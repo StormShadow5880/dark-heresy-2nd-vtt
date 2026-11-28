@@ -5,6 +5,7 @@
  * with ONE Actor.create call, so either the whole character exists or nothing does. After creation the number of
  * items is verified; an inconsistent actor is deleted again and an error is reported.
  */
+import { MAX_SKILL_RANK, applyKulLoreRanks, characteristicBonus } from '../rules/origin-grants.mjs';
 import { maxWoundsFromCharacteristics } from '../rules/imperium-maledictum.mjs';
 import { SYSTEM_ID } from '../system-id.mjs';
 import { STEPS, computeCharacter, replayAdvances, stepStatus, talentName } from './character.mjs';
@@ -77,6 +78,17 @@ export async function buildCharacterData(draft, env, resolve) {
             .filter(Boolean)
             .join('\n\n'),
     };
+    // Kul: free Forbidden Lore ranks from the Intelligence Bonus at the END of the creation (after the XP purchases), written once
+    const extraNotes = [];
+    if (state.homeWorld?.name === 'Kul') {
+        const grant = applyKulLoreRanks(system.skills, characteristicBonus(system.characteristics.intelligence));
+        const lore = grant.changes.length ? grant.changes.map((c) => `${c.key === 'theWarp' ? 'The Warp' : 'Daemonology'} ${c.from} → ${c.to}`).join(', ') : 'no change (already as high)';
+        extraNotes.push(`Kul: Forbidden Lore ranks from half the Intelligence Bonus: ${grant.wanted} (${lore}). Calculated once when the character was finished.`);
+        if (grant.capped) extraNotes.push(`Kul: half the Intelligence Bonus is ${grant.wanted}, more than the maximum rank ${MAX_SKILL_RANK}: the ranks were capped at ${MAX_SKILL_RANK}. Check with the GM.`);
+        const entry = state.consequences.find((c) => c.derive === 'kul-lore');
+        if (entry) Object.assign(entry, { status: 'resolved', result: { formula: 'half Intelligence Bonus', dice: [], total: grant.ranks } });
+    }
+    if (extraNotes.length) system.bio.notes = `${system.bio.notes}\n\n${extraNotes.join('\n')}`.trim();
     // rolls, choices and decisions of the origin that are not done (yet): listed on the character so that nobody forgets them
     const openRules = state.consequences.filter((c) => c.status !== 'resolved');
     if (openRules.length) {

@@ -304,3 +304,42 @@ test('Pellenne at the end: one item, an existing item of the same name is not re
     assert.equal(actor.items.filter((i) => i.type === 'trait' && i.name === 'Dark-sight').length, 1);
     assert.equal(actor.items.some((i) => i.type === 'talent' && /Hatred/.test(i.name)), false);
 });
+
+test('Kul: free Forbidden Lore ranks = half the Intelligence Bonus (round down), never lowered, never added, capped with a hint', async () => {
+    const { kulLoreRanks, applyKulLoreRanks, characteristicBonus } = await import('../src/module/rules/origin-grants.mjs');
+    assert.deepEqual([0, 1, 2, 3, 4, 5, 8, 9, 10, 11].map((b) => kulLoreRanks(b).ranks), [0, 0, 1, 1, 2, 2, 4, 4, 4, 4]);
+    assert.equal(kulLoreRanks(10).capped, true);
+    assert.equal(kulLoreRanks(10).wanted, 5);
+    assert.equal(kulLoreRanks(8).capped, false);
+    assert.equal(characteristicBonus({ base: 43, advance: 2, modifier: 0, unnatural: 1 }), 6, 'tens digit of 53 plus unnatural 1');
+    const skills = () => ({ forbiddenLore: { specialities: { theWarp: { advance: 0, taken: false }, daemonology: { advance: 3, taken: true } } } });
+    const s = skills();
+    const r = applyKulLoreRanks(s, 6); // 3 ranks
+    assert.equal(s.forbiddenLore.specialities.theWarp.advance, 3);
+    assert.equal(s.forbiddenLore.specialities.theWarp.taken, true);
+    assert.equal(s.forbiddenLore.specialities.daemonology.advance, 3, 'already as high: unchanged');
+    assert.deepEqual(r.changes.map((c) => c.key), ['theWarp']);
+    // applying again changes nothing (once)
+    assert.deepEqual(applyKulLoreRanks(s, 6).changes, []);
+    // already higher is never lowered
+    const high = { forbiddenLore: { specialities: { theWarp: { advance: 4, taken: true }, daemonology: { advance: 4, taken: true } } } };
+    applyKulLoreRanks(high, 4);
+    assert.equal(high.forbiddenLore.specialities.theWarp.advance, 4);
+});
+
+test('Kul at the end: the grant is written once from the final Intelligence and noted; a later Intelligence change grants nothing', async () => {
+    const d = complete('Kul', 'Outcast', 'Seeker');
+    d.biography = { name: 'T' };
+    const { data: actor } = await fin.buildCharacterData(d, env, resolve);
+    const { characteristicBonus } = await import('../src/module/rules/origin-grants.mjs');
+    const ib = characteristicBonus(actor.system.characteristics.intelligence);
+    const ranks = Math.min(4, Math.floor(ib / 2));
+    const lore = actor.system.skills.forbiddenLore.specialities;
+    assert.equal(lore.theWarp.advance >= ranks, true);
+    assert.equal(lore.daemonology.advance >= ranks, true);
+    assert.match(actor.system.bio.notes, /Kul: Forbidden Lore ranks/);
+    const entry = actor.flags['dark-heresy-2nd'].creator.consequences.find((c) => c.id.endsWith(':lore-ranks'));
+    assert.equal(entry.status, 'resolved');
+    // the result is stored, not recalculated: the stored consequence does not change with the characteristic
+    assert.equal(entry.result.total, ranks);
+});

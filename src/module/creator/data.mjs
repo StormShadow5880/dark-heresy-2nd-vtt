@@ -605,7 +605,7 @@ const EXPANSION_HOMEWORLD_CONSEQUENCES = {
         { id: 'corruption', kind: 'roll', formula: '3d5', apply: 'corruption', label: 'Starting Corruption (3d5 instead of the usual Daemon World amount)' },
         { id: 'psyniscience', kind: 'manual', label: 'The text does not say whether the Daemon World starting skill (Psyniscience rank 1) applies: decide at the table.' },
     ],
-    Kul: [{ id: 'lore-ranks', kind: 'manual', label: 'Forbidden Lore (The Warp) and (Daemonology) ranks equal to half the Intelligence Bonus (round down), unless already higher: add them after the characteristics are final.' }],
+    Kul: [{ id: 'lore-ranks', kind: 'manual', derive: 'kul-lore', label: 'Myth Made Truth: Forbidden Lore (The Warp) and (Daemonology) ranks equal to half the Intelligence Bonus (round down), unless already higher. Calculated once when the character is finished (project decision: Intelligence Bonus at the end of the creation, after the XP purchases)' }],
 };
 
 export const EXPANSION_HOMEWORLD_DEFS = homeworlds()

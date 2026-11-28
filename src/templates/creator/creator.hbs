@@ -7,9 +7,10 @@
                     <li class="cq cq--{{c.status}}">
                         <b>{{c.source}}:</b> {{c.label}}
                         {{#if c.resultText}} <span class="cq__result">Rolled {{c.resultText}}</span>{{/if}}
+                        {{#if c.derivedText}}<br /><small class="why">{{c.derivedText}}</small>{{/if}}
                         {{#if c.canRoll}} <button type="button" class="btn" data-action="rollConsequence" data-id="{{c.id}}"><i class="fa-solid fa-dice"></i> Roll {{c.formula}}</button>{{/if}}
                         {{#if c.blocked}}<br /><small class="why"><i class="fa-solid fa-triangle-exclamation"></i> Open: {{c.blocked}}. It is listed in the creation notes.</small>{{/if}}
-                        {{#if (eq c.status "manual")}}<br /><small class="why"><i class="fa-solid fa-triangle-exclamation"></i> Not automated: apply by hand. It is listed in the creation notes.</small>{{/if}}
+                        {{#if (eq c.status "manual")}}{{#unless c.derive}}<br /><small class="why"><i class="fa-solid fa-triangle-exclamation"></i> Not automated: apply by hand. It is listed in the creation notes.</small>{{/unless}}{{/if}}
                         {{#if (eq c.status "open")}}{{#unless c.canRoll}}{{#unless c.blocked}}<br /><small class="why">Open</small>{{/unless}}{{/unless}}{{/if}}
                     </li>
                 {{/each}}

@@ -115,7 +115,7 @@ export function computeCharacter(draft, env) {
     const consequence = (owner, def) => {
         const id = `${owner.id}:${def.id}`;
         const stored = (draft.consequenceRolls ?? {})[id];
-        const entry = { id, source: owner.name, kind: def.kind, label: def.label, formula: def.formula ?? null, blocked: def.blocked ?? def.tableMissing ?? null, status: 'open', result: null };
+        const entry = { id, source: owner.name, kind: def.kind, derive: def.derive ?? null, label: def.label, formula: def.formula ?? null, blocked: def.blocked ?? def.tableMissing ?? null, status: 'open', result: null };
         if (def.kind === 'manual') entry.status = 'manual';
         else if (def.blocked) entry.status = 'blocked';
         else if (def.kind === 'roll' && stored) {
