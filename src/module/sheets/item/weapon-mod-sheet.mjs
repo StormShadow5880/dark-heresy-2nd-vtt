@@ -2,7 +2,7 @@ import { DarkHeresyItemSheet } from './item-sheet.mjs';
 
 export class DarkHeresyWeaponModSheet extends DarkHeresyItemSheet {
     static DEFAULT_OPTIONS = {
-        position: { width: 820, height: 575 },
+        position: { width: 680, height: 470 },
     };
 
     static DEFAULT_TAB = 'stats';

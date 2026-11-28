@@ -3,7 +3,7 @@ import { DHSheetMixin } from '../dh-sheet-mixin.mjs';
 
 export class DarkHeresyItemSheet extends DHSheetMixin(foundry.applications.sheets.ItemSheetV2) {
     static DEFAULT_OPTIONS = {
-        position: { width: 700, height: 520 },
+        position: { width: 600, height: 430 },
     };
 
     static DEFAULT_TAB = 'description';

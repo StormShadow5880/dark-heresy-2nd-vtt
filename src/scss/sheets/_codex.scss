@@ -35,15 +35,15 @@ $cx-body: 'IM Fell DW Pica', 'Palatino Linotype', Georgia, 'Times New Roman', se
     --cx-red: #{$cx-red};
     --cx-ribbon-a: rgba(196, 174, 128, 0.85);
     --cx-ribbon-b: rgba(222, 205, 165, 0.7);
-    --cx-emblem-width: 16cqw;
+    --cx-emblem-width: 10cqw;
     --cx-emblem-ratio: 3 / 2;
     container-type: inline-size;
     box-sizing: border-box;
     min-height: 100%;
-    padding: 0 3.2cqw 4cqw;
+    padding: 0 2.4cqw 2cqw;
     color: $cx-ink;
     font-family: $cx-body;
-    font-size: clamp(13px, 1.9cqw, 22px);
+    font-size: clamp(13px, 1.7cqw, 16px);
 
     *,
     *::before,
@@ -63,7 +63,7 @@ $cx-body: 'IM Fell DW Pica', 'Palatino Linotype', Georgia, 'Times New Roman', se
         --cx-red: #3a1f63;
         --cx-ribbon-a: rgba(176, 156, 202, 0.85);
         --cx-ribbon-b: rgba(212, 200, 228, 0.7);
-        --cx-emblem-width: 14.5cqw;
+        --cx-emblem-width: 9cqw;
         --cx-emblem-ratio: 420 / 433;
 
         .dh-codex__divider {
@@ -76,10 +76,10 @@ $cx-body: 'IM Fell DW Pica', 'Palatino Linotype', Georgia, 'Times New Roman', se
         position: relative;
         display: flex;
         align-items: center;
-        gap: 3.2cqw;
-        min-height: 13.5cqw;
-        margin: 3cqw -0.2cqw 0;
-        padding: 1.2cqw 20.5cqw 1.2cqw 2.2cqw;
+        gap: 2cqw;
+        min-height: 7.5cqw;
+        margin: 1.4cqw -0.2cqw 0;
+        padding: 0.8cqw 13cqw 0.8cqw 1.6cqw;
         background: var(--cx-header) 0 0 / 100% 100% no-repeat;
         filter: drop-shadow(0 0.4cqw 0.5cqw rgba(0, 0, 0, 0.35));
     }
@@ -87,9 +87,9 @@ $cx-body: 'IM Fell DW Pica', 'Palatino Linotype', Georgia, 'Times New Roman', se
     &__icon {
         position: relative;
         flex: none;
-        width: 11.6cqw;
-        height: 11.6cqw;
-        padding: 0.5cqw;
+        width: 6.6cqw;
+        height: 6.6cqw;
+        padding: 0.35cqw;
 
         img {
             display: block;
@@ -114,12 +114,12 @@ $cx-body: 'IM Fell DW Pica', 'Palatino Linotype', Georgia, 'Times New Roman', se
         min-width: 0;
         display: flex;
         flex-direction: column;
-        gap: 1cqw;
+        gap: 0.4cqw;
     }
 
     &__emblem {
         position: absolute;
-        right: 3cqw;
+        right: 2cqw;
         top: 50%;
         width: var(--cx-emblem-width);
         aspect-ratio: var(--cx-emblem-ratio);
@@ -145,7 +145,7 @@ $cx-body: 'IM Fell DW Pica', 'Palatino Linotype', Georgia, 'Times New Roman', se
         background: transparent;
         color: #f4ead2;
         font-family: $cx-title;
-        font-size: clamp(22px, 4.6cqw, 52px);
+        font-size: clamp(18px, 3.2cqw, 30px);
         font-weight: 600;
         line-height: 1.1;
         resize: none;
@@ -177,13 +177,14 @@ $cx-body: 'IM Fell DW Pica', 'Palatino Linotype', Georgia, 'Times New Roman', se
         align-items: center;
         justify-content: center;
         gap: 0.8cqw;
-        min-width: 12.5cqw;
-        height: 3.9cqw;
-        padding: 0 2cqw;
+        min-width: 9cqw;
+        height: 2.8cqw;
+        min-height: 22px;
+        padding: 0 1.4cqw;
         background: var(--cx-plaque) 0 0 / 100% 100% no-repeat;
         color: #2f2412;
         font-family: $cx-title;
-        font-size: clamp(11px, 2.1cqw, 24px);
+        font-size: clamp(10px, 1.5cqw, 14px);
         font-weight: 700;
         letter-spacing: 0.14em;
         text-transform: uppercase;
@@ -211,8 +212,8 @@ $cx-body: 'IM Fell DW Pica', 'Palatino Linotype', Georgia, 'Times New Roman', se
     }
 
     &__plaque--text {
-        min-width: 15cqw;
-        padding: 0 3cqw;
+        min-width: 11cqw;
+        padding: 0 2cqw;
 
         input {
             width: auto;
@@ -236,7 +237,7 @@ $cx-body: 'IM Fell DW Pica', 'Palatino Linotype', Georgia, 'Times New Roman', se
         background: transparent;
         color: $cx-cream;
         font-family: $cx-title;
-        font-size: clamp(11px, 2.1cqw, 24px);
+        font-size: clamp(10px, 1.5cqw, 14px);
         letter-spacing: 0.14em;
         text-transform: uppercase;
 
@@ -255,8 +256,8 @@ $cx-body: 'IM Fell DW Pica', 'Palatino Linotype', Georgia, 'Times New Roman', se
     &__stats {
         display: flex;
         flex-wrap: wrap;
-        gap: 1.6cqw;
-        margin-top: 2.2cqw;
+        gap: 1cqw;
+        margin-top: 1.4cqw;
 
         &--six {
             grid-template-columns: repeat(6, minmax(0, 1fr));
@@ -272,15 +273,15 @@ $cx-body: 'IM Fell DW Pica', 'Palatino Linotype', Georgia, 'Times New Roman', se
         gap: 0.9cqw;
         min-width: 0;
         margin: 0;
-        padding: 1cqw 1.4cqw;
+        padding: 0.5cqw 1cqw;
         border: 1px solid rgba(110, 82, 40, 0.75);
-        border-radius: 1.2cqw;
+        border-radius: 0.8cqw;
         background: rgba(255, 252, 240, 0.35);
         box-shadow: inset 0 0 0 0.25cqw rgba(255, 252, 240, 0.5);
 
         > i {
             color: var(--cx-red);
-            font-size: 2.4cqw;
+            font-size: 1.8cqw;
         }
     }
 
@@ -300,9 +301,9 @@ $cx-body: 'IM Fell DW Pica', 'Palatino Linotype', Georgia, 'Times New Roman', se
         border-right: 1px solid rgba(110, 82, 40, 0.6);
         color: var(--cx-ink-soft);
         font-family: $cx-title;
-        font-size: clamp(10px, 1.7cqw, 19px);
+        font-size: clamp(10px, 1.4cqw, 13px);
         font-weight: 700;
-        letter-spacing: 0.14em;
+        letter-spacing: 0.12em;
         text-transform: uppercase;
     }
 
@@ -316,7 +317,7 @@ $cx-body: 'IM Fell DW Pica', 'Palatino Linotype', Georgia, 'Times New Roman', se
         border-bottom: 1px solid transparent;
         background: transparent;
         font-family: $cx-title;
-        font-size: clamp(15px, 2.9cqw, 34px);
+        font-size: clamp(14px, 2.2cqw, 22px);
         font-weight: 700;
         line-height: 1.1;
         text-align: center;
@@ -357,9 +358,9 @@ $cx-body: 'IM Fell DW Pica', 'Palatino Linotype', Georgia, 'Times New Roman', se
     &__facts {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 1cqw 0;
-        margin-top: 2.2cqw;
-        padding: 1.4cqw 0;
+        gap: 0.5cqw 0;
+        margin-top: 1.4cqw;
+        padding: 0.8cqw 0;
         border-top: 1px solid rgba(141, 107, 52, 0.6);
         border-bottom: 1px solid rgba(141, 107, 52, 0.6);
 
@@ -375,18 +376,18 @@ $cx-body: 'IM Fell DW Pica', 'Palatino Linotype', Georgia, 'Times New Roman', se
 
     &__fact {
         display: grid;
-        grid-template-columns: 10em minmax(0, 1fr);
+        grid-template-columns: 8em minmax(0, 1fr);
         align-items: center;
-        gap: 1.4cqw;
+        gap: 1cqw;
         min-width: 0;
         margin: 0;
 
         > span {
             color: var(--cx-ink-soft);
             font-family: $cx-title;
-            font-size: clamp(10px, 1.7cqw, 19px);
+            font-size: clamp(10px, 1.4cqw, 13px);
             font-weight: 700;
-            letter-spacing: 0.12em;
+            letter-spacing: 0.1em;
             text-transform: uppercase;
         }
 
@@ -405,14 +406,20 @@ $cx-body: 'IM Fell DW Pica', 'Palatino Linotype', Georgia, 'Times New Roman', se
     }
 
     select.dh-codex__field {
-        padding-block: 0.3cqw;
+        padding-block: 0.2cqw;
+        // the chosen value and the list entries: dark ink on the light field
+        color: $cx-ink;
+        option {
+            background: #efe2c0;
+            color: $cx-ink;
+        }
     }
 
     // ---- a section with a title pill (ammunition …) -------------------------------------------------------------------
     &__section {
         position: relative;
-        margin-top: 3.4cqw;
-        padding: 3cqw 1.6cqw 1.4cqw;
+        margin-top: 2.6cqw;
+        padding: 2.2cqw 1.2cqw 0.8cqw;
         border: 1px solid rgba(110, 82, 40, 0.75);
         border-radius: 1.4cqw;
         background: rgba(255, 252, 240, 0.25);
@@ -420,16 +427,16 @@ $cx-body: 'IM Fell DW Pica', 'Palatino Linotype', Georgia, 'Times New Roman', se
 
     &__section-title {
         position: absolute;
-        top: -1.9cqw;
+        top: -1.5cqw;
         left: 1cqw;
         margin: 0;
-        padding: 0.5cqw 3.6cqw 0.5cqw 2.4cqw;
+        padding: 0.3cqw 3cqw 0.3cqw 1.8cqw;
         border: 0;
         background: var(--cx-red);
         clip-path: polygon(0 0, calc(100% - 1.8cqw) 0, 100% 100%, 0 100%);
         color: var(--cx-cream, #efe2c0);
         font-family: $cx-title;
-        font-size: clamp(13px, 2.8cqw, 32px);
+        font-size: clamp(12px, 2cqw, 18px);
         letter-spacing: 0.12em;
         text-transform: uppercase;
     }
@@ -445,9 +452,9 @@ $cx-body: 'IM Fell DW Pica', 'Palatino Linotype', Georgia, 'Times New Roman', se
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 0.8cqw;
+        gap: 0.4cqw;
         margin: 0;
-        padding: 0 1.4cqw;
+        padding: 0 1cqw;
         min-width: 0;
 
         + & {
@@ -457,9 +464,9 @@ $cx-body: 'IM Fell DW Pica', 'Palatino Linotype', Georgia, 'Times New Roman', se
         > span {
             color: var(--cx-red);
             font-family: $cx-title;
-            font-size: clamp(10px, 1.8cqw, 20px);
+            font-size: clamp(10px, 1.4cqw, 13px);
             font-weight: 700;
-            letter-spacing: 0.14em;
+            letter-spacing: 0.1em;
             text-transform: uppercase;
         }
 
@@ -480,7 +487,7 @@ $cx-body: 'IM Fell DW Pica', 'Palatino Linotype', Georgia, 'Times New Roman', se
         grid-auto-flow: column;
         grid-auto-columns: minmax(0, 1fr);
         gap: 0.4cqw;
-        margin: 2.4cqw 0 0;
+        margin: 1.4cqw 0 0;
         padding: 0;
         background: none;
         border: 0;
@@ -493,15 +500,15 @@ $cx-body: 'IM Fell DW Pica', 'Palatino Linotype', Georgia, 'Times New Roman', se
 
         a {
             display: block;
-            padding: 0.9cqw 1cqw;
+            padding: 0.5cqw 1cqw;
             border: 1px solid rgba(110, 82, 40, 0.65);
             border-bottom: 0;
             background: rgba(255, 252, 240, 0.35);
             color: var(--cx-ink-soft);
             font-family: $cx-title;
-            font-size: clamp(12px, 2.4cqw, 28px);
+            font-size: clamp(11px, 1.7cqw, 16px);
             font-weight: 700;
-            letter-spacing: 0.14em;
+            letter-spacing: 0.12em;
             text-align: center;
             text-transform: uppercase;
             text-decoration: none;
@@ -628,7 +635,7 @@ $cx-body: 'IM Fell DW Pica', 'Palatino Linotype', Georgia, 'Times New Roman', se
     &__body select#{&}__field,
     &__body textarea#{&}__text {
         height: auto;
-        padding: 0.5cqw 1.2cqw;
+        padding: 0.3cqw 0.9cqw;
         border: 1px solid rgba(110, 82, 40, 0.65);
         border-radius: 0;
         background: rgba(255, 252, 240, 0.3);
@@ -639,11 +646,11 @@ $cx-body: 'IM Fell DW Pica', 'Palatino Linotype', Georgia, 'Times New Roman', se
     }
 
     &__body &__panel-title {
-        padding: 0.7cqw 1.8cqw;
+        padding: 0.4cqw 1.4cqw;
         margin: 0;
         color: var(--cx-red);
         font-family: $cx-title;
-        font-size: clamp(13px, 2.6cqw, 30px);
+        font-size: clamp(12px, 1.9cqw, 17px);
         letter-spacing: 0.14em;
         text-transform: uppercase;
         text-align: left;
@@ -664,7 +671,7 @@ $cx-body: 'IM Fell DW Pica', 'Palatino Linotype', Georgia, 'Times New Roman', se
 
     // ---- panels with a title bar (tab pages of psychic powers; usable by every sheet) -----------------------------------
     &__panel {
-        margin-top: 1.8cqw;
+        margin-top: 1cqw;
         border: 1px solid rgba(110, 82, 40, 0.75);
         border-radius: 1cqw;
         background: rgba(255, 252, 240, 0.25);
@@ -673,19 +680,37 @@ $cx-body: 'IM Fell DW Pica', 'Palatino Linotype', Georgia, 'Times New Roman', se
 
     &__panel-title {
         margin: 0;
-        padding: 0.7cqw 1.8cqw;
+        padding: 0.4cqw 1.4cqw;
         border: 0;
         border-bottom: 1px solid rgba(110, 82, 40, 0.75);
         background: var(--cx-ribbon-a);
         color: var(--cx-red);
         font-family: $cx-title;
-        font-size: clamp(13px, 2.6cqw, 30px);
-        letter-spacing: 0.14em;
+        font-size: clamp(12px, 1.9cqw, 17px);
+        letter-spacing: 0.12em;
         text-transform: uppercase;
     }
 
+    // an empty list (no ammunition, no modification, no special) shows only the title and "None"
+    &__panel:has(.dh-table--border):not(:has(.table-row)) {
+        .dh-table--border {
+            display: none;
+        }
+        .dh-codex__panel-title {
+            border-bottom: 0;
+            &::after {
+                content: ' — None';
+                opacity: 0.6;
+                letter-spacing: 0.08em;
+            }
+        }
+        .dh-codex__panel-body {
+            padding: 0;
+        }
+    }
+
     &__panel-body {
-        padding: 0.8cqw 2.2cqw 1.4cqw;
+        padding: 0.4cqw 1.4cqw 0.8cqw;
     }
 
     &__line {
@@ -693,13 +718,13 @@ $cx-body: 'IM Fell DW Pica', 'Palatino Linotype', Georgia, 'Times New Roman', se
         grid-template-columns: minmax(9em, 34%) minmax(0, 1fr);
         align-items: center;
         gap: 1.4cqw;
-        padding: 0.6cqw 0;
+        padding: 0.3cqw 0;
         border-bottom: 1px solid rgba(141, 107, 52, 0.4);
 
         > span {
             color: var(--cx-ink-soft);
             font-family: $cx-title;
-            font-size: clamp(10px, 1.7cqw, 19px);
+            font-size: clamp(10px, 1.4cqw, 13px);
             font-weight: 700;
             letter-spacing: 0.12em;
             text-transform: uppercase;
@@ -804,15 +829,15 @@ $cx-body: 'IM Fell DW Pica', 'Palatino Linotype', Georgia, 'Times New Roman', se
 
     // ---- body -------------------------------------------------------------------------------------------------------
     &__body {
-        margin-top: 2.4cqw;
+        margin-top: 1.2cqw;
     }
 
     &__row {
         display: grid;
-        grid-template-columns: 24cqw minmax(0, 1fr);
+        grid-template-columns: 20cqw minmax(0, 1fr);
         align-items: center;
-        gap: 2cqw;
-        padding: 1.1cqw 0;
+        gap: 1.4cqw;
+        padding: 0.6cqw 0;
         border-top: 1px solid rgba(141, 107, 52, 0.6);
 
         &:last-of-type {
@@ -825,23 +850,23 @@ $cx-body: 'IM Fell DW Pica', 'Palatino Linotype', Georgia, 'Times New Roman', se
     &__heading label {
         display: flex;
         align-items: center;
-        min-height: 3.4cqw;
-        padding: 0 3cqw 0 1.6cqw;
+        min-height: 2.6cqw;
+        padding: 0 2.4cqw 0 1.2cqw;
         background: linear-gradient(90deg, var(--cx-ribbon-a), var(--cx-ribbon-b));
         clip-path: polygon(0 0, calc(100% - 1.7cqw) 0, 100% 50%, calc(100% - 1.7cqw) 100%, 0 100%);
         color: var(--cx-ink-soft);
         font-family: $cx-title;
-        font-size: clamp(11px, 1.9cqw, 22px);
+        font-size: clamp(10px, 1.5cqw, 14px);
         font-weight: 700;
-        letter-spacing: 0.12em;
+        letter-spacing: 0.1em;
         text-transform: uppercase;
     }
 
     &__field {
         width: 100%;
         height: auto;
-        min-height: 3.4cqw;
-        padding: 0.5cqw 1.2cqw;
+        min-height: 2.6cqw;
+        padding: 0.3cqw 0.9cqw;
         border: 1px solid rgba(110, 82, 40, 0.65);
         border-radius: 0;
         background: rgba(255, 252, 240, 0.3);
@@ -867,21 +892,21 @@ $cx-body: 'IM Fell DW Pica', 'Palatino Linotype', Georgia, 'Times New Roman', se
     &__divider {
         width: 76%;
         aspect-ratio: 1100 / 91;
-        margin: 2.4cqw auto 1.8cqw;
+        margin: 1.2cqw auto 1cqw;
         background: var(--cx-divider) center / 100% 100% no-repeat;
     }
 
     &__heading {
-        margin: 0 0 1.4cqw;
+        margin: 0 0 0.8cqw;
         padding: 0;
         border: 0;
 
         label {
             display: inline-flex;
-            min-height: 4.2cqw;
-            padding-right: 4.2cqw;
+            min-height: 3cqw;
+            padding-right: 3.4cqw;
             color: var(--cx-red);
-            font-size: clamp(14px, 3cqw, 34px);
+            font-size: clamp(13px, 2cqw, 18px);
             letter-spacing: 0.12em;
         }
     }
@@ -889,8 +914,8 @@ $cx-body: 'IM Fell DW Pica', 'Palatino Linotype', Georgia, 'Times New Roman', se
     &__text {
         display: block;
         width: 100%;
-        min-height: 12cqw;
-        padding: 1.2cqw 1.5cqw;
+        min-height: 8cqw;
+        padding: 0.8cqw 1.2cqw;
         border: 1px solid rgba(110, 82, 40, 0.65);
         border-radius: 0;
         background: rgba(255, 252, 240, 0.3);

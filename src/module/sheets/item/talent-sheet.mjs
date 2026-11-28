@@ -2,7 +2,7 @@ import { DarkHeresyItemSheet } from './item-sheet.mjs';
 
 export class DarkHeresyTalentSheet extends DarkHeresyItemSheet {
     static DEFAULT_OPTIONS = {
-        position: { width: 760, height: 560 },
+        position: { width: 640, height: 460 },
     };
 
     static DEFAULT_TAB = 'stats';

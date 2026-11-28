@@ -41,3 +41,6 @@ All item sheets use the same kit, so they look alike. Only the fields differ.
 ## Psychic power variant
 
 `dh-codex--psychic` sets the pictures and colours (CSS variables `--cx-*`): violet warp header, eye emblem, violet parchment (`arkanes-pergament`), violet ribbons and tabs. Files: `warp-header`, `psyker-emblem`, `plakette-psy`, `icon-rahmen-psy`, `auge-trennlinie` (cut and compressed from the psychic asset pack); `auge-trennlinie` is the divider between the facts and the tabs of the psychic power sheet. A further variant (e.g. for another item group) only needs its own set of variables.
+
+## Compact layout (second pass)
+The codex sheets are denser: smaller header (icon, emblem, name), tighter spacing, smaller default windows (680 px wide), dark ink for selected dropdown values, and an empty list (ammunition, modifications, specials, armour mods) shows only its title with "— None". All sizes still scale with the window width (container units), the fonts keep a readable minimum. Window sizes and the look are untested in Foundry; no data path or function was changed.
