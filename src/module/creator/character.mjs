@@ -436,6 +436,7 @@ export function buildSimActor(state, env, draft) {
             skill.specialities[sk].taken = true;
         }
     }
+    system.bio = { ...(system.bio ?? {}), homeWorld: state.homeWorld?.name ?? '', background: state.background?.name ?? '', role: state.role?.name ?? '' };
     system.experience = { total: state.xp.total, used: 0 };
     const items = [
         ...state.aptitudes.map((a) => ({ type: 'aptitude', name: a.name, system: {} })),

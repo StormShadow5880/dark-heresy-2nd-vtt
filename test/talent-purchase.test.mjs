@@ -247,3 +247,27 @@ test('Enemy is not bought with XP: blocked, only a GM can override', () => {
     assert.equal(adv.checkPurchase(rich, q).ok, false);
     assert.equal(adv.checkPurchase(rich, q, { gmOverride: true }).ok, true);
 });
+
+test('Daemon World: more ranks of Psyniscience need the Psyker aptitude; the free start rank and other worlds are not affected', () => {
+    const daemon = (aptitudes = []) => {
+        const a = actorWith({ aptitudes });
+        a.system.bio = { ...(a.system.bio ?? {}), homeWorld: 'Daemon World' };
+        a.system.skills.psyniscience = { label: 'Psyniscience', characteristics: ['Per'], characteristic: 'Per', advance: 1, isSpecialist: false, cost: 0, current: 30 }; // the free rank of the origin
+        return a;
+    };
+    const blocked = adv.skillQuote(daemon(['Perception']), 'psyniscience');
+    assert.equal(blocked.advanceable, false);
+    assert.match(blocked.error, /Psyker aptitude/);
+    // with the Psyker aptitude the purchase works (priced as usual)
+    const ok = adv.skillQuote(daemon(['Psyker']), 'psyniscience');
+    assert.notEqual(ok.advanceable, false);
+    assert.ok(ok.cost > 0);
+    // another home world, including a specific world of the Daemon World type, is not restricted (not inherited without proof)
+    for (const world of ['Hive World', 'Tuchulcha']) {
+        const a = daemon(['Perception']);
+        a.system.bio.homeWorld = world;
+        assert.notEqual(adv.skillQuote(a, 'psyniscience').advanceable, false, world);
+    }
+    // other skills of a Daemon World character are not affected
+    assert.notEqual(adv.skillQuote(daemon([]), 'awareness').advanceable, false);
+});

@@ -129,6 +129,12 @@ export function skillQuote(actor, key, specKey = null, owned = ownedAptitudes(ac
     }
     const requirement = SKILL_APTITUDES[key];
     if (!requirement) return { ...quote, advanceable: false, error: `No aptitudes are defined for ${skill.label}.` };
+    // Daemon World ("Touched by the Warp"): more ranks of Psyniscience can only be bought with the Psyker aptitude. The free starting rank
+    // is a grant of the origin, not a purchase. Only the home world "Daemon World" itself (a specific world such as Tuchulcha does not inherit it
+    // as long as the data does not say so).
+    if (key === 'psyniscience' && String(actor.system?.bio?.homeWorld ?? '') === 'Daemon World' && !owned.has('psyker')) {
+        return { ...quote, advanceable: false, error: 'Daemon World: further ranks of Psyniscience can only be bought with the Psyker aptitude.' };
+    }
     const level = Math.max(0, Math.floor(num(target.advance)));
     Object.assign(quote, matchAptitudes(requirement, owned), { level, fromName: SKILL_LEVELS[level] ?? String(level) });
     if (level >= MAX_SKILL_LEVEL) return { ...quote, maxed: true, toName: 'Maximum' };
