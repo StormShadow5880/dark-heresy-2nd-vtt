@@ -197,11 +197,16 @@ async function resolveCard(messageId, userId) {
                 Object.assign(entry, { state: 'skipped', reason: 'No Fate Point left.' });
                 continue;
             }
+            // the Point is spent first (Shrine World may not pay for it); a repeated request spends once
+            const spent = await actor.spendFate({ label: 'Fate: Heal', requestId: `${messageId}:${entry.uuid}` });
+            if (!spent.ok) {
+                Object.assign(entry, { state: 'skipped', reason: spent.reason });
+                continue;
+            }
             const roll = await new Roll(op.die ?? '1d5').evaluate();
             await roll.toMessage({ speaker: ChatMessage.getSpeaker({ actor }), flavor: 'Fate: Heal' });
             op.amount = roll.total;
-            await actor.update({ 'system.fate.value': fate - 1 });
-            entry.fateSpent = 1;
+            entry.fateSpent = spent.cost;
         }
         if (op.type === 'fatigue') {
             const r = computeFatigueRemoval(actor.system.fatigue?.value, op.amount);

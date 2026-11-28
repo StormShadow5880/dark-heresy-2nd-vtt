@@ -5,6 +5,7 @@
  * env = { startingXp, systemDefaults }   systemDefaults: the default system data of an acolyte
  *                                         (game.model.Actor.acolyte at runtime) - used for the skill list
  */
+import { lookupRoll, tableEntries } from '../rules/private-tables.mjs';
 import { aptitudeId, aptitudeName, num } from '../rules/advancement.mjs';
 import { purchaseAdvancement } from '../rules/experience.mjs';
 import { APTITUDES } from '../rules/advancement-data.mjs';
@@ -118,11 +119,27 @@ export function computeCharacter(draft, env) {
         const entry = { id, source: owner.name, kind: def.kind, derive: def.derive ?? null, label: def.label, formula: def.formula ?? null, blocked: def.blocked ?? def.tableMissing ?? null, status: 'open', result: null };
         if (def.kind === 'manual') entry.status = 'manual';
         else if (def.blocked) entry.status = 'blocked';
+        else if (def.kind === 'choice' && def.tableMissing) entry.status = 'table-open';
         else if (def.kind === 'roll' && stored) {
             entry.result = stored;
             // a rolled result is kept; when the table that turns it into a concrete result is missing, that part stays open
             entry.status = def.tableMissing ? 'table-open' : 'resolved';
             if (def.apply === 'corruption') extraCorruption += Number(stored.total) || 0;
+        }
+        // a private table (rules/private-tables.mjs) turns a choice or a roll into a concrete result, when it is available
+        const entries = def.table ? tableEntries(env, def.table) : null;
+        if (entries) {
+            entry.table = def.table;
+            entry.blocked = null;
+            if (def.mode === 'choose') {
+                const c = addChoice({ id: `table-${id}`, step: 'aptitudes', label: def.label, options: entries.map((e, i) => option(i, e.name)) });
+                entry.status = 'open';
+                if (c.resolved) Object.assign(entry, { status: 'resolved', result: { formula: 'chosen', dice: [], total: entries[Number(c.value)]?.name ?? '' } });
+            } else if (stored) {
+                const hit = lookupRoll(entries, stored.total);
+                if (hit) Object.assign(entry, { status: 'resolved', result: { ...stored, entry: hit.name } });
+                else entry.blocked = `the result ${stored.total} is not covered by the table data`;
+            }
         }
         out.consequences.push(entry);
     };

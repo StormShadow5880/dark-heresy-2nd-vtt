@@ -381,6 +381,8 @@ export const EXPANSION_BACKGROUND_DEFS = [
                 id: 'mutation',
                 kind: 'roll',
                 formula: '5d10',
+                table: '8-16',
+                mode: 'roll',
                 label: 'Starting mutation: roll 5d10 and sum it, then look the result up on Table 8-16: Mutations (this start rule replaces the normal handling of mutation and malignancy)',
                 tableMissing: 'the concrete mutation from Table 8-16 is open: the table is not part of the system data (it belongs to the private import package); the 5d10 result is saved',
             },
@@ -490,7 +492,7 @@ export const EXPANSION_BACKGROUND_DEFS = [
             { id: 'eq-8', options: [['Stablight'], ['Glow-Globe']] },
         ],
         aptitudeChoice: ['Defence', 'Knowledge'],
-        consequences: [{ id: 'malignancy', kind: 'choice', label: 'One Malignancy (Core Rulebook Table 8-15)', blocked: 'the malignancy table is not part of the system data (it belongs to the private import package)' }],
+        consequences: [{ id: 'malignancy', kind: 'choice', table: '8-15', mode: 'choose', label: 'One Malignancy, CHOSEN from Table 8-15 (not rolled)', tableMissing: 'Table 8-15 is not part of the system data (it belongs to the private import package); the malignancy is chosen, not rolled, and stays open until the table is available' }],
     },
 ].map((def) => {
     const rule = backgrounds().find((b) => b.name === def.name);

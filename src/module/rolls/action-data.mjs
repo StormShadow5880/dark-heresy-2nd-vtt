@@ -281,7 +281,8 @@ export class ActionData {
 
         // Use a Fate for Eye of Vengeance
         if(this.rollData.eyeOfVengeance) {
-            await this.rollData.sourceActor.spendFate();
+            const spent = await this.rollData.sourceActor.spendFate({ label: 'Eye of Vengeance' });
+            this.rollData.eyeFateCost = spent.ok ? spent.cost : 0;
         }
     }
 
@@ -294,7 +295,7 @@ export class ActionData {
             await this.rollData.sourceActor.update({
                 system: {
                     fate: {
-                        value: this.rollData.sourceActor.system.fate.value + 1
+                        value: this.rollData.sourceActor.system.fate.value + (this.rollData.eyeFateCost ?? 1)
                     }
                 }
             });

@@ -66,7 +66,9 @@ export async function applyRestRecovery(actor, hours) {
 export async function fateRemovesFatigue(actor) {
     if (!(actor.system.fatigue.value > 0)) return ui.notifications.info('There is no fatigue to remove.');
     if (!(actor.system.fate.value > 0)) return ui.notifications.warn('No Fate Point left.');
-    await actor.update({ 'system.fatigue.value': 0, 'system.fate.value': actor.system.fate.value - 1 });
+    const spent = await actor.spendFate({ label: 'Remove fatigue' });
+    if (!spent.ok) return ui.notifications.warn(spent.reason);
+    await actor.update({ 'system.fatigue.value': 0 });
     await clearTimer(actor);
-    await say(actor, `<p><strong>${esc(actor.name)}</strong> spends a Fate Point: all fatigue is removed.</p>`);
+    await say(actor, `<p><strong>${esc(actor.name)}</strong> spends a Fate Point${spent.free ? ' (not reduced, Faith in the Creed)' : ''}: all fatigue is removed.</p>`);
 }

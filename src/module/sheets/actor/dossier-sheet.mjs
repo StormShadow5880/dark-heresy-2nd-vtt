@@ -8,6 +8,7 @@ import { roles } from '../../rules/roles.mjs';
 import { ORIGIN_FIELDS, isUnlocked, originLocked, UNLOCK_FLAG } from '../../rules/origin-lock.mjs';
 import { groupedOptions, isDlc, sourceLabel } from '../../rules/sources.mjs';
 import { timerView } from '../../rules/fatigue.mjs';
+import { requestInsanityRemoval } from '../../actions/origin-actions.mjs';
 import { sororitasInsanity, sororitasOffer } from '../../rules/origin-grants.mjs';
 import { giveReactionBack, takeReaction, chooseAndSpend, refundAction, resetAccount, viewFor as accountViewFor } from '../../combat/action-account.mjs';
 import {
@@ -89,6 +90,7 @@ export class AcolyteDossierSheet extends AcolyteSheet {
             restoreReaction: AcolyteDossierSheet.#onRestoreReaction,
             toggleOriginLock: AcolyteDossierSheet.#onToggleOriginLock,
             fateFatigue: AcolyteDossierSheet.#onFateFatigue,
+            removeInsanity: AcolyteDossierSheet.#onRemoveInsanity,
             refundAction: AcolyteDossierSheet.#onRefundAction,
             resetAccount: AcolyteDossierSheet.#onResetAccount,
             adjustValue: AcolyteDossierSheet.#onAdjustValue,
@@ -594,6 +596,18 @@ export class AcolyteDossierSheet extends AcolyteSheet {
             return;
         }
         await this.actor.update({ 'system.corruption': next });
+    }
+
+    /** Garden World: asks how many points, then the GM decides (actions/origin-actions.mjs) */
+    static async #onRemoveInsanity() {
+        const points = await foundry.applications.api.DialogV2.prompt({
+            window: { title: 'Serenity of the Green' },
+            content: '<p>Remove Insanity for 50 EP per point. The GM has to approve.</p><label>Points <input type="number" name="points" min="1" value="1" autofocus></label>',
+            ok: { label: 'Ask', callback: (event, button) => Number(button.form.elements.points.value) },
+            rejectClose: false,
+            modal: false,
+        });
+        if (points) await requestInsanityRemoval(this.actor, points);
     }
 
     static async #onSpendExperience() {

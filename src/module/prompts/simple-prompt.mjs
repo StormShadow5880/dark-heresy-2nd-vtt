@@ -3,6 +3,7 @@ import { sendActionDataToChat } from '../rolls/roll-helpers.mjs';
 import { actionDialog } from './dialog-helpers.mjs';
 import { isSocialSkill } from '../rules/relations.mjs';
 import { applicableOriginBonuses, applyOriginResult, planOriginRoll } from '../rules/origin-bonuses.mjs';
+import { describeSpend } from '../rules/fate.mjs';
 import { toRuleDegrees } from '../rules/degrees.mjs';
 import { bindSection, handleSelection, relationContext, sectionHtml } from '../relations/roll.mjs';
 
@@ -82,7 +83,10 @@ export async function prepareSimpleRoll(simpleSkillData) {
                     rollData.ruleDos = toRuleDegrees(result.dos);
                     rollData.originNotes = result.notes;
                     // one Fate Point, spent once, only after the roll and only when the ability took effect
-                    if (result.spendFate) await actor.spendFate();
+                    if (result.spendFate) {
+                        const spent = await actor.spendFate({ label: `${plan.fate.name} (${rollData.nameOverride})`, requestId: simpleSkillData.id ?? foundry.utils.randomID() });
+                        rollData.originNotes = [...result.notes, describeSpend(spent)].filter(Boolean);
+                    }
                 }
                 await sendActionDataToChat(simpleSkillData);
             },

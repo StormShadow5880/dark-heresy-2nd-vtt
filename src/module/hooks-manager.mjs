@@ -53,6 +53,7 @@ import { initWorldClock } from './ui/world-clock.mjs';
 import { registerRelationSocket } from './relations/roll.mjs';
 import { migrateJournalPatrons } from './relations/store.mjs';
 import { initTimeRunner, registerTimeSocket } from './actions/time-runner.mjs';
+import { registerOriginSocket, applyInfluenceLoss, requestInsanityRemoval } from './actions/origin-actions.mjs';
 import { registerHealingSocket, registerHealingLockSocket } from './actions/healing-manager.mjs';
 import { CharacterCreator } from './creator/wizard.mjs';
 import { preloadDossierImages } from './ui/preload-images.mjs';
@@ -110,6 +111,9 @@ Enable Debug with: game.dh.debug = true
             rollCharacteristicMacro,
             openCreator: () => CharacterCreator.open(),
             importRulebookPages,
+            /** Highborn-aware Influence loss: game.dh.loseInfluence(actor, 3, { source: 'rule', reason: '...' }) */
+            loseInfluence: applyInfluenceLoss,
+            removeInsanity: requestInsanityRemoval,
         };
 
         //CONFIG.debug.hooks = true;
@@ -174,6 +178,7 @@ Enable Debug with: game.dh.debug = true
         registerCombatSocket();
         registerHealingSocket();
         registerHealingLockSocket();
+        registerOriginSocket();
         if (moduleOn('time')) registerTimeSocket();
         if (moduleOn('relations')) registerRelationSocket();
         if (moduleOn('relations') && game.users.activeGM?.id === game.user.id) migrateJournalPatrons().then((n) => n && ui.notifications.info(`${n} patron(s) converted to patron actors.`)).catch((e) => console.warn('Dark Heresy 2e | patron migration failed', e));

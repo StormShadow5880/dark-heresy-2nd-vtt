@@ -103,7 +103,7 @@ export class BasicActionManager {
                 // Generate new ID for action data
                 actionData.id = uuid();
                 // Use a FP
-                await actionData.rollData.sourceActor.spendFate();
+                await actionData.rollData.sourceActor.spendFate({ label: 'Re-roll' });
                 // Refund Initial Resources
                 await actionData.refundResources();
                 // Reset

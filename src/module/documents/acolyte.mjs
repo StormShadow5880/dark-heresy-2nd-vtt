@@ -9,6 +9,7 @@ import { eliteAdvances } from '../rules/elite-advances.mjs';
 import { fieldMatch } from '../rules/config.mjs';
 import { num, sumSpentXp } from '../rules/advancement.mjs';
 import { isPsychicPowerActive } from '../actions/psychic-effect-manager.mjs';
+import { spendFatePoint } from '../rules/fate.mjs';
 import { prepareSimpleRoll } from '../prompts/simple-prompt.mjs';
 import { DHTargetedActionManager } from '../actions/targeted-action-manager.mjs';
 import { prepareDamageRoll } from '../prompts/damage-prompt.mjs';
@@ -566,14 +567,9 @@ export class DarkHeresyAcolyte extends DarkHeresyBaseActor {
         });
     }
 
-    async spendFate() {
-        await this.update({
-            system: {
-                fate: {
-                    value: this.system.fate.value - 1
-                }
-            }
-        });
+    /** Spends one Fate Point (rules/fate.mjs: Shrine World rolls 1d10 first; a repeated requestId spends once) */
+    async spendFate(options = {}) {
+        return spendFatePoint(this, options);
     }
 
     async rollCharacteristicCheck(characteristic) {

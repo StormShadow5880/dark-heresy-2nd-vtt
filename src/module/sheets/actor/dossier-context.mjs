@@ -1,3 +1,4 @@
+import { fearInsanityBonus } from '../../rules/origin-costs.mjs';
 import { TRAINING_LEVELS } from '../../rules/skill-training.mjs';
 /**
  * Builds the view model for the Dark Heresy dossier character sheet.
@@ -589,7 +590,15 @@ export function buildStatusTiles(actor) {
             tooltip: withMax(r.fate, 'Fate'),
         },
         { id: 'corruption', label: 'Corruption', path: 'system.corruption', value: r.corruption.value, max: null, tooltip: `Corruption ${r.corruption.value} · ${r.corruption.note}` },
-        { id: 'insanity', label: 'Insanity', path: 'system.insanity', value: r.insanity.value, max: null, tooltip: `Insanity ${r.insanity.value} · ${r.insanity.note}` },
+        {
+            id: 'insanity',
+            label: 'Insanity',
+            path: 'system.insanity',
+            value: r.insanity.value,
+            max: null,
+            tooltip: `Insanity ${r.insanity.value} · ${r.insanity.note}${actor.bio?.background === 'Exorcised' ? ` · counts as ${fearInsanityBonus(actor.bio, actor.system.insanityBonus)} for avoiding Fear Tests (Exorcised)` : ''}`,
+            garden: actor.bio?.homeWorld === 'Garden World',
+        },
     ];
 }
 

@@ -88,6 +88,9 @@ export async function buildCharacterData(draft, env, resolve) {
         const entry = state.consequences.find((c) => c.derive === 'kul-lore');
         if (entry) Object.assign(entry, { status: 'resolved', result: { formula: 'half Intelligence Bonus', dice: [], total: grant.ranks } });
     }
+    for (const c of state.consequences.filter((x) => x.table && x.status === 'resolved')) {
+        extraNotes.push(`${c.source}: ${c.result?.entry ?? c.result?.total} (Table ${c.table}${c.kind === 'choice' ? ', chosen' : `, rolled ${c.result?.total}`})`);
+    }
     if (extraNotes.length) system.bio.notes = `${system.bio.notes}\n\n${extraNotes.join('\n')}`.trim();
     // rolls, choices and decisions of the origin that are not done (yet): listed on the character so that nobody forgets them
     const openRules = state.consequences.filter((c) => c.status !== 'resolved');

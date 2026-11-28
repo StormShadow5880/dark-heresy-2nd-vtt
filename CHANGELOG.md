@@ -6,6 +6,10 @@ Rules that were **taken over from Imperium Maledictum** are marked with **[IM]**
 
 ## [1.9.0] – Unreleased
 
+### Origins, second pass
+
+- Shrine World: every Fate Point spend rolls 1d10 (1 = free), once per request. Highborn: `game.dh.loseInfluence`. Garden World: remove Insanity for 50 EP with GM approval. Exorcised: chosen malignancy, +2 Insanity Bonus helper for Fear. Private tables 8-15 / 8-16 as separate sources. See `docs/origin-special-rules.md`.
+
 ### Origins: Pellenne, Kul, Daemon World, Outcast, Kalto
 
 - Pellenne: choose exactly one of Hatred (Mutants) or Dark-sight in the wizard. Kul: the free Forbidden Lore ranks are calculated from the Intelligence Bonus at the end of the creation (project decision). Daemon World: more ranks of Psyniscience need the Psyker aptitude. Outcast: the fatigue threshold includes +2 Toughness Bonus. Kalto: the first level of fatigue has no effect (project decision for the rest). See `docs/fatigue.md` and `docs/origin-special-rules.md`.

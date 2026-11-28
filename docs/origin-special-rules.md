@@ -80,13 +80,36 @@ Code: `rules/origin-bonuses.mjs`, dialog section in `prompts/simple-prompt.mjs`,
 - Relationship tests resolved by the GM roll elsewhere: the named modifiers are added to the manual modifier, **no Fate Point is spent** (message shown).
 - **Not offered (stay as shown origin text):** Assassin, Warrior, Crusader, Fanatic, Ossuar, Tuchulcha, Thaur (attack/damage/Fear effects, no skill roll), Arbites (Willpower Bonus for degrees: wording in the data is garbled), Imperial Navy (Ballistic Skill degree, weapon dialog), Hrax (+10 Weapon Skill after first damage), Hive Desoleum (Willpower oath, no skill), Dark Echo and Rogue Trader Fear (+10 per Lore rank / vs aliens: the Fear test has no dialog), Port Aquila (substitute characteristic), Nexum (critical table).
 
-## Other open rules (audit for the last prompt)
+## Remaining origin rules (second pass)
 
-| Rule | Status | Missing |
-|---|---|---|
-| Exorcised malignancy | stays open: **Malignancy Table 8–15 not imported** | table text (private import package) |
-| Insanity bonus for Fear tests | not implemented: the Fear test has no dialog and no stored wording to hook | which tests, what exact modifier |
-| Garden World: 50 XP per Insanity point removed | not implemented as a purchase: the Spend EP entry has a fixed price, no Insanity-removal entry exists | printed wording and who removes (GM or the player) |
-| Highborn: Influence losses −1 (minimum 1) | not implemented: no Influence-loss event exists | a source of Influence losses |
-| Shrine World: no Fate loss on a 1d10 of 1 | not implemented: Fate is spent by hand and by the new dialog option; no d10 is rolled | whether the d10 roll replaces the cost or follows it |
-| Mutation Table 8–16 | open (concrete mutation) | table text |
+Tests: `test/private-tables.test.mjs`, `test/fate-spend.test.mjs`, `test/origin-costs.test.mjs`. **All dialogs, chat cards, the sheet buttons and the socket path are untested in Foundry.**
+
+### Private tables 8-15 (Malignancies) and 8-16 (Mutations)
+- Two **separate** private data sources (`rules/private-tables.mjs`), handed to the rules as `env.privateTables['8-15' | '8-16']`: a list of `{ name, text?, min?, max? }`. Nothing of them is in the repository, no entry is invented. Without the data every rule that needs a table stays open and visible (wizard panel, creation notes, character flag).
+- A rule can **choose** (`mode: 'choose'`: a normal wizard choice from the entries, stored in the draft) or **roll** (`mode: 'roll'`: the stored roll is mapped by `min`/`max`; a result the table does not cover stays open with that message). Resolved results are written to the biography notes with the table.
+- The import package that fills `env.privateTables` does not exist yet (the rulebook import produces journal pages, not entries): **source still missing**.
+
+### Exorcised
+- The starting Malignancy is **chosen** from Table 8-15 (not rolled, label says so), exactly one; open (`table-open`) as long as the table data is missing.
+- Insanity Bonus **+2 for avoiding Fear Tests only** (`fearInsanityBonus`): shown on the Insanity tile tooltip; no +20 on Fear or Willpower tests. There is **no Fear dialog and no stored rule for how the Insanity Bonus avoids a Fear Test**, so the helper is the reusable pre-check input and nothing is decided or rolled automatically. Hook point for later: the place that rolls a Fear test must call `fearInsanityBonus(actor.bio, actor.system.insanityBonus)` before asking for the test.
+- "Can never be possessed again by the same Daemon": **documented only**. The system has no Daemon identity on a possession, so there is nothing to compare.
+
+### Shrine World, Faith in the Creed (`rules/fate.mjs`, `Acolyte#spendFate`)
+- Every spend of a Fate Point goes through `spendFatePoint`: a Point must be available, then (Shrine World only) 1d10. A 1 = the effect happens and the pool is **not** reduced, 2-10 = spent normally. Result, cost and effect are shown (chat line, roll dialog note, card).
+- Used by: skill roll dialog Fate options, re-roll, Eye of Vengeance (the refund returns what was really paid), "Fate removes fatigue", Fate: Heal (the Point is spent before the d10 heal roll now; a failed spend skips the entry).
+- **Not** used when the Fate Threshold is burned (different action).
+- Exactly once: a repeated request id returns the first result (no second d10, no second cost), a second click while a spend of the same character runs is refused. The healing card keeps its own "working" state on top.
+
+### Highborn, Breeding Counts (`influenceLoss`, `applyInfluenceLoss`, `game.dh.loseInfluence`)
+- Rule-based loss N > 0 → `max(1, N − 1)`. Never for gains, 0, initial values, recalculation, GM corrections (`source: 'admin'`) and **voluntary costs** (`source: 'voluntary'`, no advantage is assumed). The loss is booked on the Influence modifier (base and advances stay).
+- There still is no automatic Influence-loss event in the system; the operation has to be called by hand or macro: `game.dh.loseInfluence(actor, n, { source: 'rule', reason })`. No existing event was connected because none has clear semantics.
+
+### Garden World, Serenity of the Green (`insanityRemoval`, `origin-actions.mjs`)
+- Removing Insanity: 50 XP per point from the character's own pool, **GM approval** (project decision): a leaf button on the Insanity tile asks the points; a player's request goes by socket to the active GM, who confirms; the GM client applies it once (request id seen once, owner check). Booked in the XP log. No Disorder is removed. The general limits for removing Insanity are not stored in the system: **source missing**.
+- Shock (Table 8-11) and Mental Trauma (Table 8-13) results: **not in the system data** (only Psychic Phenomena exists), so there is no duration to halve. `halveDurationRoundedUp` is the prepared helper (whole positive durations only, anything else gives no value).
+
+### Outcast and Fatigue
+- Only the fatigue threshold counts the Toughness Bonus as 2 higher; no general Toughness or damage reduction change. The FAQ statement that an exhausted characteristic reduces its bonus for the respective use (movement, melee damage, damage reduction) is what the fatigue code already does. **No recursive recalculation of the threshold from the reduced bonus is introduced**; which reading "for determining Fatigue" has beyond the threshold stays an **open interpretation**.
+
+### Origin bonuses still not automated
+Hrax, Hive Desoleum, Dark Echo and Rogue Trader Fear bonuses (no Fear dialog), Port Aquila, Nexum, Imperial Navy (weapon dialog), Arbites (garbled stored wording), Assassin/Warrior/Crusader/Fanatic/Ossuar/Tuchulcha/Thaur (attack, damage or Fear effects with no skill roll).
